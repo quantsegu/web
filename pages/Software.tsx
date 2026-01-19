@@ -1,8 +1,18 @@
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { motion } from 'motion/react';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
-import { Code, Database, Shield, Zap, Cpu, BarChart3, ExternalLink } from 'lucide-react';
+import { Code, Database, Shield, Zap, Cpu, BarChart3, ExternalLink, type LucideIcon } from 'lucide-react';
+import { loadSoftwareProjects } from '../lib/loadSoftwareProjects';
+
+const ICON_MAP: Record<string, LucideIcon> = {
+  BarChart3,
+  Code,
+  Cpu,
+  Database,
+  Shield,
+  Zap,
+};
 
 function ImageWithFallback(props: React.ImgHTMLAttributes<HTMLImageElement> & { src: string; alt: string }) {
   const [didError, setDidError] = useState(false)
@@ -81,80 +91,13 @@ function SoftwareCard({ title, description, features, icon, image, index }: Soft
 }
 
 export default function Software() {
-  const softwareProducts = [
-    {
-      title: "KensoFI Analytics",
-      description: "AI-powered financial analytics platform that provides comprehensive insights for banking, investment, and loan management.",
-      features: [
-        "AI-driven risk assessment for loan applications",
-        "Real-time portfolio analysis and optimization",
-        "Customizable financial dashboards and reporting",
-        "Automated compliance monitoring and alerts"
-      ],
-      icon: <BarChart3 size={24} />,
-      image: "https://images.unsplash.com/photo-1551288049-bebda4e38f71?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=2070&q=80"
-    },
-    {
-      title: "Emanate DataVerse",
-      description: "Enterprise data management solution that enables organizations to integrate, analyze, and visualize complex data structures.",
-      features: [
-        "Advanced data integration and transformation tools",
-        "Interactive visualization dashboards",
-        "Automated data quality monitoring",
-        "Industry-specific data models for finance, healthcare and government"
-      ],
-      icon: <Database size={24} />,
-      image: "https://images.unsplash.com/photo-1558494949-ef010cbdcc31?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=2068&q=80"
-    },
-    {
-      title: "DBX EDM Platform",
-      description: "Comprehensive enterprise data management platform that streamlines data governance, integration, and analytics.",
-      features: [
-        "End-to-end data governance framework",
-        "API-first integration architecture",
-        "Automated data lineage tracking",
-        "Scalable data processing for large enterprises"
-      ],
-      icon: <Code size={24} />,
-      image: "https://images.unsplash.com/photo-1519389950473-47ba0277781c?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=2070&q=80"
-    },
-    {
-      title: "SecureGuard",
-      description: "Comprehensive security solution for enterprise data protection and risk management.",
-      features: [
-        "Real-time threat detection and mitigation",
-        "Advanced encryption for sensitive data",
-        "Compliance monitoring for GDPR, HIPAA, and other regulations",
-        "User behavior analytics to detect insider threats"
-      ],
-      icon: <Shield size={24} />,
-      image: "https://images.unsplash.com/photo-1563986768609-322da13575f3?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1470&q=80"
-    },
-    {
-      title: "FinthosAI Engine",
-      description: "Next-generation AI platform for financial institutions, offering predictive analytics and intelligent automation.",
-      features: [
-        "Advanced predictive models for market analysis",
-        "Automated financial advisory tools",
-        "NLP-powered document analysis and extraction",
-        "Fraud detection and prevention algorithms"
-      ],
-      icon: <Cpu size={24} />,
-      image: "https://images.unsplash.com/photo-1535378917042-10a22c95931a?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1471&q=80"
-    },
-    {
-      title: "Quantum ERP",
-      description: "Integrated enterprise resource planning system with AI capabilities for modern businesses.",
-      features: [
-        "Seamless integration with existing business systems",
-        "AI-powered business process optimization",
-        "Real-time analytics and reporting",
-        "Industry-specific modules for diverse business needs"
-      ],
-      icon: <Zap size={24} />,
-      image: "https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1470&q=80"
-    }
-  ];
+  const softwareProducts = useMemo(() => {
+    const raw = loadSoftwareProjects();
+    return raw.map((p) => {
+      const Icon = ICON_MAP[p.icon] ?? Code;
+      return { ...p, icon: <Icon size={24} /> };
+    });
+  }, []);
 
   return (
     <div className="min-h-screen w-full bg-[#050108]">
