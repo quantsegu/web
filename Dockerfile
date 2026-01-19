@@ -10,4 +10,4 @@ RUN npm run build
 
 EXPOSE 3000
 ENV PORT=3000
-CMD ["/bin/sh", "-c", "npx serve -s dist -l 0.0.0.0:${PORT:-3000}"]
+CMD ["/bin/sh", "-c", "npx serve -s dist -l ${PORT:-3000}"]
