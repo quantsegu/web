@@ -13,7 +13,7 @@
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0"
   },
   "dependencies": {
-    "gray-matter": "^4.0.3",
+    "js-yaml": "^4.1.1",
     "lucide-react": "^0.462.0",
     "motion": "^11.11.17",
     "react": "^18.3.1",
@@ -21,6 +21,7 @@
     "react-router-dom": "^7.15.1"
   },
   "devDependencies": {
+    "@types/js-yaml": "^4.0.9",
     "@types/react": "^18.3.12",
     "@types/react-dom": "^18.3.1",
     "@typescript-eslint/eslint-plugin": "^8.15.0",

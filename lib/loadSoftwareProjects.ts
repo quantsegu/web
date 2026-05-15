@@ -1,5 +1,5 @@
 /// <reference types="vite/client" />
-import matter from 'gray-matter';
+import { parseFrontmatter } from './parseFrontmatter';
 
 export interface SoftwareProject {
   title: string;
@@ -25,7 +25,7 @@ export function loadSoftwareProjects(): SoftwareProject[] {
   const projects: SoftwareProject[] = Object.entries(modules)
     .filter(([path]) => !path.includes('README'))
     .map(([, raw]) => {
-      const { data } = matter(raw);
+      const { data } = parseFrontmatter(raw);
       return {
         title: String(data.title ?? ''),
         description: String(data.description ?? ''),
