@@ -2,6 +2,14 @@ import { useState } from 'react';
 import { motion } from 'motion/react';
 import { ChevronDown, ChevronUp, ExternalLink } from 'lucide-react';
 
+export interface SubsidiaryBrand {
+  name: string;
+  image: string;
+  description: string;
+  details: string;
+  url: string;
+}
+
 interface SubsidiaryCardProps {
   name: string;
   description: string;
@@ -10,6 +18,7 @@ interface SubsidiaryCardProps {
   logo: string;
   index: number;
   url?: string;
+  brands?: SubsidiaryBrand[];
 }
 
 export default function SubsidiaryCard({ 
@@ -20,8 +29,10 @@ export default function SubsidiaryCard({
   logo, 
   index,
   url,
+  brands,
 }: SubsidiaryCardProps) {
   const [isExpanded, setIsExpanded] = useState(false);
+  const expandedMaxHeight = brands?.length ? 'max-h-[2400px]' : 'max-h-96';
 
   return (
     <motion.div
@@ -41,7 +52,7 @@ export default function SubsidiaryCard({
         
         <p className="text-saffron-50 mb-4">{description}</p>
         
-        <div className={`overflow-hidden transition-all duration-300 ${isExpanded ? 'max-h-96' : 'max-h-0'}`}>
+        <div className={`overflow-hidden transition-all duration-300 ${isExpanded ? expandedMaxHeight : 'max-h-0'}`}>
           <p className="text-gray-300 mb-4">{details}</p>
           
           <div className="mb-4">
@@ -57,6 +68,42 @@ export default function SubsidiaryCard({
               ))}
             </div>
           </div>
+
+          {brands && brands.length > 0 && (
+            <div className="mb-4">
+              <h4 className="text-sm font-semibold text-saffron-300 mb-3">Brands & partners</h4>
+              <div className="grid grid-cols-1 gap-4">
+                {brands.map((brand) => (
+                  <a
+                    key={brand.url}
+                    href={brand.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="group flex gap-4 p-4 rounded-lg bg-black/30 ring-1 ring-saffron-500/10 hover:ring-saffron-500/40 transition-all"
+                  >
+                    <div className="shrink-0 w-20 h-20 rounded-lg bg-white/95 p-2 flex items-center justify-center overflow-hidden">
+                      <img
+                        src={brand.image}
+                        alt={`${brand.name} logo`}
+                        className="max-w-full max-h-full object-contain"
+                      />
+                    </div>
+                    <div className="min-w-0 flex-1">
+                      <h5 className="text-white font-semibold group-hover:text-saffron-100 transition-colors">
+                        {brand.name}
+                      </h5>
+                      <p className="text-saffron-50/90 text-sm mt-1">{brand.description}</p>
+                      <p className="text-gray-400 text-xs mt-2 line-clamp-3">{brand.details}</p>
+                      <span className="inline-flex items-center text-xs font-medium text-saffron-300 mt-2 group-hover:text-saffron-50">
+                        Visit website
+                        <ExternalLink size={12} className="ml-1" />
+                      </span>
+                    </div>
+                  </a>
+                ))}
+              </div>
+            </div>
+          )}
         </div>
         
         <div className="flex flex-wrap items-center gap-4 mt-2">

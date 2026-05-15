@@ -41,7 +41,9 @@ export default function Footer() {
           <div>
             <h4 className="text-lg font-semibold text-white mb-4">Our Companies</h4>
             <ul className="space-y-2">
-              <li><a href="#subsidiaries" className="text-gray-300 hover:text-saffron-300 transition-colors duration-200">Ecosphere Trade BV</a></li>
+              <li><a href="https://ecosphere.cc/" target="_blank" rel="noopener noreferrer" className="text-gray-300 hover:text-saffron-300 transition-colors duration-200">Ecosphere Trade BV</a></li>
+              <li><a href="https://balaji.nl/" target="_blank" rel="noopener noreferrer" className="text-gray-300 hover:text-saffron-300 transition-colors duration-200">Balaji</a></li>
+              <li><a href="https://ofbjpnetherlands.org/" target="_blank" rel="noopener noreferrer" className="text-gray-300 hover:text-saffron-300 transition-colors duration-200">OFBJP Netherlands</a></li>
               <li><a href="#subsidiaries" className="text-gray-300 hover:text-saffron-300 transition-colors duration-200">Shri Sai Ram Financials</a></li>
               <li><a href="https://brink-trick-47383861.figma.site/" target="_blank" rel="noopener noreferrer" className="text-gray-300 hover:text-saffron-300 transition-colors duration-200">Where the Alps Meet the Vedas</a></li>
               <li><a href="#subsidiaries" className="text-gray-300 hover:text-saffron-300 transition-colors duration-200">Emanate</a></li>

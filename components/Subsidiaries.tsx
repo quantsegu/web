@@ -1,4 +1,4 @@
-import SubsidiaryCard from './SubsidiaryCard';
+import SubsidiaryCard, { type SubsidiaryBrand } from './SubsidiaryCard';
 import SectionHeader from './SectionHeader';
 
 interface Subsidiary {
@@ -8,6 +8,7 @@ interface Subsidiary {
   details: string;
   locations: string[];
   url?: string;
+  brands?: SubsidiaryBrand[];
 }
 
 export default function Subsidiaries() {
@@ -15,9 +16,28 @@ export default function Subsidiaries() {
     {
       name: "Ecosphere Trade BV",
       logo: "ET",
-      description: "Delivering Indian Food to EU Diaspora with brands such as Balaji, ART etc.",
-      details: "Ecosphere Trade BV specializes in importing and distributing authentic Indian food products across European markets, catering primarily to the Indian diaspora. We partner with renowned Indian brands to bring the authentic taste of India to Europe.",
-      locations: ["Netherlands", "European Union"]
+      description: "Delivering authentic Indian food to the EU diaspora—rice, dals, spices, pickles, and more across 8+ European countries.",
+      details: "Ecosphere Trade BV imports and distributes traditional Indian groceries for communities abroad. Through ecosphere.cc and our European network, we connect farmers in India with households that want the taste of home—without compromising on quality or authenticity.",
+      locations: ["Netherlands", "European Union"],
+      url: "https://ecosphere.cc/",
+      brands: [
+        {
+          name: "Balaji",
+          image: "/brands/balaji.png",
+          description: "The taste of home—authentic Indian rice, lentils, spices, pickles, and masalas across Europe.",
+          details:
+            "Balaji delivers traditionally grown products sourced from farmers across Indian states, distributed in 8+ European countries. From Sona Masuri rice and dals to masalas and condiments, every product is packed with quality assurance and the nostalgic flavours diaspora families remember.",
+          url: "https://balaji.nl/",
+        },
+        {
+          name: "OFBJP Netherlands",
+          image: "/brands/ofbjp.png",
+          description: "Overseas Friends of BJP—uniting the Indian-Dutch community through seva, culture, and civic engagement since 2015.",
+          details:
+            "OFBJP Netherlands is a non-profit, volunteer-led foundation bridging Indian and Dutch communities. With 120+ events organised, a free community helpdesk, and representation to municipalities and parliamentarians, OFBJP serves PIO, OCI, and NRI families with unity in diversity.",
+          url: "https://ofbjpnetherlands.org/",
+        },
+      ],
     },
     {
       name: "Shri Sai Ram Financials Cooperatie",
@@ -77,6 +97,7 @@ export default function Subsidiaries() {
               details={subsidiary.details}
               locations={subsidiary.locations}
               url={subsidiary.url}
+              brands={subsidiary.brands}
               index={index}
             />
           ))}
