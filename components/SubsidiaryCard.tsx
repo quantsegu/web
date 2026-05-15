@@ -16,6 +16,7 @@ interface SubsidiaryCardProps {
   details: string;
   locations: string[];
   logo: string;
+  logoImage?: string;
   index: number;
   url?: string;
   brands?: SubsidiaryBrand[];
@@ -26,7 +27,8 @@ export default function SubsidiaryCard({
   description, 
   details, 
   locations, 
-  logo, 
+  logo,
+  logoImage,
   index,
   url,
   brands,
@@ -44,8 +46,16 @@ export default function SubsidiaryCard({
     >
       <div className="p-6">
         <div className="flex items-center mb-4">
-          <div className="w-12 h-12 rounded-full bg-gradient-to-br from-saffron-500 to-bjp-green flex items-center justify-center text-white font-bold text-xl">
-            {logo}
+          <div
+            className={`w-12 h-12 rounded-full flex items-center justify-center shrink-0 overflow-hidden ${
+              logoImage ? 'bg-white p-1' : 'bg-gradient-to-br from-saffron-500 to-bjp-green text-white font-bold text-xl'
+            }`}
+          >
+            {logoImage ? (
+              <img src={logoImage} alt={`${name} logo`} className="w-full h-full object-contain" />
+            ) : (
+              logo
+            )}
           </div>
           <h3 className="text-xl font-bold text-white ml-4">{name}</h3>
         </div>

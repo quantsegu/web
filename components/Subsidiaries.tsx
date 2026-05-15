@@ -4,6 +4,7 @@ import SectionHeader from './SectionHeader';
 interface Subsidiary {
   name: string;
   logo: string;
+  logoImage?: string;
   description: string;
   details: string;
   locations: string[];
@@ -16,6 +17,7 @@ export default function Subsidiaries() {
     {
       name: "Ecosphere Trade BV",
       logo: "ET",
+      logoImage: "/brands/balaji.png",
       description: "Delivering authentic Indian food to the EU diaspora—rice, dals, spices, pickles, and more across 8+ European countries.",
       details: "Ecosphere Trade BV imports and distributes traditional Indian groceries for communities abroad. Through ecosphere.cc and our European network, we connect farmers in India with households that want the taste of home—without compromising on quality or authenticity.",
       locations: ["Netherlands", "European Union"],
@@ -93,6 +95,7 @@ export default function Subsidiaries() {
               key={subsidiary.name}
               name={subsidiary.name}
               logo={subsidiary.logo}
+              logoImage={subsidiary.logoImage}
               description={subsidiary.description}
               details={subsidiary.details}
               locations={subsidiary.locations}
