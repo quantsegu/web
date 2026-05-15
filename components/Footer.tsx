@@ -1,3 +1,5 @@
+import { Link } from 'react-router-dom';
+
 export default function Footer() {
   const currentYear = new Date().getFullYear();
   
@@ -15,21 +17,15 @@ export default function Footer() {
           <div>
             <h4 className="text-lg font-semibold text-white mb-4">Quick Links</h4>
             <ul className="space-y-2">
-              <li><a href="#" className="text-gray-300 hover:text-saffron-300 transition-colors duration-200">Home</a></li>
-              <li><a href="#sanatan-dharma" className="text-gray-300 hover:text-saffron-300 transition-colors duration-200">Sanātana Dharma</a></li>
-              <li><a href="#bjp-support" className="text-gray-300 hover:text-saffron-300 transition-colors duration-200">BJP Vision</a></li>
-              <li><a href="#subsidiaries" className="text-gray-300 hover:text-saffron-300 transition-colors duration-200">Subsidiaries</a></li>
-              <li><a href="#collaborations" className="text-gray-300 hover:text-saffron-300 transition-colors duration-200">Collaborations</a></li>
-              <li><a href="#software" className="text-gray-300 hover:text-saffron-300 transition-colors duration-200">Software</a></li>
+              <li><Link to="/" className="text-gray-300 hover:text-saffron-300 transition-colors duration-200">Home</Link></li>
+              <li><a href="/#sanatan-dharma" className="text-gray-300 hover:text-saffron-300 transition-colors duration-200">Sanātana Dharma</a></li>
+              <li><a href="/#subsidiaries" className="text-gray-300 hover:text-saffron-300 transition-colors duration-200">Subsidiaries</a></li>
+              <li><a href="/#collaborations" className="text-gray-300 hover:text-saffron-300 transition-colors duration-200">Collaborations</a></li>
+              <li><Link to="/software" className="text-gray-300 hover:text-saffron-300 transition-colors duration-200">Software</Link></li>
               <li><a href="https://disciplined-recreation-production.up.railway.app/login" target="_blank" rel="noopener noreferrer" className="text-gray-300 hover:text-saffron-300 transition-colors duration-200">Balaji POS Login</a></li>
-              <li><a 
-                href="#profile" 
-                onClick={(e) => { e.preventDefault(); window.location.href = '#profile'; }} 
-                className="text-gray-300 hover:text-saffron-300 transition-colors duration-200"
-              >
-                Founder Profile
-              </a></li>
-              <li><a href="#contact" className="text-gray-300 hover:text-saffron-300 transition-colors duration-200">Contact</a></li>
+              <li><Link to="/profile" className="text-gray-300 hover:text-saffron-300 transition-colors duration-200">Founder Profile</Link></li>
+              <li><a href="/#contact" className="text-gray-300 hover:text-saffron-300 transition-colors duration-200">Contact</a></li>
+              <li><Link to="/bjp" className="text-gray-400 hover:text-saffron-300 transition-colors duration-200 text-sm">BJP support (personal)</Link></li>
             </ul>
           </div>
           
@@ -39,11 +35,11 @@ export default function Footer() {
               <li><a href="https://ecosphere.cc/" target="_blank" rel="noopener noreferrer" className="text-gray-300 hover:text-saffron-300 transition-colors duration-200">Ecosphere Trade BV</a></li>
               <li><a href="https://balaji.nl/" target="_blank" rel="noopener noreferrer" className="text-gray-300 hover:text-saffron-300 transition-colors duration-200">Balaji</a></li>
               <li><a href="https://ofbjpnetherlands.org/" target="_blank" rel="noopener noreferrer" className="text-gray-300 hover:text-saffron-300 transition-colors duration-200">OFBJP Netherlands</a></li>
-              <li><a href="#subsidiaries" className="text-gray-300 hover:text-saffron-300 transition-colors duration-200">Shri Sai Ram Financials</a></li>
+              <li><a href="/#subsidiaries" className="text-gray-300 hover:text-saffron-300 transition-colors duration-200">Shri Sai Ram Financials</a></li>
               <li><a href="https://brink-trick-47383861.figma.site/" target="_blank" rel="noopener noreferrer" className="text-gray-300 hover:text-saffron-300 transition-colors duration-200">Where the Alps Meet the Vedas</a></li>
-              <li><a href="#subsidiaries" className="text-gray-300 hover:text-saffron-300 transition-colors duration-200">Emanate</a></li>
+              <li><a href="/#subsidiaries" className="text-gray-300 hover:text-saffron-300 transition-colors duration-200">Emanate</a></li>
               <li><a href="https://sanatanadharmaway.eu/" target="_blank" rel="noopener noreferrer" className="text-gray-300 hover:text-saffron-300 transition-colors duration-200">Sanātana Dharma Way</a></li>
-              <li><a href="#subsidiaries" className="text-gray-300 hover:text-saffron-300 transition-colors duration-200">Dutch Caution</a></li>
+              <li><a href="/#subsidiaries" className="text-gray-300 hover:text-saffron-300 transition-colors duration-200">Dutch Caution</a></li>
             </ul>
           </div>
 

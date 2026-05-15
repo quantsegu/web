@@ -1,3 +1,4 @@
+import { Link } from 'react-router-dom';
 import { motion } from 'motion/react';
 
 export default function Hero() {
@@ -27,7 +28,7 @@ export default function Hero() {
           animate={{ opacity: 1 }}
           transition={{ duration: 0.8, delay: 0.2 }}
         >
-          Enterprise with Sanātana values — supporting BJP’s vision and the dharmic way of life
+          Enterprise with Sanātana values — food, finance, technology, and community across Europe and Asia
         </motion.p>
         <motion.p
           className="text-gray-300 text-base sm:text-lg mb-8 max-w-2xl mx-auto"
@@ -35,8 +36,8 @@ export default function Hero() {
           animate={{ opacity: 1 }}
           transition={{ duration: 0.8, delay: 0.35 }}
         >
-          Established in the Netherlands. We communicate with clarity and structure—numbered commitments,
-          transparent priorities, and action you can follow.
+          Established in the Netherlands. We build and support businesses with clear priorities,
+          transparent communication, and dharmic purpose.
         </motion.p>
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -47,12 +48,12 @@ export default function Hero() {
           <a href="#sanatan-dharma" className="btn-primary">
             Sanātana Dharma Living
           </a>
-          <a
-            href="#bjp-support"
+          <Link
+            to="/software"
             className="inline-flex items-center justify-center border-2 border-saffron-500/60 text-saffron-100 font-semibold py-3 px-8 rounded-md hover:bg-saffron-500/10 transition-all duration-300"
           >
-            BJP & National Vision
-          </a>
+            Software & POS
+          </Link>
         </motion.div>
       </div>
 

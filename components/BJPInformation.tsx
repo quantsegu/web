@@ -36,7 +36,7 @@ const commitments = [
 const quickFacts = [
   { label: 'Party', value: 'Bharatiya Janata Party (BJP)' },
   { label: 'Ideals', value: 'Antyodaya, cultural nationalism, integral humanism' },
-  { label: 'Our stance', value: 'Aligned supporter — development with dharmic values' },
+  { label: 'Our stance', value: 'Personal supporter — development with dharmic values' },
 ];
 
 export default function BJPInformation() {
@@ -44,9 +44,9 @@ export default function BJPInformation() {
     <section id="bjp-support" className="relative py-20 px-4 sm:px-6 lg:px-8">
       <div className="max-w-6xl mx-auto">
         <SectionHeader
-          hindiTitle="भारतीय जनता पार्टी — सूचना पद्धति"
-          title="Support for BJP & National Vision"
-          subtitle="We present information the BJP way: clear headings, numbered commitments, and direct access to official resources—so every visitor knows where we stand."
+          hindiTitle="सामुदायिक समर्थन"
+          title="BJP — Personal & Community Support"
+          subtitle="This page reflects our personal alignment and community context. Shreshti’s primary focus is enterprise, culture, and diaspora services—political support is documented here for transparency, not as our main offering."
         />
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-10">
@@ -104,7 +104,7 @@ export default function BJPInformation() {
           className="mt-8 text-center"
         >
           <p className="text-gray-400 text-sm mb-4 max-w-xl mx-auto">
-            Shreshti supports the BJP’s mission of a strong, prosperous Bharat rooted in Sanātana values. For official party news, manifestos, and membership, visit the source below.
+            For official party news, manifestos, and membership, visit the source below. This page is separate from our main business activities.
           </p>
           <a
             href="https://www.bjp.org/"

@@ -2,7 +2,6 @@ import { useRef, useEffect } from "react";
 import Navbar from "../components/Navbar";
 import Hero from "../components/Hero";
 import SanatanDharmaLiving from "../components/SanatanDharmaLiving";
-import BJPInformation from "../components/BJPInformation";
 import Subsidiaries from "../components/Subsidiaries";
 import Collaborations from "../components/Collaborations";
 import Founders from "../components/Founders";
@@ -283,7 +282,6 @@ export default function Home({
         <Navbar />
         <Hero />
         <SanatanDharmaLiving />
-        <BJPInformation />
         <Subsidiaries />
         <Collaborations />
         <Founders />
