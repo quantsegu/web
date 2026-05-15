@@ -20,13 +20,8 @@ export default function Footer() {
               <li><a href="#bjp-support" className="text-gray-300 hover:text-saffron-300 transition-colors duration-200">BJP Vision</a></li>
               <li><a href="#subsidiaries" className="text-gray-300 hover:text-saffron-300 transition-colors duration-200">Subsidiaries</a></li>
               <li><a href="#collaborations" className="text-gray-300 hover:text-saffron-300 transition-colors duration-200">Collaborations</a></li>
-              <li><a 
-                href="#software" 
-                onClick={(e) => { e.preventDefault(); window.location.href = '#software'; }} 
-                className="text-gray-300 hover:text-saffron-300 transition-colors duration-200"
-              >
-                Software
-              </a></li>
+              <li><a href="#software" className="text-gray-300 hover:text-saffron-300 transition-colors duration-200">Software</a></li>
+              <li><a href="https://disciplined-recreation-production.up.railway.app/login" target="_blank" rel="noopener noreferrer" className="text-gray-300 hover:text-saffron-300 transition-colors duration-200">Balaji POS Login</a></li>
               <li><a 
                 href="#profile" 
                 onClick={(e) => { e.preventDefault(); window.location.href = '#profile'; }} 

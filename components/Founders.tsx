@@ -1,23 +1,31 @@
 import { useState } from 'react';
 import { motion } from 'motion/react';
-import { Linkedin, ExternalLink } from 'lucide-react';
+import { Linkedin, ExternalLink, Award } from 'lucide-react';
 
 function ImageWithFallback(props: React.ImgHTMLAttributes<HTMLImageElement> & { src: string; alt: string }) {
   const [didError, setDidError] = useState(false)
   const { src, alt, style, className, ...rest } = props
 
   return didError ? (
-    <div
+    <motion.div
       className={`inline-block bg-gray-100 text-center align-middle ${className ?? ''}`}
       style={style}
     >
       <div className="flex items-center justify-center w-full h-full">
         <img src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iODgiIGhlaWdodD0iODgiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgc3Ryb2tlPSIjMDAwIiBzdHJva2UtbGluZWpvaW49InJvdW5kIiBvcGFjaXR5PSIuMyIgZmlsbD0ibm9uZSIgc3Ryb2tlLXdpZHRoPSIzLjciPjxyZWN0IHg9IjE2IiB5PSIxNiIgd2lkdGg9IjU2IiBoZWlnaHQ9IjU2IiByeD0iNiIvPjxwYXRoIGQ9Im0xNiA1OCAxNi0xOCAzMiAzMiIvPjxjaXJjbGUgY3g9IjUzIiBjeT0iMzUiIHI9IjciLz48L3N2Zz4KCg==" alt="Error loading image" {...rest} data-original-url={src} />
       </div>
-    </div>
+    </motion.div>
   ) : (
     <img src={src} alt={alt} className={className} style={style} {...rest} onError={() => setDidError(true)} />
   )
+}
+
+interface FounderAward {
+  title: string;
+  organization: string;
+  year: string;
+  description: string;
+  images: { src: string; alt: string }[];
 }
 
 interface FounderCardProps {
@@ -27,9 +35,10 @@ interface FounderCardProps {
   image: string;
   linkedin?: string;
   index: number;
+  awards?: FounderAward[];
 }
 
-function FounderCard({ name, role, bio, image, linkedin, index }: FounderCardProps) {
+function FounderCard({ name, role, bio, image, linkedin, index, awards }: FounderCardProps) {
   return (
     <motion.div
       initial={{ opacity: 0, y: 30 }}
@@ -51,7 +60,7 @@ function FounderCard({ name, role, bio, image, linkedin, index }: FounderCardPro
           <p className="text-saffron-300 mb-4">{role}</p>
           <p className="text-gray-300 mb-4">{bio}</p>
           
-          {linkedin && (
+          {linkedin && linkedin !== '#' && (
             <a 
               href={linkedin} 
               target="_blank" 
@@ -61,6 +70,34 @@ function FounderCard({ name, role, bio, image, linkedin, index }: FounderCardPro
               <Linkedin size={18} className="mr-2" />
               <span>Connect on LinkedIn</span>
             </a>
+          )}
+
+          {awards && awards.length > 0 && (
+            <div className="mt-8 pt-6 border-t border-saffron-500/20">
+              <div className="flex items-center mb-4">
+                <Award className="text-saffron-400 mr-2" size={22} />
+                <h4 className="text-lg font-bold text-white">Awards & Recognition</h4>
+              </div>
+              {awards.map((award) => (
+                <div key={award.title} className="mb-6 last:mb-0">
+                  <h5 className="text-white font-semibold">{award.title}</h5>
+                  <p className="text-saffron-300 text-sm">{award.organization}</p>
+                  <p className="text-gray-400 text-sm mb-2">{award.year}</p>
+                  <p className="text-gray-300 text-sm mb-4">{award.description}</p>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    {award.images.map((img) => (
+                      <div key={img.src} className="rounded-lg overflow-hidden ring-1 ring-saffron-500/20">
+                        <img
+                          src={img.src}
+                          alt={img.alt}
+                          className="w-full h-auto object-cover"
+                        />
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              ))}
+            </div>
           )}
         </div>
       </div>
@@ -78,11 +115,30 @@ export default function Founders() {
       linkedin: "https://www.linkedin.com/in/lakshmisegu/"
     },
     {
-      name: "Lavanya",
-      role: "Co-Founder & COO",
-      bio: "Lavanya brings extensive operational expertise to Shreshti, having previously held leadership positions in multinational corporations. Her strategic vision and execution capabilities have been instrumental in establishing Shreshti's presence across Europe and Asia.",
+      name: "Lavanya Segu",
+      role: "Co-Founder & COO · Founder, Balaji Foods",
+      bio: "Lavanya brings extensive operational expertise to Shreshti and leads Balaji Foods across Europe. Her strategic vision and execution have been instrumental in establishing Shreshti's presence across Europe and Asia, delivering authentic Indian food to diaspora communities in 8+ countries.",
       image: "/founders/lavanya.jpg",
-      linkedin: "#"
+      linkedin: "#",
+      awards: [
+        {
+          title: "Vasavi Women Award 2026",
+          organization: "Vasavi Clubs International NRI District V601A",
+          year: "Vasavi Jayanthi 2026 · Netherlands",
+          description:
+            "Recognised alongside Ashwini Babu (The Chutney Project) for leadership, community impact, and contributions to the Indian-Dutch diaspora. Nominations were supported by Vasavi Club Europe under the vision of Live to Serve.",
+          images: [
+            {
+              src: "/awards/lavanya-vasavi-women-award-2026.png",
+              alt: "Vasavi Women Award 2026 announcement featuring Lavanya Segu, Founder of Balaji Foods",
+            },
+            {
+              src: "/awards/lavanya-vasavi-ceremony.png",
+              alt: "Vasavi Clubs International award ceremony with Lavanya Segu and community leaders",
+            },
+          ],
+        },
+      ],
     }
   ];
 
@@ -104,12 +160,13 @@ export default function Founders() {
         <div className="space-y-8">
           {founders.map((founder, index) => (
             <FounderCard
-              key={index}
+              key={founder.name}
               name={founder.name}
               role={founder.role}
               bio={founder.bio}
               image={founder.image}
               linkedin={founder.linkedin}
+              awards={founder.awards}
               index={index}
             />
           ))}

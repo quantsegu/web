@@ -7,6 +7,7 @@ const navLinks = [
   { href: '#bjp-support', label: 'BJP Vision' },
   { href: '#subsidiaries', label: 'Subsidiaries' },
   { href: '#collaborations', label: 'Collaborations' },
+  { href: '#founders', label: 'Founders' },
   { href: '#software', label: 'Software', hashRoute: true },
   { href: '#profile', label: 'Founder', hashRoute: true },
   { href: '#contact', label: 'Contact' },
@@ -18,7 +19,13 @@ export default function Navbar() {
   const handleNav = (e: React.MouseEvent<HTMLAnchorElement>, hashRoute?: boolean) => {
     if (hashRoute) {
       e.preventDefault();
-      window.location.href = e.currentTarget.getAttribute('href') || '#';
+      const href = e.currentTarget.getAttribute('href') || '#';
+      const hash = href.startsWith('#') ? href : `#${href}`;
+      if (window.location.hash !== hash) {
+        window.location.hash = hash;
+      } else {
+        window.dispatchEvent(new HashChangeEvent('hashchange'));
+      }
     }
     setIsMenuOpen(false);
   };

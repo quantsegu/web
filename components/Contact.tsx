@@ -4,7 +4,7 @@ import { Mail, Globe, Send, Linkedin } from 'lucide-react';
 
 const founders = [
   { name: "Lakshmi Narayana Segu", role: "Founder & CEO", image: "/founders/lakshmi-narayana-segu.jpg", linkedin: "https://www.linkedin.com/in/lakshmisegu/" },
-  { name: "Lavanya", role: "Co-Founder & COO", image: "/founders/lavanya.jpg", linkedin: "#" }
+  { name: "Lavanya Segu", role: "Co-Founder & COO · Balaji Foods", image: "/founders/lavanya.jpg", linkedin: "#" }
 ];
 
 function FounderImage({ src, alt, className }: { src: string; alt: string; className?: string }) {

@@ -5,6 +5,7 @@ import SanatanDharmaLiving from "../components/SanatanDharmaLiving";
 import BJPInformation from "../components/BJPInformation";
 import Subsidiaries from "../components/Subsidiaries";
 import Collaborations from "../components/Collaborations";
+import Founders from "../components/Founders";
 import Contact from "../components/Contact";
 import Footer from "../components/Footer";
 
@@ -285,6 +286,7 @@ export default function Home({
         <BJPInformation />
         <Subsidiaries />
         <Collaborations />
+        <Founders />
         <Contact />
         <Footer />
       </div>

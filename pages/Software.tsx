@@ -39,9 +39,11 @@ interface SoftwareCardProps {
   icon: React.ReactNode;
   image: string;
   index: number;
+  url?: string;
+  ctaLabel?: string;
 }
 
-function SoftwareCard({ title, description, features, icon, image, index }: SoftwareCardProps) {
+function SoftwareCard({ title, description, features, icon, image, index, url, ctaLabel }: SoftwareCardProps) {
   return (
     <motion.div
       initial={{ opacity: 0, y: 30 }}
@@ -80,10 +82,25 @@ function SoftwareCard({ title, description, features, icon, image, index }: Soft
             </ul>
           </div>
           
-          <button className="mt-auto flex items-center text-sm text-saffron-300 hover:text-white transition-colors duration-200">
-            <span>Request Demo</span>
-            <ExternalLink size={16} className="ml-2" />
-          </button>
+          {url ? (
+            <a
+              href={url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="mt-auto inline-flex items-center text-sm font-medium text-saffron-300 hover:text-white transition-colors duration-200"
+            >
+              <span>{ctaLabel ?? 'Open application'}</span>
+              <ExternalLink size={16} className="ml-2" />
+            </a>
+          ) : (
+            <a
+              href="#contact"
+              className="mt-auto inline-flex items-center text-sm text-saffron-300 hover:text-white transition-colors duration-200"
+            >
+              <span>Request Demo</span>
+              <ExternalLink size={16} className="ml-2" />
+            </a>
+          )}
         </div>
       </div>
     </motion.div>
@@ -116,19 +133,30 @@ export default function Software() {
             <p className="text-saffron-100 max-w-2xl mx-auto text-lg">
               Cutting-edge software platforms and tools powering digital transformation across industries
             </p>
-            <div className="w-20 h-1 bg-gradient-to-r from-saffron-500 to-bjp-green mx-auto mt-4"></div>
+            <div className="w-20 h-1 bg-gradient-to-r from-saffron-500 to-bjp-green mx-auto mt-4" />
+            <a
+              href="https://disciplined-recreation-production.up.railway.app/login"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center mt-8 bg-gradient-to-r from-saffron-500 to-bjp-green text-white font-medium py-3 px-8 rounded-full hover:from-saffron-600 hover:to-bjp-green-dark transition-all duration-300"
+            >
+              Open Balaji POS Login
+              <ExternalLink size={18} className="ml-2" />
+            </a>
           </motion.div>
 
           <div className="space-y-12">
             {softwareProducts.map((product, index) => (
               <SoftwareCard
-                key={index}
+                key={product.title}
                 title={product.title}
                 description={product.description}
                 features={product.features}
                 icon={product.icon}
                 image={product.image}
                 index={index}
+                url={product.url}
+                ctaLabel={product.ctaLabel}
               />
             ))}
           </div>
