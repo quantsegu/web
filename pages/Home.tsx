@@ -2,7 +2,6 @@ import { useRef, useEffect } from "react";
 import Navbar from "../components/Navbar";
 import Hero from "../components/Hero";
 import Subsidiaries from "../components/Subsidiaries";
-import JointVentures from "../components/JointVentures";
 import Collaborations from "../components/Collaborations";
 import Contact from "../components/Contact";
 import Footer from "../components/Footer";
@@ -281,7 +280,6 @@ export default function Home({
         <Navbar />
         <Hero />
         <Subsidiaries />
-        <JointVentures />
         <Collaborations />
         <Contact />
         <Footer />

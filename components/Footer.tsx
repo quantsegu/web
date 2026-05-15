@@ -17,7 +17,6 @@ export default function Footer() {
             <ul className="space-y-2">
               <li><a href="#" className="text-gray-300 hover:text-purple-300 transition-colors duration-200">Home</a></li>
               <li><a href="#subsidiaries" className="text-gray-300 hover:text-purple-300 transition-colors duration-200">Subsidiaries</a></li>
-              <li><a href="#joint-ventures" className="text-gray-300 hover:text-purple-300 transition-colors duration-200">Joint Ventures</a></li>
               <li><a href="#collaborations" className="text-gray-300 hover:text-purple-300 transition-colors duration-200">Collaborations</a></li>
               <li><a 
                 href="#software" 
@@ -44,7 +43,8 @@ export default function Footer() {
               <li><a href="#subsidiaries" className="text-gray-300 hover:text-purple-300 transition-colors duration-200">Shri Sai Ram Financials</a></li>
               <li><a href="#subsidiaries" className="text-gray-300 hover:text-purple-300 transition-colors duration-200">KensoFI</a></li>
               <li><a href="#subsidiaries" className="text-gray-300 hover:text-purple-300 transition-colors duration-200">Emanate</a></li>
-              <li><a href="#joint-ventures" className="text-gray-300 hover:text-purple-300 transition-colors duration-200">Joint Ventures</a></li>
+              <li><a href="https://sanatanadharmaway.eu/" target="_blank" rel="noopener noreferrer" className="text-gray-300 hover:text-purple-300 transition-colors duration-200">Sanātana Dharma Way</a></li>
+              <li><a href="#subsidiaries" className="text-gray-300 hover:text-purple-300 transition-colors duration-200">Dutch Caution</a></li>
             </ul>
           </div>
 
@@ -52,7 +52,6 @@ export default function Footer() {
             <h4 className="text-lg font-semibold text-white mb-4">Collaborations</h4>
             <ul className="space-y-2">
               <li><a href="https://quantamixsolutions.com/" target="_blank" rel="noopener noreferrer" className="text-gray-300 hover:text-purple-300 transition-colors duration-200">Quantamix Solutions</a></li>
-              <li><a href="https://sanatanadharmaway.eu/" target="_blank" rel="noopener noreferrer" className="text-gray-300 hover:text-purple-300 transition-colors duration-200">Sanātana Dharma Way</a></li>
               <li><a href="https://kensofi.com/" target="_blank" rel="noopener noreferrer" className="text-gray-300 hover:text-purple-300 transition-colors duration-200">KensoFI</a></li>
               <li><a href="https://www.lekhly.com/" target="_blank" rel="noopener noreferrer" className="text-gray-300 hover:text-purple-300 transition-colors duration-200">Lekhly</a></li>
             </ul>

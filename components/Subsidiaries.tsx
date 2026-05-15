@@ -1,8 +1,17 @@
 import { motion } from 'motion/react';
 import SubsidiaryCard from './SubsidiaryCard';
 
+interface Subsidiary {
+  name: string;
+  logo: string;
+  description: string;
+  details: string;
+  locations: string[];
+  url?: string;
+}
+
 export default function Subsidiaries() {
-  const subsidiaries = [
+  const subsidiaries: Subsidiary[] = [
     {
       name: "Ecosphere Trade BV",
       logo: "ET",
@@ -30,6 +39,21 @@ export default function Subsidiaries() {
       description: "A company providing solutions in Data, AI, ERP across Finance, Government and Healthcare industries.",
       details: "Emanate delivers comprehensive data, AI, and ERP solutions tailored for finance, government, and healthcare sectors. Our expertise lies in transforming complex data into actionable insights and implementing robust enterprise systems that drive efficiency and innovation.",
       locations: ["Netherlands", "Switzerland", "Zambia"]
+    },
+    {
+      name: "Sanātana Dharma Way",
+      logo: "SD",
+      description: "An interactive learning guide to Sanātana Dharma for study, practice, and daily life.",
+      details: "Sanātana Dharma Way maps this tradition as a connected landscape—structured knowledge regions, topic pages, and references designed to help people learn and apply teachings in real life, not only collect information.",
+      locations: ["European Union"],
+      url: "https://sanatanadharmaway.eu/"
+    },
+    {
+      name: "Dutch Caution",
+      logo: "DC",
+      description: "Security and risk management providing comprehensive safety solutions and consultancy across Europe.",
+      details: "Dutch Caution delivers security and risk management services for organizations that need practical safety solutions, risk assessment, and consultancy tailored to European operating environments.",
+      locations: ["Netherlands", "European Union"]
     }
   ];
 
@@ -51,12 +75,13 @@ export default function Subsidiaries() {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {subsidiaries.map((subsidiary, index) => (
             <SubsidiaryCard
-              key={index}
+              key={subsidiary.name}
               name={subsidiary.name}
               logo={subsidiary.logo}
               description={subsidiary.description}
               details={subsidiary.details}
               locations={subsidiary.locations}
+              url={subsidiary.url}
               index={index}
             />
           ))}

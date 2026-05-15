@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { motion } from 'motion/react';
-import { ChevronDown, ChevronUp } from 'lucide-react';
+import { ChevronDown, ChevronUp, ExternalLink } from 'lucide-react';
 
 interface SubsidiaryCardProps {
   name: string;
@@ -9,6 +9,7 @@ interface SubsidiaryCardProps {
   locations: string[];
   logo: string;
   index: number;
+  url?: string;
 }
 
 export default function SubsidiaryCard({ 
@@ -17,7 +18,8 @@ export default function SubsidiaryCard({
   details, 
   locations, 
   logo, 
-  index 
+  index,
+  url,
 }: SubsidiaryCardProps) {
   const [isExpanded, setIsExpanded] = useState(false);
 
@@ -57,22 +59,35 @@ export default function SubsidiaryCard({
           </div>
         </div>
         
-        <button
-          onClick={() => setIsExpanded(!isExpanded)}
-          className="flex items-center text-sm text-purple-300 hover:text-purple-100 transition-colors duration-200 mt-2"
-        >
-          {isExpanded ? (
-            <>
-              <span>Show less</span>
-              <ChevronUp size={16} className="ml-1" />
-            </>
-          ) : (
-            <>
-              <span>Learn more</span>
-              <ChevronDown size={16} className="ml-1" />
-            </>
+        <div className="flex flex-wrap items-center gap-4 mt-2">
+          <button
+            onClick={() => setIsExpanded(!isExpanded)}
+            className="flex items-center text-sm text-purple-300 hover:text-purple-100 transition-colors duration-200"
+          >
+            {isExpanded ? (
+              <>
+                <span>Show less</span>
+                <ChevronUp size={16} className="ml-1" />
+              </>
+            ) : (
+              <>
+                <span>Learn more</span>
+                <ChevronDown size={16} className="ml-1" />
+              </>
+            )}
+          </button>
+          {url && (
+            <a
+              href={url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center text-sm font-medium text-purple-300 hover:text-purple-100 transition-colors"
+            >
+              Visit website
+              <ExternalLink size={16} className="ml-1" />
+            </a>
           )}
-        </button>
+        </div>
       </div>
     </motion.div>
   );

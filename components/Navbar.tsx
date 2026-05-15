@@ -17,7 +17,6 @@ export default function Navbar() {
             <div className="ml-10 flex items-baseline space-x-4">
               <a href="#" className="text-white hover:text-purple-300 px-3 py-2 rounded-md text-sm font-medium">Home</a>
               <a href="#subsidiaries" className="text-white hover:text-purple-300 px-3 py-2 rounded-md text-sm font-medium">Subsidiaries</a>
-              <a href="#joint-ventures" className="text-white hover:text-purple-300 px-3 py-2 rounded-md text-sm font-medium">Joint Ventures</a>
               <a href="#collaborations" className="text-white hover:text-purple-300 px-3 py-2 rounded-md text-sm font-medium">Collaborations</a>
               <a href="#software" onClick={(e) => { e.preventDefault(); window.location.href = '#software'; }} className="text-white hover:text-purple-300 px-3 py-2 rounded-md text-sm font-medium">Software</a>
               <a href="#profile" onClick={(e) => { e.preventDefault(); window.location.href = '#profile'; }} className="text-white hover:text-purple-300 px-3 py-2 rounded-md text-sm font-medium">Founder</a>
@@ -52,13 +51,6 @@ export default function Navbar() {
               onClick={() => setIsMenuOpen(false)}
             >
               Subsidiaries
-            </a>
-            <a 
-              href="#joint-ventures" 
-              className="text-white hover:text-purple-300 block px-3 py-2 rounded-md text-base font-medium"
-              onClick={() => setIsMenuOpen(false)}
-            >
-              Joint Ventures
             </a>
             <a 
               href="#collaborations" 

@@ -55,13 +55,6 @@ export default function Collaborations() {
       url: 'https://quantamixsolutions.com/',
     },
     {
-      name: 'Sanātana Dharma Way',
-      logo: 'SD',
-      description:
-        'An interactive learning guide to Sanātana Dharma—connecting tradition, practice, and daily life through structured knowledge regions.',
-      url: 'https://sanatanadharmaway.eu/',
-    },
-    {
       name: 'KensoFI',
       logo: 'KF',
       description:
@@ -89,7 +82,7 @@ export default function Collaborations() {
         >
           <h2 className="text-3xl sm:text-4xl font-bold text-white mb-4">Collaborations</h2>
           <p className="text-purple-200 max-w-2xl mx-auto">
-            Trusted partners we work with across technology, finance, culture, and content
+            Trusted partners we work with across technology, finance, and content
           </p>
           <motion.div
             className="w-20 h-1 bg-gradient-to-r from-purple-500 to-pink-500 mx-auto mt-4"
@@ -100,7 +93,7 @@ export default function Collaborations() {
           />
         </motion.div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
           {collaborations.map((partner, index) => (
             <CollaborationCard key={partner.url} {...partner} index={index} />
           ))}
