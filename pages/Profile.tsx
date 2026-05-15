@@ -37,13 +37,13 @@ function ExperienceCard({ company, position, period, description, index }: Exper
       whileInView={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5, delay: index * 0.1 }}
       viewport={{ once: true, margin: "-100px" }}
-      className="relative pl-8 pb-8 border-l border-purple-800"
+      className="relative pl-8 pb-8 border-l border-saffron-800"
     >
-      <div className="absolute -left-3 top-0 w-6 h-6 rounded-full bg-gradient-to-br from-purple-500 to-pink-600"></div>
+      <div className="absolute -left-3 top-0 w-6 h-6 rounded-full bg-gradient-to-br from-saffron-500 to-bjp-green"></div>
       <div className="bg-black/40 backdrop-blur-md rounded-xl p-6">
         <h3 className="text-white font-semibold text-lg">{position}</h3>
         <div className="flex justify-between items-center mb-3">
-          <p className="text-purple-300">{company}</p>
+          <p className="text-saffron-300">{company}</p>
           <p className="text-gray-400 text-sm">{period}</p>
         </div>
         <p className="text-gray-300">{description}</p>
@@ -145,7 +145,7 @@ export default function Profile() {
               className="lg:w-1/3"
             >
               <div className="relative">
-                <div className="absolute -inset-2 rounded-3xl bg-gradient-to-br from-purple-600 to-pink-600 opacity-75 blur"></div>
+                <div className="absolute -inset-2 rounded-3xl bg-gradient-to-br from-saffron-500 to-bjp-green opacity-75 blur"></div>
                 <div className="relative overflow-hidden rounded-2xl">
                   <ImageWithFallback
                     src={profileData.image}
@@ -159,20 +159,20 @@ export default function Profile() {
                 <h3 className="text-white font-bold text-xl mb-4">Contact</h3>
                 <div className="space-y-4">
                   <div className="flex items-center">
-                    <Mail className="text-purple-400 mr-4" size={20} />
-                    <a href={`mailto:${profileData.contact.email}`} className="text-gray-300 hover:text-purple-300 transition-colors">
+                    <Mail className="text-saffron-400 mr-4" size={20} />
+                    <a href={`mailto:${profileData.contact.email}`} className="text-gray-300 hover:text-saffron-300 transition-colors">
                       {profileData.contact.email}
                     </a>
                   </div>
                   <div className="flex items-center">
-                    <Linkedin className="text-purple-400 mr-4" size={20} />
-                    <a href={profileData.contact.linkedin} target="_blank" rel="noopener noreferrer" className="text-gray-300 hover:text-purple-300 transition-colors">
+                    <Linkedin className="text-saffron-400 mr-4" size={20} />
+                    <a href={profileData.contact.linkedin} target="_blank" rel="noopener noreferrer" className="text-gray-300 hover:text-saffron-300 transition-colors">
                       LinkedIn Profile
                     </a>
                   </div>
                   <div className="flex items-center">
-                    <Globe className="text-purple-400 mr-4" size={20} />
-                    <a href="/" className="text-gray-300 hover:text-purple-300 transition-colors">
+                    <Globe className="text-saffron-400 mr-4" size={20} />
+                    <a href="/" className="text-gray-300 hover:text-saffron-300 transition-colors">
                       Shreshti Website
                     </a>
                   </div>
@@ -187,7 +187,7 @@ export default function Profile() {
               className="lg:w-2/3"
             >
               <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold text-white mb-2">{profileData.name}</h1>
-              <p className="text-purple-300 text-xl mb-6">{profileData.title}</p>
+              <p className="text-saffron-300 text-xl mb-6">{profileData.title}</p>
               
               <div className="bg-black/30 backdrop-blur-md rounded-xl p-6 mb-8">
                 <h2 className="text-2xl font-bold text-white mb-4">About</h2>
@@ -197,7 +197,7 @@ export default function Profile() {
               
               <div className="bg-black/30 backdrop-blur-md rounded-xl p-6 mb-8">
                 <div className="flex items-center mb-4">
-                  <Award className="text-purple-400 mr-3" size={24} />
+                  <Award className="text-saffron-400 mr-3" size={24} />
                   <h2 className="text-2xl font-bold text-white">Awards & Recognition</h2>
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-6">
@@ -207,10 +207,10 @@ export default function Profile() {
                       initial={{ opacity: 0, y: 10 }}
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ duration: 0.5, delay: 0.2 + index * 0.1 }}
-                      className="bg-purple-900/30 p-4 rounded-lg"
+                      className="bg-saffron-950/40 p-4 rounded-lg"
                     >
                       <h3 className="text-white font-semibold">{award.title}</h3>
-                      <p className="text-purple-300 text-sm">{award.organization}</p>
+                      <p className="text-saffron-300 text-sm">{award.organization}</p>
                       <p className="text-gray-400 text-sm">{award.year}</p>
                     </motion.div>
                   ))}
@@ -219,7 +219,7 @@ export default function Profile() {
               
               <div className="bg-black/30 backdrop-blur-md rounded-xl p-6">
                 <div className="flex items-center mb-4">
-                  <GraduationCap className="text-purple-400 mr-3" size={24} />
+                  <GraduationCap className="text-saffron-400 mr-3" size={24} />
                   <h2 className="text-2xl font-bold text-white">Education</h2>
                 </div>
                 <div className="space-y-4">
@@ -229,10 +229,10 @@ export default function Profile() {
                       initial={{ opacity: 0, y: 10 }}
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ duration: 0.5, delay: 0.2 + index * 0.1 }}
-                      className="border-l-2 border-purple-700 pl-4"
+                      className="border-l-2 border-saffron-700 pl-4"
                     >
                       <h3 className="text-white font-semibold">{edu.degree}</h3>
-                      <p className="text-purple-300">{edu.institution}</p>
+                      <p className="text-saffron-300">{edu.institution}</p>
                       <p className="text-gray-400 text-sm">{edu.year}</p>
                     </motion.div>
                   ))}
@@ -247,7 +247,7 @@ export default function Profile() {
       <section className="py-16 px-4 sm:px-6 lg:px-8">
         <div className="max-w-7xl mx-auto">
           <div className="flex items-center mb-10">
-            <Briefcase className="text-purple-400 mr-3" size={28} />
+            <Briefcase className="text-saffron-400 mr-3" size={28} />
             <h2 className="text-3xl font-bold text-white">Professional Experience</h2>
           </div>
           
@@ -270,7 +270,7 @@ export default function Profile() {
       <section className="py-16 px-4 sm:px-6 lg:px-8 bg-black/30">
         <div className="max-w-7xl mx-auto">
           <div className="flex items-center mb-10">
-            <Users className="text-purple-400 mr-3" size={28} />
+            <Users className="text-saffron-400 mr-3" size={28} />
             <h2 className="text-3xl font-bold text-white">Expertise & Skills</h2>
           </div>
           
@@ -281,7 +281,7 @@ export default function Profile() {
                 initial={{ opacity: 0, scale: 0.9 }}
                 animate={{ opacity: 1, scale: 1 }}
                 transition={{ duration: 0.3, delay: 0.1 * index }}
-                className="bg-gradient-to-r from-purple-900/70 to-pink-900/70 px-4 py-2 rounded-full text-white"
+                className="bg-gradient-to-r from-saffron-900/70 to-bjp-green/40 px-4 py-2 rounded-full text-white"
               >
                 {skill}
               </motion.span>

@@ -1,5 +1,5 @@
-import { motion } from 'motion/react';
 import SubsidiaryCard from './SubsidiaryCard';
+import SectionHeader from './SectionHeader';
 
 interface Subsidiary {
   name: string;
@@ -27,11 +27,12 @@ export default function Subsidiaries() {
       locations: ["India", "Netherlands", "Switzerland"]
     },
     {
-      name: "KensoFI",
-      logo: "KF",
-      description: "AI based solution for Loan, finance management.",
-      details: "KensoFI leverages artificial intelligence to revolutionize loan and finance management. Our cutting-edge solutions help financial institutions streamline their operations, assess risks more accurately, and provide better services to their customers.",
-      locations: ["Netherlands", "Switzerland"]
+      name: "Where the Alps Meet the Vedas",
+      logo: "AV",
+      description: "An Alpine ashram for the modern seeker—yoga, Ayurveda, and sattvic living at the foot of sacred mountains.",
+      details: "A Hindu-rooted retreat in the Italian Alps offering daily sadhana, sattvic cuisine, farm and equine therapy, and seasonal programs aligned with Ayurvedic ritucharya. Guests experience authentic spiritual practice where Alpine beauty meets Sanātana Dharma.",
+      locations: ["Italian Alps", "Switzerland"],
+      url: "https://brink-trick-47383861.figma.site/"
     },
     {
       name: "Emanate",
@@ -60,17 +61,11 @@ export default function Subsidiaries() {
   return (
     <section id="subsidiaries" className="relative py-20 px-4 sm:px-6 lg:px-8">
       <div className="max-w-6xl mx-auto">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8 }}
-          viewport={{ once: true, margin: "-100px" }}
-          className="text-center mb-16"
-        >
-          <h2 className="text-3xl sm:text-4xl font-bold text-white mb-4">Our Subsidiaries</h2>
-          <p className="text-purple-200 max-w-2xl mx-auto">Discover our diverse portfolio of companies operating across multiple industries and regions</p>
-          <div className="w-20 h-1 bg-gradient-to-r from-purple-500 to-pink-500 mx-auto mt-4"></div>
-        </motion.div>
+        <SectionHeader
+          hindiTitle="उपकंपनियाँ"
+          title="Our Subsidiaries"
+          subtitle="Discover our diverse portfolio of companies operating across multiple industries and regions"
+        />
         
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {subsidiaries.map((subsidiary, index) => (

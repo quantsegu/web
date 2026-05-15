@@ -1,3 +1,66 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@layer base {
+  :root {
+    --color-saffron: #ff9933;
+    --color-bjp-green: #138808;
+    --color-bjp-navy: #0a1628;
+  }
+
+  body {
+    @apply font-display antialiased;
+  }
+}
+
+@layer components {
+  .tricolor-bar {
+    @apply h-1 w-full;
+    background: linear-gradient(
+      90deg,
+      var(--color-saffron) 0%,
+      var(--color-saffron) 33.33%,
+      #ffffff 33.33%,
+      #ffffff 66.66%,
+      var(--color-bjp-green) 66.66%,
+      var(--color-bjp-green) 100%
+    );
+  }
+
+  .section-heading {
+    @apply text-3xl sm:text-4xl font-bold text-white mb-2;
+  }
+
+  .section-subtitle {
+    @apply text-saffron-100 max-w-2xl mx-auto text-base sm:text-lg;
+  }
+
+  .section-divider {
+    @apply w-24 h-1 bg-gradient-to-r from-saffron-500 via-white to-bjp-green mx-auto mt-4 rounded-full;
+  }
+
+  .bjp-card {
+    @apply bg-bjp-navy-light/80 backdrop-blur-md rounded-lg border border-saffron-500/20 overflow-hidden;
+  }
+
+  .bjp-pillar-number {
+    @apply flex-shrink-0 w-10 h-10 rounded-md bg-gradient-to-br from-saffron-500 to-bjp-green text-white font-bold text-lg flex items-center justify-center;
+  }
+
+  .bjp-commitment-row {
+    @apply flex gap-4 p-5 border-b border-saffron-500/15 last:border-b-0 hover:bg-saffron-500/5 transition-colors;
+  }
+
+  .btn-primary {
+    @apply inline-flex items-center justify-center bg-gradient-to-r from-saffron-500 to-bjp-green text-white font-semibold py-3 px-8 rounded-md hover:from-saffron-600 hover:to-bjp-green-dark transition-all duration-300 shadow-lg shadow-saffron-900/30;
+  }
+
+  .link-accent {
+    @apply text-saffron-300 hover:text-white transition-colors duration-200;
+  }
+
+  .badge-location {
+    @apply inline-block bg-bjp-green/20 text-saffron-100 text-xs px-3 py-1 rounded-sm border border-bjp-green/30;
+  }
+}

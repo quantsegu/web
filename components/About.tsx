@@ -12,7 +12,7 @@ export default function About() {
           className="text-center mb-16"
         >
           <h2 className="text-3xl sm:text-4xl font-bold text-white mb-4">About Shreshti</h2>
-          <div className="w-20 h-1 bg-gradient-to-r from-purple-500 to-pink-500 mx-auto"></div>
+          <div className="w-20 h-1 bg-gradient-to-r from-saffron-500 to-bjp-green mx-auto"></div>
         </motion.div>
         
         <motion.div

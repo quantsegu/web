@@ -60,27 +60,27 @@ function SoftwareCard({ title, description, features, icon, image, index }: Soft
         </div>
         <div className="w-full md:w-3/5 p-6 flex flex-col">
           <div className="flex items-center mb-4">
-            <div className="w-12 h-12 rounded-full bg-gradient-to-br from-purple-500 to-pink-600 flex items-center justify-center text-white">
+            <div className="w-12 h-12 rounded-full bg-gradient-to-br from-saffron-500 to-bjp-green flex items-center justify-center text-white">
               {icon}
             </div>
             <h3 className="text-xl font-bold text-white ml-4">{title}</h3>
           </div>
           
-          <p className="text-purple-100 mb-6">{description}</p>
+          <p className="text-saffron-50 mb-6">{description}</p>
           
           <div className="mb-4 flex-grow">
-            <h4 className="text-sm font-semibold text-purple-300 mb-2">Key Features:</h4>
+            <h4 className="text-sm font-semibold text-saffron-300 mb-2">Key Features:</h4>
             <ul className="space-y-2">
               {features.map((feature, i) => (
                 <li key={i} className="flex items-start">
-                  <span className="text-purple-400 mr-2">•</span>
+                  <span className="text-saffron-400 mr-2">•</span>
                   <span className="text-gray-300">{feature}</span>
                 </li>
               ))}
             </ul>
           </div>
           
-          <button className="mt-auto flex items-center text-sm text-purple-300 hover:text-white transition-colors duration-200">
+          <button className="mt-auto flex items-center text-sm text-saffron-300 hover:text-white transition-colors duration-200">
             <span>Request Demo</span>
             <ExternalLink size={16} className="ml-2" />
           </button>
@@ -113,10 +113,10 @@ export default function Software() {
             className="text-center mb-16"
           >
             <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold text-white mb-4">Software Solutions</h1>
-            <p className="text-purple-200 max-w-2xl mx-auto text-lg">
+            <p className="text-saffron-100 max-w-2xl mx-auto text-lg">
               Cutting-edge software platforms and tools powering digital transformation across industries
             </p>
-            <div className="w-20 h-1 bg-gradient-to-r from-purple-500 to-pink-500 mx-auto mt-4"></div>
+            <div className="w-20 h-1 bg-gradient-to-r from-saffron-500 to-bjp-green mx-auto mt-4"></div>
           </motion.div>
 
           <div className="space-y-12">
@@ -139,12 +139,12 @@ export default function Software() {
       <section className="py-16 px-4 sm:px-6 lg:px-8 bg-black/30">
         <div className="max-w-4xl mx-auto text-center">
           <h2 className="text-2xl sm:text-3xl font-bold text-white mb-4">Looking for a Custom Solution?</h2>
-          <p className="text-purple-200 mb-8">
+          <p className="text-saffron-100 mb-8">
             Our team of experts can develop tailored software solutions to meet your specific business needs and challenges.
           </p>
           <a 
             href="#contact" 
-            className="inline-block bg-gradient-to-r from-purple-600 to-pink-600 text-white font-medium py-3 px-8 rounded-full hover:from-purple-700 hover:to-pink-700 transition-all duration-300"
+            className="inline-block bg-gradient-to-r from-saffron-500 to-bjp-green text-white font-medium py-3 px-8 rounded-full hover:from-saffron-600 hover:to-bjp-green-dark transition-all duration-300"
           >
             Contact Us Today
           </a>

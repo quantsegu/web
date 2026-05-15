@@ -33,24 +33,24 @@ export default function SubsidiaryCard({
     >
       <div className="p-6">
         <div className="flex items-center mb-4">
-          <div className="w-12 h-12 rounded-full bg-gradient-to-br from-purple-500 to-pink-600 flex items-center justify-center text-white font-bold text-xl">
+          <div className="w-12 h-12 rounded-full bg-gradient-to-br from-saffron-500 to-bjp-green flex items-center justify-center text-white font-bold text-xl">
             {logo}
           </div>
           <h3 className="text-xl font-bold text-white ml-4">{name}</h3>
         </div>
         
-        <p className="text-purple-100 mb-4">{description}</p>
+        <p className="text-saffron-50 mb-4">{description}</p>
         
         <div className={`overflow-hidden transition-all duration-300 ${isExpanded ? 'max-h-96' : 'max-h-0'}`}>
           <p className="text-gray-300 mb-4">{details}</p>
           
           <div className="mb-4">
-            <h4 className="text-sm font-semibold text-purple-300 mb-2">Operating in:</h4>
+            <h4 className="text-sm font-semibold text-saffron-300 mb-2">Operating in:</h4>
             <div className="flex flex-wrap gap-2">
               {locations.map((location, i) => (
                 <span 
                   key={i} 
-                  className="inline-block bg-purple-900/50 text-purple-200 text-xs px-3 py-1 rounded-full"
+                  className="inline-block bg-bjp-green/20 text-saffron-100 text-xs px-3 py-1 rounded-full"
                 >
                   {location}
                 </span>
@@ -62,7 +62,7 @@ export default function SubsidiaryCard({
         <div className="flex flex-wrap items-center gap-4 mt-2">
           <button
             onClick={() => setIsExpanded(!isExpanded)}
-            className="flex items-center text-sm text-purple-300 hover:text-purple-100 transition-colors duration-200"
+            className="flex items-center text-sm text-saffron-300 hover:text-saffron-50 transition-colors duration-200"
           >
             {isExpanded ? (
               <>
@@ -81,7 +81,7 @@ export default function SubsidiaryCard({
               href={url}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center text-sm font-medium text-purple-300 hover:text-purple-100 transition-colors"
+              className="inline-flex items-center text-sm font-medium text-saffron-300 hover:text-saffron-50 transition-colors"
             >
               Visit website
               <ExternalLink size={16} className="ml-1" />

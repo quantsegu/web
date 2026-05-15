@@ -1,6 +1,8 @@
 import { useRef, useEffect } from "react";
 import Navbar from "../components/Navbar";
 import Hero from "../components/Hero";
+import SanatanDharmaLiving from "../components/SanatanDharmaLiving";
+import BJPInformation from "../components/BJPInformation";
 import Subsidiaries from "../components/Subsidiaries";
 import Collaborations from "../components/Collaborations";
 import Contact from "../components/Contact";
@@ -62,16 +64,16 @@ export default function Home({
       vec4 col = vec4(0.0, 0.0, 0.0, 1.0);
 
       // Background gradient - darker colors for less distraction
-      vec3 gradCol1 = vec3(0.05, 0.02, 0.08);
-      vec3 gradCol2 = vec3(0.07, 0.01, 0.12);
+      vec3 gradCol1 = vec3(0.04, 0.06, 0.12);
+      vec3 gradCol2 = vec3(0.08, 0.04, 0.02);
       col.xyz = mix(gradCol1, gradCol2, uv.x + uv.y);
 
       // Center uv coords
       uv -= 0.5;
       
-      // Wave colors to interpolate between - more subtle
-      const vec3 col1 = vec3(0.12, 0.2, 0.4);
-      const vec3 col2 = vec3(0.4, 0.1, 0.4);
+      // Saffron to green wave accents (BJP-inspired palette)
+      const vec3 col1 = vec3(0.85, 0.45, 0.08);
+      const vec3 col2 = vec3(0.05, 0.45, 0.02);
 
       // Used to antialias the lines based on display pixel density
       float aaDy = iResolution.y * 0.000005;
@@ -265,7 +267,7 @@ export default function Home({
   }, [speed, lineCount, amplitude, yOffset, opacity]);
 
   return (
-    <div className="relative min-h-screen w-full bg-[#050108]">
+    <div className="relative min-h-screen w-full bg-bjp-navy">
       {/* Gradient Shader Background */}
       <div className="fixed top-0 left-0 w-full h-full z-0">
         <canvas
@@ -279,6 +281,8 @@ export default function Home({
       <div className="relative z-10">
         <Navbar />
         <Hero />
+        <SanatanDharmaLiving />
+        <BJPInformation />
         <Subsidiaries />
         <Collaborations />
         <Contact />

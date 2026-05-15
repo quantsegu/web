@@ -65,12 +65,12 @@ export default function Contact() {
                 rel="noopener noreferrer"
                 className="flex flex-col items-center group"
               >
-                <div className="w-24 h-24 rounded-full overflow-hidden border-2 border-purple-500/50 flex-shrink-0">
+                <div className="w-24 h-24 rounded-full overflow-hidden border-2 border-saffron-500/50 flex-shrink-0">
                   <FounderImage src={f.image} alt={f.name} className="w-full h-full object-cover" />
                 </div>
-                <span className="text-white font-medium mt-2 text-sm group-hover:text-purple-300">{f.name}</span>
-                <span className="text-purple-300 text-xs">{f.role}</span>
-                <Linkedin size={14} className="mt-1 text-purple-400 group-hover:text-white" />
+                <span className="text-white font-medium mt-2 text-sm group-hover:text-saffron-300">{f.name}</span>
+                <span className="text-saffron-300 text-xs">{f.role}</span>
+                <Linkedin size={14} className="mt-1 text-saffron-400 group-hover:text-white" />
               </a>
             ))}
           </div>
@@ -88,7 +88,7 @@ export default function Contact() {
             
             <div className="space-y-6">              
               <div className="flex items-start">
-                <Mail className="text-purple-400 mr-4 mt-1" size={20} />
+                <Mail className="text-saffron-400 mr-4 mt-1" size={20} />
                 <div>
                   <h4 className="text-white font-medium">Email</h4>
                   <p className="text-gray-300">lakshmi@shreshti.nl</p>
@@ -96,7 +96,7 @@ export default function Contact() {
               </div>
               
               <div className="flex items-start">
-                <Globe className="text-purple-400 mr-4 mt-1" size={20} />
+                <Globe className="text-saffron-400 mr-4 mt-1" size={20} />
                 <div>
                   <h4 className="text-white font-medium">Global Presence</h4>
                   <p className="text-gray-300">Operating across Europe, Asia and Africa</p>
@@ -106,10 +106,10 @@ export default function Contact() {
             
             <div className="mt-8">
               <div className="flex flex-wrap gap-2">
-                <span className="inline-block bg-purple-900/50 text-purple-200 text-xs px-3 py-1 rounded-full">Netherlands</span>
-                <span className="inline-block bg-purple-900/50 text-purple-200 text-xs px-3 py-1 rounded-full">Switzerland</span>
-                <span className="inline-block bg-purple-900/50 text-purple-200 text-xs px-3 py-1 rounded-full">India</span>
-                <span className="inline-block bg-purple-900/50 text-purple-200 text-xs px-3 py-1 rounded-full">Zambia</span>
+                <span className="inline-block bg-bjp-green/20 text-saffron-100 text-xs px-3 py-1 rounded-full">Netherlands</span>
+                <span className="inline-block bg-bjp-green/20 text-saffron-100 text-xs px-3 py-1 rounded-full">Switzerland</span>
+                <span className="inline-block bg-bjp-green/20 text-saffron-100 text-xs px-3 py-1 rounded-full">India</span>
+                <span className="inline-block bg-bjp-green/20 text-saffron-100 text-xs px-3 py-1 rounded-full">Zambia</span>
               </div>
             </div>
           </motion.div>
@@ -125,7 +125,7 @@ export default function Contact() {
               
               <div className="space-y-4">
                 <div>
-                  <label htmlFor="name" className="block text-sm font-medium text-purple-200 mb-1">Name</label>
+                  <label htmlFor="name" className="block text-sm font-medium text-saffron-100 mb-1">Name</label>
                   <input
                     type="text"
                     id="name"
@@ -133,13 +133,13 @@ export default function Contact() {
                     value={formState.name}
                     onChange={handleChange}
                     required
-                    className="w-full px-4 py-2 bg-purple-900/30 border border-purple-800 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 text-white"
+                    className="w-full px-4 py-2 bg-saffron-950/40 border border-saffron-800 rounded-lg focus:outline-none focus:ring-2 focus:ring-saffron-500 text-white"
                     placeholder="Your name"
                   />
                 </div>
                 
                 <div>
-                  <label htmlFor="email" className="block text-sm font-medium text-purple-200 mb-1">Email</label>
+                  <label htmlFor="email" className="block text-sm font-medium text-saffron-100 mb-1">Email</label>
                   <input
                     type="email"
                     id="email"
@@ -147,13 +147,13 @@ export default function Contact() {
                     value={formState.email}
                     onChange={handleChange}
                     required
-                    className="w-full px-4 py-2 bg-purple-900/30 border border-purple-800 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 text-white"
+                    className="w-full px-4 py-2 bg-saffron-950/40 border border-saffron-800 rounded-lg focus:outline-none focus:ring-2 focus:ring-saffron-500 text-white"
                     placeholder="Your email"
                   />
                 </div>
                 
                 <div>
-                  <label htmlFor="message" className="block text-sm font-medium text-purple-200 mb-1">Message</label>
+                  <label htmlFor="message" className="block text-sm font-medium text-saffron-100 mb-1">Message</label>
                   <textarea
                     id="message"
                     name="message"
@@ -161,7 +161,7 @@ export default function Contact() {
                     onChange={handleChange}
                     required
                     rows={4}
-                    className="w-full px-4 py-2 bg-purple-900/30 border border-purple-800 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 text-white"
+                    className="w-full px-4 py-2 bg-saffron-950/40 border border-saffron-800 rounded-lg focus:outline-none focus:ring-2 focus:ring-saffron-500 text-white"
                     placeholder="Your message"
                   ></textarea>
                 </div>
@@ -169,7 +169,7 @@ export default function Contact() {
               
               <button
                 type="submit"
-                className={`mt-6 flex items-center justify-center w-full bg-gradient-to-r from-purple-600 to-pink-600 text-white font-medium py-2 px-4 rounded-lg hover:from-purple-700 hover:to-pink-700 transition-all duration-300 ${isSubmitted ? 'opacity-70 cursor-not-allowed' : ''}`}
+                className={`mt-6 flex items-center justify-center w-full bg-gradient-to-r from-saffron-500 to-bjp-green text-white font-medium py-2 px-4 rounded-lg hover:from-saffron-600 hover:to-bjp-green-dark transition-all duration-300 ${isSubmitted ? 'opacity-70 cursor-not-allowed' : ''}`}
                 disabled={isSubmitted}
               >
                 {isSubmitted ? (

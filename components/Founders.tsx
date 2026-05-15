@@ -48,7 +48,7 @@ function FounderCard({ name, role, bio, image, linkedin, index }: FounderCardPro
         </div>
         <div className="w-full md:w-2/3 p-6">
           <h3 className="text-2xl font-bold text-white">{name}</h3>
-          <p className="text-purple-300 mb-4">{role}</p>
+          <p className="text-saffron-300 mb-4">{role}</p>
           <p className="text-gray-300 mb-4">{bio}</p>
           
           {linkedin && (
@@ -56,7 +56,7 @@ function FounderCard({ name, role, bio, image, linkedin, index }: FounderCardPro
               href={linkedin} 
               target="_blank" 
               rel="noopener noreferrer"
-              className="inline-flex items-center text-purple-300 hover:text-white transition-colors duration-200"
+              className="inline-flex items-center text-saffron-300 hover:text-white transition-colors duration-200"
             >
               <Linkedin size={18} className="mr-2" />
               <span>Connect on LinkedIn</span>
@@ -97,8 +97,8 @@ export default function Founders() {
           className="text-center mb-16"
         >
           <h2 className="text-3xl sm:text-4xl font-bold text-white mb-4">Our Founders</h2>
-          <p className="text-purple-200 max-w-2xl mx-auto">The visionary leaders behind Shreshti's global success</p>
-          <div className="w-20 h-1 bg-gradient-to-r from-purple-500 to-pink-500 mx-auto mt-4"></div>
+          <p className="text-saffron-100 max-w-2xl mx-auto">The visionary leaders behind Shreshti's global success</p>
+          <div className="w-20 h-1 bg-gradient-to-r from-saffron-500 to-bjp-green mx-auto mt-4"></div>
         </motion.div>
         
         <div className="space-y-8">
@@ -129,7 +129,7 @@ export default function Founders() {
           </p>
           <a 
             href="#contact" 
-            className="inline-flex items-center bg-gradient-to-r from-purple-600 to-pink-600 text-white font-medium py-2 px-6 rounded-lg hover:from-purple-700 hover:to-pink-700 transition-all duration-300"
+            className="inline-flex items-center bg-gradient-to-r from-saffron-500 to-bjp-green text-white font-medium py-2 px-6 rounded-lg hover:from-saffron-600 hover:to-bjp-green-dark transition-all duration-300"
           >
             Get in Touch
             <ExternalLink size={16} className="ml-2" />
