@@ -4,8 +4,8 @@ export default function Footer() {
   return (
     <footer className="relative py-10 px-4 sm:px-6 lg:px-8 border-t border-purple-900/30">
       <div className="max-w-6xl mx-auto">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
-          <div className="md:col-span-2">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-8">
+          <div className="sm:col-span-2 lg:col-span-2">
             <h3 className="text-xl font-bold text-white mb-4">Shreshti</h3>
             <p className="text-gray-300 mb-4 max-w-md">
               Established in the Netherlands, Shreshti is a dynamic organization with subsidiaries spanning multiple industries and regions.
@@ -18,6 +18,7 @@ export default function Footer() {
               <li><a href="#" className="text-gray-300 hover:text-purple-300 transition-colors duration-200">Home</a></li>
               <li><a href="#subsidiaries" className="text-gray-300 hover:text-purple-300 transition-colors duration-200">Subsidiaries</a></li>
               <li><a href="#joint-ventures" className="text-gray-300 hover:text-purple-300 transition-colors duration-200">Joint Ventures</a></li>
+              <li><a href="#collaborations" className="text-gray-300 hover:text-purple-300 transition-colors duration-200">Collaborations</a></li>
               <li><a 
                 href="#software" 
                 onClick={(e) => { e.preventDefault(); window.location.href = '#software'; }} 
@@ -44,6 +45,16 @@ export default function Footer() {
               <li><a href="#subsidiaries" className="text-gray-300 hover:text-purple-300 transition-colors duration-200">KensoFI</a></li>
               <li><a href="#subsidiaries" className="text-gray-300 hover:text-purple-300 transition-colors duration-200">Emanate</a></li>
               <li><a href="#joint-ventures" className="text-gray-300 hover:text-purple-300 transition-colors duration-200">Joint Ventures</a></li>
+            </ul>
+          </div>
+
+          <div>
+            <h4 className="text-lg font-semibold text-white mb-4">Collaborations</h4>
+            <ul className="space-y-2">
+              <li><a href="https://quantamixsolutions.com/" target="_blank" rel="noopener noreferrer" className="text-gray-300 hover:text-purple-300 transition-colors duration-200">Quantamix Solutions</a></li>
+              <li><a href="https://sanatanadharmaway.eu/" target="_blank" rel="noopener noreferrer" className="text-gray-300 hover:text-purple-300 transition-colors duration-200">Sanātana Dharma Way</a></li>
+              <li><a href="https://kensofi.com/" target="_blank" rel="noopener noreferrer" className="text-gray-300 hover:text-purple-300 transition-colors duration-200">KensoFI</a></li>
+              <li><a href="https://www.lekhly.com/" target="_blank" rel="noopener noreferrer" className="text-gray-300 hover:text-purple-300 transition-colors duration-200">Lekhly</a></li>
             </ul>
           </div>
         </div>
