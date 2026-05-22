@@ -32,6 +32,12 @@ export default function WealthTools() {
             <p className="text-saffron-100 max-w-2xl mx-auto text-lg">
               Personal finance calculators for retirement planning, passive income targets, and portfolio assumptions — private, browser-only, no account required.
             </p>
+            <a
+              href="/resources.html"
+              className="inline-block mt-6 text-sm font-medium text-saffron-300 hover:text-white transition-colors"
+            >
+              Browse the full resources hub →
+            </a>
             <div className="w-20 h-1 bg-gradient-to-r from-saffron-500 to-bjp-green mx-auto mt-4" />
           </motion.div>
 

@@ -76,6 +76,7 @@ export default function App() {
         <Route path="/" element={<Home {...shaderProps} />} />
         <Route path="/software" element={<Software />} />
         <Route path="/wealth-tools" element={<WealthTools />} />
+        <Route path="/resources" element={<Navigate to="/resources.html" replace />} />
         <Route path="/wealth-tools/investment-universe" element={<InvestmentUniverse />} />
         <Route
           path="/wealth-tools/investment-universe.html"

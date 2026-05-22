@@ -1,0 +1,671 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Shreshti wealth resources hub — calculators, guides, country comparisons, retirement planning, tax optimization, and downloadable checklists for investors." />
+  <title>Resources Hub — Shreshti Wealth</title>
+  <style>
+    :root {
+      --navy: #0a1628;
+      --navy-light: #122038;
+      --saffron: #ff9933;
+      --saffron-muted: rgba(255, 153, 51, 0.15);
+      --green: #138808;
+      --surface: rgba(0, 0, 0, 0.4);
+      --border: rgba(255, 153, 51, 0.2);
+      --text: #f8fafc;
+      --text-muted: #cbd5e1;
+      --text-faint: #94a3b8;
+      --radius: 0.75rem;
+      --header-h: 56px;
+      --sidebar-w: 240px;
+      --font: "Segoe UI", system-ui, sans-serif;
+    }
+    *, *::before, *::after { box-sizing: border-box; }
+    html { scroll-behavior: smooth; font-size: 16px; }
+    body {
+      margin: 0;
+      font-family: var(--font);
+      background: var(--navy);
+      color: var(--text);
+      line-height: 1.5;
+      min-height: 100vh;
+    }
+    a { color: var(--saffron); text-decoration: none; }
+    a:hover { color: #ffb866; }
+    :focus-visible { outline: 2px solid var(--saffron); outline-offset: 2px; }
+    button, input { font: inherit; }
+
+    .tricolor { height: 3px; background: linear-gradient(90deg, var(--saffron) 33%, #fff 33% 66%, var(--green) 66%); }
+
+    .site-header {
+      position: sticky; top: 0; z-index: 200;
+      height: var(--header-h);
+      display: flex; align-items: center; gap: 12px;
+      padding: 0 16px;
+      background: rgba(10, 22, 40, 0.95);
+      backdrop-filter: blur(10px);
+      border-bottom: 1px solid var(--border);
+    }
+    .logo { display: flex; align-items: center; gap: 10px; color: var(--text); text-decoration: none; }
+    .logo-mark {
+      width: 32px; height: 32px; border-radius: 6px;
+      background: linear-gradient(135deg, var(--saffron), var(--green));
+      display: grid; place-items: center; font-weight: 700; font-size: 0.85rem; color: #fff;
+    }
+    .logo-text { font-weight: 700; font-size: 0.95rem; }
+    .logo-sub { font-size: 0.7rem; color: var(--text-faint); display: block; }
+    .header-nav { margin-left: auto; display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+    .header-nav a {
+      font-size: 0.8rem; color: var(--text-muted); padding: 6px 10px; border-radius: 6px;
+    }
+    .header-nav a:hover { background: var(--saffron-muted); color: var(--text); }
+
+    .app { display: flex; min-height: calc(100vh - var(--header-h) - 3px); }
+    .sidebar {
+      width: var(--sidebar-w); flex-shrink: 0;
+      background: var(--navy-light);
+      border-right: 1px solid var(--border);
+      position: sticky; top: calc(var(--header-h) + 3px);
+      max-height: calc(100vh - var(--header-h) - 3px);
+      overflow-y: auto;
+      padding: 16px 12px;
+    }
+    .sidebar-title {
+      font-size: 0.65rem; font-weight: 700; letter-spacing: 0.1em;
+      text-transform: uppercase; color: var(--saffron); margin: 0 0 10px 4px;
+    }
+    .catalog-group { margin-bottom: 18px; }
+    .catalog-group h3 {
+      font-size: 0.72rem; font-weight: 600; color: var(--text-faint);
+      text-transform: uppercase; letter-spacing: 0.06em;
+      margin: 0 0 6px 4px;
+    }
+    .catalog-link {
+      display: block; padding: 7px 10px; border-radius: 6px;
+      font-size: 0.82rem; color: var(--text-muted); text-decoration: none;
+    }
+    .catalog-link:hover, .catalog-link.active {
+      background: var(--saffron-muted); color: var(--text);
+    }
+    .catalog-link.active { font-weight: 600; color: var(--saffron); }
+
+    .main { flex: 1; min-width: 0; }
+
+    .hero {
+      padding: 40px 24px 32px;
+      border-bottom: 1px solid var(--border);
+      background: linear-gradient(180deg, rgba(255,153,51,0.08) 0%, transparent 70%);
+    }
+    .hero-eyebrow {
+      font-size: 0.7rem; font-weight: 600; letter-spacing: 0.12em;
+      text-transform: uppercase; color: var(--saffron); margin-bottom: 10px;
+    }
+    .hero h1 {
+      font-size: clamp(1.75rem, 4vw, 2.5rem); font-weight: 700;
+      margin: 0 0 12px; letter-spacing: -0.02em;
+    }
+    .hero-lead { font-size: 1.05rem; color: #ffe8cc; max-width: 42rem; margin: 0 0 10px; }
+    .hero-note { font-size: 0.85rem; color: var(--text-faint); max-width: 38rem; margin: 0; }
+    .hero-stats {
+      display: flex; flex-wrap: wrap; gap: 20px; margin-top: 24px;
+    }
+    .hero-stat strong { display: block; font-size: 1.35rem; color: #fff; }
+    .hero-stat span { font-size: 0.78rem; color: var(--text-faint); }
+
+    .toolbar {
+      position: sticky; top: calc(var(--header-h) + 3px); z-index: 100;
+      background: rgba(10, 22, 40, 0.92);
+      backdrop-filter: blur(8px);
+      border-bottom: 1px solid var(--border);
+      padding: 12px 24px;
+      display: flex; flex-wrap: wrap; gap: 12px; align-items: center;
+    }
+    .search-wrap { flex: 1; min-width: 200px; max-width: 360px; position: relative; }
+    .search-wrap svg {
+      position: absolute; left: 10px; top: 50%; transform: translateY(-50%);
+      width: 16px; height: 16px; color: var(--text-faint); pointer-events: none;
+    }
+    #search {
+      width: 100%; padding: 9px 12px 9px 34px;
+      border: 1px solid var(--border); border-radius: 8px;
+      background: var(--surface); color: var(--text);
+    }
+    #search::placeholder { color: var(--text-faint); }
+    .filter-chips { display: flex; flex-wrap: wrap; gap: 6px; }
+    .chip {
+      padding: 6px 12px; font-size: 0.75rem; border-radius: 999px;
+      border: 1px solid var(--border); background: transparent;
+      color: var(--text-muted); cursor: pointer; transition: 0.15s;
+    }
+    .chip:hover { border-color: var(--saffron); color: var(--text); }
+    .chip.active {
+      background: var(--saffron-muted); border-color: var(--saffron);
+      color: var(--saffron); font-weight: 600;
+    }
+
+    .section-nav {
+      display: flex; gap: 4px; overflow-x: auto;
+      padding: 8px 24px; border-bottom: 1px solid var(--border);
+      scrollbar-width: thin;
+    }
+    .section-nav a {
+      flex-shrink: 0; padding: 6px 12px; font-size: 0.78rem;
+      border-radius: 6px; color: var(--text-muted); text-decoration: none;
+    }
+    .section-nav a:hover { background: var(--saffron-muted); color: var(--text); }
+
+    .content { padding: 0 24px 48px; max-width: 1100px; }
+    .section { padding-top: 36px; scroll-margin-top: 140px; }
+    .section-head { margin-bottom: 20px; }
+    .section-head h2 {
+      font-size: 1.35rem; font-weight: 700; margin: 0 0 6px;
+      display: flex; align-items: center; gap: 10px;
+    }
+    .section-head h2::before {
+      content: ""; width: 4px; height: 1.1em; border-radius: 2px;
+      background: linear-gradient(180deg, var(--saffron), var(--green));
+    }
+    .section-head p { margin: 0; color: var(--text-muted); font-size: 0.9rem; max-width: 36rem; }
+
+    .card-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+      gap: 16px;
+    }
+    .resource-card {
+      background: var(--surface);
+      backdrop-filter: blur(8px);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 18px;
+      display: flex; flex-direction: column;
+      transition: border-color 0.2s, transform 0.2s;
+    }
+    .resource-card:hover { border-color: rgba(255, 153, 51, 0.45); }
+    .resource-card.hidden { display: none; }
+    .card-type {
+      font-size: 0.65rem; font-weight: 700; letter-spacing: 0.08em;
+      text-transform: uppercase; color: var(--saffron); margin-bottom: 8px;
+    }
+    .resource-card h3 { font-size: 1rem; margin: 0 0 8px; color: #fff; }
+    .resource-card p {
+      font-size: 0.82rem; color: var(--text-muted); margin: 0 0 12px; flex: 1;
+    }
+    .card-goals { display: flex; flex-wrap: wrap; gap: 4px; margin-bottom: 12px; }
+    .goal-tag {
+      font-size: 0.65rem; padding: 2px 8px; border-radius: 4px;
+      background: rgba(255,255,255,0.06); color: var(--text-faint);
+    }
+    .card-cta {
+      font-size: 0.8rem; font-weight: 600; color: var(--saffron);
+      display: inline-flex; align-items: center; gap: 4px;
+    }
+    .card-cta:hover { color: #fff; }
+
+    .lead-card {
+      border-style: dashed;
+      background: rgba(19, 136, 8, 0.08);
+    }
+    .lead-card .btn-download {
+      display: inline-block; margin-top: 4px;
+      padding: 8px 14px; font-size: 0.78rem; font-weight: 600;
+      border: none; border-radius: 6px; cursor: pointer;
+      background: linear-gradient(90deg, var(--saffron), var(--green));
+      color: #fff;
+    }
+    .lead-card .btn-download:hover { filter: brightness(1.08); }
+
+    .cta-block {
+      margin-top: 48px;
+      padding: 32px;
+      border-radius: var(--radius);
+      border: 1px solid var(--border);
+      background: linear-gradient(135deg, rgba(255,153,51,0.12), rgba(19,136,8,0.1));
+      text-align: center;
+    }
+    .cta-block h2 { margin: 0 0 10px; font-size: 1.5rem; }
+    .cta-block p { color: var(--text-muted); max-width: 32rem; margin: 0 auto 20px; font-size: 0.95rem; }
+    .btn-primary {
+      display: inline-flex; align-items: center; justify-content: center;
+      padding: 12px 24px; font-weight: 600; font-size: 0.9rem;
+      border-radius: 8px; border: none; cursor: pointer;
+      background: linear-gradient(90deg, var(--saffron), var(--green));
+      color: #fff; text-decoration: none;
+    }
+    .btn-primary:hover { filter: brightness(1.06); color: #fff; }
+    .btn-secondary {
+      display: inline-flex; margin-left: 10px;
+      padding: 12px 20px; font-size: 0.88rem; font-weight: 600;
+      border: 1px solid var(--border); border-radius: 8px;
+      color: var(--text-muted); text-decoration: none;
+    }
+    .btn-secondary:hover { border-color: var(--saffron); color: var(--text); }
+
+    .empty-state {
+      display: none; padding: 24px; text-align: center;
+      color: var(--text-faint); font-size: 0.9rem;
+    }
+    .empty-state.visible { display: block; }
+
+    .site-footer {
+      padding: 24px; border-top: 1px solid var(--border);
+      text-align: center; font-size: 0.78rem; color: var(--text-faint);
+    }
+    .site-footer a { color: var(--text-muted); }
+
+    @media (max-width: 900px) {
+      .sidebar { display: none; }
+      .hero, .content, .toolbar, .section-nav { padding-left: 16px; padding-right: 16px; }
+    }
+    @media (max-width: 520px) {
+      .btn-secondary { display: block; margin: 10px auto 0; width: fit-content; }
+    }
+  </style>
+</head>
+<body>
+  <div class="tricolor" aria-hidden="true"></div>
+  <header class="site-header">
+    <a href="/" class="logo">
+      <span class="logo-mark" aria-hidden="true">S</span>
+      <span>
+        <span class="logo-text">Shreshti</span>
+        <span class="logo-sub">Resources library</span>
+      </span>
+    </a>
+    <nav class="header-nav" aria-label="Site">
+      <a href="/">Home</a>
+      <a href="/wealth-tools">Wealth Tools</a>
+      <a href="/#contact">Contact</a>
+    </nav>
+  </header>
+
+  <div class="app">
+    <aside class="sidebar" aria-label="Library catalog">
+      <p class="sidebar-title">Browse by goal</p>
+      <div class="catalog-group">
+        <h3>Problems</h3>
+        <a href="#featured-tools" class="catalog-link" data-goal-filter="all">All resources</a>
+        <a href="#featured-tools" class="catalog-link" data-goal-filter="grow">Grow returns</a>
+        <a href="#country-comparison" class="catalog-link" data-goal-filter="compare">Compare countries</a>
+        <a href="#retirement" class="catalog-link" data-goal-filter="retire">Plan retirement</a>
+        <a href="#tax-portfolio" class="catalog-link" data-goal-filter="tax">Reduce tax drag</a>
+        <a href="#lead-magnets" class="catalog-link" data-goal-filter="preserve">Preserve wealth</a>
+      </div>
+      <div class="catalog-group">
+        <h3>Sections</h3>
+        <a href="#featured-tools" class="catalog-link">Featured tools</a>
+        <a href="#featured-guides" class="catalog-link">Featured guides</a>
+        <a href="#country-comparison" class="catalog-link">Country comparison</a>
+        <a href="#retirement" class="catalog-link">Retirement</a>
+        <a href="#tax-portfolio" class="catalog-link">Tax &amp; portfolio</a>
+        <a href="#lead-magnets" class="catalog-link">Downloads</a>
+        <a href="#advisor-cta" class="catalog-link">Speak with advisor</a>
+      </div>
+    </aside>
+
+    <div class="main">
+      <header class="hero" id="top">
+        <p class="hero-eyebrow">Wealth · education · tools</p>
+        <h1>Resources hub</h1>
+        <p class="hero-lead">
+          Tools, guides, calculators, checklists, and comparison pages—grouped by the problems you are trying to solve:
+          better returns, cross-border clarity, retirement income, and long-term wealth preservation.
+        </p>
+        <p class="hero-note">
+          Educational material only. Nothing here is personal financial, tax, or legal advice.
+        </p>
+        <div class="hero-stats" aria-label="Library at a glance">
+          <div class="hero-stat"><strong>7</strong><span>Interactive tools</span></div>
+          <div class="hero-stat"><strong>6</strong><span>Guides &amp; references</span></div>
+          <div class="hero-stat"><strong>4</strong><span>Download checklists</span></div>
+        </div>
+      </header>
+
+      <div class="toolbar" role="search">
+        <div class="search-wrap">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+          <input type="search" id="search" placeholder="Search tools, guides, topics…" autocomplete="off" aria-label="Search resources" />
+        </div>
+        <div class="filter-chips" role="group" aria-label="Filter by goal">
+          <button type="button" class="chip active" data-goal="all">All</button>
+          <button type="button" class="chip" data-goal="grow">Returns</button>
+          <button type="button" class="chip" data-goal="preserve">Preservation</button>
+          <button type="button" class="chip" data-goal="retire">Retirement</button>
+          <button type="button" class="chip" data-goal="tax">Tax</button>
+          <button type="button" class="chip" data-goal="compare">Compare</button>
+          <button type="button" class="chip" data-goal="property">Property</button>
+        </div>
+      </div>
+
+      <nav class="section-nav" aria-label="Page sections">
+        <a href="#featured-tools">Tools</a>
+        <a href="#featured-guides">Guides</a>
+        <a href="#country-comparison">Countries</a>
+        <a href="#retirement">Retirement</a>
+        <a href="#tax-portfolio">Tax &amp; portfolio</a>
+        <a href="#lead-magnets">Downloads</a>
+        <a href="#advisor-cta">Advisor</a>
+      </nav>
+
+      <div class="content">
+        <p id="empty-state" class="empty-state" role="status">No resources match your search. Try clearing filters or a different keyword.</p>
+
+        <section class="section" id="featured-tools">
+          <div class="section-head">
+            <h2>Featured tools</h2>
+            <p>Browser-based calculators—private, no account. Start with the highest-impact diagnostic for your situation.</p>
+          </div>
+          <div class="card-grid">
+            <article class="resource-card" data-search="portfolio efficiency scorecard audit fees diversification" data-goal="grow tax">
+              <span class="card-type">Tool</span>
+              <h3>Portfolio Efficiency Scorecard</h3>
+              <p>Score portfolio efficiency out of 100, surface return leaks, and prioritize fixes across fees, cash, concentration, and tax.</p>
+              <div class="card-goals"><span class="goal-tag">Returns</span><span class="goal-tag">Tax</span></div>
+              <a class="card-cta" href="/wealth-tools/portfolio-efficiency-scorecard">Run scorecard →</a>
+            </article>
+            <article class="resource-card" data-search="retirement income planner passive savings withdrawal" data-goal="retire grow">
+              <span class="card-type">Tool</span>
+              <h3>Retirement Income Planner</h3>
+              <p>Model whether your portfolio can reach a target passive income with compounding, inflation, and scenario presets.</p>
+              <div class="card-goals"><span class="goal-tag">Retirement</span><span class="goal-tag">Returns</span></div>
+              <a class="card-cta" href="/wealth-tools/retirement-income-planner">Open planner →</a>
+            </article>
+            <article class="resource-card" data-search="tax drag calculator dividends wealth tax compounding" data-goal="tax preserve">
+              <span class="card-type">Tool</span>
+              <h3>Tax Drag Calculator</h3>
+              <p>Quantify how dividend, wealth, and capital-gains treatment erodes decades of compounding—with country-style presets.</p>
+              <div class="card-goals"><span class="goal-tag">Tax</span><span class="goal-tag">Preservation</span></div>
+              <a class="card-cta" href="/wealth-tools/tax-drag-calculator">Open calculator →</a>
+            </article>
+            <article class="resource-card" data-search="investment universe asset classes alternatives" data-goal="grow">
+              <span class="card-type">Tool · reference</span>
+              <h3>The Investment Universe</h3>
+              <p>Structured comparison of traditional markets, alternatives, and niche exposures before you allocate capital.</p>
+              <div class="card-goals"><span class="goal-tag">Returns</span><span class="goal-tag">Education</span></div>
+              <a class="card-cta" href="/wealth-tools/investment-universe">Explore universe →</a>
+            </article>
+          </div>
+        </section>
+
+        <section class="section" id="featured-guides">
+          <div class="section-head">
+            <h2>Featured guides</h2>
+            <p>Long-form reference material—read before changing allocation, jurisdiction, or withdrawal strategy.</p>
+          </div>
+          <div class="card-grid">
+            <article class="resource-card" data-search="guide asset class traditional alternative niche" data-goal="grow">
+              <span class="card-type">Guide</span>
+              <h3>What is an asset class?</h3>
+              <p>How traditional, alternative, and niche sleeves differ in liquidity, drivers, and portfolio role—inside the Investment Universe.</p>
+              <div class="card-goals"><span class="goal-tag">Allocation</span></div>
+              <a class="card-cta" href="/wealth-tools/investment-universe#asset-class">Read section →</a>
+            </article>
+            <article class="resource-card" data-search="guide suitability goals time horizon income" data-goal="grow retire">
+              <span class="card-type">Guide</span>
+              <h3>Suitability by goal</h3>
+              <p>Map categories to objectives—growth, income, inflation hedge, diversification—without product pitches.</p>
+              <div class="card-goals"><span class="goal-tag">Goals</span></div>
+              <a class="card-cta" href="/wealth-tools/investment-universe#suitability">View lenses →</a>
+            </article>
+            <article class="resource-card" data-search="guide portfolio roles core satellite hedge" data-goal="preserve grow">
+              <span class="card-type">Guide</span>
+              <h3>Portfolio role groupings</h3>
+              <p>Core, satellite, hedge, and speculative sleeves—when each belongs in a diversified plan.</p>
+              <div class="card-goals"><span class="goal-tag">Structure</span></div>
+              <a class="card-cta" href="/wealth-tools/investment-universe#portfolio">See roles →</a>
+            </article>
+            <article class="resource-card" data-search="guide risk warnings liquidity leverage" data-goal="grow preserve">
+              <span class="card-type">Guide</span>
+              <h3>Risk &amp; complexity warnings</h3>
+              <p>Concentrated, illiquid, and levered exposures—what to verify before sizing a position.</p>
+              <div class="card-goals"><span class="goal-tag">Risk</span></div>
+              <a class="card-cta" href="/wealth-tools/investment-universe#warnings">Read risks →</a>
+            </article>
+          </div>
+        </section>
+
+        <section class="section" id="country-comparison">
+          <div class="section-head">
+            <h2>Country comparison resources</h2>
+            <p>For internationally mobile investors comparing tax drag, pensions, and property across jurisdictions.</p>
+          </div>
+          <div class="card-grid">
+            <article class="resource-card" data-search="global wealth preservation comparison switzerland netherlands germany uae singapore" data-goal="compare preserve tax">
+              <span class="card-type">Comparison</span>
+              <h3>Global Wealth Preservation Comparison</h3>
+              <p>Seven-jurisdiction dashboard: tax drag, pensions, real estate, and projected net worth over 10–25 years.</p>
+              <div class="card-goals"><span class="goal-tag">Cross-border</span><span class="goal-tag">Tax</span></div>
+              <a class="card-cta" href="/wealth-tools/global-wealth-preservation-comparison">Open comparison →</a>
+            </article>
+            <article class="resource-card" data-search="wealth preservation planner switzerland netherlands relocate" data-goal="compare preserve">
+              <span class="card-type">Comparison · planner</span>
+              <h3>Wealth Preservation Planner (CH / NL)</h3>
+              <p>Model net worth, tax drag, pensions, and property—stay, relocate, or move later between Switzerland and the Netherlands.</p>
+              <div class="card-goals"><span class="goal-tag">CH · NL</span></div>
+              <a class="card-cta" href="/wealth-tools/wealth-preservation-planner">Open planner →</a>
+            </article>
+            <article class="resource-card" data-search="tax drag low tax high tax netherlands switzerland preset" data-goal="compare tax">
+              <span class="card-type">Comparison</span>
+              <h3>Tax profile presets</h3>
+              <p>Side-by-side low-tax vs high-tax and NL / CH-style assumptions in the Tax Drag Calculator.</p>
+              <div class="card-goals"><span class="goal-tag">Tax profiles</span></div>
+              <a class="card-cta" href="/wealth-tools/tax-drag-calculator">Compare profiles →</a>
+            </article>
+          </div>
+        </section>
+
+        <section class="section" id="retirement">
+          <div class="section-head">
+            <h2>Retirement resources</h2>
+            <p>Income targets, sustainable withdrawal, and housing capacity—plan the transition from accumulation to decumulation.</p>
+          </div>
+          <div class="card-grid">
+            <article class="resource-card" data-search="retirement income planner withdrawal rate savings" data-goal="retire">
+              <span class="card-type">Calculator</span>
+              <h3>Retirement Income Planner</h3>
+              <p>Solve for monthly savings or sustainable income with sensitivity charts and scenario presets.</p>
+              <div class="card-goals"><span class="goal-tag">Income target</span></div>
+              <a class="card-cta" href="/wealth-tools/retirement-income-planner">Plan income →</a>
+            </article>
+            <article class="resource-card" data-search="mortgage capacity payment loan amortization" data-goal="retire property">
+              <span class="card-type">Calculator</span>
+              <h3>Additional Mortgage Capacity</h3>
+              <p>Translate an affordable extra monthly payment into borrowing capacity—with stress-rate comparison.</p>
+              <div class="card-goals"><span class="goal-tag">Property</span></div>
+              <a class="card-cta" href="/wealth-tools/additional-mortgage-capacity">Check capacity →</a>
+            </article>
+            <article class="resource-card" data-search="pension pillars netherlands switzerland wealth preservation" data-goal="retire compare">
+              <span class="card-type">Guide · tool</span>
+              <h3>Pension &amp; pillar modeling</h3>
+              <p>CH pillars and NL pension pots inside the Wealth Preservation Planner—linked to relocation scenarios.</p>
+              <div class="card-goals"><span class="goal-tag">Pensions</span></div>
+              <a class="card-cta" href="/wealth-tools/wealth-preservation-planner">Model pensions →</a>
+            </article>
+          </div>
+        </section>
+
+        <section class="section" id="tax-portfolio">
+          <div class="section-head">
+            <h2>Tax &amp; portfolio optimization resources</h2>
+            <p>Reduce leakage from tax, fees, and structure—then validate allocation fit against your horizon and goals.</p>
+          </div>
+          <div class="card-grid">
+            <article class="resource-card" data-search="tax drag dividends wealth tax capital gains" data-goal="tax">
+              <span class="card-type">Calculator</span>
+              <h3>Tax Drag Calculator</h3>
+              <p>Gross vs net projections, cumulative tax paid, and compounding lost over multi-decade horizons.</p>
+              <div class="card-goals"><span class="goal-tag">Tax drag</span></div>
+              <a class="card-cta" href="/wealth-tools/tax-drag-calculator">Calculate drag →</a>
+            </article>
+            <article class="resource-card" data-search="portfolio efficiency fees cash concentration rebalancing" data-goal="tax grow">
+              <span class="card-type">Diagnostic</span>
+              <h3>Portfolio Efficiency Scorecard</h3>
+              <p>Weighted audit across seven categories with personalized recommendations and uplift estimate.</p>
+              <div class="card-goals"><span class="goal-tag">Optimization</span></div>
+              <a class="card-cta" href="/wealth-tools/portfolio-efficiency-scorecard">Run audit →</a>
+            </article>
+            <article class="resource-card" data-search="comparison table asset categories liquidity volatility" data-goal="grow tax">
+              <span class="card-type">Reference</span>
+              <h3>Category comparison tables</h3>
+              <p>Filter traditional, alternative, niche, and collectible sleeves—compare liquidity and complexity in one view.</p>
+              <div class="card-goals"><span class="goal-tag">Allocation</span></div>
+              <a class="card-cta" href="/wealth-tools/investment-universe#comparison">Open tables →</a>
+            </article>
+          </div>
+        </section>
+
+        <section class="section" id="lead-magnets">
+          <div class="section-head">
+            <h2>Lead magnet downloads</h2>
+            <p>Practical checklists—request a copy and we will send the PDF. No spam; educational use only.</p>
+          </div>
+          <div class="card-grid">
+            <article class="resource-card lead-card" data-search="checklist pre allocation review download" data-goal="grow" data-lead="pre-allocation">
+              <span class="card-type">Checklist · PDF</span>
+              <h3>Pre-allocation review checklist</h3>
+              <p>12 questions to answer before increasing risk, illiquidity, or concentration in any sleeve.</p>
+              <div class="card-goals"><span class="goal-tag">Allocation</span></div>
+              <button type="button" class="btn-download" data-lead="pre-allocation">Request PDF</button>
+            </article>
+            <article class="resource-card lead-card" data-search="cross border relocation checklist download" data-goal="compare preserve" data-lead="relocation">
+              <span class="card-type">Checklist · PDF</span>
+              <h3>Cross-border relocation checklist</h3>
+              <p>Tax residency, pension portability, property, and banking—decision points before a move.</p>
+              <div class="card-goals"><span class="goal-tag">Mobility</span></div>
+              <button type="button" class="btn-download" data-lead="relocation">Request PDF</button>
+            </article>
+            <article class="resource-card lead-card" data-search="retirement readiness checklist download" data-goal="retire" data-lead="retirement-ready">
+              <span class="card-type">Checklist · PDF</span>
+              <h3>Retirement readiness checklist</h3>
+              <p>Income gap, withdrawal rate sanity, fee drag, and emergency liquidity—one-page review.</p>
+              <div class="card-goals"><span class="goal-tag">Retirement</span></div>
+              <button type="button" class="btn-download" data-lead="retirement-ready">Request PDF</button>
+            </article>
+            <article class="resource-card lead-card" data-search="annual portfolio hygiene checklist download" data-goal="tax grow" data-lead="hygiene">
+              <span class="card-type">Checklist · PDF</span>
+              <h3>Annual portfolio hygiene checklist</h3>
+              <p>Yearly review of fees, cash drag, rebalancing drift, tax lots, and goal alignment.</p>
+              <div class="card-goals"><span class="goal-tag">Maintenance</span></div>
+              <button type="button" class="btn-download" data-lead="hygiene">Request PDF</button>
+            </article>
+          </div>
+        </section>
+
+        <section class="section" id="advisor-cta">
+          <div class="cta-block">
+            <h2>Speak with an advisor</h2>
+            <p>
+              Tools and guides help you think clearly—they do not replace a conversation about your full balance sheet,
+              residency, family goals, and implementation. Reach out for a structured review.
+            </p>
+            <a href="/#contact" class="btn-primary">Contact Shreshti</a>
+            <a href="/wealth-tools" class="btn-secondary">Browse all tools</a>
+          </div>
+        </section>
+      </div>
+
+      <footer class="site-footer">
+        <p>&copy; <span id="year"></span> Shreshti · Educational resources only · <a href="/">Home</a> · <a href="/#contact">Contact</a></p>
+      </footer>
+    </div>
+  </div>
+
+  <script>
+    (function () {
+      var yearEl = document.getElementById('year');
+      if (yearEl) yearEl.textContent = String(new Date().getFullYear());
+
+      var searchInput = document.getElementById('search');
+      var chips = document.querySelectorAll('.chip[data-goal]');
+      var catalogLinks = document.querySelectorAll('.catalog-link[data-goal-filter]');
+      var cards = document.querySelectorAll('.resource-card');
+      var emptyState = document.getElementById('empty-state');
+      var activeGoal = 'all';
+
+      function cardMatches(card, query, goal) {
+        var searchBlob = (card.getAttribute('data-search') || '') + ' ' + card.textContent;
+        var cardGoals = (card.getAttribute('data-goal') || '').split(/\s+/);
+        var matchesQuery = !query || searchBlob.toLowerCase().indexOf(query) !== -1;
+        var matchesGoal = goal === 'all' || cardGoals.indexOf(goal) !== -1;
+        return matchesQuery && matchesGoal;
+      }
+
+      function applyFilters() {
+        var query = (searchInput && searchInput.value || '').trim().toLowerCase();
+        var visible = 0;
+        cards.forEach(function (card) {
+          var show = cardMatches(card, query, activeGoal);
+          card.classList.toggle('hidden', !show);
+          if (show) visible++;
+        });
+        if (emptyState) emptyState.classList.toggle('visible', visible === 0);
+      }
+
+      if (searchInput) {
+        searchInput.addEventListener('input', applyFilters);
+      }
+
+      chips.forEach(function (chip) {
+        chip.addEventListener('click', function () {
+          activeGoal = chip.getAttribute('data-goal') || 'all';
+          chips.forEach(function (c) { c.classList.toggle('active', c === chip); });
+          catalogLinks.forEach(function (link) {
+            var g = link.getAttribute('data-goal-filter');
+            link.classList.toggle('active', g === activeGoal);
+          });
+          applyFilters();
+        });
+      });
+
+      catalogLinks.forEach(function (link) {
+        link.addEventListener('click', function (e) {
+          var g = link.getAttribute('data-goal-filter');
+          if (!g) return;
+          e.preventDefault();
+          activeGoal = g;
+          chips.forEach(function (c) {
+            c.classList.toggle('active', c.getAttribute('data-goal') === activeGoal);
+          });
+          catalogLinks.forEach(function (l) {
+            l.classList.toggle('active', l.getAttribute('data-goal-filter') === activeGoal);
+          });
+          applyFilters();
+          var target = link.getAttribute('href');
+          if (target) document.querySelector(target)?.scrollIntoView({ behavior: 'smooth' });
+        });
+      });
+
+      document.querySelectorAll('.btn-download').forEach(function (btn) {
+        btn.addEventListener('click', function () {
+          var id = btn.getAttribute('data-lead') || 'resource';
+          var title = btn.closest('.resource-card')?.querySelector('h3')?.textContent || 'Resource';
+          var subject = encodeURIComponent('Resource download: ' + title);
+          var body = encodeURIComponent(
+            'Hi,\n\nI would like to receive the PDF checklist: "' + title + '" (id: ' + id + ').\n\nThank you.'
+          );
+          window.location.href = '/#contact';
+          try { sessionStorage.setItem('resourceLead', JSON.stringify({ id: id, title: title })); } catch (_) {}
+        });
+      });
+
+      var sectionIds = ['featured-tools', 'featured-guides', 'country-comparison', 'retirement', 'tax-portfolio', 'lead-magnets', 'advisor-cta'];
+      if ('IntersectionObserver' in window) {
+        var observer = new IntersectionObserver(function (entries) {
+          entries.forEach(function (entry) {
+            if (!entry.isIntersecting) return;
+            document.querySelectorAll('.catalog-link[href="#' + entry.target.id + '"]').forEach(function (a) {
+              if (!a.hasAttribute('data-goal-filter')) a.classList.add('active');
+            });
+          });
+        }, { rootMargin: '-40% 0px -50% 0px', threshold: 0 });
+        sectionIds.forEach(function (id) {
+          var el = document.getElementById(id);
+          if (el) observer.observe(el);
+        });
+      }
+    })();
+  </script>
+</body>
+</html>
