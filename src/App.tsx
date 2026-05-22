@@ -123,6 +123,19 @@ export default function App() {
           path="/wealth-tools/additional-mortgage-capacity.html"
           element={<Navigate to="/wealth-tools/additional-mortgage-capacity" replace />}
         />
+        <Route
+          path="/wealth-tools/global-wealth-preservation-comparison"
+          element={
+            <WealthToolFrame
+              src="/wealth-tools/global-wealth-preservation-comparison.html"
+              title="Global Wealth Preservation Comparison"
+            />
+          }
+        />
+        <Route
+          path="/wealth-tools/global-wealth-preservation-comparison.html"
+          element={<Navigate to="/wealth-tools/global-wealth-preservation-comparison" replace />}
+        />
         <Route path="/profile" element={<Profile />} />
         <Route path="/bjp" element={<BJP />} />
         <Route path="/communities" element={<IndianCommunities />} />

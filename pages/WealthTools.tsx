@@ -1,6 +1,6 @@
 import { motion } from 'motion/react';
 import { Link } from 'react-router-dom';
-import { ExternalLink, Home, LineChart, PiggyBank, Scale } from 'lucide-react';
+import { ExternalLink, Globe, Home, LineChart, PiggyBank, Scale } from 'lucide-react';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import { wealthTools } from '../lib/wealthTools';
@@ -10,6 +10,7 @@ const ICONS = {
   portfolio: PiggyBank,
   tax: Scale,
   mortgage: Home,
+  globe: Globe,
 } as const;
 
 export default function WealthTools() {

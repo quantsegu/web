@@ -1,0 +1,1422 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Global wealth preservation comparison — seven jurisdictions, tax drag, pensions, and long-term net worth for internationally mobile investors." />
+  <title>Global Wealth Preservation Comparison</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js" defer></script>
+  <style>
+    :root {
+      --accent: #0d6e6e;
+      --accent-hover: #0a5858;
+      --accent-muted: rgba(13, 110, 110, 0.12);
+      --bg: #f4f4f2;
+      --surface: #ffffff;
+      --surface-2: #ebebea;
+      --border: #d4d4d0;
+      --text: #1a1a18;
+      --text-muted: #5c5c58;
+      --text-faint: #8a8a85;
+      --positive: #1a6b3c;
+      --negative: #9b2c2c;
+      --warning: #8a6d1a;
+      --shadow: 0 1px 3px rgba(0,0,0,0.06);
+      --radius: 4px;
+      --font: "Helvetica Neue", Helvetica, Arial, system-ui, sans-serif;
+      --mono: ui-monospace, "SF Mono", Menlo, monospace;
+      --sidebar-w: 300px;
+      --header-h: 48px;
+    }
+    [data-theme="dark"] {
+      --accent: #3db8b0;
+      --accent-hover: #5cc9c2;
+      --accent-muted: rgba(61, 184, 176, 0.15);
+      --bg: #141413;
+      --surface: #1e1e1c;
+      --surface-2: #282826;
+      --border: #3a3a36;
+      --text: #ecece8;
+      --text-muted: #a8a8a2;
+      --text-faint: #72726c;
+      --positive: #4db87a;
+      --negative: #e07070;
+      --warning: #d4b84a;
+      --shadow: 0 1px 3px rgba(0,0,0,0.35);
+    }
+    *, *::before, *::after { box-sizing: border-box; }
+    html { font-size: 14px; scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      font-family: var(--font);
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.45;
+      min-height: 100vh;
+      font-feature-settings: "tnum" 1, "lnum" 1;
+    }
+    .tabular { font-variant-numeric: tabular-nums lining-nums; }
+    button, input, select { font-family: inherit; font-size: inherit; }
+    a { color: var(--accent); }
+    :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+    .app-header {
+      position: sticky; top: 0; z-index: 100;
+      height: var(--header-h);
+      display: flex; align-items: center; gap: 12px;
+      padding: 0 16px;
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      box-shadow: var(--shadow);
+    }
+    .logo { display: flex; align-items: center; gap: 8px; text-decoration: none; color: var(--text); }
+    .logo svg { width: 28px; height: 28px; flex-shrink: 0; }
+    .logo-title { font-size: 0.95rem; font-weight: 600; letter-spacing: -0.02em; }
+    .logo-sub { font-size: 0.7rem; color: var(--text-muted); }
+    .header-actions { margin-left: auto; display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+    .btn {
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 6px 12px;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      background: var(--surface);
+      color: var(--text);
+      cursor: pointer;
+      font-size: 0.8rem;
+      white-space: nowrap;
+      text-decoration: none;
+    }
+    .btn:hover { background: var(--surface-2); }
+    .btn-primary { background: var(--accent); border-color: var(--accent); color: #fff; }
+    [data-theme="dark"] .btn-primary { color: #0a1414; }
+    .btn-primary:hover { background: var(--accent-hover); border-color: var(--accent-hover); }
+    .btn-sm { padding: 4px 8px; font-size: 0.75rem; }
+    .btn-group { display: flex; border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; }
+    .btn-group .btn { border: none; border-radius: 0; border-right: 1px solid var(--border); }
+    .btn-group .btn:last-child { border-right: none; }
+    .btn-group .btn.active { background: var(--accent-muted); color: var(--accent); font-weight: 600; }
+
+    .app-shell { display: flex; min-height: calc(100vh - var(--header-h)); }
+    .sidebar {
+      width: var(--sidebar-w); flex-shrink: 0;
+      background: var(--surface);
+      border-right: 1px solid var(--border);
+      overflow-y: auto;
+      max-height: calc(100vh - var(--header-h));
+      position: sticky; top: var(--header-h);
+    }
+    .sidebar-inner { padding: 12px; }
+    .main { flex: 1; min-width: 0; }
+    .main-scroll { padding: 12px 16px 32px; }
+
+    .panel-title {
+      font-size: 0.65rem; font-weight: 600; text-transform: uppercase;
+      letter-spacing: 0.08em; color: var(--text-faint);
+      margin: 14px 0 8px;
+    }
+    .panel-title:first-child { margin-top: 0; }
+    .field { margin-bottom: 10px; }
+    .field label { display: block; font-size: 0.75rem; color: var(--text-muted); margin-bottom: 3px; }
+    .field input, .field select {
+      width: 100%; padding: 6px 8px;
+      border: 1px solid var(--border); border-radius: var(--radius);
+      background: var(--bg); color: var(--text);
+    }
+    .field-hint { font-size: 0.68rem; color: var(--text-faint); margin-top: 2px; }
+    .input-row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+    .toggle-row {
+      display: flex; align-items: center; justify-content: space-between;
+      font-size: 0.75rem; color: var(--text-muted); margin-bottom: 8px;
+    }
+    .toggle-row input { width: auto; accent-color: var(--accent); }
+
+    .hero {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 20px;
+      margin-bottom: 12px;
+      box-shadow: var(--shadow);
+    }
+    .hero-eyebrow {
+      font-size: 0.65rem; font-weight: 600; text-transform: uppercase;
+      letter-spacing: 0.1em; color: var(--accent); margin: 0 0 6px;
+    }
+    .hero h1 { margin: 0 0 8px; font-size: 1.4rem; font-weight: 600; letter-spacing: -0.03em; line-height: 1.2; }
+    .hero-lead { margin: 0; font-size: 0.88rem; color: var(--text-muted); max-width: 52rem; line-height: 1.55; }
+    .hero-points {
+      display: flex; flex-wrap: wrap; gap: 8px 16px;
+      margin-top: 14px; padding-top: 12px;
+      border-top: 1px solid var(--border);
+      font-size: 0.72rem; color: var(--text-faint);
+    }
+    .hero-points span::before { content: "— "; color: var(--border); }
+
+    .interpretation {
+      background: var(--accent-muted);
+      border: 1px solid var(--border);
+      border-left: 3px solid var(--accent);
+      border-radius: var(--radius);
+      padding: 10px 12px;
+      font-size: 0.85rem;
+      margin-bottom: 12px;
+      line-height: 1.5;
+    }
+    .summary-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+      gap: 8px; margin-bottom: 12px;
+    }
+    .summary-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 10px;
+      box-shadow: var(--shadow);
+    }
+    .summary-card .label { font-size: 0.65rem; color: var(--text-faint); text-transform: uppercase; letter-spacing: 0.05em; }
+    .summary-card .value { font-size: 1.05rem; font-weight: 600; margin-top: 2px; }
+    .summary-card .sub { font-size: 0.68rem; color: var(--text-muted); margin-top: 2px; }
+    .summary-card.highlight { border-color: var(--accent); }
+    .positive { color: var(--positive); }
+    .negative { color: var(--negative); }
+
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      margin-bottom: 12px;
+      box-shadow: var(--shadow);
+    }
+    .card-header {
+      padding: 8px 12px;
+      border-bottom: 1px solid var(--border);
+      font-size: 0.8rem; font-weight: 600;
+    }
+    .card-body { padding: 12px; }
+    .chart-wrap { position: relative; height: 240px; }
+    .chart-wrap.tall { height: 280px; }
+    .charts-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    @media (max-width: 960px) { .charts-row { grid-template-columns: 1fr; } }
+
+    .jurisdiction-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+      gap: 10px;
+      margin-bottom: 12px;
+    }
+    .jurisdiction-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 10px 12px;
+      box-shadow: var(--shadow);
+      cursor: pointer;
+      transition: border-color 0.15s;
+    }
+    .jurisdiction-card:hover { border-color: var(--accent); }
+    .jurisdiction-card.active { border-color: var(--accent); box-shadow: 0 0 0 1px var(--accent); }
+    .jurisdiction-card h3 { margin: 0 0 8px; font-size: 0.85rem; font-weight: 600; }
+    .jurisdiction-card .code { font-size: 0.65rem; color: var(--text-faint); font-weight: 400; }
+    .profile-row {
+      display: flex; justify-content: space-between; gap: 8px;
+      font-size: 0.7rem; padding: 3px 0;
+      border-bottom: 1px solid var(--border);
+    }
+    .profile-row:last-child { border-bottom: none; }
+    .profile-row dt { color: var(--text-faint); margin: 0; }
+    .profile-row dd { margin: 0; font-weight: 500; text-align: right; }
+
+    .table-wrap { overflow-x: auto; }
+    table { width: 100%; border-collapse: collapse; font-size: 0.72rem; }
+    th, td {
+      padding: 6px 8px;
+      text-align: center;
+      border-bottom: 1px solid var(--border);
+      white-space: nowrap;
+    }
+    th { position: sticky; top: 0; background: var(--surface-2); font-weight: 600; color: var(--text-muted); z-index: 1; }
+    th:first-child, td:first-child { text-align: left; position: sticky; left: 0; background: var(--surface); z-index: 2; }
+    th:first-child { background: var(--surface-2); }
+    tr:hover td { background: var(--accent-muted); }
+    tr.best-row td { font-weight: 600; }
+    tr.best-row td:first-child { color: var(--accent); }
+
+    .insight-block { margin-bottom: 14px; }
+    .insight-block h3 { margin: 0 0 6px; font-size: 0.82rem; font-weight: 600; }
+    .insight-block p { margin: 0; font-size: 0.78rem; color: var(--text-muted); line-height: 1.55; }
+    .insight-winner {
+      display: inline-block;
+      margin-top: 6px;
+      padding: 3px 8px;
+      background: var(--accent-muted);
+      border-radius: var(--radius);
+      font-size: 0.72rem;
+      font-weight: 600;
+      color: var(--accent);
+    }
+
+    .framework-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      gap: 8px;
+    }
+    .framework-item {
+      padding: 10px 12px;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      background: var(--bg);
+      font-size: 0.75rem;
+    }
+    .framework-item strong { display: block; font-size: 0.78rem; margin-bottom: 4px; }
+    .framework-item .pick { color: var(--accent); font-weight: 600; margin-top: 4px; }
+
+    details.method {
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      background: var(--surface);
+      margin-bottom: 12px;
+    }
+    details.method summary { padding: 10px 12px; cursor: pointer; font-weight: 600; font-size: 0.8rem; }
+    details.method .method-body {
+      padding: 0 12px 12px;
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      line-height: 1.55;
+    }
+
+    .cta-block {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-left: 3px solid var(--accent);
+      border-radius: var(--radius);
+      padding: 16px 18px;
+      display: flex; flex-wrap: wrap; align-items: center; gap: 12px 20px;
+    }
+    .cta-block h2 { margin: 0; font-size: 0.95rem; font-weight: 600; flex: 1 1 200px; }
+    .cta-block p { margin: 4px 0 0; font-size: 0.78rem; color: var(--text-muted); flex: 1 1 100%; }
+    .cta-actions { display: flex; flex-wrap: wrap; gap: 8px; }
+
+    .horizon-pills { display: flex; gap: 4px; flex-wrap: wrap; margin-bottom: 10px; }
+    .horizon-pills button {
+      padding: 5px 10px; font-size: 0.72rem;
+      border: 1px solid var(--border); border-radius: var(--radius);
+      background: var(--bg); color: var(--text-muted); cursor: pointer;
+    }
+    .horizon-pills button.active { border-color: var(--accent); background: var(--accent-muted); color: var(--accent); font-weight: 600; }
+
+    .state-banner {
+      display: none; padding: 8px 12px; font-size: 0.75rem;
+      border-radius: var(--radius); margin-bottom: 8px;
+    }
+    .state-banner.visible { display: block; }
+    .state-banner.error { background: rgba(155,44,44,0.12); color: var(--negative); border: 1px solid var(--negative); }
+
+    /* Design-system validation block (hidden in production view) */
+    #ds-sandbox[hidden] { display: none !important; }
+    #ds-sandbox {
+      border: 2px dashed var(--warning);
+      border-radius: var(--radius);
+      padding: 12px;
+      margin-bottom: 12px;
+      background: var(--surface-2);
+    }
+    #ds-sandbox h2 { margin: 0 0 8px; font-size: 0.8rem; color: var(--warning); }
+
+    @media print {
+      .sidebar, .app-header .header-actions, .no-print { display: none !important; }
+      .app-shell { display: block; }
+    }
+    @media (max-width: 768px) {
+      .app-shell { flex-direction: column; }
+      .sidebar { width: 100%; max-height: none; position: static; border-right: none; border-bottom: 1px solid var(--border); }
+    }
+  </style>
+</head>
+<body>
+  <header class="app-header no-print">
+    <a class="logo" href="/wealth-tools" aria-label="Back to Wealth Tools">
+      <svg viewBox="0 0 32 32" aria-hidden="true" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <rect width="32" height="32" rx="4" fill="currentColor" opacity="0.08"/>
+        <circle cx="16" cy="16" r="9" stroke="currentColor" stroke-width="1.25" opacity="0.5"/>
+        <path d="M8 16 H24 M16 8 V24" stroke="var(--accent)" stroke-width="1.5"/>
+      </svg>
+      <div>
+        <div class="logo-title">Global Wealth Preservation</div>
+        <div class="logo-sub">7 jurisdictions · planning dashboard</div>
+      </div>
+    </a>
+    <div class="header-actions">
+      <div class="btn-group" role="group" aria-label="Display currency">
+        <button type="button" class="btn btn-sm active" id="btnCurCHF" aria-pressed="true">CHF</button>
+        <button type="button" class="btn btn-sm" id="btnCurEUR" aria-pressed="false">EUR</button>
+        <button type="button" class="btn btn-sm" id="btnCurUSD" aria-pressed="false">USD</button>
+      </div>
+      <div class="btn-group" role="group" aria-label="Value mode">
+        <button type="button" class="btn btn-sm active" id="btnNominal" aria-pressed="true">Nominal</button>
+        <button type="button" class="btn btn-sm" id="btnReal" aria-pressed="false">Real</button>
+      </div>
+      <a href="/wealth-tools" class="btn btn-sm">Wealth Tools</a>
+      <button type="button" class="btn btn-sm" id="btnPrint">Print</button>
+      <button type="button" class="btn btn-sm" id="btnTheme" aria-label="Toggle theme">Dark</button>
+    </div>
+  </header>
+
+  <div class="app-shell">
+    <aside class="sidebar no-print" aria-label="Comparison assumptions">
+      <div class="sidebar-inner">
+        <button type="button" class="btn btn-primary" style="width:100%;margin-bottom:8px" id="btnReset">Reset assumptions</button>
+
+        <p class="panel-title">Timeline</p>
+        <div class="input-row">
+          <div class="field">
+            <label for="currentAge">Current age</label>
+            <input type="number" id="currentAge" min="25" max="70" value="40" />
+          </div>
+          <div class="field">
+            <label for="retirementAge">Retirement age</label>
+            <input type="number" id="retirementAge" min="55" max="75" value="65" />
+          </div>
+        </div>
+        <div class="field">
+          <label for="planningHorizon">Planning horizon (years)</label>
+          <input type="number" id="planningHorizon" min="10" max="40" value="25" />
+        </div>
+
+        <p class="panel-title">Salary &amp; savings</p>
+        <div class="field">
+          <label for="grossSalary">Gross annual salary</label>
+          <input type="number" id="grossSalary" min="0" step="1000" value="180000" class="tabular" />
+        </div>
+        <div class="input-row">
+          <div class="field">
+            <label for="salaryGrowth">Salary growth (%/yr)</label>
+            <input type="number" id="salaryGrowth" min="0" max="12" step="0.1" value="2" />
+          </div>
+          <div class="field">
+            <label for="savingsRate">Savings rate (% gross)</label>
+            <input type="number" id="savingsRate" min="5" max="55" step="1" value="28" />
+          </div>
+        </div>
+        <div class="field">
+          <label for="annualSavings">Or fixed annual savings override</label>
+          <input type="number" id="annualSavings" min="0" step="1000" value="0" class="tabular" />
+          <p class="field-hint">0 = use savings rate × salary</p>
+        </div>
+
+        <p class="panel-title">Portfolio</p>
+        <div class="field">
+          <label for="portfolioValue">Starting liquid portfolio</label>
+          <input type="number" id="portfolioValue" min="0" step="5000" value="450000" class="tabular" />
+        </div>
+        <div class="input-row">
+          <div class="field">
+            <label for="portfolioReturn">Expected return (%/yr)</label>
+            <input type="number" id="portfolioReturn" min="0" max="12" step="0.1" value="6" />
+          </div>
+          <div class="field">
+            <label for="dividendYield">Dividend yield (%)</label>
+            <input type="number" id="dividendYield" min="0" max="6" step="0.1" value="2" />
+          </div>
+        </div>
+        <div class="field">
+          <label for="feeDrag">Fee drag (%/yr)</label>
+          <input type="number" id="feeDrag" min="0" max="2" step="0.05" value="0.4" />
+        </div>
+
+        <p class="panel-title">Real estate</p>
+        <div class="toggle-row">
+          <label for="ownsProperty">Own investment property</label>
+          <input type="checkbox" id="ownsProperty" checked />
+        </div>
+        <div id="reFields">
+          <div class="input-row">
+            <div class="field">
+              <label for="propertyValue">Property value</label>
+              <input type="number" id="propertyValue" min="0" step="10000" value="0" class="tabular" />
+            </div>
+            <div class="field">
+              <label for="mortgageBalance">Mortgage</label>
+              <input type="number" id="mortgageBalance" min="0" step="5000" value="0" class="tabular" />
+            </div>
+          </div>
+          <div class="input-row">
+            <div class="field">
+              <label for="propertyAppreciation">Appreciation (%/yr)</label>
+              <input type="number" id="propertyAppreciation" min="-2" max="8" step="0.1" value="2.5" />
+            </div>
+            <div class="field">
+              <label for="rentalIncome">Rental income / yr</label>
+              <input type="number" id="rentalIncome" min="0" step="500" value="0" class="tabular" />
+            </div>
+          </div>
+        </div>
+
+        <p class="panel-title">Pension (planning)</p>
+        <div class="field">
+          <label for="pensionPot">Existing pension capital</label>
+          <input type="number" id="pensionPot" min="0" step="5000" value="95000" class="tabular" />
+        </div>
+        <div class="field">
+          <label for="pensionReturn">Pension growth (%/yr)</label>
+          <input type="number" id="pensionReturn" min="0" max="8" step="0.1" value="3" />
+        </div>
+
+        <p class="panel-title">Relocation</p>
+        <div class="field">
+          <label for="baseJurisdiction">Starting jurisdiction (all scenarios)</label>
+          <select id="baseJurisdiction">
+            <option value="NL">Netherlands</option>
+            <option value="CH">Switzerland</option>
+            <option value="DE">Germany</option>
+            <option value="BE">Belgium</option>
+            <option value="AE">Dubai / UAE</option>
+            <option value="SG">Singapore</option>
+            <option value="LU">Luxembourg</option>
+          </select>
+        </div>
+        <div class="toggle-row">
+          <label for="relocationOn">Model move during horizon</label>
+          <input type="checkbox" id="relocationOn" />
+        </div>
+        <div id="moveFields" hidden>
+          <div class="input-row">
+            <div class="field">
+              <label for="moveYear">Move in year</label>
+              <input type="number" id="moveYear" min="1" max="30" value="5" />
+            </div>
+            <div class="field">
+              <label for="moveTarget">Move to</label>
+              <select id="moveTarget">
+                <option value="CH">Switzerland</option>
+                <option value="AE">Dubai / UAE</option>
+                <option value="SG">Singapore</option>
+                <option value="NL">Netherlands</option>
+                <option value="DE">Germany</option>
+                <option value="BE">Belgium</option>
+                <option value="LU">Luxembourg</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <p class="panel-title">Macro &amp; FX</p>
+        <div class="field">
+          <label for="inflation">Inflation (%/yr)</label>
+          <input type="number" id="inflation" min="0" max="8" step="0.1" value="2" />
+        </div>
+        <div class="field">
+          <label for="withdrawalRate">Portfolio withdrawal rate (%)</label>
+          <input type="number" id="withdrawalRate" min="2.5" max="5" step="0.1" value="3.5" />
+        </div>
+        <div class="input-row">
+          <div class="field">
+            <label for="fxEurChf">EUR/CHF</label>
+            <input type="number" id="fxEurChf" min="0.7" max="1.2" step="0.001" value="0.94" />
+          </div>
+          <div class="field">
+            <label for="fxUsdChf">USD/CHF</label>
+            <input type="number" id="fxUsdChf" min="0.7" max="1.2" step="0.001" value="0.88" />
+          </div>
+        </div>
+      </div>
+    </aside>
+
+    <main class="main">
+      <div class="main-scroll">
+        <section id="ds-sandbox" hidden aria-hidden="true">
+          <h2>Design system check</h2>
+          <div class="summary-grid tabular">
+            <div class="summary-card highlight"><div class="label">KPI</div><div class="value">CHF 2.4M</div><div class="sub">Sample</div></div>
+            <div class="summary-card"><div class="label">Drag</div><div class="value negative">−4.2%</div></div>
+          </div>
+          <div class="field"><label>Input</label><input type="number" value="100000" /></div>
+          <button type="button" class="btn btn-primary btn-sm">Primary</button>
+        </section>
+
+        <section class="hero" aria-labelledby="heroTitle">
+          <p class="hero-eyebrow">Cross-border wealth · executive briefing</p>
+          <h1 id="heroTitle">Where Does More Wealth Survive?</h1>
+          <p class="hero-lead">
+            An analytical comparison for internationally mobile investors and high-income professionals. Model how salary, investment taxation, pensions, and real-estate economics compound — or erode — total net worth across Switzerland, the Netherlands, Germany, Belgium, Dubai/UAE, Singapore, and Luxembourg over 10, 20, and 25-year horizons.
+          </p>
+          <div class="hero-points">
+            <span>Seven jurisdictions side by side</span>
+            <span>Annual tax drag &amp; compounding</span>
+            <span>Pension &amp; property layers</span>
+            <span>Planning logic — not legal advice</span>
+          </div>
+        </section>
+
+        <div class="horizon-pills no-print" role="group" aria-label="Highlight horizon">
+          <button type="button" data-horizon="10" class="active">10-year lens</button>
+          <button type="button" data-horizon="20">20-year lens</button>
+          <button type="button" data-horizon="25">25-year lens</button>
+        </div>
+
+        <div id="stateBanner" class="state-banner" role="status" aria-live="polite"></div>
+        <p class="interpretation tabular" id="interpretation" aria-live="polite"></p>
+        <div class="summary-grid tabular" id="summaryGrid" aria-label="Headline comparison metrics"></div>
+
+        <section aria-labelledby="cardsTitle">
+          <h2 id="cardsTitle" class="panel-title" style="margin:0 0 8px;font-size:0.75rem;color:var(--text)">Jurisdiction profiles</h2>
+          <div class="jurisdiction-grid" id="jurisdictionCards"></div>
+        </section>
+
+        <div class="charts-row">
+          <section class="card">
+            <div class="card-header">Total net worth over time (all jurisdictions)</div>
+            <div class="card-body"><div class="chart-wrap tall"><canvas id="chartNetWorth" aria-label="Net worth projection chart"></canvas></div></div>
+          </section>
+          <section class="card">
+            <div class="card-header">Average annual tax drag</div>
+            <div class="card-body"><div class="chart-wrap"><canvas id="chartTaxDrag" aria-label="Tax drag by jurisdiction"></canvas></div></div>
+          </section>
+        </div>
+        <div class="charts-row">
+          <section class="card">
+            <div class="card-header">Asset mix at horizon (<span id="focusJLabel">—</span>)</div>
+            <div class="card-body"><div class="chart-wrap"><canvas id="chartAssets" aria-label="Asset composition"></canvas></div></div>
+          </section>
+          <section class="card">
+            <div class="card-header">Retirement income potential</div>
+            <div class="card-body"><div class="chart-wrap"><canvas id="chartRetirement" aria-label="Retirement income by jurisdiction"></canvas></div></div>
+          </section>
+        </div>
+        <section class="card">
+          <div class="card-header">Ranked wealth preservation (horizon net worth)</div>
+          <div class="card-body"><div class="chart-wrap"><canvas id="chartRank" aria-label="Ranked outcomes"></canvas></div></div>
+        </section>
+
+        <section class="card">
+          <div class="card-header">Detailed comparison matrix</div>
+          <div class="table-wrap">
+            <table id="compareMatrix">
+              <thead>
+                <tr>
+                  <th scope="col">Dimension</th>
+                  <th scope="col">CH</th>
+                  <th scope="col">NL</th>
+                  <th scope="col">DE</th>
+                  <th scope="col">BE</th>
+                  <th scope="col">UAE</th>
+                  <th scope="col">SG</th>
+                  <th scope="col">LU</th>
+                </tr>
+              </thead>
+              <tbody id="matrixBody"></tbody>
+            </table>
+          </div>
+        </section>
+
+        <section class="card">
+          <div class="card-header">Strategic insights</div>
+          <div class="card-body" id="insightsPanel"></div>
+        </section>
+
+        <section class="card">
+          <div class="card-header">Decision framework — choose by priority</div>
+          <div class="card-body">
+            <div class="framework-grid" id="frameworkPanel"></div>
+          </div>
+        </section>
+
+        <details class="method">
+          <summary>Methodology &amp; disclaimer</summary>
+          <div class="method-body">
+            <p><strong>Scope:</strong> High-level planning model for private individuals. It does not replace tax, legal, immigration, or investment advice. Cantonal, municipal, treaty, entity-structure, and product-specific rules are simplified.</p>
+            <p><strong>Net worth</strong> = liquid portfolio (after estimated annual tax drag) + pension capital + property equity. Salary converts to savings via your rate or fixed override until retirement.</p>
+            <p><strong>Jurisdiction highlights:</strong> Switzerland — private movable capital gains generally untaxed; wealth tax placeholder. Netherlands — Box 3–style wealth drag. Germany — ~26.375% on financial investment gains/dividends (saver allowance not fully modelled). Belgium — 2026+ capital-gains reform on financial assets at planning level; pre-2026 low-friction assumption phased out. UAE — no personal income tax on wages/investment/rental under current individual assumptions; corporate/business activity may differ. Singapore — no capital gains tax generally; property friction included. Luxembourg — capital gains on portfolio subject to holding-period / substantial-participation rules at planning level.</p>
+            <p><strong>Relocation:</strong> The seven columns each assume full residence in that jurisdiction for the entire horizon. Enabling “Model move” adds a dashed <em>Your move</em> path: start in your base jurisdiction, switch at the move year — useful for stress-testing one timeline, not a simultaneous residency ranking.</p>
+            <p><strong>Currency:</strong> Internal amounts in CHF; EUR and USD views use your FX inputs.</p>
+          </div>
+        </details>
+
+        <section class="cta-block no-print" aria-labelledby="ctaTitle">
+          <div>
+            <h2 id="ctaTitle">Request a tailored cross-border wealth review</h2>
+            <p>Compare your actual residency, pension statements, entity structure, and property holdings — not generic assumptions. Get a personalized wealth-preservation model built on your numbers.</p>
+          </div>
+          <div class="cta-actions">
+            <a class="btn btn-primary" href="/#contact">Request cross-border review</a>
+            <a class="btn" href="/wealth-tools/wealth-preservation-planner">CH / NL deep planner</a>
+          </div>
+        </section>
+      </div>
+    </main>
+  </div>
+
+  <script>
+(function () {
+  'use strict';
+
+  const JURISDICTIONS = {
+    CH: {
+      id: 'CH', name: 'Switzerland', code: 'CH',
+      incomeTax: 22, dividendTax: 22, cgTax: 0, cgRealization: 0.2, wealthTax: 0.35,
+      box3Deemed: 0, box3Rate: 0, pensionContrib: 0.12, reFriction: 0.9,
+      profiles: {
+        wealth: 'Very strong', investment: 'CG-free (private movable)', pension: 'Pillar 1–3a',
+        re: 'Cantonal; mortgage interest', fit: 'Preservation & stability'
+      },
+      scores: { salary: 72, compound: 92, pension: 90, re: 74, mobility: 78, currency: 88 },
+      risks: 'Wealth tax variance; pillar 2 mobility; withholding on foreign dividends',
+      investor: 'HNW preserving capital; CH/EU mobile executives'
+    },
+    NL: {
+      id: 'NL', name: 'Netherlands', code: 'NL',
+      incomeTax: 37, dividendTax: 0, cgTax: 0, cgRealization: 0, wealthTax: 0,
+      box3Deemed: 1.8, box3Rate: 32, pensionContrib: 0.07, reFriction: 1.2,
+      profiles: {
+        wealth: 'Structured', investment: 'Box 3 wealth drag', pension: 'AOW + employer',
+        re: 'Box 1 rental; eigen woning', fit: 'EU professionals with pensions'
+      },
+      scores: { salary: 58, compound: 68, pension: 82, re: 70, mobility: 85, currency: 70 },
+      risks: 'Box 3 reform uncertainty; actual-return transition',
+      investor: 'NL residents optimising pension + salary'
+    },
+    DE: {
+      id: 'DE', name: 'Germany', code: 'DE',
+      incomeTax: 42, dividendTax: 26.375, cgTax: 26.375, cgRealization: 0.25, wealthTax: 0,
+      box3Deemed: 0, box3Rate: 0, pensionContrib: 0.093, reFriction: 1.4,
+      profiles: {
+        wealth: 'Moderate', investment: 'Abgeltungsteuer ~26.4%', pension: 'Statutory + Riester/Rürup',
+        re: 'Speculation tax timing', fit: 'Salaried DE residents'
+      },
+      scores: { salary: 52, compound: 55, pension: 78, re: 65, mobility: 72, currency: 72 },
+      risks: 'Solidarity surcharge; church tax; rental/speculation rules',
+      investor: 'High-earning employees in DE'
+    },
+    BE: {
+      id: 'BE', name: 'Belgium', code: 'BE',
+      incomeTax: 45, dividendTax: 30, cgTax: 10, cgRealization: 0.3, wealthTax: 0,
+      box3Deemed: 0, box3Rate: 0, pensionContrib: 0.07, reFriction: 1.3,
+      profiles: {
+        wealth: 'Mixed (2026 shift)', investment: 'CG reform from 2026', pension: 'Statutory + group',
+        re: 'Cadastral income system', fit: 'Pre-2026 accumulators transitioning'
+      },
+      scores: { salary: 48, compound: 62, pension: 75, re: 68, mobility: 80, currency: 68 },
+      risks: '2026 financial CG regime; high dividend withholding',
+      investor: 'Belgian residents with accumulated portfolios'
+    },
+    AE: {
+      id: 'AE', name: 'Dubai / UAE', code: 'AE',
+      incomeTax: 0, dividendTax: 0, cgTax: 0, cgRealization: 0, wealthTax: 0,
+      box3Deemed: 0, box3Rate: 0, pensionContrib: 0.05, reFriction: 1,
+      profiles: {
+        wealth: 'Very strong cash-flow', investment: 'No personal investment tax*', pension: 'Voluntary / employer',
+        re: 'Freehold zones; fees', fit: 'Tax-efficient accumulation'
+      },
+      scores: { salary: 95, compound: 96, pension: 45, re: 82, mobility: 90, currency: 75 },
+      risks: '*Corporate tax on business; visa/property fees; currency peg',
+      investor: 'Global mobile earners; entrepreneurs (structure-dependent)'
+    },
+    SG: {
+      id: 'SG', name: 'Singapore', code: 'SG',
+      incomeTax: 22, dividendTax: 0, cgTax: 0, cgRealization: 0, wealthTax: 0,
+      box3Deemed: 0, box3Rate: 0, pensionContrib: 0.12, reFriction: 2.5,
+      profiles: {
+        wealth: 'Strong compounding', investment: 'No CG tax generally', pension: 'CPF (residents)',
+        re: 'ABSD / stamp friction', fit: 'Asia-Pacific mobile professionals'
+      },
+      scores: { salary: 78, compound: 90, pension: 70, re: 55, mobility: 88, currency: 76 },
+      risks: 'Property cooling measures; CPF lock-in for residents',
+      investor: 'Expats & regional HQs; equity-heavy investors'
+    },
+    LU: {
+      id: 'LU', name: 'Luxembourg', code: 'LU',
+      incomeTax: 38, dividendTax: 15, cgTax: 4, cgRealization: 0.35, wealthTax: 0,
+      box3Deemed: 0, box3Rate: 0, pensionContrib: 0.08, reFriction: 1.1,
+      profiles: {
+        wealth: 'Sophisticated', investment: 'CG by holding period', pension: 'Statutory + supplementary',
+        re: 'Moderate transaction costs', fit: 'EU cross-border executives'
+      },
+      scores: { salary: 62, compound: 74, pension: 80, re: 72, mobility: 86, currency: 74 },
+      risks: 'Substantial participation rules; payroll complexity',
+      investor: 'Finance-sector mobile professionals in Benelux'
+    }
+  };
+
+  const ORDER = ['CH', 'NL', 'DE', 'BE', 'AE', 'SG', 'LU'];
+  const CHART_COLORS = ['#0d6e6e', '#2a5f8f', '#6a5f3a', '#8a5a2a', '#1a6b3c', '#5c4d8a', '#7a4d5a'];
+
+  const $ = (id) => document.getElementById(id);
+  const state = {
+    displayCurrency: 'CHF',
+    valueMode: 'nominal',
+    theme: 'light',
+    highlightHorizon: 25,
+    focusJurisdiction: 'CH',
+    charts: {},
+    debounceTimer: null,
+    lastResult: null
+  };
+
+  function pct(v) { return Number(v) / 100; }
+
+  function readInputs() {
+    const annualOverride = Number($('annualSavings').value);
+    return {
+      currentAge: Number($('currentAge').value),
+      retirementAge: Number($('retirementAge').value),
+      planningHorizon: Number($('planningHorizon').value),
+      grossSalary: Number($('grossSalary').value),
+      salaryGrowth: Number($('salaryGrowth').value),
+      savingsRate: Number($('savingsRate').value),
+      annualSavingsOverride: annualOverride > 0 ? annualOverride : null,
+      portfolioValue: Number($('portfolioValue').value),
+      portfolioReturn: Number($('portfolioReturn').value),
+      dividendYield: Number($('dividendYield').value),
+      feeDrag: Number($('feeDrag').value),
+      ownsProperty: $('ownsProperty').checked,
+      propertyValue: Number($('propertyValue').value),
+      mortgageBalance: Number($('mortgageBalance').value),
+      propertyAppreciation: Number($('propertyAppreciation').value),
+      rentalIncome: Number($('rentalIncome').value),
+      pensionPot: Number($('pensionPot').value),
+      pensionReturn: Number($('pensionReturn').value),
+      baseJurisdiction: $('baseJurisdiction').value,
+      relocationOn: $('relocationOn').checked,
+      moveYear: Number($('moveYear').value),
+      moveTarget: $('moveTarget').value,
+      inflation: Number($('inflation').value),
+      withdrawalRate: Number($('withdrawalRate').value),
+      fxEurChf: Number($('fxEurChf').value),
+      fxUsdChf: Number($('fxUsdChf').value)
+    };
+  }
+
+  function calendarYear(yearIndex) {
+    return new Date().getFullYear() + yearIndex;
+  }
+
+  /** Each column assumes full residence in that jurisdiction for the comparison matrix. */
+  function resolveJurisdiction(scenarioId) {
+    return scenarioId;
+  }
+
+  function projectRelocationPath(inp) {
+    let portfolio = inp.portfolioValue;
+    let pension = inp.pensionPot;
+    let property = inp.ownsProperty ? inp.propertyValue : 0;
+    let mortgage = inp.ownsProperty ? inp.mortgageBalance : 0;
+    const portR = pct(inp.portfolioReturn) - pct(inp.feeDrag);
+    const penR = pct(inp.pensionReturn);
+    const propR = pct(inp.propertyAppreciation);
+    const rows = [];
+
+    for (let y = 0; y <= inp.planningHorizon; y++) {
+      const age = inp.currentAge + y;
+      const activeId = y < inp.moveYear ? inp.baseJurisdiction : inp.moveTarget;
+      const activeJ = JURISDICTIONS[activeId];
+      const retired = age >= inp.retirementAge;
+      const salary = inp.grossSalary * Math.pow(1 + pct(inp.salaryGrowth), Math.max(0, y - 1));
+      const grossIncome = retired || y === 0 ? (y === 0 ? inp.grossSalary : 0) : salary;
+      let savings = 0;
+      let tax = 0;
+      if (y > 0) {
+        savings = retired ? 0 : (
+          inp.annualSavingsOverride != null ? inp.annualSavingsOverride : salary * pct(inp.savingsRate)
+        );
+        const dividendIncome = portfolio * pct(inp.dividendYield);
+        const portReturnAmt = portfolio * portR;
+        let pensionContrib = 0;
+        if (!retired) {
+          pensionContrib = salary * activeJ.pensionContrib;
+          pension += pensionContrib;
+        }
+        pension *= (1 + penR);
+        portfolio = portfolio * (1 + portR) + savings;
+        if (inp.ownsProperty) {
+          property *= (1 + propR);
+          mortgage = Math.max(0, mortgage * 0.975);
+        }
+        const rentalNet = inp.ownsProperty ? Math.max(0, inp.rentalIncome - property * pct(activeJ.reFriction) * 0.5) : 0;
+        tax = calcTax(activeJ, {
+          grossIncome, portfolio, dividendIncome, rentalNet, pensionContrib,
+          portReturnAmt, propertyValue: property
+        }, y);
+        portfolio = Math.max(0, portfolio - tax);
+      }
+      rows.push({
+        year: y, age, netWorth: portfolio + pension + (property - mortgage), jurisdiction: activeId, tax
+      });
+    }
+    return rows;
+  }
+
+  function calcTax(j, ctx, yearIndex) {
+    const { grossIncome, portfolio, dividendIncome, rentalNet, pensionContrib, portReturnAmt } = ctx;
+    if (j.id === 'NL') {
+      const income = Math.max(0, grossIncome + rentalNet - pensionContrib) * pct(j.incomeTax);
+      const box3 = portfolio * pct(j.box3Deemed) * pct(j.box3Rate);
+      return income + box3;
+    }
+    let tax = Math.max(0, grossIncome + rentalNet - pensionContrib) * pct(j.incomeTax);
+    tax += dividendIncome * pct(j.dividendTax);
+    tax += portfolio * pct(j.wealthTax);
+    const cgBase = Math.max(0, portReturnAmt - dividendIncome);
+    let cgRate = j.cgTax;
+    if (j.id === 'BE' && calendarYear(yearIndex) < 2026) cgRate = 0;
+    tax += cgBase * pct(cgRate) * j.cgRealization;
+    if (j.id === 'AE') {
+      tax += rentalNet * pct(j.reFriction);
+    }
+    if (j.id === 'SG' && ctx.propertyValue > 0) {
+      tax += ctx.propertyValue * pct(j.reFriction) * 0.15;
+    }
+    return tax;
+  }
+
+  function projectJurisdiction(scenarioId, inp) {
+    const j = JURISDICTIONS[scenarioId];
+    let portfolio = inp.portfolioValue;
+    let pension = inp.pensionPot;
+    let property = inp.ownsProperty ? inp.propertyValue : 0;
+    let mortgage = inp.ownsProperty ? inp.mortgageBalance : 0;
+    const portR = pct(inp.portfolioReturn) - pct(inp.feeDrag);
+    const penR = pct(inp.pensionReturn);
+    const propR = pct(inp.propertyAppreciation);
+    const rows = [];
+    let totalTax = 0;
+
+    function snapshot(year, age, activeJ, grossIncome, savings, tax) {
+      const reEquity = property - mortgage;
+      const netWorth = portfolio + pension + reEquity;
+      const retired = age >= inp.retirementAge;
+      let retIncomeMo = 0;
+      if (retired) {
+        const portMo = portfolio * pct(inp.withdrawalRate) / 12;
+        const penMo = pension * 0.04 / 12;
+        const rentMo = Math.max(0, inp.rentalIncome) / 12;
+        retIncomeMo = portMo + penMo + rentMo;
+      }
+      return { year, age, jurisdiction: activeJ, grossIncome, savings, portfolio, pension, reEquity, netWorth, tax, retIncomeMo };
+    }
+
+    rows.push(snapshot(0, inp.currentAge, scenarioId, inp.grossSalary, 0, 0));
+
+    for (let y = 1; y <= inp.planningHorizon; y++) {
+      const age = inp.currentAge + y;
+      const activeId = resolveJurisdiction(scenarioId);
+      const activeJ = JURISDICTIONS[activeId] || j;
+      const retired = age >= inp.retirementAge;
+      const salary = inp.grossSalary * Math.pow(1 + pct(inp.salaryGrowth), y - 1);
+      const grossIncome = retired ? 0 : salary;
+      const savings = retired ? 0 : (
+        inp.annualSavingsOverride != null
+          ? inp.annualSavingsOverride
+          : salary * pct(inp.savingsRate)
+      );
+
+      const portBefore = portfolio;
+      const dividendIncome = portfolio * pct(inp.dividendYield);
+      const portReturnAmt = portfolio * portR;
+
+      let pensionContrib = 0;
+      if (!retired) {
+        pensionContrib = salary * activeJ.pensionContrib;
+        pension += pensionContrib;
+      }
+      pension *= (1 + penR);
+
+      portfolio = portfolio * (1 + portR) + savings;
+      if (inp.ownsProperty) {
+        property *= (1 + propR);
+        mortgage = Math.max(0, mortgage * 0.975);
+      }
+
+      const rentalNet = inp.ownsProperty ? Math.max(0, inp.rentalIncome - property * pct(activeJ.reFriction) * 0.5) : 0;
+      const tax = calcTax(activeJ, {
+        grossIncome, portfolio, dividendIncome, rentalNet, pensionContrib,
+        portReturnAmt, propertyValue: property
+      }, y);
+      totalTax += tax;
+      portfolio = Math.max(0, portfolio - tax);
+
+      rows.push(snapshot(y, age, activeId, grossIncome, savings, tax));
+    }
+
+    const last = rows[rows.length - 1];
+    const retired = last.age >= inp.retirementAge;
+    const retIncome = retired ? last.retIncomeMo : (
+      last.portfolio * pct(inp.withdrawalRate) / 12 +
+      last.pension * 0.04 / 12
+    );
+
+    return {
+      id: scenarioId,
+      name: j.name,
+      rows,
+      startNW: rows[0].netWorth,
+      endNW: last.netWorth,
+      nw10: rows[Math.min(10, rows.length - 1)].netWorth,
+      nw20: rows[Math.min(20, rows.length - 1)].netWorth,
+      nw25: rows[Math.min(25, rows.length - 1)].netWorth,
+      avgTax: inp.planningHorizon > 0 ? totalTax / inp.planningHorizon : 0,
+      retIncome,
+      pensionEnd: last.pension,
+      portfolioEnd: last.portfolio,
+      reEnd: last.reEquity,
+      taxDragPct: last.netWorth > 0 ? (totalTax / inp.planningHorizon) / (last.portfolio + 1) * 100 : 0
+    };
+  }
+
+  function validate(inp) {
+    const err = [];
+    if (inp.retirementAge <= inp.currentAge) err.push('Retirement age must exceed current age.');
+    if (inp.planningHorizon < 10 || inp.planningHorizon > 40) err.push('Planning horizon should be 10–40 years.');
+    if (inp.relocationOn && inp.moveYear < 1) err.push('Move year must be at least 1.');
+    return err;
+  }
+
+  function toDisplay(amount, inp) {
+    if (!Number.isFinite(amount)) return amount;
+    if (state.displayCurrency === 'EUR') return amount / inp.fxEurChf;
+    if (state.displayCurrency === 'USD') return amount / inp.fxUsdChf;
+    return amount;
+  }
+
+  function currencyLabel() {
+    return state.displayCurrency;
+  }
+
+  function inflFactor(years, inp) {
+    return Math.pow(1 + pct(inp.inflation), years);
+  }
+
+  function deflate(amount, factor) {
+    return state.valueMode === 'real' && factor > 0 ? amount / factor : amount;
+  }
+
+  function formatMoney(amount, inp, yearsFromNow) {
+    if (!Number.isFinite(amount)) return '—';
+    let v = toDisplay(amount, inp);
+    v = deflate(v, inflFactor(yearsFromNow || 0, inp));
+    const cur = currencyLabel();
+    try {
+      return new Intl.NumberFormat(undefined, { style: 'currency', currency: cur, maximumFractionDigits: 0 }).format(v);
+    } catch {
+      return cur + ' ' + Math.round(v).toLocaleString();
+    }
+  }
+
+  function calculateAll() {
+    const inp = readInputs();
+    const errors = validate(inp);
+    const banner = $('stateBanner');
+    if (errors.length) {
+      banner.textContent = errors.join(' ');
+      banner.className = 'state-banner visible error';
+      return null;
+    }
+    banner.className = 'state-banner';
+    const results = {};
+    ORDER.forEach(id => { results[id] = projectJurisdiction(id, inp); });
+    return { inp, results };
+  }
+
+  function bestAtHorizon(results, horizon) {
+    const key = 'nw' + horizon;
+    return ORDER.reduce((a, id) =>
+      results[id][key] > results[a][key] ? id : a, ORDER[0]);
+  }
+
+  function renderCards(res) {
+    const el = $('jurisdictionCards');
+    el.innerHTML = ORDER.map(id => {
+      const j = JURISDICTIONS[id];
+      const r = res.results[id];
+      const active = state.focusJurisdiction === id ? ' active' : '';
+      const p = j.profiles;
+      return `<article class="jurisdiction-card${active}" data-j="${id}" tabindex="0" role="button" aria-pressed="${state.focusJurisdiction === id}">
+        <h3>${j.name} <span class="code">${j.code}</span></h3>
+        <dl>
+          <div class="profile-row"><dt>Wealth preservation</dt><dd>${p.wealth}</dd></div>
+          <div class="profile-row"><dt>Investment tax</dt><dd>${p.investment}</dd></div>
+          <div class="profile-row"><dt>Pension</dt><dd>${p.pension}</dd></div>
+          <div class="profile-row"><dt>Real estate</dt><dd>${p.re}</dd></div>
+          <div class="profile-row"><dt>Strategic fit</dt><dd>${p.fit}</dd></div>
+        </dl>
+        <p class="field-hint tabular" style="margin-top:8px">${formatMoney(r.endNW, res.inp, res.inp.planningHorizon)} at horizon</p>
+      </article>`;
+    }).join('');
+    el.querySelectorAll('.jurisdiction-card').forEach(card => {
+      card.addEventListener('click', () => {
+        state.focusJurisdiction = card.dataset.j;
+        el.querySelectorAll('.jurisdiction-card').forEach(c => {
+          c.classList.toggle('active', c.dataset.j === state.focusJurisdiction);
+          c.setAttribute('aria-pressed', c.dataset.j === state.focusJurisdiction);
+        });
+        $('focusJLabel').textContent = JURISDICTIONS[state.focusJurisdiction].name;
+        renderCharts(res);
+      });
+    });
+  }
+
+  function renderSummary(res) {
+    const h = state.highlightHorizon;
+    const best = bestAtHorizon(res.results, h);
+    const bestR = res.results[best];
+    const worst = ORDER.reduce((a, id) =>
+      res.results[id]['nw' + h] < res.results[a]['nw' + h] ? id : a, ORDER[0]);
+    const spread = bestR['nw' + h] - res.results[worst]['nw' + h];
+    const inp = res.inp;
+    const fm = (n, yr) => formatMoney(n, inp, yr);
+
+    $('summaryGrid').innerHTML = [
+      { label: `Best at ${h} years`, value: JURISDICTIONS[best].name, sub: fm(bestR['nw' + h], h), highlight: true },
+      { label: 'Horizon spread', value: fm(spread, h), sub: `${JURISDICTIONS[best].code} vs ${JURISDICTIONS[worst].code}`, highlight: false },
+      { label: 'Lowest avg tax drag', value: ORDER.reduce((a, id) => res.results[id].avgTax < res.results[a].avgTax ? id : a, ORDER[0]), sub: fm(Math.min(...ORDER.map(id => res.results[id].avgTax)), h), highlight: false },
+      { label: 'Top retirement income', value: ORDER.reduce((a, id) => res.results[id].retIncome > res.results[a].retIncome ? id : a, ORDER[0]), sub: '/mo at horizon', highlight: false }
+    ].map(c => `
+      <div class="summary-card ${c.highlight ? 'highlight' : ''}">
+        <div class="label">${c.label}</div>
+        <div class="value tabular">${c.value}</div>
+        <div class="sub">${c.sub}</div>
+      </div>
+    `).join('');
+  }
+
+  function renderInterpretation(res) {
+    const h = state.highlightHorizon;
+    const best = bestAtHorizon(res.results, h);
+    const inp = res.inp;
+    const fm = (n, yr) => formatMoney(n, inp, yr);
+    const ranked = ORDER.slice().sort((a, b) => res.results[b]['nw' + h] - res.results[a]['nw' + h]);
+    let moveNote = '';
+    if (inp.relocationOn) {
+      const path = projectRelocationPath(inp);
+      const end = path[Math.min(h, path.length - 1)];
+      moveNote = ` Relocation path (${JURISDICTIONS[inp.baseJurisdiction].code} → ${JURISDICTIONS[inp.moveTarget].code} in year ${inp.moveYear}): ${fm(end.netWorth, h)}.`;
+    }
+    $('interpretation').textContent =
+      `Over ${h} years, ${JURISDICTIONS[best].name} projects the highest net worth (${fm(res.results[best]['nw' + h], h)}), ` +
+      `with average annual tax drag near ${fm(res.results[best].avgTax, h)}. ` +
+      `Ranking: ${ranked.map(id => JURISDICTIONS[id].code).join(' → ')}. ` +
+      `Assumptions: ${inp.grossSalary.toLocaleString()} CHF salary, ${inp.portfolioReturn}% return, ${inp.savingsRate}% savings rate.${moveNote}`;
+  }
+
+  function labelScore(v) {
+    if (v >= 85) return 'Excellent';
+    if (v >= 72) return 'Strong';
+    if (v >= 58) return 'Moderate';
+    return 'Constrained';
+  }
+
+  function renderMatrix(res) {
+    const { inp, results } = res;
+    const fm = (n) => formatMoney(n, inp, inp.planningHorizon);
+    const rows = [
+      ['Salary efficiency', ...ORDER.map(id => labelScore(JURISDICTIONS[id].scores.salary))],
+      ['Tax on capital gains', ...ORDER.map(id => {
+        const j = JURISDICTIONS[id];
+        return j.cgTax === 0 ? 'None / N/A' : j.cgTax + '% (plan.)';
+      })],
+      ['Tax on dividends', ...ORDER.map(id => {
+        const j = JURISDICTIONS[id];
+        return j.dividendTax === 0 ? 'Low / none' : j.dividendTax + '%';
+      })],
+      ['Annual wealth-tax drag', ...ORDER.map(id => {
+        const j = JURISDICTIONS[id];
+        if (j.box3Deemed) return 'Box 3 ~' + (j.box3Deemed * j.box3Rate / 100).toFixed(2) + '%';
+        return j.wealthTax ? j.wealthTax + '% assets' : '—';
+      })],
+      ['Pension accumulation', ...ORDER.map(id => labelScore(JURISDICTIONS[id].scores.pension))],
+      ['Real estate friendliness', ...ORDER.map(id => labelScore(JURISDICTIONS[id].scores.re))],
+      ['Cross-border flexibility', ...ORDER.map(id => labelScore(JURISDICTIONS[id].scores.mobility))],
+      ['Currency strength (planning)', ...ORDER.map(id => labelScore(JURISDICTIONS[id].scores.currency))],
+      ['Total projected net worth', ...ORDER.map(id => fm(results[id].endNW))],
+      ['Estimated retirement income', ...ORDER.map(id => fm(results[id].retIncome) + '/mo')],
+      ['Key risks', ...ORDER.map(id => JURISDICTIONS[id].risks)],
+      ['Best-suited profile', ...ORDER.map(id => JURISDICTIONS[id].investor)]
+    ];
+    const bestEnd = ORDER.reduce((a, id) => results[id].endNW > results[a].endNW ? id : a, ORDER[0]);
+    $('matrixBody').innerHTML = rows.map((row, i) => {
+      const isNw = row[0] === 'Total projected net worth';
+      return `<tr class="${isNw ? 'best-row' : ''}">${row.map((cell, ci) => {
+        const cls = isNw && ORDER[ci - 1] === bestEnd && ci > 0 ? ' tabular positive' : (ci > 0 ? ' tabular' : '');
+        return `<${ci === 0 ? 'th scope="row"' : 'td'} class="${cls.trim()}">${cell}</${ci === 0 ? 'th' : 'td'}>`;
+      }).join('')}</tr>`;
+    }).join('');
+  }
+
+  function renderInsights(res) {
+    const { results } = res;
+    const byCompound = ORDER.slice().sort((a, b) => JURISDICTIONS[b].scores.compound - JURISDICTIONS[a].scores.compound)[0];
+    const bySalary = ORDER.slice().sort((a, b) => JURISDICTIONS[b].scores.salary - JURISDICTIONS[a].scores.salary)[0];
+    const byRe = ORDER.slice().sort((a, b) => JURISDICTIONS[b].scores.re - JURISDICTIONS[a].scores.re)[0];
+    const byPension = ORDER.slice().sort((a, b) => JURISDICTIONS[b].scores.pension - JURISDICTIONS[a].scores.pension)[0];
+    const byMobility = ORDER.slice().sort((a, b) => JURISDICTIONS[b].scores.mobility - JURISDICTIONS[a].scores.mobility)[0];
+
+    const blocks = [
+      { title: 'Which jurisdictions preserve investment compounding best?', text: 'Low or zero capital-gains friction and minimal wealth-tax drag allow more of your gross return to remain in the portfolio. UAE and Singapore score highest on pure compounding; Switzerland adds wealth tax but still exempts private movable capital gains.', winner: byCompound },
+      { title: 'Which are strongest for salary accumulation?', text: 'Zero or low income tax on employment income increases net cash available for savings. UAE leads; Singapore and Switzerland follow for high earners once social contributions are considered.', winner: bySalary },
+      { title: 'Which are strongest for real-estate-based wealth?', text: 'Property economics depend on transaction taxes, financing deductibility, and rental treatment — not just income tax. UAE and Switzerland rank higher in this model; Singapore faces explicit property-friction assumptions.', winner: byRe },
+      { title: 'Which are strongest for retirement income?', text: 'Robust occupational and state pensions plus portfolio withdrawal capacity drive retirement quality. Switzerland and Netherlands lead on pension structure; Luxembourg and Germany offer strong statutory layers.', winner: byPension },
+      { title: 'Which are strongest for internationally mobile professionals?', text: 'Treaty networks, familiar English/French/German business environments, and predictable payroll matter alongside tax. Netherlands, Luxembourg, Singapore, and UAE balance mobility with professional infrastructure.', winner: byMobility }
+    ];
+
+    $('insightsPanel').innerHTML = blocks.map(b => `
+      <div class="insight-block">
+        <h3>${b.title}</h3>
+        <p>${b.text}</p>
+        <span class="insight-winner">Planning leader: ${JURISDICTIONS[b.winner].name}</span>
+      </div>
+    `).join('');
+  }
+
+  function renderFramework(res) {
+    const priorities = [
+      { key: 'compound', label: 'Maximum compounding', scoreKey: 'compound' },
+      { key: 'salary', label: 'Tax-efficient salary accumulation', scoreKey: 'salary' },
+      { key: 'pension', label: 'Pension robustness', scoreKey: 'pension' },
+      { key: 're', label: 'Property investing', scoreKey: 're' },
+      { key: 'currency', label: 'Currency defensiveness', scoreKey: 'currency' },
+      { key: 'mobility', label: 'Cross-border flexibility', scoreKey: 'mobility' }
+    ];
+    $('frameworkPanel').innerHTML = priorities.map(p => {
+      const pick = ORDER.slice().sort((a, b) => JURISDICTIONS[b].scores[p.scoreKey] - JURISDICTIONS[a].scores[p.scoreKey])[0];
+      return `<div class="framework-item"><strong>${p.label}</strong><span class="pick">${JURISDICTIONS[pick].name}</span></div>`;
+    }).join('');
+  }
+
+  function chartColors() {
+    const dark = document.documentElement.getAttribute('data-theme') === 'dark';
+    return {
+      text: dark ? '#a8a8a2' : '#5c5c58',
+      grid: dark ? '#3a3a36' : '#e0e0dc'
+    };
+  }
+
+  function destroyChart(key) {
+    if (state.charts[key]) { state.charts[key].destroy(); state.charts[key] = null; }
+  }
+
+  function chartOpts(colors, yTitle) {
+    return {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: { legend: { labels: { color: colors.text, boxWidth: 10, font: { size: 10 } } } },
+      scales: {
+        x: { ticks: { color: colors.text, maxTicksLimit: 14 }, grid: { color: colors.grid } },
+        y: {
+          title: yTitle ? { display: true, text: yTitle, color: colors.text, font: { size: 10 } } : undefined,
+          ticks: { color: colors.text },
+          grid: { color: colors.grid }
+        }
+      }
+    };
+  }
+
+  function renderCharts(res) {
+    if (!res || typeof Chart === 'undefined') return;
+    const { inp, results } = res;
+    const colors = chartColors();
+    const cur = currencyLabel();
+    const def = (v, yr) => deflate(toDisplay(v, inp), inflFactor(yr, inp));
+
+    const ages = results.CH.rows.map(r => r.age);
+    const datasets = ORDER.map((id, i) => ({
+      label: JURISDICTIONS[id].code,
+      data: results[id].rows.map(r => def(r.netWorth, r.year)),
+      borderColor: CHART_COLORS[i],
+      backgroundColor: 'transparent',
+      tension: 0.1,
+      pointRadius: 0,
+      borderWidth: id === state.focusJurisdiction ? 2.5 : 1.25
+    }));
+    if (inp.relocationOn) {
+      const path = projectRelocationPath(inp);
+      datasets.push({
+        label: 'Your move',
+        data: path.map(r => def(r.netWorth, r.year)),
+        borderColor: '#8a6d1a',
+        borderDash: [6, 4],
+        backgroundColor: 'transparent',
+        tension: 0.1,
+        pointRadius: 0,
+        borderWidth: 2
+      });
+    }
+    destroyChart('netWorth');
+    state.charts.netWorth = new Chart($('chartNetWorth'), {
+      type: 'line',
+      data: { labels: ages, datasets },
+      options: chartOpts(colors, cur)
+    });
+
+    destroyChart('tax');
+    state.charts.tax = new Chart($('chartTaxDrag'), {
+      type: 'bar',
+      data: {
+        labels: ORDER.map(id => JURISDICTIONS[id].code),
+        datasets: [{
+          label: 'Avg annual tax drag',
+          data: ORDER.map(id => def(results[id].avgTax, inp.planningHorizon)),
+          backgroundColor: CHART_COLORS
+        }]
+      },
+      options: { ...chartOpts(colors, cur + '/yr'), indexAxis: 'y' }
+    });
+
+    const focus = results[state.focusJurisdiction];
+    const last = focus.rows[focus.rows.length - 1];
+    destroyChart('assets');
+    state.charts.assets = new Chart($('chartAssets'), {
+      type: 'doughnut',
+      data: {
+        labels: ['Portfolio', 'Pension', 'Real estate'],
+        datasets: [{
+          data: [
+            def(last.portfolio, inp.planningHorizon),
+            def(last.pension, inp.planningHorizon),
+            def(last.reEquity, inp.planningHorizon)
+          ],
+          backgroundColor: [CHART_COLORS[0], CHART_COLORS[1], CHART_COLORS[2]]
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: { legend: { position: 'bottom', labels: { color: colors.text, font: { size: 10 } } } }
+      }
+    });
+
+    destroyChart('retirement');
+    state.charts.retirement = new Chart($('chartRetirement'), {
+      type: 'bar',
+      data: {
+        labels: ORDER.map(id => JURISDICTIONS[id].code),
+        datasets: [{
+          label: 'Monthly at horizon',
+          data: ORDER.map(id => def(results[id].retIncome, inp.planningHorizon)),
+          backgroundColor: CHART_COLORS
+        }]
+      },
+      options: chartOpts(colors, cur + '/mo')
+    });
+
+    const ranked = ORDER.slice().sort((a, b) => results[b].endNW - results[a].endNW);
+    destroyChart('rank');
+    state.charts.rank = new Chart($('chartRank'), {
+      type: 'bar',
+      data: {
+        labels: ranked.map(id => JURISDICTIONS[id].name),
+        datasets: [{
+          label: 'Net worth at horizon',
+          data: ranked.map(id => def(results[id].endNW, inp.planningHorizon)),
+          backgroundColor: ranked.map((_, i) => CHART_COLORS[i % CHART_COLORS.length])
+        }]
+      },
+      options: { ...chartOpts(colors, cur), indexAxis: 'y' }
+    });
+  }
+
+  function recalc() {
+    const res = calculateAll();
+    state.lastResult = res;
+    if (!res) return;
+    renderCards(res);
+    renderSummary(res);
+    renderInterpretation(res);
+    renderMatrix(res);
+    renderInsights(res);
+    renderFramework(res);
+    renderCharts(res);
+    $('focusJLabel').textContent = JURISDICTIONS[state.focusJurisdiction].name;
+  }
+
+  function scheduleRecalc() {
+    clearTimeout(state.debounceTimer);
+    state.debounceTimer = setTimeout(recalc, 80);
+  }
+
+  const inputIds = [
+    'currentAge', 'retirementAge', 'planningHorizon', 'grossSalary', 'salaryGrowth', 'savingsRate', 'annualSavings',
+    'portfolioValue', 'portfolioReturn', 'dividendYield', 'feeDrag', 'ownsProperty', 'propertyValue', 'mortgageBalance',
+    'propertyAppreciation', 'rentalIncome', 'pensionPot', 'pensionReturn', 'baseJurisdiction', 'relocationOn',
+    'moveYear', 'moveTarget', 'inflation', 'withdrawalRate', 'fxEurChf', 'fxUsdChf'
+  ];
+  inputIds.forEach(id => {
+    const el = $(id);
+    if (!el) return;
+    el.addEventListener('input', scheduleRecalc);
+    if (el.type === 'checkbox') el.addEventListener('change', scheduleRecalc);
+  });
+
+  document.querySelectorAll('.horizon-pills button').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.horizon-pills button').forEach(b => b.classList.toggle('active', b === btn));
+      state.highlightHorizon = Number(btn.dataset.horizon);
+      recalc();
+    });
+  });
+
+  $('btnReset').addEventListener('click', () => {
+    $('currentAge').value = 40;
+    $('planningHorizon').value = 25;
+    $('portfolioValue').value = 450000;
+    $('grossSalary').value = 180000;
+    state.focusJurisdiction = 'CH';
+    recalc();
+  });
+
+  $('btnTheme').addEventListener('click', () => {
+    const next = state.theme === 'dark' ? 'light' : 'dark';
+    state.theme = next;
+    document.documentElement.setAttribute('data-theme', next);
+    $('btnTheme').textContent = next === 'dark' ? 'Light' : 'Dark';
+    recalc();
+  });
+  $('btnNominal').addEventListener('click', () => {
+    state.valueMode = 'nominal';
+    $('btnNominal').classList.add('active');
+    $('btnReal').classList.remove('active');
+    recalc();
+  });
+  $('btnReal').addEventListener('click', () => {
+    state.valueMode = 'real';
+    $('btnReal').classList.add('active');
+    $('btnNominal').classList.remove('active');
+    recalc();
+  });
+  ['CHF', 'EUR', 'USD'].forEach(cur => {
+    $('btnCur' + cur).addEventListener('click', () => {
+      state.displayCurrency = cur;
+      ['CHF', 'EUR', 'USD'].forEach(c => {
+        $('btnCur' + c).classList.toggle('active', c === cur);
+        $('btnCur' + c).setAttribute('aria-pressed', c === cur);
+      });
+      recalc();
+    });
+  });
+  $('btnPrint').addEventListener('click', () => window.print());
+  $('ownsProperty').addEventListener('change', () => {
+    $('reFields').style.opacity = $('ownsProperty').checked ? '1' : '0.45';
+    scheduleRecalc();
+  });
+  $('relocationOn').addEventListener('change', () => {
+    $('moveFields').hidden = !$('relocationOn').checked;
+    scheduleRecalc();
+  });
+
+  if (new URLSearchParams(location.search).get('sandbox') === '1') {
+    $('ds-sandbox').hidden = false;
+    $('ds-sandbox').removeAttribute('aria-hidden');
+  }
+
+  state.theme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+  document.documentElement.setAttribute('data-theme', state.theme);
+  $('btnTheme').textContent = state.theme === 'dark' ? 'Light' : 'Dark';
+
+  function waitChart() {
+    if (typeof Chart !== 'undefined') recalc();
+    else setTimeout(waitChart, 50);
+  }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', waitChart);
+  else waitChart();
+})();
+  </script>
+</body>
+</html>

@@ -4,7 +4,7 @@ export interface WealthTool {
   description: string;
   features: string[];
   href: string;
-  icon: 'retirement' | 'portfolio' | 'tax' | 'mortgage';
+  icon: 'retirement' | 'portfolio' | 'tax' | 'mortgage' | 'globe';
   ctaLabel?: string;
 }
 
@@ -88,5 +88,21 @@ export const wealthTools: WealthTool[] = [
     href: '/wealth-tools/additional-mortgage-capacity',
     icon: 'mortgage',
     ctaLabel: 'Open calculator',
+  },
+  {
+    id: 'global-wealth-preservation-comparison',
+    title: 'Global Wealth Preservation Comparison',
+    description:
+      'Premium seven-jurisdiction dashboard for internationally mobile investors. Compare tax drag, pensions, real estate, and projected net worth across Switzerland, Netherlands, Germany, Belgium, UAE, Singapore, and Luxembourg.',
+    features: [
+      'Jurisdiction profile cards and detailed comparison matrix',
+      'Interactive assumptions: salary, portfolio, property, pensions, relocation',
+      'Net worth, tax drag, asset mix, retirement income, and ranking charts',
+      '10 / 20 / 25-year horizon lens with CHF, EUR, or USD display',
+      'Decision framework by priority — compounding, salary, pension, property, mobility',
+    ],
+    href: '/wealth-tools/global-wealth-preservation-comparison',
+    icon: 'globe',
+    ctaLabel: 'Open comparison',
   },
 ];
