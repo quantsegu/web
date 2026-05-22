@@ -1,0 +1,925 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Compare personal vs Swiss GmbH/AG car ownership — 5-year TCO with VAT, Privatanteil 10.8%, and cantonal tax." />
+  <title>Personal vs Company Car — Swiss Ownership Comparison</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js" defer></script>
+  <style>
+    :root {
+      --accent: #8b4518;
+      --accent-hover: #6d3612;
+      --accent-muted: rgba(139, 69, 24, 0.12);
+      --personal: #2a5f8f;
+      --personal-muted: rgba(42, 95, 143, 0.1);
+      --company: #138808;
+      --company-muted: rgba(19, 136, 8, 0.1);
+      --bg: #f6f4f0;
+      --surface: #ffffff;
+      --surface-2: #edeae4;
+      --border: #d6d0c6;
+      --text: #1c1916;
+      --text-muted: #5e5850;
+      --text-faint: #8a8378;
+      --gain: #1a6b3c;
+      --loss: #9b2c2c;
+      --shadow: 0 1px 3px rgba(0,0,0,0.06);
+      --radius: 4px;
+      --font: "Helvetica Neue", Helvetica, Arial, system-ui, sans-serif;
+      --header-h: 48px;
+      --form-w: 320px;
+    }
+    [data-theme="dark"] {
+      --accent: #d4a574;
+      --accent-hover: #e8bc8a;
+      --accent-muted: rgba(212, 165, 116, 0.15);
+      --personal: #6a9fd4;
+      --personal-muted: rgba(106, 159, 212, 0.12);
+      --company: #4db87a;
+      --company-muted: rgba(77, 184, 122, 0.12);
+      --bg: #141210;
+      --surface: #1f1c18;
+      --surface-2: #2a2620;
+      --border: #3d3830;
+      --text: #f0ebe3;
+      --text-muted: #b0a89a;
+      --text-faint: #7a7368;
+      --gain: #4db87a;
+      --loss: #e07070;
+      --shadow: 0 1px 3px rgba(0,0,0,0.35);
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { font-size: 14px; scroll-behavior: smooth; }
+    body {
+      font-family: var(--font); background: var(--bg); color: var(--text);
+      line-height: 1.45; font-feature-settings: "tnum" 1, "lnum" 1;
+      min-height: 100vh;
+    }
+    .tabular { font-variant-numeric: tabular-nums lining-nums; }
+    button, input, select, textarea { font-family: inherit; font-size: inherit; }
+    a { color: var(--accent); }
+    :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+    .app-header {
+      position: sticky; top: 0; z-index: 100; height: var(--header-h);
+      display: flex; align-items: center; gap: 12px; padding: 0 16px;
+      background: var(--surface); border-bottom: 1px solid var(--border); box-shadow: var(--shadow);
+    }
+    .logo { display: flex; align-items: center; gap: 8px; text-decoration: none; color: var(--text); }
+    .logo svg { width: 28px; height: 28px; }
+    .logo-title { font-size: 0.95rem; font-weight: 600; }
+    .logo-sub { font-size: 0.68rem; color: var(--text-muted); }
+    .header-tag {
+      font-size: 0.65rem; letter-spacing: 0.08em; text-transform: uppercase;
+      color: var(--text-faint); border: 1px solid var(--border); padding: 4px 8px; border-radius: var(--radius);
+    }
+    .header-actions { margin-left: auto; display: flex; align-items: center; gap: 8px; }
+    .btn {
+      padding: 6px 12px; border: 1px solid var(--border); border-radius: var(--radius);
+      background: var(--surface); color: var(--text); cursor: pointer; font-size: 0.8rem; text-decoration: none;
+    }
+    .btn:hover { background: var(--surface-2); }
+    .btn-primary { background: var(--accent); border-color: var(--accent); color: #fff; font-weight: 600; }
+    [data-theme="dark"] .btn-primary { color: #1a1410; }
+    .btn-sm { padding: 4px 8px; font-size: 0.72rem; }
+
+    .page-hero {
+      padding: 28px 24px 20px;
+      border-bottom: 1px solid var(--border);
+      background: linear-gradient(180deg, var(--accent-muted) 0%, transparent 100%);
+      max-width: 52rem;
+    }
+    .hero-eyebrow {
+      font-size: 0.65rem; font-weight: 600; letter-spacing: 0.12em;
+      text-transform: uppercase; color: var(--accent); margin-bottom: 8px;
+    }
+    .page-hero h1 {
+      font-size: clamp(1.5rem, 4vw, 2rem); font-weight: 700;
+      letter-spacing: -0.03em; line-height: 1.15; margin-bottom: 8px;
+    }
+    .page-hero h1 em { font-style: normal; color: var(--accent); }
+    .page-hero p { color: var(--text-muted); font-size: 0.9rem; max-width: 36rem; }
+
+    .workspace {
+      display: grid; grid-template-columns: var(--form-w) 1fr;
+      min-height: calc(100vh - var(--header-h) - 120px);
+      border-top: 1px solid var(--border);
+    }
+
+    .form-panel {
+      border-right: 1px solid var(--border);
+      background: var(--surface);
+      padding: 16px;
+      overflow-y: auto;
+      max-height: calc(100vh - var(--header-h));
+      position: sticky; top: var(--header-h);
+    }
+    .panel-title {
+      font-size: 0.65rem; font-weight: 600; text-transform: uppercase;
+      letter-spacing: 0.08em; color: var(--text-faint);
+      margin-bottom: 12px; padding-bottom: 8px; border-bottom: 1px solid var(--border);
+    }
+    .section-divider {
+      font-size: 0.62rem; font-weight: 600; letter-spacing: 0.08em;
+      text-transform: uppercase; color: var(--text-faint);
+      margin: 14px 0 10px; display: flex; align-items: center; gap: 8px;
+    }
+    .section-divider::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+
+    .field { margin-bottom: 10px; }
+    .field label {
+      display: block; font-size: 0.7rem; font-weight: 500; color: var(--text-muted);
+      margin-bottom: 4px; text-transform: uppercase; letter-spacing: 0.04em;
+    }
+    .field input, .field select, .field textarea {
+      width: 100%; padding: 7px 9px; border: 1px solid var(--border);
+      border-radius: var(--radius); background: var(--bg); color: var(--text);
+    }
+    .field textarea { min-height: 64px; resize: vertical; line-height: 1.45; text-transform: none; }
+    .field-hint { font-size: 0.65rem; color: var(--text-faint); margin-top: 3px; }
+    .field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+    .field.hidden { display: none; }
+    .prefix-wrap { position: relative; }
+    .prefix-wrap span {
+      position: absolute; left: 9px; top: 50%; transform: translateY(-50%);
+      font-size: 0.72rem; color: var(--text-faint);
+    }
+    .prefix-wrap input { padding-left: 40px; }
+
+    .preset-row { display: grid; grid-template-columns: 1fr 1fr; gap: 4px; margin-bottom: 12px; }
+    .preset-row button {
+      padding: 6px; font-size: 0.68rem; border: 1px solid var(--border);
+      border-radius: var(--radius); background: var(--bg); color: var(--text-muted); cursor: pointer;
+    }
+    .preset-row button.active { border-color: var(--accent); background: var(--accent-muted); color: var(--accent); font-weight: 600; }
+
+    .analyse-btn {
+      width: 100%; margin-top: 12px; padding: 11px;
+      background: var(--accent); color: #fff; border: none; border-radius: var(--radius);
+      font-size: 0.85rem; font-weight: 600; cursor: pointer;
+      transition: background 0.15s;
+    }
+    .analyse-btn:hover { background: var(--accent-hover); }
+    [data-theme="dark"] .analyse-btn { color: #1a1410; }
+
+    .output-panel { padding: 20px 24px 32px; min-width: 0; }
+
+    .empty-state {
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      text-align: center; padding: 4rem 2rem; color: var(--text-muted);
+    }
+    .empty-state .icon { font-size: 2rem; opacity: 0.35; margin-bottom: 12px; }
+    .empty-state h3 { font-size: 1.1rem; font-weight: 600; color: var(--text); opacity: 0.6; margin-bottom: 6px; }
+    .empty-state p { font-size: 0.82rem; max-width: 280px; line-height: 1.55; }
+
+    .compare-grid {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 16px;
+    }
+    .compare-card {
+      border: 1px solid var(--border); border-radius: var(--radius);
+      overflow: hidden; background: var(--surface); box-shadow: var(--shadow);
+    }
+    .compare-card.winner { border-width: 2px; }
+    .compare-card.personal.winner { border-color: var(--personal); }
+    .compare-card.company.winner { border-color: var(--company); }
+    .compare-card-header {
+      padding: 10px 14px; display: flex; align-items: center; justify-content: space-between;
+    }
+    .compare-card.personal .compare-card-header { background: var(--personal-muted); }
+    .compare-card.company .compare-card-header { background: var(--company-muted); }
+    .compare-card-header h3 { font-size: 0.8rem; font-weight: 600; }
+    .compare-card.personal .compare-card-header h3 { color: var(--personal); }
+    .compare-card.company .compare-card-header h3 { color: var(--company); }
+    .winner-tag {
+      font-size: 0.62rem; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase;
+      background: var(--gain); color: #fff; padding: 2px 7px; border-radius: var(--radius);
+    }
+    .compare-card-body { padding: 12px 14px; }
+    .cost-label { font-size: 0.62rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-faint); }
+    .cost-value { font-size: 1.45rem; font-weight: 700; margin: 4px 0 8px; }
+    .cost-meta { font-size: 0.72rem; color: var(--text-muted); line-height: 1.5; }
+    .cost-saving { font-size: 0.72rem; color: var(--gain); font-weight: 600; margin-top: 4px; }
+
+    .verdict-box {
+      background: var(--text); color: var(--bg);
+      border-radius: var(--radius); padding: 14px 16px; margin-bottom: 16px;
+      font-size: 0.88rem; line-height: 1.6;
+    }
+    [data-theme="dark"] .verdict-box { background: #0a1628; color: #f0ebe3; }
+    .verdict-box .verdict-label {
+      font-size: 0.65rem; text-transform: uppercase; letter-spacing: 0.1em;
+      opacity: 0.65; margin-bottom: 6px;
+    }
+    .verdict-box strong { color: var(--accent); }
+    [data-theme="dark"] .verdict-box strong { color: #ff9933; }
+
+    .notice {
+      padding: 10px 12px; margin-bottom: 14px; font-size: 0.78rem; color: var(--text-muted);
+      background: var(--surface); border-left: 3px solid var(--accent);
+      border-radius: var(--radius); border: 1px solid var(--border); border-left-width: 3px;
+    }
+
+    .card {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: var(--radius); margin-bottom: 14px; box-shadow: var(--shadow);
+    }
+    .card-header {
+      padding: 8px 12px; border-bottom: 1px solid var(--border);
+      font-size: 0.78rem; font-weight: 600;
+    }
+    .card-body { padding: 12px; }
+    .chart-wrap { position: relative; height: 240px; }
+
+    .detail-cols { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    @media (max-width: 640px) { .detail-cols { grid-template-columns: 1fr; } }
+    .detail-col { padding: 10px; border: 1px solid var(--border); border-radius: var(--radius); font-size: 0.76rem; }
+    .detail-col.personal { background: var(--personal-muted); }
+    .detail-col.company { background: var(--company-muted); }
+    .detail-col h4 { font-size: 0.68rem; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 8px; }
+    .metric-row { display: flex; justify-content: space-between; padding: 4px 0; border-bottom: 1px solid var(--border); }
+    .metric-row:last-child { border-bottom: none; }
+    .metric-row dt { color: var(--text-muted); margin: 0; }
+    .metric-row dd { margin: 0; font-weight: 600; }
+
+    .tco-table { width: 100%; border-collapse: collapse; font-size: 0.75rem; }
+    .tco-table th, .tco-table td { padding: 7px 8px; border-bottom: 1px solid var(--border); text-align: right; }
+    .tco-table th { text-align: left; color: var(--text-faint); font-weight: 600; font-size: 0.68rem; text-transform: uppercase; }
+    .tco-table tr.total { font-weight: 700; background: var(--surface-2); }
+
+    .guide-list { list-style: none; }
+    .guide-list li {
+      padding: 9px 11px; margin-bottom: 6px; border: 1px solid var(--border);
+      border-radius: var(--radius); font-size: 0.78rem; color: var(--text-muted);
+    }
+    .guide-list li strong { display: block; color: var(--text); margin-bottom: 3px; font-size: 0.82rem; }
+
+    .cta-block {
+      text-align: center; padding: 22px 16px;
+      background: var(--accent-muted); border: 1px solid var(--border); border-radius: var(--radius);
+    }
+    .cta-block h2 { margin: 0 0 8px; font-size: 1.05rem; }
+    .cta-block p { margin: 0 0 14px; color: var(--text-muted); font-size: 0.84rem; }
+
+    .disclaimer {
+      font-size: 0.68rem; color: var(--text-faint); padding: 12px 24px;
+      border-top: 1px solid var(--border); letter-spacing: 0.02em;
+    }
+
+    @media (max-width: 900px) {
+      .workspace { grid-template-columns: 1fr; }
+      .form-panel { position: static; max-height: none; border-right: none; border-bottom: 1px solid var(--border); }
+      .compare-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <header class="app-header">
+    <a class="logo" href="/wealth-tools" aria-label="Wealth Tools">
+      <svg viewBox="0 0 32 32" aria-hidden="true" fill="none">
+        <rect width="32" height="32" rx="4" fill="currentColor" opacity="0.08"/>
+        <path d="M8 20h16M6 20l3-6h14l3 6" stroke="var(--company)" stroke-width="1.8" stroke-linecap="round"/>
+        <circle cx="10" cy="20" r="2" fill="var(--personal)"/>
+        <circle cx="22" cy="20" r="2" fill="var(--personal)"/>
+      </svg>
+      <div>
+        <div class="logo-title">Personal vs Company Car</div>
+        <div class="logo-sub">Swiss 5-year TCO</div>
+      </div>
+    </a>
+    <span class="header-tag">2024/25 tax rules</span>
+    <div class="header-actions">
+      <a href="/wealth-tools" class="btn btn-sm">Wealth Tools</a>
+      <button type="button" class="btn btn-sm" id="btnTheme" aria-label="Toggle theme">Dark</button>
+    </div>
+  </header>
+
+  <div class="page-hero">
+    <p class="hero-eyebrow">Decision tool</p>
+    <h1>Personal or <em>company car</em> ownership in Switzerland?</h1>
+    <p>Enter any vehicle and profile — get a full 5-year comparison with VAT reclaim, Privatanteil (10.8%), depreciation, cantonal motor tax, and net cost to you. Runs in your browser; no account required.</p>
+  </div>
+
+  <div class="workspace">
+    <aside class="form-panel" aria-label="Your profile">
+      <div class="panel-title">Your profile</div>
+
+      <div class="preset-row" role="group" aria-label="Vehicle presets">
+        <button type="button" data-preset="tesla" class="active">Tesla MY</button>
+        <button type="button" data-preset="vw">VW Golf</button>
+        <button type="button" data-preset="bmw">BMW 3er</button>
+        <button type="button" data-preset="van">Kombi EV</button>
+      </div>
+
+      <div class="section-divider">Vehicle</div>
+      <div class="field">
+        <label for="carName">Car make &amp; model</label>
+        <input type="text" id="carName" value="Tesla Model Y Long Range" />
+      </div>
+      <div class="field-row">
+        <div class="field">
+          <label for="purchasePrice">Purchase price</label>
+          <div class="prefix-wrap"><span>CHF</span><input type="number" id="purchasePrice" value="58000" min="5000" step="500" /></div>
+        </div>
+        <div class="field">
+          <label for="businessUse">Business use %</label>
+          <input type="number" id="businessUse" value="70" min="0" max="100" step="5" />
+        </div>
+      </div>
+      <div class="field-row">
+        <div class="field">
+          <label for="fuelType">Fuel type</label>
+          <select id="fuelType">
+            <option value="electric" selected>Electric (EV)</option>
+            <option value="petrol">Petrol</option>
+            <option value="diesel">Diesel</option>
+            <option value="hybrid">Hybrid</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="financing">Financing</label>
+          <select id="financing">
+            <option value="cash" selected>Cash purchase</option>
+            <option value="lease">Leasing</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="section-divider">Personal &amp; company</div>
+      <div class="field">
+        <label for="canton">Canton</label>
+        <select id="canton">
+          <option value="zg" selected>Zug</option>
+          <option value="zh">Zürich</option>
+          <option value="ge">Genève</option>
+          <option value="bs">Basel-Stadt</option>
+          <option value="be">Bern</option>
+          <option value="vd">Vaud</option>
+          <option value="ti">Ticino</option>
+          <option value="lu">Luzern</option>
+          <option value="ag">Aargau</option>
+          <option value="sg">St. Gallen</option>
+          <option value="sz">Schwyz</option>
+        </select>
+      </div>
+      <div class="field-row">
+        <div class="field">
+          <label for="companyProfit">Company profit / yr</label>
+          <div class="prefix-wrap"><span>CHF</span><input type="number" id="companyProfit" value="120000" min="0" step="5000" /></div>
+        </div>
+        <div class="field">
+          <label for="marginalRate">Personal tax rate %</label>
+          <input type="number" id="marginalRate" value="28" min="10" max="55" step="0.5" />
+        </div>
+      </div>
+      <div class="field-row">
+        <div class="field">
+          <label for="vatRegistered">VAT registered</label>
+          <select id="vatRegistered">
+            <option value="yes" selected>Yes</option>
+            <option value="no">No</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="companyType">Company type</label>
+          <select id="companyType">
+            <option value="gmbh" selected>GmbH</option>
+            <option value="ag">AG</option>
+            <option value="sole">Sole trader</option>
+          </select>
+        </div>
+      </div>
+      <div class="field">
+        <label for="corpTaxRate">Company profit tax %</label>
+        <input type="number" id="corpTaxRate" value="11.8" min="11" max="22" step="0.1" />
+        <span class="field-hint">Pre-filled from canton</span>
+      </div>
+      <div class="field">
+        <label for="socialRate">Social on Privatanteil %</label>
+        <input type="number" id="socialRate" value="12" min="0" max="25" step="0.5" />
+      </div>
+
+      <div class="section-divider">Running costs / yr</div>
+      <div class="field-row">
+        <div class="field">
+          <label for="insurance">Insurance</label>
+          <input type="number" id="insurance" value="1500" min="0" step="50" />
+        </div>
+        <div class="field">
+          <label for="mvTax">MV tax (ICE base)</label>
+          <input type="number" id="mvTax" value="560" min="0" step="20" data-auto="1" />
+        </div>
+      </div>
+      <div class="field-row">
+        <div class="field">
+          <label for="maintenance">Maintenance</label>
+          <input type="number" id="maintenance" value="800" min="0" step="50" />
+        </div>
+        <div class="field">
+          <label for="charging">Fuel / charging</label>
+          <input type="number" id="charging" value="1000" min="0" step="50" />
+        </div>
+      </div>
+
+      <div class="section-divider">Horizon</div>
+      <div class="field-row">
+        <div class="field">
+          <label for="horizon">Years</label>
+          <input type="number" id="horizon" value="5" min="1" max="10" step="1" />
+        </div>
+        <div class="field">
+          <label for="resalePct">Resale %</label>
+          <input type="number" id="resalePct" value="50" min="0" max="90" step="5" />
+        </div>
+      </div>
+      <div class="field">
+        <label for="registration">Registration (one-off)</label>
+        <input type="number" id="registration" value="400" min="0" step="50" />
+      </div>
+
+      <div id="leaseFields" class="hidden">
+        <div class="section-divider">Leasing</div>
+        <div class="field">
+          <label for="leaseMonthly">Lease / month (CHF)</label>
+          <input type="number" id="leaseMonthly" value="650" min="0" step="50" />
+        </div>
+        <div class="field">
+          <label for="leaseBuyout">List price ex VAT (Privatanteil base)</label>
+          <input type="number" id="leaseBuyout" value="53654" min="0" step="500" />
+        </div>
+      </div>
+
+      <div class="section-divider">Optional</div>
+      <div class="field">
+        <label for="additionalNotes">Additional notes</label>
+        <textarea id="additionalNotes" placeholder="e.g. sell after 3 years, cross-border travel…"></textarea>
+      </div>
+
+      <button type="button" class="analyse-btn" id="analyseBtn">Compare both structures</button>
+    </aside>
+
+    <main class="output-panel">
+      <div id="emptyState" class="empty-state">
+        <div class="icon" aria-hidden="true">⚖</div>
+        <h3>Ready to compare</h3>
+        <p>Adjust your vehicle and tax profile on the left, then click Compare to see the full 5-year analysis.</p>
+      </div>
+
+      <div id="results" class="hidden">
+        <div class="compare-grid tabular" id="compareGrid"></div>
+        <div class="verdict-box tabular" id="verdictBox"></div>
+        <p class="notice tabular" id="complianceNotice"></p>
+
+        <section class="card">
+          <div class="card-header">Acquisition</div>
+          <div class="card-body detail-cols tabular" id="acquisitionCols"></div>
+        </section>
+
+        <section class="card">
+          <div class="card-header">Annual running costs &amp; deductibility</div>
+          <div class="card-body tabular" id="runningTable"></div>
+        </section>
+
+        <section class="card">
+          <div class="card-header">Tax treatment</div>
+          <div class="card-body detail-cols tabular" id="taxCols"></div>
+        </section>
+
+        <section class="card">
+          <div class="card-header">Total cost of ownership summary</div>
+          <div class="card-body" style="overflow-x:auto">
+            <table class="tco-table tabular" id="tcoTable"></table>
+          </div>
+        </section>
+
+        <section class="card">
+          <div class="card-header">Net cost over time</div>
+          <div class="card-body"><div class="chart-wrap"><canvas id="chartTco" aria-label="Cumulative net cost"></canvas></div></div>
+        </section>
+
+        <section class="card">
+          <div class="card-header">Decision guide</div>
+          <div class="card-body"><ul class="guide-list" id="guideList"></ul></div>
+        </section>
+
+        <section class="card">
+          <div class="card-header">Leasing variant</div>
+          <div class="card-body tabular" id="leaseNote"></div>
+        </section>
+
+        <section class="card">
+          <div class="card-header">EV / fuel considerations</div>
+          <div class="card-body tabular" id="evNote"></div>
+        </section>
+
+        <section class="cta-block">
+          <h2>Request a vehicle &amp; allocation review</h2>
+          <p>Validate Privatanteil, MWST, logbook, and salary certificate treatment with your Treuhänder.</p>
+          <a href="/#contact" class="btn btn-primary">Contact Shreshti</a>
+        </section>
+      </div>
+    </main>
+  </div>
+
+  <p class="disclaimer">
+    Illustrative model based on Swiss tax law 2024/25 (Privatanteil 10.8%, VAT 8.1%). Not financial, legal, or tax advice — confirm with a licensed advisor before deciding.
+  </p>
+
+  <script>
+(function () {
+  'use strict';
+
+  const VAT = 0.081;
+  const PRIVAT_MONTHLY = 0.009;
+  const PRIVAT_MIN_MONTH = 150;
+  const DEP_YEARS = 5;
+
+  const CANTONS = {
+    zg: { name: 'Zug', corp: 11.8, mvIce: 500, wealthPm: 0.12 },
+    zh: { name: 'Zürich', corp: 19.6, mvIce: 680, wealthPm: 0.18 },
+    ge: { name: 'Genève', corp: 14.7, mvIce: 720, wealthPm: 0.35 },
+    bs: { name: 'Basel-Stadt', corp: 15.2, mvIce: 650, wealthPm: 0.28 },
+    be: { name: 'Bern', corp: 18.2, mvIce: 600, wealthPm: 0.20 },
+    vd: { name: 'Vaud', corp: 14.0, mvIce: 640, wealthPm: 0.30 },
+    ti: { name: 'Ticino', corp: 16.1, mvIce: 580, wealthPm: 0.22 },
+    lu: { name: 'Luzern', corp: 12.6, mvIce: 550, wealthPm: 0.15 },
+    ag: { name: 'Aargau', corp: 16.5, mvIce: 580, wealthPm: 0.16 },
+    sg: { name: 'St. Gallen', corp: 16.4, mvIce: 590, wealthPm: 0.17 },
+    sz: { name: 'Schwyz', corp: 14.1, mvIce: 520, wealthPm: 0.14 },
+  };
+
+  const FUEL_DEFAULTS = {
+    electric: { maintenance: 800, charging: 1000 },
+    petrol: { maintenance: 1200, charging: 2400 },
+    diesel: { maintenance: 1300, charging: 2200 },
+    hybrid: { maintenance: 1100, charging: 1600 },
+  };
+
+  const PRESETS = {
+    tesla: { carName: 'Tesla Model Y Long Range', purchasePrice: 58000, fuelType: 'electric', insurance: 1500, mvTax: 560, maintenance: 800, charging: 1000, resalePct: 50, businessUse: 70 },
+    vw: { carName: 'VW Golf 2.0 TDI', purchasePrice: 42000, fuelType: 'diesel', insurance: 1200, mvTax: 480, maintenance: 1300, charging: 2200, resalePct: 42 },
+    bmw: { carName: 'BMW 320d Touring', purchasePrice: 65000, fuelType: 'diesel', insurance: 1800, mvTax: 620, maintenance: 1500, charging: 2800, resalePct: 45 },
+    van: { carName: 'VW ID. Buzz', purchasePrice: 72000, fuelType: 'electric', insurance: 1400, mvTax: 700, maintenance: 900, charging: 1100, resalePct: 48, businessUse: 85 },
+  };
+
+  const $ = (id) => document.getElementById(id);
+  let chartTco;
+  let hasRun = false;
+
+  function pct(v) { return Number(v) / 100; }
+  function exVat(incl) { return incl / (1 + VAT); }
+  function fmt(n) {
+    if (!Number.isFinite(n)) return '—';
+    return 'CHF ' + Math.round(n).toLocaleString('de-CH');
+  }
+  function fmtPct(n) { return Number(n).toFixed(1) + '%'; }
+  function isEv(fuel) { return fuel === 'electric' || fuel === 'hybrid'; }
+
+  function readInputs() {
+    const canton = $('canton').value;
+    const c = CANTONS[canton] || CANTONS.zg;
+    const fuel = $('fuelType').value;
+    return {
+      carName: $('carName').value.trim() || 'Vehicle',
+      purchasePrice: Number($('purchasePrice').value),
+      fuelType: fuel,
+      isEv: isEv(fuel),
+      canton, cantonName: c.name,
+      businessUse: Number($('businessUse').value),
+      companyProfit: Number($('companyProfit').value),
+      marginalRate: Number($('marginalRate').value),
+      corpTaxRate: Number($('corpTaxRate').value) / 100,
+      vatRegistered: $('vatRegistered').value === 'yes',
+      companyType: $('companyType').value,
+      socialRate: Number($('socialRate').value) / 100,
+      financing: $('financing').value,
+      leaseMonthly: Number($('leaseMonthly').value),
+      leaseBuyout: Number($('leaseBuyout').value),
+      insurance: Number($('insurance').value),
+      mvTaxIce: Number($('mvTax').value),
+      maintenance: Number($('maintenance').value),
+      charging: Number($('charging').value),
+      horizon: Math.max(1, Number($('horizon').value)),
+      resalePct: Number($('resalePct').value),
+      registration: Number($('registration').value),
+      additionalNotes: ($('additionalNotes').value || '').trim(),
+      cantonMvIce: c.mvIce,
+      wealthPm: c.wealthPm / 1000,
+    };
+  }
+
+  function annualMvTax(inp) {
+    const base = inp.mvTaxIce > 0 ? inp.mvTaxIce : inp.cantonMvIce;
+    return inp.isEv ? base * 0.5 : base;
+  }
+  function annualRunning(inp) {
+    return inp.insurance + annualMvTax(inp) + inp.maintenance + inp.charging;
+  }
+  function privatanteilBase(inp) {
+    const ex = inp.financing === 'lease' ? inp.leaseBuyout : exVat(inp.purchasePrice);
+    return Math.max(ex * PRIVAT_MONTHLY * 12, PRIVAT_MIN_MONTH * 12);
+  }
+
+  function simulate(inp) {
+    const years = inp.horizon;
+    const biz = Math.min(1, Math.max(0, inp.businessUse / 100));
+    const flatOk = inp.businessUse > 50 && inp.companyType !== 'sole';
+    const priceIncl = inp.purchasePrice;
+    const priceEx = exVat(priceIncl);
+    const vatAmt = priceIncl - priceEx;
+    const vatReclaim = inp.vatRegistered && flatOk ? vatAmt * biz : 0;
+    const running = annualRunning(inp);
+    const resale = priceIncl * pct(inp.resalePct);
+    const privat = flatOk ? privatanteilBase(inp) : 0;
+    const depAnnual = priceEx / DEP_YEARS;
+    const leaseAnnual = inp.financing === 'lease' ? inp.leaseMonthly * 12 : 0;
+    const personalAcq = priceIncl;
+    const companyAcqNet = inp.financing === 'cash' ? priceIncl - vatReclaim : 0;
+
+    const personalGross = personalAcq + inp.registration + running * years;
+    const personalTaxSave = ((priceEx / DEP_YEARS) * biz * years + running * biz * years) * pct(inp.marginalRate);
+    const wealthTax = priceIncl * inp.wealthPm * years * 0.85;
+    const personalNet = personalGross - personalTaxSave - resale + wealthTax;
+
+    let companyGross = inp.registration + running * years;
+    let companyTaxSave = 0;
+    if (inp.financing === 'cash') {
+      companyGross += companyAcqNet;
+      companyTaxSave = (depAnnual * years + running * years) * inp.corpTaxRate;
+    } else {
+      companyGross += leaseAnnual * years;
+      companyTaxSave = (leaseAnnual * years + running * years) * inp.corpTaxRate;
+    }
+    const ownerPrivTax = privat * pct(inp.marginalRate) * years;
+    const ownerSocial = privat * inp.socialRate * years;
+    const vatPriv = privat * VAT * years;
+    const companyNet = companyGross - companyTaxSave + ownerPrivTax + ownerSocial + vatPriv - resale;
+
+    const diff = companyNet - personalNet;
+    const winner = personalNet <= companyNet ? 'personal' : 'company';
+
+    const yearlyPersonal = [];
+    const yearlyCompany = [];
+    let cumP = personalAcq + inp.registration;
+    let cumC = (inp.financing === 'cash' ? companyAcqNet : 0) + inp.registration;
+    const annualPersSave = (depAnnual * biz + running * biz) * pct(inp.marginalRate);
+    const annualCorpSave = ((inp.financing === 'lease' ? leaseAnnual : depAnnual) + running) * inp.corpTaxRate;
+    const annualOwnerCost = flatOk ? privat * (pct(inp.marginalRate) + inp.socialRate + VAT) : 0;
+
+    for (let y = 1; y <= years; y++) {
+      cumP += running - annualPersSave - (y === years ? resale : 0);
+      cumC += running - annualCorpSave + annualOwnerCost - (y === years ? resale : 0);
+      if (inp.financing === 'lease') cumC += leaseAnnual;
+      yearlyPersonal.push({ year: y, net: cumP });
+      yearlyCompany.push({ year: y, net: cumC });
+    }
+
+    return {
+      priceIncl, priceEx, vatAmt, vatReclaim, running, resale, privat, flatOk, biz,
+      depAnnual, leaseAnnual, personalAcq, companyAcqNet,
+      personalGross, personalTaxSave, wealthTax, personalNet,
+      companyGross, companyTaxSave, ownerPrivTax, ownerSocial, vatPriv, companyNet,
+      diff, winner, yearlyPersonal, yearlyCompany, mvTax: annualMvTax(inp),
+    };
+  }
+
+  function buildCompareCards(inp, r) {
+    const personalWins = r.winner === 'personal';
+    $('compareGrid').innerHTML = `
+      <div class="compare-card personal ${personalWins ? 'winner' : ''}">
+        <div class="compare-card-header">
+          <h3>Personal ownership</h3>
+          ${personalWins ? '<span class="winner-tag">Better</span>' : ''}
+        </div>
+        <div class="compare-card-body">
+          <div class="cost-label">${inp.horizon}-yr net cost to you</div>
+          <div class="cost-value">${fmt(r.personalNet)}</div>
+          <div class="cost-meta">No Privatanteil · No VAT reclaim<br>Wealth tax · Simpler admin</div>
+        </div>
+      </div>
+      <div class="compare-card company ${!personalWins ? 'winner' : ''}">
+        <div class="compare-card-header">
+          <h3>Company (${inp.companyType === 'ag' ? 'AG' : inp.companyType === 'sole' ? 'Sole trader*' : 'GmbH'})</h3>
+          ${!personalWins ? '<span class="winner-tag">Better</span>' : ''}
+        </div>
+        <div class="compare-card-body">
+          <div class="cost-label">${inp.horizon}-yr net cost to you</div>
+          <div class="cost-value">${fmt(r.companyNet)}</div>
+          ${r.vatReclaim > 0 ? `<div class="cost-saving">VAT reclaim: ${fmt(r.vatReclaim)}</div>` : ''}
+          <div class="cost-meta">Privatanteil ${fmt(r.privat)}/yr · Depreciation deductible<br>${r.vatReclaim > 0 ? 'VAT on books · ' : ''}More compliance</div>
+        </div>
+      </div>`;
+  }
+
+  function render(inp, r) {
+    buildCompareCards(inp, r);
+    const winLabel = r.winner === 'personal' ? 'Private ownership' : 'Company ownership';
+    $('verdictBox').innerHTML = `
+      <div class="verdict-label">Verdict · ${inp.carName}</div>
+      <strong>${winLabel}</strong> is lower by ${fmt(Math.abs(r.diff))} over ${inp.horizon} years
+      (private ${fmt(r.personalNet)} vs company ${fmt(r.companyNet)} net to owner).
+      ${inp.additionalNotes ? '<br><br><span style="opacity:0.85">Note: ' + inp.additionalNotes.replace(/</g, '&lt;') + '</span>' : ''}`;
+
+    let notice = r.flatOk
+      ? `Flat Privatanteil 10.8% p.a. (0.9%/month, min CHF 150/mo) incl. commuting · Canton ${inp.cantonName} · VAT 8.1%.`
+      : 'Business use ≤50% or sole trader: flat Privatanteil may not apply — use a logbook; company path may be understated.';
+    if (inp.companyType === 'sole') notice += ' *Sole trader: model uses Einzelunternehmen rules; Privatanteil on car differs from GmbH.';
+    $('complianceNotice').textContent = notice;
+
+    $('acquisitionCols').innerHTML = colHtml('Personal', [
+      ['Purchase incl. VAT', fmt(r.priceIncl)],
+      ['VAT recovery', '—'],
+      ['Registration', fmt(inp.registration)],
+      ['Net acquisition', fmt(r.personalAcq)],
+    ], 'personal') + colHtml('Company', [
+      ['Purchase incl. VAT', fmt(r.priceIncl)],
+      ['VAT reclaimed', fmt(r.vatReclaim)],
+      ['Registration', fmt(inp.registration)],
+      ['Net acquisition', inp.financing === 'cash' ? fmt(r.companyAcqNet) : 'Leased'],
+    ], 'company');
+
+    const bizPct = fmtPct(inp.businessUse);
+    $('runningTable').innerHTML = `<table class="tco-table"><thead><tr>
+      <th>Cost / year</th><th>Amount</th><th>Personal</th><th>Company</th></tr></thead><tbody>
+      <tr><td>Insurance</td><td>${fmt(inp.insurance)}</td><td>${bizPct} deduct.</td><td>100%</td></tr>
+      <tr><td>Motor vehicle tax</td><td>${fmt(r.mvTax)}</td><td>—</td><td>100%</td></tr>
+      <tr><td>Maintenance</td><td>${fmt(inp.maintenance)}</td><td>${bizPct}</td><td>100%</td></tr>
+      <tr><td>Fuel / charging</td><td>${fmt(inp.charging)}</td><td>${bizPct}</td><td>100%</td></tr>
+      <tr class="total"><td>Total</td><td>${fmt(r.running)}</td><td>${fmt(r.running * r.biz)}</td><td>${fmt(r.running)}</td></tr>
+    </tbody></table>`;
+
+    $('taxCols').innerHTML = colHtml('Personal tax', [
+      ['Wealth tax (est.)', fmt(r.wealthTax)],
+      ['Business deduction', bizPct + ' of dep. + running'],
+      ['Income tax saved', fmt(r.personalTaxSave)],
+      ['Commute', 'Limited with private car'],
+    ], 'personal') + colHtml('Company tax', [
+      ['Depreciation', fmt(r.depAnnual) + '/yr'],
+      ['Corp. tax saved', fmt(r.companyTaxSave)],
+      ['Privatanteil / yr', fmt(r.privat) + ' → Lohnausweis 2.2'],
+      ['Your income tax', fmt(r.ownerPrivTax / inp.horizon) + '/yr'],
+      ['Social + MWST', fmt((r.ownerSocial + r.vatPriv) / inp.horizon) + '/yr'],
+    ], 'company');
+
+    const run5 = r.running * inp.horizon;
+    $('tcoTable').innerHTML = `<thead><tr><th>Element (${inp.horizon} yr)</th><th>Personal</th><th>Company</th></tr></thead><tbody>
+      <tr><td>Net purchase / lease capital</td><td>${fmt(r.personalAcq)}</td><td>${inp.financing === 'cash' ? fmt(r.companyAcqNet) : fmt(r.leaseAnnual * inp.horizon)}</td></tr>
+      <tr><td>Running costs</td><td>${fmt(run5)}</td><td>${fmt(run5)}</td></tr>
+      <tr><td>Tax savings</td><td>−${fmt(r.personalTaxSave)}</td><td>−${fmt(r.companyTaxSave)}</td></tr>
+      <tr><td>Privatanteil tax cost</td><td>—</td><td>+${fmt(r.ownerPrivTax + r.ownerSocial + r.vatPriv)}</td></tr>
+      <tr><td>Wealth tax</td><td>+${fmt(r.wealthTax)}</td><td>—</td></tr>
+      <tr><td>Resale</td><td>−${fmt(r.resale)}</td><td>−${fmt(r.resale)}</td></tr>
+      <tr class="total"><td>Total net cost</td><td>${fmt(r.personalNet)}</td><td>${fmt(r.companyNet)}</td></tr>
+      <tr class="total"><td>Saving vs alternative</td><td>${personalWinsLabel(r)}</td><td>${companyWinsLabel(r)}</td></tr>
+    </tbody>`;
+
+    $('leaseNote').innerHTML = inp.financing === 'lease'
+      ? '<p><strong>Leasing selected.</strong> Privatanteil uses list price ex VAT, not monthly payment. Payments are expensed; VAT on instalments subject to private-use correction. Leasing rarely changes the verdict unless subsidised vs buying.</p>'
+      : '<p><strong>Cash purchase.</strong> Straight-line depreciation over 5 years on ex-VAT cost. Switch to Leasing in the form to compare fleet-style structures.</p>';
+
+    const fuelLabel = { electric: 'Electric', petrol: 'Petrol', diesel: 'Diesel', hybrid: 'Hybrid' }[inp.fuelType];
+    $('evNote').innerHTML = inp.isEv
+      ? `<p><strong>${fuelLabel}:</strong> ~50% motor vehicle tax vs ICE in ${inp.cantonName}. No federal Swiss purchase subsidy. Home charging via company: clarify MWST. Zug may revise EV tax rules.</p>`
+      : `<p><strong>${fuelLabel}:</strong> Full cantonal motor vehicle tax. Higher fuel/charging line in the model. No EV-specific discounts.</p>`;
+
+    const guides = [];
+    if (r.winner === 'personal') {
+      guides.push({ t: 'Private ownership wins', b: `At ${fmtPct(inp.marginalRate)} marginal tax vs ${fmtPct(inp.corpTaxRate * 100)} company rate in ${inp.cantonName}, Privatanteil cost outweighs corporate shields for this ${inp.carName}.` });
+    } else {
+      guides.push({ t: 'Company ownership wins', b: `VAT (${fmt(r.vatReclaim)}) and deductible costs beat Privatanteil drag — often when profit stays in the company at ${fmtPct(inp.corpTaxRate * 100)}.` });
+    }
+    guides.push({ t: 'Compliance', b: 'Company: Lohnausweis 2.2, box F, MWST on benefit, Fahrtenbuch if ≤50% business. Missing Privatanteil → hidden dividend risk.' });
+    guides.push({ t: 'When the other structure wins', b: r.winner === 'personal'
+      ? 'Company: ~100% business use, high VAT reclaim, low personal marginal rate, long profit retention.'
+      : 'Private: high marginal tax, moderate LTV, shareholder needs simple admin.' });
+    if (inp.companyProfit > 200000) {
+      guides.push({ t: 'Profit context', b: `Company profit CHF ${inp.companyProfit.toLocaleString('de-CH')}/yr — effective rate still ~${fmtPct(inp.corpTaxRate * 100)} in ${inp.cantonName}; Pillar Two not modelled.` });
+    }
+    $('guideList').innerHTML = guides.map(g => `<li><strong>${g.t}</strong>${g.b}</li>`).join('');
+
+    renderChart(inp, r);
+  }
+
+  function personalWinsLabel(r) {
+    return r.winner === 'personal' ? fmt(Math.abs(r.diff)) : '—';
+  }
+  function companyWinsLabel(r) {
+    return r.winner === 'company' ? fmt(Math.abs(r.diff)) : '—';
+  }
+  function colHtml(title, rows, cls) {
+    return `<div class="detail-col ${cls}"><h4>${title}</h4><dl>` +
+      rows.map(([k, v]) => `<div class="metric-row"><dt>${k}</dt><dd>${v}</dd></div>`).join('') + '</dl></div>';
+  }
+
+  function renderChart(inp, r) {
+    if (typeof Chart === 'undefined') return;
+    const dark = document.documentElement.getAttribute('data-theme') === 'dark';
+    const colors = { text: dark ? '#b0a89a' : '#5e5850', grid: dark ? '#3d3830' : '#e0dcd4', p: dark ? '#6a9fd4' : '#2a5f8f', c: dark ? '#4db87a' : '#138808' };
+    if (chartTco) chartTco.destroy();
+    chartTco = new Chart($('chartTco'), {
+      type: 'line',
+      data: {
+        labels: r.yearlyPersonal.map(x => 'Y' + x.year),
+        datasets: [
+          { label: 'Personal', data: r.yearlyPersonal.map(x => x.net), borderColor: colors.p, tension: 0.2, pointRadius: 3 },
+          { label: 'Company', data: r.yearlyCompany.map(x => x.net), borderColor: colors.c, tension: 0.2, pointRadius: 3 },
+        ],
+      },
+      options: {
+        responsive: true, maintainAspectRatio: false,
+        plugins: { legend: { labels: { color: colors.text } } },
+        scales: {
+          x: { ticks: { color: colors.text }, grid: { color: colors.grid } },
+          y: { ticks: { color: colors.text, callback: v => 'CHF ' + Math.round(v / 1000) + 'k' }, grid: { color: colors.grid } },
+        },
+      },
+    });
+  }
+
+  function showResults() {
+    $('emptyState').classList.add('hidden');
+    $('results').classList.remove('hidden');
+    hasRun = true;
+  }
+
+  function runAnalysis() {
+    const inp = readInputs();
+    if (inp.purchasePrice < 1000) return;
+    if (inp.financing === 'lease' && !inp.leaseBuyout) {
+      inp.leaseBuyout = Math.round(exVat(inp.purchasePrice));
+      $('leaseBuyout').value = inp.leaseBuyout;
+    }
+    showResults();
+    render(inp, simulate(inp));
+  }
+
+  function onCantonChange() {
+    const c = CANTONS[$('canton').value];
+    if (c) {
+      $('corpTaxRate').value = c.corp;
+      if ($('mvTax').dataset.auto === '1') $('mvTax').value = c.mvIce;
+    }
+  }
+
+  function onFuelChange() {
+    const d = FUEL_DEFAULTS[$('fuelType').value];
+    if (d) {
+      $('maintenance').value = d.maintenance;
+      $('charging').value = d.charging;
+    }
+    if (hasRun) runAnalysis();
+  }
+
+  function applyPreset(name) {
+    const p = PRESETS[name];
+    if (!p) return;
+    document.querySelectorAll('[data-preset]').forEach(b => b.classList.toggle('active', b.dataset.preset === name));
+    Object.entries(p).forEach(([k, v]) => { const el = $(k); if (el) el.value = v; });
+    onCantonChange();
+    runAnalysis();
+  }
+
+  $('analyseBtn').addEventListener('click', runAnalysis);
+  $('financing').addEventListener('change', () => {
+    $('leaseFields').classList.toggle('hidden', $('financing').value !== 'lease');
+    if ($('financing').value === 'lease') $('leaseBuyout').value = Math.round(exVat(Number($('purchasePrice').value)));
+    if (hasRun) runAnalysis();
+  });
+  $('canton').addEventListener('change', () => { onCantonChange(); if (hasRun) runAnalysis(); });
+  $('fuelType').addEventListener('change', onFuelChange);
+  $('mvTax').addEventListener('input', () => { $('mvTax').dataset.auto = '0'; if (hasRun) runAnalysis(); });
+  $('purchasePrice').addEventListener('input', () => {
+    if ($('financing').value === 'lease') $('leaseBuyout').value = Math.round(exVat(Number($('purchasePrice').value) || 0));
+    if (hasRun) runAnalysis();
+  });
+
+  document.querySelectorAll('[data-preset]').forEach(b => b.addEventListener('click', () => applyPreset(b.dataset.preset)));
+  ['carName','businessUse','marginalRate','corpTaxRate','vatRegistered','companyType','socialRate',
+    'leaseMonthly','leaseBuyout','insurance','maintenance','charging','horizon','resalePct','registration','companyProfit'
+  ].forEach(id => { const el = $(id); if (el) el.addEventListener('input', () => { if (hasRun) runAnalysis(); }); });
+  $('vatRegistered').addEventListener('change', () => { if (hasRun) runAnalysis(); });
+
+  $('btnTheme').addEventListener('click', () => {
+    const d = document.documentElement.getAttribute('data-theme') === 'dark';
+    document.documentElement.setAttribute('data-theme', d ? 'light' : 'dark');
+    $('btnTheme').textContent = d ? 'Dark' : 'Light';
+    if (hasRun) runAnalysis();
+  });
+
+  function init() {
+    const dark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+    document.documentElement.setAttribute('data-theme', dark ? 'dark' : 'light');
+    $('btnTheme').textContent = dark ? 'Light' : 'Dark';
+    $('mvTax').dataset.auto = '1';
+    function wait() {
+      if (typeof Chart !== 'undefined') applyPreset('tesla');
+      else setTimeout(wait, 50);
+    }
+    wait();
+  }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);
+  else init();
+})();
+  </script>
+</body>
+</html>

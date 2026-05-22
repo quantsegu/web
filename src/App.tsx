@@ -123,6 +123,19 @@ export default function App() {
           element={<Navigate to="/wealth-tools/portfolio-efficiency-scorecard" replace />}
         />
         <Route
+          path="/wealth-tools/personal-vs-company-car-planner"
+          element={
+            <WealthToolFrame
+              src="/wealth-tools/personal-vs-company-car-planner.html"
+              title="Personal vs Company Car Planner"
+            />
+          }
+        />
+        <Route
+          path="/wealth-tools/personal-vs-company-car-planner.html"
+          element={<Navigate to="/wealth-tools/personal-vs-company-car-planner" replace />}
+        />
+        <Route
           path="/wealth-tools/real-estate-vs-equity-planner"
           element={
             <WealthToolFrame

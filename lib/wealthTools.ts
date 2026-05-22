@@ -4,7 +4,7 @@ export interface WealthTool {
   description: string;
   features: string[];
   href: string;
-  icon: 'retirement' | 'portfolio' | 'tax' | 'mortgage' | 'globe' | 'universe' | 'policy' | 'realestate';
+  icon: 'retirement' | 'portfolio' | 'tax' | 'mortgage' | 'globe' | 'universe' | 'policy' | 'realestate' | 'car';
   ctaLabel?: string;
 }
 
@@ -104,6 +104,22 @@ export const wealthTools: WealthTool[] = [
     href: '/wealth-tools/portfolio-efficiency-scorecard',
     icon: 'portfolio',
     ctaLabel: 'Run scorecard',
+  },
+  {
+    id: 'personal-vs-company-car-planner',
+    title: 'Personal vs Company Car Planner',
+    description:
+      'Compare 5-year total cost of any vehicle privately vs through a Swiss GmbH or AG — side-by-side cards, VAT, Privatanteil 10.8%, cantonal tax, leasing, and decision guide.',
+    features: [
+      'Any make/model — presets or custom purchase price',
+      'Acquisition, running costs, and tax treatment side by side',
+      'Zug and other canton corporate tax defaults',
+      'Cash vs leasing with Privatanteil on list price',
+      '5-year TCO table, chart, and decision guide',
+    ],
+    href: '/wealth-tools/personal-vs-company-car-planner',
+    icon: 'car',
+    ctaLabel: 'Compare ownership',
   },
   {
     id: 'real-estate-vs-equity-planner',
