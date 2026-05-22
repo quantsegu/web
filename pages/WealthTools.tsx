@@ -13,6 +13,7 @@ const ICONS = {
   tax: Scale,
   mortgage: Home,
   globe: Globe,
+  realestate: Building2,
 } as const;
 
 export default function WealthTools() {
