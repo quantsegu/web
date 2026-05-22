@@ -4,7 +4,7 @@ export interface WealthTool {
   description: string;
   features: string[];
   href: string;
-  icon: 'retirement' | 'portfolio' | 'tax' | 'mortgage' | 'globe' | 'universe';
+  icon: 'retirement' | 'portfolio' | 'tax' | 'mortgage' | 'globe' | 'universe' | 'policy';
   ctaLabel?: string;
 }
 
@@ -24,6 +24,22 @@ export const wealthTools: WealthTool[] = [
     href: '/wealth-tools/investment-universe',
     icon: 'universe',
     ctaLabel: 'Explore universe',
+  },
+  {
+    id: 'investment-policy-dashboard',
+    title: 'Investment Policy Dashboard',
+    description:
+      'Define or review a private-client investment policy — goals, risk capacity, target allocation bands, liquidity buckets, rebalancing rules, and tax-aware guidelines with a draft IPS output.',
+    features: [
+      'Goal and objective inputs with preservation, retirement, growth, and legacy presets',
+      'Risk capacity vs tolerance with suggested allocation ranges',
+      'Liquidity reserve sizing and three-bucket planning',
+      'Rebalancing triggers — calendar, threshold, or hybrid',
+      'Draft investment policy statement with copy and print',
+    ],
+    href: '/wealth-tools/investment-policy-dashboard',
+    icon: 'policy',
+    ctaLabel: 'Open dashboard',
   },
   {
     id: 'retirement-income-planner',

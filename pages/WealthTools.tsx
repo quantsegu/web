@@ -1,12 +1,13 @@
 import { motion } from 'motion/react';
 import { Link } from 'react-router-dom';
-import { BarChart3, ExternalLink, Globe, Home, LineChart, PiggyBank, Scale } from 'lucide-react';
+import { BarChart3, ClipboardList, ExternalLink, Globe, Home, LineChart, PiggyBank, Scale } from 'lucide-react';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import { wealthTools } from '../lib/wealthTools';
 
 const ICONS = {
   universe: BarChart3,
+  policy: ClipboardList,
   retirement: LineChart,
   portfolio: PiggyBank,
   tax: Scale,

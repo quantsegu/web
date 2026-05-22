@@ -142,6 +142,19 @@ export default function App() {
           path="/wealth-tools/global-wealth-preservation-comparison.html"
           element={<Navigate to="/wealth-tools/global-wealth-preservation-comparison" replace />}
         />
+        <Route
+          path="/wealth-tools/investment-policy-dashboard"
+          element={
+            <WealthToolFrame
+              src="/wealth-tools/investment-policy-dashboard.html"
+              title="Investment Policy Dashboard"
+            />
+          }
+        />
+        <Route
+          path="/wealth-tools/investment-policy-dashboard.html"
+          element={<Navigate to="/wealth-tools/investment-policy-dashboard" replace />}
+        />
         <Route path="/bjp" element={<BJP />} />
         <Route path="/communities" element={<IndianCommunities />} />
         <Route path="*" element={<Navigate to="/" replace />} />

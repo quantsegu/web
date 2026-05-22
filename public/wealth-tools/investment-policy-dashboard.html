@@ -1,0 +1,1004 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Investment policy dashboard — define target allocation, risk, liquidity, rebalancing rules, and tax-aware guidelines for long-term wealth." />
+  <title>Investment Policy Dashboard</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js" defer></script>
+  <style>
+    :root {
+      --accent: #2c4a6e;
+      --accent-hover: #1e3550;
+      --accent-muted: rgba(44, 74, 110, 0.1);
+      --bg: #f2f3f6;
+      --surface: #ffffff;
+      --surface-2: #e6e9ef;
+      --border: #c5cad4;
+      --text: #11141a;
+      --text-muted: #4a5362;
+      --text-faint: #788294;
+      --positive: #1a5c38;
+      --warning: #8a5c10;
+      --negative: #8b3030;
+      --shadow: 0 1px 3px rgba(0,0,0,0.06);
+      --radius: 4px;
+      --font: "Helvetica Neue", Helvetica, Arial, system-ui, sans-serif;
+      --mono: ui-monospace, "SF Mono", Menlo, monospace;
+      --header-h: 48px;
+      --sidebar-w: 292px;
+    }
+    [data-theme="dark"] {
+      --accent: #7eb0e0;
+      --accent-hover: #a8c8f0;
+      --accent-muted: rgba(126, 176, 224, 0.12);
+      --bg: #0e1014;
+      --surface: #181c22;
+      --surface-2: #232830;
+      --border: #3a424e;
+      --text: #eef1f5;
+      --text-muted: #a8b0bc;
+      --text-faint: #6e7888;
+      --positive: #4db87a;
+      --warning: #d4a84a;
+      --negative: #e07070;
+      --shadow: 0 1px 3px rgba(0,0,0,0.35);
+    }
+    *, *::before, *::after { box-sizing: border-box; }
+    html { font-size: 14px; scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      font-family: var(--font);
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.5;
+      font-feature-settings: "tnum" 1, "lnum" 1;
+    }
+    .tabular { font-variant-numeric: tabular-nums lining-nums; }
+    button, input, select, textarea { font-family: inherit; font-size: inherit; }
+    a { color: var(--accent); }
+    :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+    .app-header {
+      position: sticky; top: 0; z-index: 100;
+      height: var(--header-h);
+      display: flex; align-items: center; gap: 12px;
+      padding: 0 16px;
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      box-shadow: var(--shadow);
+    }
+    .logo { display: flex; align-items: center; gap: 8px; text-decoration: none; color: var(--text); }
+    .logo svg { width: 28px; height: 28px; }
+    .logo-title { font-size: 0.95rem; font-weight: 600; letter-spacing: -0.02em; }
+    .logo-sub { font-size: 0.68rem; color: var(--text-muted); }
+    .header-actions { margin-left: auto; display: flex; gap: 8px; flex-wrap: wrap; }
+    .btn {
+      padding: 6px 12px; border: 1px solid var(--border); border-radius: var(--radius);
+      background: var(--surface); color: var(--text); cursor: pointer; font-size: 0.8rem;
+      text-decoration: none; display: inline-flex; align-items: center;
+    }
+    .btn:hover { background: var(--surface-2); }
+    .btn-primary { background: var(--accent); border-color: var(--accent); color: #fff; }
+    [data-theme="dark"] .btn-primary { color: #0e1014; }
+    .btn-sm { padding: 4px 8px; font-size: 0.72rem; }
+
+    .app-shell { display: flex; min-height: calc(100vh - var(--header-h)); }
+    .sidebar {
+      width: var(--sidebar-w); flex-shrink: 0;
+      background: var(--surface); border-right: 1px solid var(--border);
+      position: sticky; top: var(--header-h);
+      max-height: calc(100vh - var(--header-h)); overflow-y: auto;
+      padding: 12px;
+    }
+    .main { flex: 1; min-width: 0; }
+    .main-scroll { padding: 0 16px 32px; }
+
+    .panel-title {
+      font-size: 0.65rem; font-weight: 600; text-transform: uppercase;
+      letter-spacing: 0.08em; color: var(--text-faint); margin: 12px 0 8px;
+    }
+    .panel-title:first-child { margin-top: 0; }
+    .field { margin-bottom: 10px; }
+    .field label { display: block; font-size: 0.75rem; color: var(--text-muted); margin-bottom: 3px; }
+    .field input, .field select, .field textarea {
+      width: 100%; padding: 6px 8px; border: 1px solid var(--border);
+      border-radius: var(--radius); background: var(--bg); color: var(--text);
+    }
+    .field-hint { font-size: 0.65rem; color: var(--text-faint); margin-top: 2px; }
+    .input-row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+    .check-grid { display: grid; gap: 4px; font-size: 0.72rem; color: var(--text-muted); }
+    .check-grid label { display: flex; align-items: center; gap: 6px; cursor: pointer; }
+    .check-grid input { width: auto; accent-color: var(--accent); }
+    .preset-row { display: grid; grid-template-columns: repeat(2, 1fr); gap: 4px; margin-bottom: 8px; }
+    .preset-row button {
+      padding: 6px; font-size: 0.68rem; border: 1px solid var(--border);
+      border-radius: var(--radius); background: var(--bg); color: var(--text-muted); cursor: pointer;
+    }
+    .preset-row button.active { border-color: var(--accent); background: var(--accent-muted); color: var(--accent); font-weight: 600; }
+    .mix-row { display: grid; grid-template-columns: 1fr 52px; gap: 6px; align-items: center; margin-bottom: 5px; }
+    .mix-row label { font-size: 0.72rem; color: var(--text-muted); margin: 0; }
+    .mix-total { font-size: 0.7rem; margin-top: 4px; }
+    .mix-total.warn { color: var(--warning); font-weight: 600; }
+
+    .hero {
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      padding: 24px 20px 20px;
+      margin: 0 -16px 16px;
+      box-shadow: var(--shadow);
+    }
+    .hero-eyebrow {
+      font-size: 0.62rem; font-weight: 700; text-transform: uppercase;
+      letter-spacing: 0.12em; color: var(--accent); margin: 0 0 8px;
+    }
+    .hero h1 { margin: 0 0 8px; font-size: 1.45rem; font-weight: 600; letter-spacing: -0.03em; line-height: 1.2; max-width: 40rem; }
+    .hero-lead { margin: 0; font-size: 0.88rem; color: var(--text-muted); max-width: 48rem; line-height: 1.55; }
+    .hero-grid {
+      display: flex; flex-wrap: wrap; gap: 8px; margin-top: 14px;
+      padding-top: 12px; border-top: 1px solid var(--border);
+    }
+    .hero-grid span {
+      font-size: 0.68rem; padding: 4px 10px; border: 1px solid var(--border);
+      border-radius: var(--radius); color: var(--text-faint); background: var(--bg);
+    }
+
+    .section-nav {
+      display: flex; flex-wrap: wrap; gap: 4px; margin-bottom: 14px;
+      padding: 8px; background: var(--surface); border: 1px solid var(--border);
+      border-radius: var(--radius);
+    }
+    .section-nav a {
+      font-size: 0.7rem; padding: 4px 8px; border-radius: var(--radius);
+      color: var(--text-muted); text-decoration: none;
+    }
+    .section-nav a:hover { background: var(--accent-muted); color: var(--accent); }
+
+    .summary-grid {
+      display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+      gap: 8px; margin-bottom: 14px;
+    }
+    .summary-card {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: var(--radius); padding: 10px 12px; box-shadow: var(--shadow);
+    }
+    .summary-card.highlight { border-color: var(--accent); }
+    .summary-card .label { font-size: 0.62rem; text-transform: uppercase; letter-spacing: 0.06em; color: var(--text-faint); }
+    .summary-card .value { font-size: 1rem; font-weight: 600; margin-top: 3px; }
+    .summary-card .sub { font-size: 0.68rem; color: var(--text-muted); margin-top: 2px; }
+
+    .card {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: var(--radius); margin-bottom: 12px; box-shadow: var(--shadow);
+    }
+    .card-header {
+      padding: 10px 14px; border-bottom: 1px solid var(--border);
+      font-size: 0.8rem; font-weight: 600;
+      display: flex; align-items: baseline; justify-content: space-between; gap: 8px;
+    }
+    .card-header .num { font-size: 0.65rem; color: var(--text-faint); font-weight: 600; }
+    .card-body { padding: 12px 14px; }
+    .card-body p { margin: 0 0 8px; font-size: 0.8rem; color: var(--text-muted); line-height: 1.55; }
+    .card-body p:last-child { margin-bottom: 0; }
+
+    .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    @media (max-width: 900px) { .two-col { grid-template-columns: 1fr; } }
+
+    .risk-meter {
+      height: 8px; background: var(--surface-2); border-radius: 4px; overflow: hidden; margin: 8px 0;
+    }
+    .risk-meter-fill { height: 100%; background: var(--accent); border-radius: 4px; transition: width 0.2s; }
+    .risk-labels { display: flex; justify-content: space-between; font-size: 0.65rem; color: var(--text-faint); }
+
+    .range-table { width: 100%; border-collapse: collapse; font-size: 0.75rem; }
+    .range-table th, .range-table td {
+      padding: 6px 8px; border-bottom: 1px solid var(--border); text-align: left;
+    }
+    .range-table th { color: var(--text-faint); font-weight: 600; font-size: 0.65rem; text-transform: uppercase; }
+    .range-table .band { font-weight: 600; color: var(--accent); }
+    .range-table .current { color: var(--text-muted); }
+    .range-table tr.mismatch td { background: var(--accent-muted); }
+
+    .chart-wrap { position: relative; height: 220px; max-width: 280px; margin: 0 auto; }
+
+    .bucket-grid { display: grid; gap: 8px; }
+    .bucket-item {
+      display: grid; grid-template-columns: 100px 1fr auto;
+      gap: 10px; align-items: center; padding: 8px 10px;
+      border: 1px solid var(--border); border-radius: var(--radius); background: var(--bg);
+      font-size: 0.75rem;
+    }
+    .bucket-item strong { color: var(--text); }
+    .bucket-bar { height: 6px; background: var(--surface-2); border-radius: 3px; overflow: hidden; }
+    .bucket-bar-fill { height: 100%; background: var(--accent); }
+
+    .rule-list { list-style: none; padding: 0; margin: 0; }
+    .rule-list li {
+      padding: 8px 10px; margin-bottom: 6px;
+      border-left: 3px solid var(--accent);
+      background: var(--accent-muted);
+      border-radius: 0 var(--radius) var(--radius) 0;
+      font-size: 0.78rem; color: var(--text-muted);
+    }
+    .rule-list li strong { color: var(--text); display: block; font-size: 0.8rem; margin-bottom: 2px; }
+
+    .tax-grid { display: grid; gap: 8px; }
+    .tax-item {
+      padding: 10px 12px; border: 1px solid var(--border); border-radius: var(--radius);
+      font-size: 0.76rem; color: var(--text-muted);
+    }
+    .tax-item h4 { margin: 0 0 4px; font-size: 0.8rem; color: var(--text); }
+
+    .ips-doc {
+      font-family: var(--mono);
+      font-size: 0.72rem;
+      line-height: 1.6;
+      white-space: pre-wrap;
+      padding: 14px;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      color: var(--text-muted);
+      max-height: 420px;
+      overflow-y: auto;
+    }
+
+    .cta-block {
+      border: 1px solid var(--border);
+      border-left: 3px solid var(--accent);
+      border-radius: var(--radius);
+      padding: 16px 18px;
+      background: var(--surface);
+      display: flex; flex-wrap: wrap; gap: 12px 20px; align-items: center;
+    }
+    .cta-block h2 { margin: 0; font-size: 0.95rem; flex: 1 1 220px; }
+    .cta-block p { margin: 4px 0 0; font-size: 0.78rem; color: var(--text-muted); flex: 1 1 100%; }
+
+    details.method { border: 1px solid var(--border); border-radius: var(--radius); background: var(--surface); margin-bottom: 12px; }
+    details.method summary { padding: 10px 12px; cursor: pointer; font-weight: 600; font-size: 0.8rem; }
+    details.method .method-body { padding: 0 12px 12px; font-size: 0.75rem; color: var(--text-muted); line-height: 1.55; }
+
+    @media (max-width: 768px) {
+      .app-shell { flex-direction: column; }
+      .sidebar { width: 100%; max-height: none; position: static; }
+      .hero { margin-left: 0; margin-right: 0; }
+    }
+    @media print {
+      .sidebar, .app-header .header-actions, .no-print { display: none !important; }
+      .app-shell { display: block; }
+      .ips-doc { max-height: none; }
+    }
+  </style>
+</head>
+<body>
+  <header class="app-header no-print">
+    <a class="logo" href="/wealth-tools" aria-label="Back to Wealth Tools">
+      <svg viewBox="0 0 32 32" aria-hidden="true" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <rect width="32" height="32" rx="4" fill="currentColor" opacity="0.08"/>
+        <path d="M8 22 L8 10 M16 22 L16 8 M24 22 L24 14" stroke="var(--accent)" stroke-width="1.75" stroke-linecap="round"/>
+        <line x1="6" y1="24" x2="26" y2="24" stroke="currentColor" stroke-width="1" opacity="0.3"/>
+      </svg>
+      <div>
+        <div class="logo-title">Investment Policy Dashboard</div>
+        <div class="logo-sub">Private-client strategy framework</div>
+      </div>
+    </a>
+    <div class="header-actions">
+      <a href="/wealth-tools" class="btn btn-sm">Wealth Tools</a>
+      <button type="button" class="btn btn-sm" id="btnPrint">Print / PDF</button>
+      <button type="button" class="btn btn-sm" id="btnCopyIps">Copy IPS</button>
+      <button type="button" class="btn btn-sm" id="btnTheme" aria-label="Toggle theme">Dark</button>
+    </div>
+  </header>
+
+  <div class="app-shell">
+    <aside class="sidebar no-print" aria-label="Policy inputs">
+      <p class="panel-title">Profile preset</p>
+      <div class="preset-row" role="group" aria-label="Presets">
+        <button type="button" data-preset="preservation">Preservation</button>
+        <button type="button" data-preset="balanced" class="active">Balanced</button>
+        <button type="button" data-preset="growth">Growth</button>
+        <button type="button" data-preset="pre-retirement">Pre-retirement</button>
+      </div>
+      <button type="button" class="btn btn-primary" style="width:100%;margin-bottom:10px" id="btnReset">Reset inputs</button>
+
+      <p class="panel-title">1 · Goals &amp; objectives</p>
+      <div class="field">
+        <label for="primaryGoal">Primary objective</label>
+        <select id="primaryGoal">
+          <option value="preservation">Wealth preservation</option>
+          <option value="retirement" selected>Retirement funding</option>
+          <option value="growth">Long-term growth</option>
+          <option value="legacy">Legacy &amp; intergenerational</option>
+        </select>
+      </div>
+      <div class="field">
+        <span class="field label" style="display:block;font-size:0.75rem;color:var(--text-muted);margin-bottom:4px">Secondary objectives</span>
+        <div class="check-grid" id="secondaryGoals">
+          <label><input type="checkbox" value="liquidity" checked /> Liquidity buffer</label>
+          <label><input type="checkbox" value="income" /> Income distributions</label>
+          <label><input type="checkbox" value="tax" checked /> Tax efficiency</label>
+          <label><input type="checkbox" value="pension" checked /> Pension coordination</label>
+          <label><input type="checkbox" value="property" /> Real-estate anchor</label>
+        </div>
+      </div>
+      <div class="field">
+        <label for="investableAssets">Investable assets (excl. primary home)</label>
+        <input type="number" id="investableAssets" min="0" step="10000" value="1200000" class="tabular" />
+      </div>
+      <div class="field">
+        <label for="targetRealReturn">Target real return (%/yr)</label>
+        <input type="number" id="targetRealReturn" min="0" max="10" step="0.25" value="3.5" />
+      </div>
+
+      <p class="panel-title">2 · Risk &amp; horizon</p>
+      <div class="input-row">
+        <div class="field">
+          <label for="currentAge">Age</label>
+          <input type="number" id="currentAge" min="25" max="80" value="44" />
+        </div>
+        <div class="field">
+          <label for="horizonYears">Time horizon (years)</label>
+          <input type="number" id="horizonYears" min="3" max="40" value="22" />
+        </div>
+      </div>
+      <div class="field">
+        <label for="riskTolerance">Risk tolerance (1 conservative – 5 aggressive)</label>
+        <input type="range" id="riskTolerance" min="1" max="5" step="1" value="3" />
+        <span class="field-hint tabular" id="riskToleranceLabel">3 — Moderate</span>
+      </div>
+      <div class="field">
+        <label for="incomeStability">Income stability</label>
+        <select id="incomeStability">
+          <option value="high">High (tenured / diversified)</option>
+          <option value="medium" selected>Medium</option>
+          <option value="low">Low (variable / cyclical)</option>
+        </select>
+      </div>
+      <div class="field">
+        <label for="drawdownComfort">Max tolerable portfolio drawdown (%)</label>
+        <input type="number" id="drawdownComfort" min="5" max="50" step="1" value="20" />
+      </div>
+
+      <p class="panel-title">3 · Current allocation (%)</p>
+      <div class="mix-row"><label for="mixCash">Cash &amp; equivalents</label><input type="number" id="mixCash" min="0" max="100" value="8" /></div>
+      <div class="mix-row"><label for="mixBonds">Bonds / credit</label><input type="number" id="mixBonds" min="0" max="100" value="18" /></div>
+      <div class="mix-row"><label for="mixEquity">Global equities</label><input type="number" id="mixEquity" min="0" max="100" value="52" /></div>
+      <div class="mix-row"><label for="mixAlt">Alternatives</label><input type="number" id="mixAlt" min="0" max="100" value="7" /></div>
+      <div class="mix-row"><label for="mixRe">Real estate (investment)</label><input type="number" id="mixRe" min="0" max="100" value="10" /></div>
+      <div class="mix-row"><label for="mixPension">Pension / locked</label><input type="number" id="mixPension" min="0" max="100" value="5" /></div>
+      <p class="mix-total tabular" id="mixTotal">Total: 100%</p>
+
+      <p class="panel-title">4 · Liquidity &amp; rebalancing</p>
+      <div class="field">
+        <label for="monthlyExpenses">Core monthly expenses</label>
+        <input type="number" id="monthlyExpenses" min="0" step="500" value="8500" class="tabular" />
+      </div>
+      <div class="field">
+        <label for="liquidityMonths">Liquidity reserve target (months)</label>
+        <input type="number" id="liquidityMonths" min="3" max="36" value="12" />
+      </div>
+      <div class="field">
+        <label for="rebalanceMode">Rebalancing approach</label>
+        <select id="rebalanceMode">
+          <option value="threshold">Threshold bands (preferred)</option>
+          <option value="calendar">Calendar (annual)</option>
+          <option value="hybrid">Hybrid — calendar + threshold</option>
+        </select>
+      </div>
+      <div class="field">
+        <label for="rebalanceBand">Drift trigger (% from target)</label>
+        <input type="number" id="rebalanceBand" min="2" max="15" step="1" value="5" />
+      </div>
+
+      <p class="panel-title">5 · Tax context</p>
+      <div class="field">
+        <label for="taxResidency">Tax residency (planning)</label>
+        <select id="taxResidency">
+          <option value="CH">Switzerland</option>
+          <option value="NL" selected>Netherlands</option>
+          <option value="DE">Germany</option>
+          <option value="AE">UAE</option>
+          <option value="SG">Singapore</option>
+          <option value="OTHER">Other / multi</option>
+        </select>
+      </div>
+      <div class="field">
+        <label for="taxPriority">Tax priority</label>
+        <select id="taxPriority">
+          <option value="deferral">Deferral &amp; location of assets</option>
+          <option value="efficiency" selected>After-tax efficiency</option>
+          <option value="simplicity">Simplicity &amp; compliance</option>
+        </select>
+      </div>
+    </aside>
+
+    <main class="main">
+      <div class="main-scroll">
+        <section class="hero" aria-labelledby="heroTitle">
+          <p class="hero-eyebrow">Investment policy · institutional framework</p>
+          <h1 id="heroTitle">Define your investment policy with clarity</h1>
+          <p class="hero-lead">
+            A structured private-client dashboard to align target allocation, risk capacity, liquidity reserves, rebalancing discipline, and tax-aware guidelines — producing a draft investment policy statement you can refine with advisers.
+          </p>
+          <div class="hero-grid">
+            <span>Target allocation ranges</span>
+            <span>Liquidity buckets</span>
+            <span>Rebalancing triggers</span>
+            <span>Risk summary</span>
+            <span>Draft IPS output</span>
+          </div>
+        </section>
+
+        <nav class="section-nav no-print" aria-label="On-page sections">
+          <a href="#sec-goals">Goals</a>
+          <a href="#sec-risk">Risk</a>
+          <a href="#sec-allocation">Allocation</a>
+          <a href="#sec-rebalance">Rebalancing</a>
+          <a href="#sec-liquidity">Liquidity</a>
+          <a href="#sec-tax">Tax</a>
+          <a href="#sec-ips">IPS</a>
+        </nav>
+
+        <div class="summary-grid tabular" id="summaryGrid" aria-live="polite"></div>
+
+        <section class="card" id="sec-goals">
+          <div class="card-header"><span>Goals &amp; objectives</span><span class="num">§1</span></div>
+          <div class="card-body" id="goalsNarrative"></div>
+        </section>
+
+        <div class="two-col">
+          <section class="card" id="sec-risk">
+            <div class="card-header"><span>Risk capacity &amp; time horizon</span><span class="num">§2</span></div>
+            <div class="card-body">
+              <p id="riskNarrative"></p>
+              <p class="panel-title" style="margin-top:12px">Composite risk profile</p>
+              <div class="risk-meter" aria-hidden="true"><div class="risk-meter-fill" id="riskMeterFill"></div></div>
+              <div class="risk-labels"><span>Conservative</span><span>Moderate</span><span>Aggressive</span></div>
+              <p id="riskSummary" style="margin-top:10px"></p>
+            </div>
+          </section>
+          <section class="card">
+            <div class="card-header">Risk vs capacity</div>
+            <div class="card-body"><div class="chart-wrap"><canvas id="chartRisk" aria-label="Risk tolerance versus capacity"></canvas></div></div>
+          </section>
+        </div>
+
+        <section class="card" id="sec-allocation">
+          <div class="card-header"><span>Target allocation builder</span><span class="num">§3</span></div>
+          <div class="card-body">
+            <p>Suggested ranges reflect your objective, horizon, and composite risk score. Current weights highlight drift outside bands.</p>
+            <div class="two-col" style="margin-top:12px">
+              <table class="range-table" id="allocationTable">
+                <thead>
+                  <tr><th>Asset sleeve</th><th>Target range</th><th>Policy mid</th><th>Your current</th></tr>
+                </thead>
+                <tbody id="allocationBody"></tbody>
+              </table>
+              <div><div class="chart-wrap"><canvas id="chartAllocation" aria-label="Target versus current allocation"></canvas></div></div>
+            </div>
+          </div>
+        </section>
+
+        <section class="card" id="sec-rebalance">
+          <div class="card-header"><span>Rebalancing rules</span><span class="num">§4</span></div>
+          <div class="card-body">
+            <ul class="rule-list" id="rebalanceRules"></ul>
+          </div>
+        </section>
+
+        <section class="card" id="sec-liquidity">
+          <div class="card-header"><span>Liquidity bucket planning</span><span class="num">§5</span></div>
+          <div class="card-body">
+            <p id="liquidityIntro"></p>
+            <div class="bucket-grid" id="liquidityBuckets" style="margin-top:12px"></div>
+          </div>
+        </section>
+
+        <section class="card" id="sec-tax">
+          <div class="card-header"><span>Tax-aware investing guidelines</span><span class="num">§6</span></div>
+          <div class="card-body">
+            <div class="tax-grid" id="taxGuidelines"></div>
+          </div>
+        </section>
+
+        <section class="card" id="sec-ips">
+          <div class="card-header"><span>Investment policy statement (draft)</span><span class="num">§7–8</span></div>
+          <div class="card-body">
+            <p>Generated from your inputs. Review with qualified advisers before implementation.</p>
+            <pre class="ips-doc tabular" id="ipsOutput" aria-label="Draft investment policy statement"></pre>
+          </div>
+        </section>
+
+        <details class="method">
+          <summary>Methodology &amp; disclaimer</summary>
+          <div class="method-body">
+            <p>Allocation ranges are heuristic bands derived from goal, age, horizon, tolerance, and income stability — not optimisation outputs. Risk capacity blends horizon length, age, stability, and drawdown comfort capped by tolerance.</p>
+            <p>Liquidity buckets separate operational cash, strategic reserves, and growth capital. Tax notes are jurisdiction sketches for planning conversations only.</p>
+            <p>This dashboard is educational and does not constitute investment, legal, or tax advice. Past frameworks do not guarantee outcomes.</p>
+          </div>
+        </details>
+
+        <section class="cta-block no-print" aria-labelledby="ctaTitle">
+          <div>
+            <h2 id="ctaTitle">Implement with advisory oversight</h2>
+            <p>Translate this draft IPS into account structure, fund selection, pension coordination, and tax reporting — tailored to your residency and entities.</p>
+          </div>
+          <div style="display:flex;flex-wrap:wrap;gap:8px">
+            <a class="btn btn-primary" href="/#contact">Request policy implementation review</a>
+            <a class="btn" href="/wealth-tools/portfolio-efficiency-scorecard">Audit current portfolio</a>
+          </div>
+        </section>
+      </div>
+    </main>
+  </div>
+
+  <script>
+(function () {
+  'use strict';
+
+  const SLEEVES = [
+    { key: 'cash', label: 'Cash & equivalents', mixId: 'mixCash' },
+    { key: 'bonds', label: 'Bonds / credit', mixId: 'mixBonds' },
+    { key: 'equity', label: 'Global equities', mixId: 'mixEquity' },
+    { key: 'alt', label: 'Alternatives', mixId: 'mixAlt' },
+    { key: 're', label: 'Real estate (investment)', mixId: 'mixRe' },
+    { key: 'pension', label: 'Pension / locked', mixId: 'mixPension' }
+  ];
+
+  const TOLERANCE_LABELS = ['', 'Very conservative', 'Conservative', 'Moderate', 'Growth-oriented', 'Aggressive'];
+
+  const PRESETS = {
+    preservation: { primaryGoal: 'preservation', riskTolerance: 2, horizonYears: 15, mixCash: 15, mixBonds: 35, mixEquity: 35, mixAlt: 3, mixRe: 10, mixPension: 2, liquidityMonths: 18 },
+    balanced: { primaryGoal: 'retirement', riskTolerance: 3, horizonYears: 20, mixCash: 8, mixBonds: 18, mixEquity: 52, mixAlt: 7, mixRe: 10, mixPension: 5, liquidityMonths: 12 },
+    growth: { primaryGoal: 'growth', riskTolerance: 4, horizonYears: 25, mixCash: 5, mixBonds: 10, mixEquity: 65, mixAlt: 10, mixRe: 5, mixPension: 5, liquidityMonths: 9 },
+    'pre-retirement': { primaryGoal: 'retirement', riskTolerance: 3, horizonYears: 8, mixCash: 12, mixBonds: 28, mixEquity: 42, mixAlt: 5, mixRe: 8, mixPension: 5, liquidityMonths: 15 }
+  };
+
+  const TAX_NOTES = {
+    CH: ['Favour tax-transparent equity funds where appropriate; model wealth tax on financial assets.', 'Use Pillar 3a and occupational pillars as non-portfolio buckets in IPS.', 'Private movable capital gains often untaxed — still document acquisition cost.'],
+    NL: ['Separate Box 1 (income), Box 2 (substantial interest), Box 3 (wealth) sleeves in reporting.', 'Box 3 drives after-tax return on liquid portfolio — location matters pre-move.', 'Pension entitlements are balance-sheet items, not rebalanced with ETFs.'],
+    DE: ['Abgeltungsteuer on most financial income — factor into return assumptions.', 'Riester/Rürup and statutory pension outside tactical allocation.', 'Real-estate income taxed in income basket — keep in RE sleeve.'],
+    AE: ['No personal income tax on portfolio income under typical individual assumptions — document entity risk.', 'Maintain offshore custody discipline; FX and banking access are operational risks.', 'Business income may fall under corporate tax — separate from IPS portfolio.'],
+    SG: ['No capital gains tax generally; still model property stamp duties and CPF lock-in.', 'Equity compounding favourable; property is a distinct sleeve with friction.', 'Tax residency and treaty status drive withholding on foreign dividends.'],
+    OTHER: ['Map assets to residency, treaty, and entity structure before tactical moves.', 'Prioritise compliance and reporting over marginal tax alpha.', 'Review annually with cross-border tax adviser.']
+  };
+
+  const $ = (id) => document.getElementById(id);
+  const state = { theme: 'light', charts: {} };
+
+  function pct(v) { return Number(v) / 100; }
+
+  function readInputs() {
+    const secondary = [];
+    document.querySelectorAll('#secondaryGoals input:checked').forEach(cb => secondary.push(cb.value));
+    return {
+      primaryGoal: $('primaryGoal').value,
+      secondary,
+      investableAssets: Number($('investableAssets').value),
+      targetRealReturn: Number($('targetRealReturn').value),
+      currentAge: Number($('currentAge').value),
+      horizonYears: Number($('horizonYears').value),
+      riskTolerance: Number($('riskTolerance').value),
+      incomeStability: $('incomeStability').value,
+      drawdownComfort: Number($('drawdownComfort').value),
+      mix: {
+        cash: Number($('mixCash').value),
+        bonds: Number($('mixBonds').value),
+        equity: Number($('mixEquity').value),
+        alt: Number($('mixAlt').value),
+        re: Number($('mixRe').value),
+        pension: Number($('mixPension').value)
+      },
+      monthlyExpenses: Number($('monthlyExpenses').value),
+      liquidityMonths: Number($('liquidityMonths').value),
+      rebalanceMode: $('rebalanceMode').value,
+      rebalanceBand: Number($('rebalanceBand').value),
+      taxResidency: $('taxResidency').value,
+      taxPriority: $('taxPriority').value
+    };
+  }
+
+  function riskCapacityScore(inp) {
+    let s = 50;
+    s += Math.min(25, inp.horizonYears * 1.2);
+    s -= Math.max(0, (inp.currentAge - 35) * 0.4);
+    if (inp.incomeStability === 'high') s += 8;
+    if (inp.incomeStability === 'low') s -= 12;
+    s += (inp.drawdownComfort - 15) * 0.5;
+    return Math.max(10, Math.min(95, Math.round(s)));
+  }
+
+  function compositeRisk(inp) {
+    const capacity = riskCapacityScore(inp);
+    const tolerance = (inp.riskTolerance - 1) * 22 + 12;
+    return Math.round(Math.min(capacity, tolerance) * 0.55 + (capacity + tolerance) / 2 * 0.45);
+  }
+
+  function riskBand(score) {
+    if (score < 35) return { label: 'Conservative', equityCap: 40 };
+    if (score < 55) return { label: 'Moderate-conservative', equityCap: 55 };
+    if (score < 70) return { label: 'Moderate', equityCap: 65 };
+    if (score < 82) return { label: 'Moderate-aggressive', equityCap: 75 };
+    return { label: 'Growth-oriented', equityCap: 85 };
+  }
+
+  function suggestRanges(inp) {
+    const score = compositeRisk(inp);
+    const band = riskBand(score);
+    let eqMid = Math.min(band.equityCap, 35 + score * 0.45);
+    let bondMid = Math.max(8, 45 - eqMid * 0.55);
+    let cashMid = 8;
+    let altMid = 5;
+    let reMid = 8;
+    let penMid = 6;
+
+    if (inp.primaryGoal === 'preservation') {
+      eqMid -= 10; bondMid += 8; cashMid += 4;
+    } else if (inp.primaryGoal === 'growth') {
+      eqMid += 8; bondMid -= 6; altMid += 3;
+    } else if (inp.primaryGoal === 'legacy') {
+      eqMid += 4; penMid += 4; reMid += 2;
+    }
+    if (inp.horizonYears < 8) {
+      eqMid -= 8; cashMid += 5; bondMid += 4;
+    }
+    if (inp.secondary.includes('property')) reMid += 4;
+    if (inp.secondary.includes('pension')) penMid += 3;
+
+    const spread = inp.riskTolerance <= 2 ? 4 : inp.riskTolerance >= 4 ? 7 : 5;
+    const clamp = (v) => Math.max(0, Math.min(100, Math.round(v)));
+
+    function range(mid) {
+      return { low: clamp(mid - spread), high: clamp(mid + spread), mid: clamp(mid) };
+    }
+
+    return {
+      score,
+      band: band.label,
+      cash: range(cashMid),
+      bonds: range(bondMid),
+      equity: range(eqMid),
+      alt: range(altMid),
+      re: range(reMid),
+      pension: range(penMid)
+    };
+  }
+
+  function formatMoney(n) {
+    if (!Number.isFinite(n)) return '—';
+    try {
+      return new Intl.NumberFormat(undefined, { style: 'currency', currency: 'EUR', maximumFractionDigits: 0 }).format(n);
+    } catch {
+      return '€' + Math.round(n).toLocaleString();
+    }
+  }
+
+  function liquidityPlan(inp) {
+    const reserve = inp.monthlyExpenses * inp.liquidityMonths;
+    const minCashPct = Math.min(25, Math.max(5, (reserve / inp.investableAssets) * 100));
+    const operational = Math.min(reserve, inp.investableAssets * pct(minCashPct) * 0.6);
+    const strategic = Math.max(reserve - operational, inp.investableAssets * pct(minCashPct) * 0.4);
+    const growth = Math.max(0, inp.investableAssets - reserve);
+    return { reserve, operational, strategic, growth, minCashPct };
+  }
+
+  function rebalanceRules(inp, ranges) {
+    const band = inp.rebalanceBand;
+    const rules = [];
+    if (inp.rebalanceMode === 'calendar' || inp.rebalanceMode === 'hybrid') {
+      rules.push({
+        title: 'Calendar review',
+        text: 'Full policy review and allocation check annually (Q4), or after any change in residency, employment, or >15% net-worth event.'
+      });
+    }
+    if (inp.rebalanceMode === 'threshold' || inp.rebalanceMode === 'hybrid') {
+      rules.push({
+        title: 'Drift bands',
+        text: `Rebalance when any sleeve drifts more than ±${band}% from policy mid-point. Prioritise equity vs bond drift before alternatives.`
+      });
+    }
+    rules.push({
+      title: 'Cash sleeve',
+      text: `Maintain operational liquidity of at least ${inp.liquidityMonths} months core expenses (${formatMoney(inp.monthlyExpenses * inp.liquidityMonths)}) before increasing risk assets.`
+    });
+    rules.push({
+      title: 'Pension / locked capital',
+      text: 'Occupational and state pension pots are excluded from tactical rebalancing; coordinate contribution policy separately.'
+    });
+    rules.push({
+      title: 'Real estate',
+      text: ranges.re.mid >= 10
+        ? 'Investment property is a strategic sleeve — rebalance via new capital flows, not forced sales, unless LTV or concentration limits are breached.'
+        : 'Real estate is ancillary; cap new commitments unless explicitly added as a secondary objective.'
+    });
+    return rules;
+  }
+
+  function buildIps(inp, ranges, liq, rules) {
+    const goalMap = {
+      preservation: 'preserve real purchasing power with limited drawdown volatility',
+      retirement: 'fund retirement spending within a sustainable withdrawal framework',
+      growth: 'maximise long-term after-tax compounding subject to risk limits',
+      legacy: 'grow capital for intergenerational transfer with governance discipline'
+    };
+    const sec = inp.secondary.length ? inp.secondary.join(', ') : 'none specified';
+    const lines = [
+      'INVESTMENT POLICY STATEMENT (DRAFT)',
+      'Generated: ' + new Date().toISOString().slice(0, 10),
+      '—'.repeat(48),
+      '',
+      '1. PURPOSE',
+      'This policy guides the investable portfolio (excluding primary residence) for a ' +
+        inp.horizonYears + '-year horizon. Primary objective: ' + goalMap[inp.primaryGoal] + '.',
+      'Secondary considerations: ' + sec + '.',
+      '',
+      '2. RISK PHILOSOPHY',
+      'Composite risk score: ' + ranges.score + '/100 (' + ranges.band + ').',
+      'Stated tolerance: ' + inp.riskTolerance + '/5 (' + TOLERANCE_LABELS[inp.riskTolerance] + ').',
+      'Maximum tolerable peak-to-trough drawdown: ' + inp.drawdownComfort + '%.',
+      'Income stability: ' + inp.incomeStability + '.',
+      '',
+      '3. TARGET ALLOCATION (POLICY RANGES)',
+      'Cash: ' + ranges.cash.low + '–' + ranges.cash.high + '% (mid ' + ranges.cash.mid + '%)',
+      'Bonds: ' + ranges.bonds.low + '–' + ranges.bonds.high + '% (mid ' + ranges.bonds.mid + '%)',
+      'Global equities: ' + ranges.equity.low + '–' + ranges.equity.high + '% (mid ' + ranges.equity.mid + '%)',
+      'Alternatives: ' + ranges.alt.low + '–' + ranges.alt.high + '% (mid ' + ranges.alt.mid + '%)',
+      'Investment real estate: ' + ranges.re.low + '–' + ranges.re.high + '% (mid ' + ranges.re.mid + '%)',
+      'Pension / locked: ' + ranges.pension.low + '–' + ranges.pension.high + '% (mid ' + ranges.pension.mid + '%)',
+      'Target real return (planning): ' + inp.targetRealReturn + '% p.a. after inflation.',
+      '',
+      '4. LIQUIDITY',
+      'Reserve target: ' + inp.liquidityMonths + ' months (~' + formatMoney(liq.reserve) + ').',
+      'Minimum cash sleeve guidance: ~' + liq.minCashPct.toFixed(1) + '% of investable assets.',
+      'Buckets: operational ' + formatMoney(liq.operational) + '; strategic ' + formatMoney(liq.strategic) +
+        '; growth capital ' + formatMoney(liq.growth) + '.',
+      '',
+      '5. REBALANCING',
+      ...rules.map((r, i) => '  ' + (i + 1) + '. ' + r.title + ': ' + r.text),
+      '',
+      '6. TAX-AWARE GUIDELINES (' + inp.taxResidency + ')',
+      ...((TAX_NOTES[inp.taxResidency] || TAX_NOTES.OTHER).map(t => '  • ' + t)),
+      'Tax priority: ' + inp.taxPriority + '.',
+      '',
+      '7. ROLES OF KEY SLEEVES',
+      'Cash: liquidity and optionality. Equities: primary growth engine. Bonds: volatility dampener.',
+      'Alternatives: diversifier only within band. Real estate: inflation-linked anchor if adopted.',
+      'Pension: human-capital / longevity hedge — not traded tactically.',
+      '',
+      '8. GOVERNANCE',
+      'Review IPS annually or upon residency, tax, or goal change. No single-security bets >5% without exception memo.',
+      '',
+      '—'.repeat(48),
+      'Illustrative only. Not investment, legal, or tax advice.'
+    ];
+    return lines.join('\n');
+  }
+
+  function render(inp) {
+    const ranges = suggestRanges(inp);
+    const liq = liquidityPlan(inp);
+    const rules = rebalanceRules(inp, ranges);
+    const mixTotal = Object.values(inp.mix).reduce((a, b) => a + b, 0);
+    const capacity = riskCapacityScore(inp);
+    const composite = compositeRisk(inp);
+
+    $('riskToleranceLabel').textContent = inp.riskTolerance + ' — ' + TOLERANCE_LABELS[inp.riskTolerance];
+    $('mixTotal').textContent = 'Total: ' + mixTotal + '%';
+    $('mixTotal').classList.toggle('warn', mixTotal !== 100);
+
+    const goalText = {
+      preservation: 'Capital preservation dominates — prioritise liquidity, quality bonds, and limited equity beta.',
+      retirement: 'Retirement funding — balance growth with drawdown control as horizon shortens.',
+      growth: 'Long-term compounding — equity-led with disciplined alternatives cap.',
+      legacy: 'Intergenerational transfer — governance, tax location, and growth sleeves matter.'
+    };
+    $('goalsNarrative').innerHTML =
+      '<p><strong>Primary:</strong> ' + goalText[inp.primaryGoal] + '</p>' +
+      '<p><strong>Investable base:</strong> ' + formatMoney(inp.investableAssets) +
+      ' · <strong>Target real return:</strong> ' + inp.targetRealReturn + '% p.a.</p>' +
+      '<p><strong>Secondary objectives active:</strong> ' + (inp.secondary.length ? inp.secondary.join(', ') : 'none') + '.</p>';
+
+    $('riskNarrative').textContent =
+      'At age ' + inp.currentAge + ' with a ' + inp.horizonYears + '-year horizon, capacity score is ' + capacity +
+      '/100. Tolerance is capped so the policy does not exceed what you can emotionally and financially absorb.';
+    $('riskMeterFill').style.width = composite + '%';
+    $('riskSummary').innerHTML =
+      '<strong>Composite:</strong> ' + composite + '/100 — ' + ranges.band + '. ' +
+      'Equity sleeve capped near ' + ranges.equity.high + '% under this profile.';
+
+    $('summaryGrid').innerHTML = [
+      { label: 'Policy risk band', value: ranges.band, sub: composite + '/100 composite', hi: true },
+      { label: 'Liquidity reserve', value: formatMoney(liq.reserve), sub: inp.liquidityMonths + ' months expenses' },
+      { label: 'Equity target mid', value: ranges.equity.mid + '%', sub: ranges.equity.low + '–' + ranges.equity.high + '% band' },
+      { label: 'Rebalance trigger', value: '±' + inp.rebalanceBand + '%', sub: inp.rebalanceMode.replace('-', ' ') },
+      { label: 'Mix check', value: mixTotal === 100 ? 'Aligned' : mixTotal + '%', sub: mixTotal === 100 ? 'Current weights sum to 100' : 'Adjust current allocation inputs', hi: mixTotal !== 100 }
+    ].map(c => `
+      <div class="summary-card ${c.hi ? 'highlight' : ''}">
+        <div class="label">${c.label}</div>
+        <div class="value">${c.value}</div>
+        <div class="sub">${c.sub}</div>
+      </div>
+    `).join('');
+
+    const rangeMap = {
+      cash: ranges.cash, bonds: ranges.bonds, equity: ranges.equity,
+      alt: ranges.alt, re: ranges.re, pension: ranges.pension
+    };
+    $('allocationBody').innerHTML = SLEEVES.map(s => {
+      const r = rangeMap[s.key];
+      const cur = inp.mix[s.key];
+      const out = cur < r.low || cur > r.high;
+      return `<tr class="${out ? 'mismatch' : ''}">
+        <th scope="row">${s.label}</th>
+        <td class="band">${r.low}–${r.high}%</td>
+        <td class="tabular">${r.mid}%</td>
+        <td class="current tabular">${cur}%</td>
+      </tr>`;
+    }).join('');
+
+    $('rebalanceRules').innerHTML = rules.map(r =>
+      `<li><strong>${r.title}</strong>${r.text}</li>`
+    ).join('');
+
+    $('liquidityIntro').textContent =
+      'Separate operational cash (0–' + Math.min(12, inp.liquidityMonths) + ' months), strategic reserves, and growth capital. ' +
+      'Suggested minimum cash sleeve: ' + liq.minCashPct.toFixed(1) + '% of investable assets.';
+
+    const buckets = [
+      { name: 'Operational', amt: liq.operational, desc: 'Bills, tax, near-term commitments' },
+      { name: 'Strategic reserve', amt: liq.strategic, desc: 'Career / market shock buffer' },
+      { name: 'Growth capital', amt: liq.growth, desc: 'Risk assets per IPS bands' }
+    ];
+    $('liquidityBuckets').innerHTML = buckets.map(b => {
+      const pctW = inp.investableAssets > 0 ? (b.amt / inp.investableAssets) * 100 : 0;
+      return `<div class="bucket-item">
+        <strong>${b.name}</strong>
+        <div><div class="bucket-bar"><div class="bucket-bar-fill" style="width:${Math.min(100, pctW)}%"></div></div>
+        <span class="field-hint">${b.desc}</span></div>
+        <span class="tabular">${formatMoney(b.amt)}</span>
+      </div>`;
+    }).join('');
+
+    const taxLines = TAX_NOTES[inp.taxResidency] || TAX_NOTES.OTHER;
+    $('taxGuidelines').innerHTML =
+      '<div class="tax-item"><h4>Residency: ' + inp.taxResidency + '</h4><p>Priority: ' + inp.taxPriority + '</p></div>' +
+      taxLines.map(t => `<div class="tax-item">${t}</div>`).join('');
+
+    $('ipsOutput').textContent = buildIps(inp, ranges, liq, rules);
+
+    renderCharts(inp, ranges, capacity, composite);
+  }
+
+  function chartColors() {
+    const dark = document.documentElement.getAttribute('data-theme') === 'dark';
+    return { text: dark ? '#a8b0bc' : '#4a5362', grid: dark ? '#3a424e' : '#d0d5de' };
+  }
+
+  function destroyChart(k) {
+    if (state.charts[k]) { state.charts[k].destroy(); state.charts[k] = null; }
+  }
+
+  function renderCharts(inp, ranges, capacity, composite) {
+    if (typeof Chart === 'undefined') return;
+    const colors = chartColors();
+
+    destroyChart('risk');
+    state.charts.risk = new Chart($('chartRisk'), {
+      type: 'bar',
+      data: {
+        labels: ['Tolerance', 'Capacity', 'Policy composite'],
+        datasets: [{
+          data: [
+            (inp.riskTolerance - 1) * 22 + 12,
+            capacity,
+            composite
+          ],
+          backgroundColor: ['#5a7a9a', '#2c4a6e', '#1a5c38']
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: { legend: { display: false } },
+        scales: {
+          y: { max: 100, ticks: { color: colors.text }, grid: { color: colors.grid } },
+          x: { ticks: { color: colors.text }, grid: { display: false } }
+        }
+      }
+    });
+
+    const mids = [ranges.cash.mid, ranges.bonds.mid, ranges.equity.mid, ranges.alt.mid, ranges.re.mid, ranges.pension.mid];
+    const currents = [inp.mix.cash, inp.mix.bonds, inp.mix.equity, inp.mix.alt, inp.mix.re, inp.mix.pension];
+    destroyChart('alloc');
+    state.charts.alloc = new Chart($('chartAllocation'), {
+      type: 'bar',
+      data: {
+        labels: SLEEVES.map(s => s.label.split(' ')[0]),
+        datasets: [
+          { label: 'Policy mid', data: mids, backgroundColor: '#2c4a6e' },
+          { label: 'Current', data: currents, backgroundColor: '#8a9bb0' }
+        ]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: { legend: { labels: { color: colors.text, font: { size: 10 } } } },
+        scales: {
+          y: { max: 80, ticks: { color: colors.text }, grid: { color: colors.grid } },
+          x: { ticks: { color: colors.text, font: { size: 9 } }, grid: { display: false } }
+        }
+      }
+    });
+  }
+
+  function applyPreset(name) {
+    const p = PRESETS[name];
+    if (!p) return;
+    Object.keys(p).forEach(k => {
+      const el = $(k);
+      if (el) el.value = p[k];
+    });
+    document.querySelectorAll('.preset-row button').forEach(btn => {
+      btn.classList.toggle('active', btn.dataset.preset === name);
+    });
+    recalc();
+  }
+
+  function recalc() { render(readInputs()); }
+
+  function scheduleRecalc() {
+    clearTimeout(state.debounce);
+    state.debounce = setTimeout(recalc, 60);
+  }
+
+  const inputIds = [
+    'primaryGoal', 'investableAssets', 'targetRealReturn', 'currentAge', 'horizonYears',
+    'riskTolerance', 'incomeStability', 'drawdownComfort',
+    'mixCash', 'mixBonds', 'mixEquity', 'mixAlt', 'mixRe', 'mixPension',
+    'monthlyExpenses', 'liquidityMonths', 'rebalanceMode', 'rebalanceBand',
+    'taxResidency', 'taxPriority'
+  ];
+  inputIds.forEach(id => {
+    const el = $(id);
+    if (el) el.addEventListener('input', scheduleRecalc);
+    if (el) el.addEventListener('change', scheduleRecalc);
+  });
+  document.querySelectorAll('#secondaryGoals input').forEach(el => el.addEventListener('change', scheduleRecalc));
+
+  document.querySelectorAll('.preset-row button').forEach(btn => {
+    btn.addEventListener('click', () => applyPreset(btn.dataset.preset));
+  });
+
+  $('btnReset').addEventListener('click', () => applyPreset('balanced'));
+  $('btnTheme').addEventListener('click', () => {
+    state.theme = state.theme === 'dark' ? 'light' : 'dark';
+    document.documentElement.setAttribute('data-theme', state.theme);
+    $('btnTheme').textContent = state.theme === 'dark' ? 'Light' : 'Dark';
+    recalc();
+  });
+  $('btnPrint').addEventListener('click', () => window.print());
+  $('btnCopyIps').addEventListener('click', async () => {
+    try {
+      await navigator.clipboard.writeText($('ipsOutput').textContent);
+      $('btnCopyIps').textContent = 'Copied';
+      setTimeout(() => { $('btnCopyIps').textContent = 'Copy IPS'; }, 2000);
+    } catch {
+      $('btnCopyIps').textContent = 'Select & copy';
+    }
+  });
+
+  state.theme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+  document.documentElement.setAttribute('data-theme', state.theme);
+  $('btnTheme').textContent = state.theme === 'dark' ? 'Light' : 'Dark';
+
+  function waitChart() {
+    if (typeof Chart !== 'undefined') recalc();
+    else setTimeout(waitChart, 50);
+  }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', waitChart);
+  else waitChart();
+})();
+  </script>
+</body>
+</html>
