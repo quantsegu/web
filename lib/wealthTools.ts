@@ -4,7 +4,7 @@ export interface WealthTool {
   description: string;
   features: string[];
   href: string;
-  icon: 'retirement' | 'portfolio';
+  icon: 'retirement' | 'portfolio' | 'tax' | 'mortgage';
   ctaLabel?: string;
 }
 
@@ -21,9 +21,25 @@ export const wealthTools: WealthTool[] = [
       'Growth charts, sensitivity grid, and CSV export',
       'Nominal vs real values and shareable URL state',
     ],
-    href: '/wealth-tools/retirement-income-planner.html',
+    href: '/wealth-tools/retirement-income-planner',
     icon: 'retirement',
     ctaLabel: 'Open planner',
+  },
+  {
+    id: 'tax-drag-calculator',
+    title: 'Tax Drag Calculator',
+    description:
+      'See how dividends, wealth tax, and capital-gains treatment erode long-term compounding. Compare low-tax vs high-tax profiles and country-style assumptions side by side.',
+    features: [
+      'Gross vs net portfolio projection over decades',
+      'Dividend, Box 3–style wealth, and CG tax inputs',
+      'Cumulative tax paid and compounding lost',
+      'Low-tax, high-tax, NL, and Switzerland presets',
+      'Chart-led explanation with custom analysis CTA',
+    ],
+    href: '/wealth-tools/tax-drag-calculator',
+    icon: 'tax',
+    ctaLabel: 'Open calculator',
   },
   {
     id: 'wealth-preservation-planner',
@@ -40,5 +56,37 @@ export const wealthTools: WealthTool[] = [
     href: '/wealth-tools/wealth-preservation-planner.html',
     icon: 'portfolio',
     ctaLabel: 'Open planner',
+  },
+  {
+    id: 'portfolio-efficiency-scorecard',
+    title: 'Portfolio Efficiency Scorecard',
+    description:
+      'Interactive diagnostic that scores portfolio efficiency out of 100, surfaces return leaks (fees, cash, concentration, tax, diversification, rebalancing, goal mismatch), and suggests priority fixes.',
+    features: [
+      'Seven-category weighted audit with meters and leak chart',
+      'Fee, cash, holdings, geographic, tax, and rebalancing inputs',
+      'Goal vs allocation fit with time horizon and income target',
+      'Risk flags, personalized recommendations, and uplift estimate',
+      'Efficient, typical, leaky, and pre-retirement presets',
+    ],
+    href: '/wealth-tools/portfolio-efficiency-scorecard',
+    icon: 'portfolio',
+    ctaLabel: 'Run scorecard',
+  },
+  {
+    id: 'additional-mortgage-capacity',
+    title: 'Additional Mortgage Capacity',
+    description:
+      'If you can afford X more per month, how much extra mortgage can you borrow at Y% for Z years? Reverse mode solves the payment for a target loan. Includes stress-test comparison and amortization charts.',
+    features: [
+      'Payment → loan capacity with standard amortizing formula',
+      'Reverse mode: loan amount → required payment',
+      'Monthly, bi-weekly, weekly, quarterly, and annual frequency',
+      'Stress-rate capacity vs base rate side by side',
+      'Yearly amortization table and principal vs interest chart',
+    ],
+    href: '/wealth-tools/additional-mortgage-capacity',
+    icon: 'mortgage',
+    ctaLabel: 'Open calculator',
   },
 ];

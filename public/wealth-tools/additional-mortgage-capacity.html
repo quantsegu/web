@@ -1,0 +1,804 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Calculate additional mortgage capacity from an affordable extra monthly payment — amortizing loan math with stress-test comparison." />
+  <title>Additional Mortgage Capacity — Payment-Based Borrowing Power</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js" defer></script>
+  <style>
+    :root {
+      --accent: #1e4d3e;
+      --accent-hover: #163a30;
+      --accent-muted: rgba(30, 77, 62, 0.1);
+      --bg: #f5f6f4;
+      --surface: #ffffff;
+      --surface-2: #e9ebe8;
+      --border: #c5cac4;
+      --text: #141816;
+      --text-muted: #4d544f;
+      --text-faint: #7a827c;
+      --loss: #9b2c2c;
+      --loss-muted: rgba(155, 44, 44, 0.1);
+      --gain: #1a5c38;
+      --gain-muted: rgba(26, 92, 56, 0.1);
+      --principal: #2a5f8f;
+      --interest: #8b5a2b;
+      --shadow: 0 1px 3px rgba(0,0,0,0.06);
+      --radius: 4px;
+      --font: "Helvetica Neue", Helvetica, Arial, system-ui, sans-serif;
+      --header-h: 48px;
+      --sidebar-w: 276px;
+    }
+    [data-theme="dark"] {
+      --accent: #6bc4a8;
+      --accent-hover: #8ed8be;
+      --accent-muted: rgba(107, 196, 168, 0.12);
+      --bg: #0e100f;
+      --surface: #1a1e1c;
+      --surface-2: #252a27;
+      --border: #3a423d;
+      --text: #eef2ef;
+      --text-muted: #a8b0aa;
+      --text-faint: #6e7770;
+      --loss: #e07070;
+      --loss-muted: rgba(224, 112, 112, 0.12);
+      --gain: #4db87a;
+      --gain-muted: rgba(77, 184, 122, 0.12);
+      --principal: #6a9fd4;
+      --interest: #d4a574;
+      --shadow: 0 1px 3px rgba(0,0,0,0.35);
+    }
+    *, *::before, *::after { box-sizing: border-box; }
+    html { font-size: 14px; scroll-behavior: smooth; }
+    body {
+      margin: 0; font-family: var(--font); background: var(--bg); color: var(--text);
+      line-height: 1.45; font-feature-settings: "tnum" 1, "lnum" 1;
+    }
+    .tabular { font-variant-numeric: tabular-nums lining-nums; }
+    button, input, select { font-family: inherit; font-size: inherit; }
+    a { color: var(--accent); }
+    :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+    .app-header {
+      position: sticky; top: 0; z-index: 100; height: var(--header-h);
+      display: flex; align-items: center; gap: 12px; padding: 0 16px;
+      background: var(--surface); border-bottom: 1px solid var(--border); box-shadow: var(--shadow);
+    }
+    .logo { display: flex; align-items: center; gap: 8px; text-decoration: none; color: var(--text); }
+    .logo svg { width: 28px; height: 28px; }
+    .logo-title { font-size: 0.95rem; font-weight: 600; }
+    .logo-sub { font-size: 0.68rem; color: var(--text-muted); }
+    .header-actions { margin-left: auto; display: flex; gap: 8px; }
+    .btn {
+      padding: 6px 12px; border: 1px solid var(--border); border-radius: var(--radius);
+      background: var(--surface); color: var(--text); cursor: pointer; font-size: 0.8rem;
+      text-decoration: none; display: inline-flex; align-items: center;
+    }
+    .btn:hover { background: var(--surface-2); }
+    .btn-primary { background: var(--accent); border-color: var(--accent); color: #fff; }
+    [data-theme="dark"] .btn-primary { color: #0e100f; }
+    .btn-sm { padding: 4px 8px; font-size: 0.72rem; }
+    .btn.active { background: var(--accent-muted); color: var(--accent); font-weight: 600; }
+
+    .layout { display: flex; min-height: calc(100vh - var(--header-h)); }
+    .sidebar {
+      width: var(--sidebar-w); flex-shrink: 0; background: var(--surface);
+      border-right: 1px solid var(--border); position: sticky; top: var(--header-h);
+      max-height: calc(100vh - var(--header-h)); overflow-y: auto; padding: 12px;
+    }
+    .main { flex: 1; min-width: 0; }
+
+    .panel-title {
+      font-size: 0.65rem; font-weight: 600; text-transform: uppercase;
+      letter-spacing: 0.08em; color: var(--text-faint); margin: 12px 0 8px;
+    }
+    .panel-title:first-child { margin-top: 0; }
+    .field { margin-bottom: 10px; }
+    .field label { display: block; font-size: 0.75rem; color: var(--text-muted); margin-bottom: 3px; }
+    .field input, .field select, .field textarea {
+      width: 100%; padding: 6px 8px; border: 1px solid var(--border);
+      border-radius: var(--radius); background: var(--bg); color: var(--text);
+    }
+    .field textarea { min-height: 52px; resize: vertical; font-size: 0.72rem; }
+    .field-hint { font-size: 0.65rem; color: var(--text-faint); margin-top: 2px; }
+    .field.hidden { display: none; }
+
+    .mode-toggle { display: flex; flex-direction: column; gap: 4px; margin-bottom: 12px; }
+    .mode-toggle button {
+      text-align: left; padding: 8px 10px; font-size: 0.72rem;
+      border: 1px solid var(--border); border-radius: var(--radius);
+      background: var(--bg); color: var(--text-muted); cursor: pointer; line-height: 1.35;
+    }
+    .mode-toggle button.active {
+      border-color: var(--accent); background: var(--accent-muted);
+      color: var(--accent); font-weight: 600;
+    }
+    .mode-toggle button strong { display: block; font-size: 0.78rem; color: inherit; }
+
+    .hero {
+      padding: 24px 24px 20px;
+      background: linear-gradient(180deg, var(--accent-muted) 0%, transparent 100%);
+      border-bottom: 1px solid var(--border);
+    }
+    .hero h1 { font-size: 1.55rem; font-weight: 700; letter-spacing: -0.03em; margin: 0 0 8px; max-width: 36rem; }
+    .hero p { margin: 0; color: var(--text-muted); font-size: 0.88rem; max-width: 42rem; }
+    .hero-answer {
+      margin-top: 16px; padding: 14px 16px; background: var(--surface);
+      border: 1px solid var(--accent); border-radius: var(--radius);
+      font-size: 0.9rem;
+    }
+    .hero-answer .big { font-size: 1.75rem; font-weight: 800; color: var(--accent); display: block; margin-top: 4px; }
+
+    .content { padding: 16px 20px 32px; }
+    .notice {
+      padding: 12px 14px; margin-bottom: 16px; font-size: 0.8rem; color: var(--text-muted);
+      background: var(--surface); border-left: 3px solid var(--accent);
+      border-radius: var(--radius); border: 1px solid var(--border); border-left-width: 3px;
+    }
+
+    .summary-grid {
+      display: grid; grid-template-columns: repeat(auto-fill, minmax(148px, 1fr));
+      gap: 8px; margin-bottom: 20px;
+    }
+    .summary-card {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: var(--radius); padding: 10px 12px; box-shadow: var(--shadow);
+    }
+    .summary-card.highlight { border-color: var(--accent); background: var(--accent-muted); }
+    .summary-card .label {
+      font-size: 0.62rem; text-transform: uppercase; letter-spacing: 0.06em; color: var(--text-faint);
+    }
+    .summary-card .value { font-size: 1.1rem; font-weight: 700; margin-top: 4px; }
+    .summary-card .sub { font-size: 0.68rem; color: var(--text-muted); margin-top: 2px; }
+
+    .compare-row {
+      display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin-bottom: 16px;
+    }
+    @media (max-width: 720px) { .compare-row { grid-template-columns: 1fr; } }
+    .compare-card {
+      padding: 14px; border-radius: var(--radius); border: 1px solid var(--border);
+      background: var(--surface);
+    }
+    .compare-card.stress { border-color: var(--loss); background: var(--loss-muted); }
+    .compare-card.delta { border-color: var(--text-faint); }
+    .compare-card h3 {
+      margin: 0 0 8px; font-size: 0.68rem; text-transform: uppercase;
+      letter-spacing: 0.06em; color: var(--text-faint);
+    }
+    .compare-card .big { font-size: 1.25rem; font-weight: 700; }
+    .compare-card p { margin: 6px 0 0; font-size: 0.72rem; color: var(--text-muted); }
+
+    .card {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: var(--radius); margin-bottom: 16px; box-shadow: var(--shadow);
+    }
+    .card-header {
+      padding: 8px 12px; border-bottom: 1px solid var(--border);
+      font-size: 0.8rem; font-weight: 600;
+    }
+    .card-body { padding: 12px; overflow-x: auto; }
+    .chart-wrap { position: relative; height: 240px; }
+
+    .amort-table { width: 100%; border-collapse: collapse; font-size: 0.72rem; }
+    .amort-table th, .amort-table td {
+      padding: 6px 8px; text-align: right; border-bottom: 1px solid var(--border);
+    }
+    .amort-table th { text-align: right; font-weight: 600; color: var(--text-faint); background: var(--surface-2); }
+    .amort-table th:first-child, .amort-table td:first-child { text-align: left; }
+    .amort-table tbody tr:hover { background: var(--accent-muted); }
+
+    .formula-box {
+      font-size: 0.72rem; color: var(--text-muted); padding: 10px;
+      background: var(--surface-2); border-radius: var(--radius); margin-top: 8px;
+    }
+    .formula-box code { font-size: 0.7rem; color: var(--text); }
+
+    .cta-block {
+      text-align: center; padding: 24px 16px;
+      background: var(--accent-muted); border: 1px solid var(--border); border-radius: var(--radius);
+    }
+    .cta-block h2 { margin: 0 0 8px; font-size: 1.05rem; }
+    .cta-block p { margin: 0 0 14px; color: var(--text-muted); font-size: 0.85rem; max-width: 32rem; margin-left: auto; margin-right: auto; }
+    .disclaimer { font-size: 0.68rem; color: var(--text-faint); text-align: center; margin-top: 16px; }
+
+    @media (max-width: 768px) {
+      .layout { flex-direction: column; }
+      .sidebar { width: 100%; max-height: none; position: static; }
+    }
+  </style>
+</head>
+<body>
+  <header class="app-header">
+    <a class="logo" href="/wealth-tools" aria-label="Back to Wealth Tools">
+      <svg viewBox="0 0 32 32" aria-hidden="true" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <rect width="32" height="32" rx="4" fill="currentColor" opacity="0.08"/>
+        <path d="M6 26 L16 8 L26 26 Z" stroke="var(--accent)" stroke-width="1.5" fill="none" stroke-linejoin="round"/>
+        <rect x="12" y="18" width="8" height="8" fill="var(--accent)" opacity="0.35"/>
+      </svg>
+      <div>
+        <div class="logo-title">Additional Mortgage Capacity</div>
+        <div class="logo-sub">Payment-based borrowing power</div>
+      </div>
+    </a>
+    <div class="header-actions">
+      <a href="/wealth-tools" class="btn btn-sm">Wealth Tools</a>
+      <button type="button" class="btn btn-sm" id="btnTheme" aria-label="Toggle theme">Dark</button>
+    </div>
+  </header>
+
+  <div class="layout">
+    <aside class="sidebar" aria-label="Mortgage inputs">
+      <div class="mode-toggle" role="group" aria-label="Calculation mode">
+        <button type="button" class="active" data-mode="payment" id="modePayment">
+          <strong>How much extra can I borrow?</strong>
+          Enter affordable extra payment → loan capacity
+        </button>
+        <button type="button" data-mode="loan" id="modeLoan">
+          <strong>What will this extra loan cost me?</strong>
+          Enter desired extra loan → monthly payment
+        </button>
+      </div>
+
+      <p class="panel-title">Core inputs</p>
+      <div class="field" id="fieldExtraPayment">
+        <label for="extraPayment">Additional payment amount</label>
+        <input type="number" id="extraPayment" min="0" step="50" value="850" class="tabular" />
+        <span class="field-hint" id="hintExtraPayment">Per period (see frequency below)</span>
+      </div>
+      <div class="field hidden" id="fieldExtraLoan">
+        <label for="extraLoan">Desired additional loan amount</label>
+        <input type="number" id="extraLoan" min="0" step="1000" value="150000" class="tabular" />
+      </div>
+      <div class="field">
+        <label for="interestRate">Interest rate (% per year, nominal)</label>
+        <input type="number" id="interestRate" min="0" max="25" step="0.05" value="3.25" class="tabular" />
+      </div>
+      <div class="field">
+        <label for="termYears">Mortgage term (years)</label>
+        <input type="number" id="termYears" min="1" max="40" step="1" value="25" class="tabular" />
+      </div>
+      <div class="field">
+        <label for="paymentFreq">Payment frequency</label>
+        <select id="paymentFreq">
+          <option value="monthly" selected>Monthly (12/yr)</option>
+          <option value="biweekly">Bi-weekly (26/yr)</option>
+          <option value="weekly">Weekly (52/yr)</option>
+          <option value="quarterly">Quarterly (4/yr)</option>
+          <option value="annual">Annual (1/yr)</option>
+        </select>
+      </div>
+      <div class="field">
+        <label for="currency">Currency</label>
+        <select id="currency">
+          <option value="CHF" selected>CHF</option>
+          <option value="EUR">EUR</option>
+          <option value="USD">USD</option>
+          <option value="GBP">GBP</option>
+        </select>
+      </div>
+
+      <p class="panel-title">Stress test</p>
+      <div class="field">
+        <label for="stressRate">Stress-test interest rate (%)</label>
+        <input type="number" id="stressRate" min="0" max="30" step="0.1" value="5.5" class="tabular" />
+        <span class="field-hint">Affordability buffer — often +2% vs offer rate</span>
+      </div>
+
+      <p class="panel-title">Existing mortgage (optional)</p>
+      <div class="field">
+        <label for="currentBalance">Current mortgage balance</label>
+        <input type="number" id="currentBalance" min="0" step="1000" value="0" class="tabular" placeholder="0" />
+      </div>
+      <div class="field">
+        <label for="remainingTerm">Remaining term (years)</label>
+        <input type="number" id="remainingTerm" min="0" max="40" step="1" value="0" class="tabular" placeholder="0" />
+        <span class="field-hint">0 = not specified</span>
+      </div>
+
+      <p class="panel-title">Lender constraints (notes)</p>
+      <div class="field">
+        <label for="ltvNote">Maximum LTV note</label>
+        <textarea id="ltvNote" placeholder="e.g. Bank max 80% LTV on primary residence — capacity may be lower than payment math."></textarea>
+      </div>
+      <div class="field">
+        <label for="incomeCapNote">Income-based lending cap note</label>
+        <textarea id="incomeCapNote" placeholder="e.g. DSCR / 33% rule — gross income CHF 12k/mo may cap total debt service."></textarea>
+      </div>
+    </aside>
+
+    <div class="main">
+      <section class="hero">
+        <h1>Additional mortgage capacity from your extra payment</h1>
+        <p>
+          Standard amortizing loan math: if you can afford a fixed extra payment each period at a given rate and term, this shows the principal you could finance. Compare against a higher stress rate to see how affordability tests shrink borrowing power.
+        </p>
+        <div class="hero-answer tabular" id="heroAnswer" aria-live="polite">
+          <span id="heroLabel">Additional loan capacity</span>
+          <span class="big" id="heroValue">—</span>
+        </div>
+      </section>
+
+      <div class="content">
+        <p class="notice" id="lenderNotice">
+          <strong>Payment-based capacity, not lender approval.</strong>
+          Banks also limit mortgages by income, living expenses, other debt, stress-tested rates, loan-to-value (LTV), and property type. This tool answers the pure math question — “what principal fits this payment?” — not your guaranteed offer. Use the LTV and income notes on the left to record constraints from your lender conversation.
+        </p>
+
+        <div class="summary-grid tabular" id="summaryGrid" aria-live="polite"></div>
+
+        <section class="compare-row tabular" id="stressCompare" aria-label="Base vs stress comparison"></section>
+
+        <section class="card">
+          <div class="card-header">Principal vs interest over time</div>
+          <div class="card-body">
+            <div class="chart-wrap"><canvas id="chartAmort" aria-label="Amortization chart"></canvas></div>
+            <div class="formula-box">
+              <strong>Formula</strong> (payment <code>A</code>, periodic rate <code>i</code>, payments <code>n</code>):
+              <code>P = A × (1 − (1+i)<sup>−n</sup>) / i</code> when <code>i &gt; 0</code>; if <code>i = 0</code>, <code>P = A × n</code>.
+              Reverse: <code>A = P × i / (1 − (1+i)<sup>−n</sup>)</code>.
+            </div>
+          </div>
+        </section>
+
+        <section class="card">
+          <div class="card-header">Yearly amortization summary</div>
+          <div class="card-body">
+            <table class="amort-table tabular" id="amortTable">
+              <thead>
+                <tr>
+                  <th scope="col">Year</th>
+                  <th scope="col">Principal paid</th>
+                  <th scope="col">Interest paid</th>
+                  <th scope="col">Total payment</th>
+                  <th scope="col">End balance</th>
+                </tr>
+              </thead>
+              <tbody id="amortBody"></tbody>
+            </table>
+          </div>
+        </section>
+
+        <section class="card" id="contextCard" hidden>
+          <div class="card-header">Existing mortgage context</div>
+          <div class="card-body tabular" id="contextBody" style="font-size:0.8rem;color:var(--text-muted)"></div>
+        </section>
+
+        <section class="cta-block">
+          <h2>Need a full affordability review?</h2>
+          <p>Cross-border income, multiple properties, and pillar/pension income require lender-specific modelling beyond payment math.</p>
+          <a href="/#contact" class="btn btn-primary">Contact Shreshti</a>
+        </section>
+        <p class="disclaimer">Illustrative only. Not mortgage, tax, or legal advice. Verify rates and fees with your lender.</p>
+      </div>
+    </div>
+  </div>
+
+  <script>
+(function () {
+  'use strict';
+
+  const FREQ = { monthly: 12, biweekly: 26, weekly: 52, quarterly: 4, annual: 1 };
+  const FREQ_LABEL = {
+    monthly: 'month', biweekly: 'bi-weekly period', weekly: 'week',
+    quarterly: 'quarter', annual: 'year',
+  };
+
+  const $ = (id) => document.getElementById(id);
+  let chartAmort = null;
+  let mode = 'payment';
+
+  function ppy(freq) { return FREQ[freq] || 12; }
+
+  function numPayments(years, freq) {
+    return Math.max(1, Math.round(years * ppy(freq)));
+  }
+
+  function periodicRate(annualPct, freq) {
+    return (Number(annualPct) / 100) / ppy(freq);
+  }
+
+  /** P = A * (1 - (1+i)^-n) / i */
+  function loanFromPayment(A, annualPct, years, freq) {
+    const n = numPayments(years, freq);
+    const i = periodicRate(annualPct, freq);
+    if (!Number.isFinite(A) || A < 0) return 0;
+    if (Math.abs(i) < 1e-14) return A * n;
+    return A * (1 - Math.pow(1 + i, -n)) / i;
+  }
+
+  /** A = P * i / (1 - (1+i)^-n) */
+  function paymentFromLoan(P, annualPct, years, freq) {
+    const n = numPayments(years, freq);
+    const i = periodicRate(annualPct, freq);
+    if (!Number.isFinite(P) || P <= 0) return 0;
+    if (Math.abs(i) < 1e-14) return P / n;
+    return P * i / (1 - Math.pow(1 + i, -n));
+  }
+
+  function amortize(P, annualPct, years, freq, fixedPayment) {
+    const n = numPayments(years, freq);
+    const i = periodicRate(annualPct, freq);
+    const payment = fixedPayment ?? paymentFromLoan(P, annualPct, years, freq);
+    let balance = P;
+    let totalInterest = 0;
+    const periods = [];
+    const paymentsPerYear = ppy(freq);
+
+    for (let p = 1; p <= n; p++) {
+      const interest = balance * (Math.abs(i) < 1e-14 ? 0 : i);
+      let principal = payment - interest;
+      if (p === n) {
+        principal = balance;
+        balance = 0;
+      } else {
+        balance = Math.max(0, balance - principal);
+      }
+      totalInterest += interest;
+      periods.push({ period: p, payment, principal, interest, balance });
+    }
+
+    const yearly = [];
+    for (let y = 1; y <= Math.ceil(n / paymentsPerYear); y++) {
+      const start = (y - 1) * paymentsPerYear;
+      const end = Math.min(y * paymentsPerYear, n);
+      let prinY = 0, intY = 0, payY = 0;
+      for (let idx = start; idx < end; idx++) {
+        if (periods[idx]) {
+          prinY += periods[idx].principal;
+          intY += periods[idx].interest;
+          payY += periods[idx].payment;
+        }
+      }
+      const endBal = periods[end - 1] ? periods[end - 1].balance : 0;
+      yearly.push({ year: y, principal: prinY, interest: intY, payment: payY, endBalance: endBal });
+    }
+
+    return {
+      payment,
+      totalInterest,
+      totalRepayment: P + totalInterest,
+      periods,
+      yearly,
+      n,
+    };
+  }
+
+  function fmtMoney(n, c) {
+    if (!Number.isFinite(n)) return '—';
+    try {
+      return new Intl.NumberFormat(undefined, { style: 'currency', currency: c, maximumFractionDigits: 0 }).format(n);
+    } catch {
+      return `${c} ${Math.round(n).toLocaleString()}`;
+    }
+  }
+
+  function fmtPct(n, d = 2) {
+    return `${Number(n).toFixed(d)}%`;
+  }
+
+  function readInputs() {
+    return {
+      mode,
+      extraPayment: Number($('extraPayment').value),
+      extraLoan: Number($('extraLoan').value),
+      interestRate: Number($('interestRate').value),
+      termYears: Number($('termYears').value),
+      paymentFreq: $('paymentFreq').value,
+      stressRate: Number($('stressRate').value),
+      currentBalance: Number($('currentBalance').value) || 0,
+      remainingTerm: Number($('remainingTerm').value) || 0,
+      ltvNote: ($('ltvNote').value || '').trim(),
+      incomeCapNote: ($('incomeCapNote').value || '').trim(),
+      currency: $('currency').value,
+    };
+  }
+
+  function compute(inp) {
+    const freqLabel = FREQ_LABEL[inp.paymentFreq] || 'period';
+    let principal, payment;
+
+    if (inp.mode === 'payment') {
+      payment = inp.extraPayment;
+      principal = loanFromPayment(payment, inp.interestRate, inp.termYears, inp.paymentFreq);
+    } else {
+      principal = inp.extraLoan;
+      payment = paymentFromLoan(principal, inp.interestRate, inp.termYears, inp.paymentFreq);
+    }
+
+    const base = amortize(principal, inp.interestRate, inp.termYears, inp.paymentFreq, payment);
+    const stressPrincipal = inp.mode === 'payment'
+      ? loanFromPayment(payment, inp.stressRate, inp.termYears, inp.paymentFreq)
+      : principal;
+    const stressPayment = inp.mode === 'loan'
+      ? paymentFromLoan(principal, inp.stressRate, inp.termYears, inp.paymentFreq)
+      : payment;
+    const stress = amortize(
+      inp.mode === 'payment' ? stressPrincipal : principal,
+      inp.stressRate,
+      inp.termYears,
+      inp.paymentFreq,
+      inp.mode === 'payment' ? payment : stressPayment
+    );
+
+    const capacityDelta = principal - stressPrincipal;
+
+    return {
+      principal,
+      payment,
+      base,
+      stressPrincipal,
+      stressPayment,
+      stress,
+      capacityDelta,
+      freqLabel,
+    };
+  }
+
+  function setMode(next) {
+    mode = next;
+    $('modePayment').classList.toggle('active', mode === 'payment');
+    $('modeLoan').classList.toggle('active', mode === 'loan');
+    $('fieldExtraPayment').classList.toggle('hidden', mode !== 'payment');
+    $('fieldExtraLoan').classList.toggle('hidden', mode !== 'loan');
+    recalc();
+  }
+
+  function renderHero(inp, res) {
+    if (inp.mode === 'payment') {
+      $('heroLabel').textContent = `At ${fmtPct(inp.interestRate)} for ${inp.termYears} years (${inp.paymentFreq})`;
+      $('heroValue').textContent = fmtMoney(res.principal, inp.currency);
+      $('hintExtraPayment').textContent = `Per ${res.freqLabel} — drives loan capacity`;
+    } else {
+      $('heroLabel').textContent = `Monthly cost for ${fmtMoney(res.principal, inp.currency)} extra loan`;
+      $('heroValue').textContent = `${fmtMoney(res.payment, inp.currency)} / ${res.freqLabel}`;
+      $('hintExtraPayment').textContent = `Per ${res.freqLabel}`;
+    }
+  }
+
+  function renderSummary(inp, res) {
+    const c = inp.currency;
+    const cards = [
+      {
+        label: inp.mode === 'payment' ? 'Additional loan capacity' : 'Required payment',
+        value: inp.mode === 'payment' ? fmtMoney(res.principal, c) : fmtMoney(res.payment, c),
+        sub: inp.mode === 'payment' ? `${res.base.n} payments` : `On ${fmtMoney(res.principal, c)} principal`,
+        highlight: true,
+      },
+      {
+        label: 'Payment per period',
+        value: fmtMoney(res.payment, c),
+        sub: `${inp.paymentFreq} · ${fmtPct(inp.interestRate)} rate`,
+      },
+      {
+        label: 'Total interest',
+        value: fmtMoney(res.base.totalInterest, c),
+        sub: `Over ${inp.termYears} years`,
+      },
+      {
+        label: 'Total repayment',
+        value: fmtMoney(res.base.totalRepayment, c),
+        sub: 'Principal + interest',
+      },
+      {
+        label: 'Stress capacity',
+        value: inp.mode === 'payment' ? fmtMoney(res.stressPrincipal, c) : fmtMoney(res.stressPayment, c),
+        sub: `At ${fmtPct(inp.stressRate)} stress rate`,
+      },
+      {
+        label: 'Stress vs base gap',
+        value: inp.mode === 'payment'
+          ? fmtMoney(res.capacityDelta, c)
+          : fmtMoney(res.stressPayment - res.payment, c),
+        sub: inp.mode === 'payment' ? 'Lower principal at stress rate' : 'Higher payment at stress rate',
+      },
+    ];
+
+    $('summaryGrid').innerHTML = cards.map(card => `
+      <div class="summary-card ${card.highlight ? 'highlight' : ''}">
+        <div class="label">${card.label}</div>
+        <div class="value">${card.value}</div>
+        <div class="sub">${card.sub}</div>
+      </div>
+    `).join('');
+  }
+
+  function renderStressCompare(inp, res) {
+    const c = inp.currency;
+    if (inp.mode === 'payment') {
+      $('stressCompare').innerHTML = `
+        <div class="compare-card">
+          <h3>Base rate (${fmtPct(inp.interestRate)})</h3>
+          <div class="big" style="color:var(--gain)">${fmtMoney(res.principal, c)}</div>
+          <p>Extra principal at ${fmtMoney(res.payment, c)} / ${res.freqLabel}</p>
+        </div>
+        <div class="compare-card stress">
+          <h3>Stress rate (${fmtPct(inp.stressRate)})</h3>
+          <div class="big" style="color:var(--loss)">${fmtMoney(res.stressPrincipal, c)}</div>
+          <p>Same payment — less borrowing power</p>
+        </div>
+        <div class="compare-card delta">
+          <h3>Difference</h3>
+          <div class="big">−${fmtMoney(res.capacityDelta, c)}</div>
+          <p>${res.capacityDelta > 0 && res.principal > 0 ? fmtPct((res.capacityDelta / res.principal) * 100, 1) : '0%'} less capacity under stress</p>
+        </div>
+      `;
+    } else {
+      $('stressCompare').innerHTML = `
+        <div class="compare-card">
+          <h3>Base rate (${fmtPct(inp.interestRate)})</h3>
+          <div class="big" style="color:var(--gain)">${fmtMoney(res.payment, c)}</div>
+          <p>Per ${res.freqLabel} on ${fmtMoney(res.principal, c)}</p>
+        </div>
+        <div class="compare-card stress">
+          <h3>Stress rate (${fmtPct(inp.stressRate)})</h3>
+          <div class="big" style="color:var(--loss)">${fmtMoney(res.stressPayment, c)}</div>
+          <p>Same loan — higher payment</p>
+        </div>
+        <div class="compare-card delta">
+          <h3>Difference</h3>
+          <div class="big">+${fmtMoney(res.stressPayment - res.payment, c)}</div>
+          <p>Extra cost per ${res.freqLabel} if stress rate applied</p>
+        </div>
+      `;
+    }
+  }
+
+  function renderTable(res) {
+    $('amortBody').innerHTML = res.base.yearly.map(row => `
+      <tr>
+        <td>${row.year}</td>
+        <td>${fmtMoney(row.principal, readInputs().currency)}</td>
+        <td>${fmtMoney(row.interest, readInputs().currency)}</td>
+        <td>${fmtMoney(row.payment, readInputs().currency)}</td>
+        <td>${fmtMoney(row.endBalance, readInputs().currency)}</td>
+      </tr>
+    `).join('');
+  }
+
+  function chartColors() {
+    const dark = document.documentElement.getAttribute('data-theme') === 'dark';
+    return {
+      text: dark ? '#a8b0aa' : '#4d544f',
+      grid: dark ? '#3a423d' : '#e0e4e0',
+      principal: dark ? '#6a9fd4' : '#2a5f8f',
+      interest: dark ? '#d4a574' : '#8b5a2b',
+    };
+  }
+
+  function destroyChart() {
+    if (chartAmort) { chartAmort.destroy(); chartAmort = null; }
+  }
+
+  function renderChart(inp, res) {
+    if (typeof Chart === 'undefined') return;
+    const colors = chartColors();
+    const labels = res.base.yearly.map(y => `Year ${y.year}`);
+    destroyChart();
+    chartAmort = new Chart($('chartAmort'), {
+      type: 'bar',
+      data: {
+        labels,
+        datasets: [
+          {
+            label: 'Principal',
+            data: res.base.yearly.map(y => y.principal),
+            backgroundColor: colors.principal,
+            stack: 'stack',
+          },
+          {
+            label: 'Interest',
+            data: res.base.yearly.map(y => y.interest),
+            backgroundColor: colors.interest,
+            stack: 'stack',
+          },
+        ],
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: { labels: { color: colors.text } },
+          tooltip: {
+            callbacks: {
+              label: ctx => `${ctx.dataset.label}: ${fmtMoney(ctx.raw, inp.currency)}`,
+            },
+          },
+        },
+        scales: {
+          x: { stacked: true, ticks: { color: colors.text }, grid: { color: colors.grid } },
+          y: {
+            stacked: true,
+            ticks: { color: colors.text },
+            grid: { color: colors.grid },
+            title: { display: true, text: inp.currency, color: colors.text },
+          },
+        },
+      },
+    });
+  }
+
+  function renderContext(inp) {
+    const card = $('contextCard');
+    if (inp.currentBalance <= 0) {
+      card.hidden = true;
+      return;
+    }
+    card.hidden = false;
+    let html = `Current balance: <strong>${fmtMoney(inp.currentBalance, inp.currency)}</strong>`;
+    if (inp.remainingTerm > 0) {
+      html += ` · ${inp.remainingTerm} years remaining`;
+      const estPayment = paymentFromLoan(inp.currentBalance, inp.interestRate, inp.remainingTerm, inp.paymentFreq);
+      html += ` · Est. payment ~${fmtMoney(estPayment, inp.currency)} / ${FREQ_LABEL[inp.paymentFreq]}`;
+    }
+    if (inp.mode === 'payment' && inp.extraPayment > 0) {
+      const totalNew = inp.currentBalance + loanFromPayment(inp.extraPayment, inp.interestRate, inp.termYears, inp.paymentFreq);
+      html += `<br>New total mortgage (if top-up added): ~${fmtMoney(totalNew, inp.currency)} — still subject to LTV and income caps.`;
+    }
+    if (inp.ltvNote) html += `<br><br><strong>LTV note:</strong> ${escapeHtml(inp.ltvNote)}`;
+    if (inp.incomeCapNote) html += `<br><strong>Income cap note:</strong> ${escapeHtml(inp.incomeCapNote)}`;
+    $('contextBody').innerHTML = html;
+  }
+
+  function escapeHtml(s) {
+    return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+  }
+
+  function recalc() {
+    const inp = readInputs();
+    if (inp.termYears < 1) return;
+    if (inp.mode === 'payment' && inp.extraPayment < 0) return;
+    if (inp.mode === 'loan' && inp.extraLoan < 0) return;
+
+    const res = compute(inp);
+    renderHero(inp, res);
+    renderSummary(inp, res);
+    renderStressCompare(inp, res);
+    renderTable(res);
+    renderChart(inp, res);
+    renderContext(inp);
+  }
+
+  $('modePayment').addEventListener('click', () => setMode('payment'));
+  $('modeLoan').addEventListener('click', () => setMode('loan'));
+
+  [
+    'extraPayment', 'extraLoan', 'interestRate', 'termYears', 'stressRate',
+    'currentBalance', 'remainingTerm',
+  ].forEach(id => {
+    const el = $(id);
+    if (el) el.addEventListener('input', recalc);
+  });
+  ['paymentFreq', 'currency'].forEach(id => {
+    const el = $(id);
+    if (el) el.addEventListener('change', recalc);
+  });
+  ['ltvNote', 'incomeCapNote'].forEach(id => {
+    const el = $(id);
+    if (el) el.addEventListener('input', recalc);
+  });
+
+  $('btnTheme').addEventListener('click', () => {
+    const dark = document.documentElement.getAttribute('data-theme') === 'dark';
+    document.documentElement.setAttribute('data-theme', dark ? 'light' : 'dark');
+    $('btnTheme').textContent = dark ? 'Dark' : 'Light';
+    recalc();
+  });
+
+  function init() {
+    const dark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+    document.documentElement.setAttribute('data-theme', dark ? 'dark' : 'light');
+    $('btnTheme').textContent = dark ? 'Light' : 'Dark';
+    function wait() {
+      if (typeof Chart !== 'undefined') recalc();
+      else setTimeout(wait, 50);
+    }
+    wait();
+  }
+
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);
+  else init();
+})();
+  </script>
+</body>
+</html>

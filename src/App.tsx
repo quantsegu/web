@@ -5,7 +5,8 @@ import Software from '../pages/Software';
 import Profile from '../pages/Profile';
 import BJP from '../pages/BJP';
 import WealthTools from '../pages/WealthTools';
-import RetirementPlannerFrame from '../components/RetirementPlannerFrame';
+import InvestmentUniverse from '../pages/InvestmentUniverse';
+import WealthToolFrame from '../components/WealthToolFrame';
 
 function LegacyHashRedirect() {
   const location = useLocation();
@@ -76,10 +77,50 @@ export default function App() {
         <Route path="/" element={<Home {...shaderProps} />} />
         <Route path="/software" element={<Software />} />
         <Route path="/wealth-tools" element={<WealthTools />} />
-        <Route path="/wealth-tools/retirement-income-planner" element={<RetirementPlannerFrame />} />
+        <Route path="/investment-universe" element={<InvestmentUniverse />} />
+        <Route
+          path="/investment-universe.html"
+          element={<Navigate to="/investment-universe" replace />}
+        />
+        <Route
+          path="/wealth-tools/retirement-income-planner"
+          element={<WealthToolFrame src="/wealth-tools/retirement-income-planner.html" title="Retirement Income Planner" />}
+        />
         <Route
           path="/wealth-tools/retirement-income-planner.html"
           element={<Navigate to="/wealth-tools/retirement-income-planner" replace />}
+        />
+        <Route
+          path="/wealth-tools/tax-drag-calculator"
+          element={<WealthToolFrame src="/wealth-tools/tax-drag-calculator.html" title="Tax Drag Calculator" />}
+        />
+        <Route
+          path="/wealth-tools/tax-drag-calculator.html"
+          element={<Navigate to="/wealth-tools/tax-drag-calculator" replace />}
+        />
+        <Route
+          path="/wealth-tools/wealth-preservation-planner"
+          element={<WealthToolFrame src="/wealth-tools/wealth-preservation-planner.html" title="Wealth Preservation Planner" />}
+        />
+        <Route
+          path="/wealth-tools/wealth-preservation-planner.html"
+          element={<Navigate to="/wealth-tools/wealth-preservation-planner" replace />}
+        />
+        <Route
+          path="/wealth-tools/portfolio-efficiency-scorecard"
+          element={<WealthToolFrame src="/wealth-tools/portfolio-efficiency-scorecard.html" title="Portfolio Efficiency Scorecard" />}
+        />
+        <Route
+          path="/wealth-tools/portfolio-efficiency-scorecard.html"
+          element={<Navigate to="/wealth-tools/portfolio-efficiency-scorecard" replace />}
+        />
+        <Route
+          path="/wealth-tools/additional-mortgage-capacity"
+          element={<WealthToolFrame src="/wealth-tools/additional-mortgage-capacity.html" title="Additional Mortgage Capacity" />}
+        />
+        <Route
+          path="/wealth-tools/additional-mortgage-capacity.html"
+          element={<Navigate to="/wealth-tools/additional-mortgage-capacity" replace />}
         />
         <Route path="/profile" element={<Profile />} />
         <Route path="/bjp" element={<BJP />} />

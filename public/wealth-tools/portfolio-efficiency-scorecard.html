@@ -1,0 +1,1088 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Portfolio efficiency scorecard — diagnose fee drag, cash drag, concentration, tax inefficiency, and goal-allocation mismatch." />
+  <title>Portfolio Efficiency Scorecard — Diagnostic Audit</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js" defer></script>
+  <style>
+    :root {
+      --accent: #2c4a6e;
+      --accent-hover: #1e3550;
+      --accent-muted: rgba(44, 74, 110, 0.1);
+      --bg: #f4f5f7;
+      --surface: #ffffff;
+      --surface-2: #e8eaee;
+      --border: #c8cdd6;
+      --text: #12151a;
+      --text-muted: #4a5260;
+      --text-faint: #7a8494;
+      --warn: #9b5c00;
+      --warn-muted: rgba(155, 92, 0, 0.1);
+      --loss: #9b2c2c;
+      --loss-muted: rgba(155, 44, 44, 0.1);
+      --gain: #1a5c38;
+      --gain-muted: rgba(26, 92, 56, 0.1);
+      --score-high: #1a5c38;
+      --score-mid: #9b5c00;
+      --score-low: #9b2c2c;
+      --shadow: 0 1px 3px rgba(0,0,0,0.06);
+      --radius: 4px;
+      --font: "Helvetica Neue", Helvetica, Arial, system-ui, sans-serif;
+      --header-h: 48px;
+      --sidebar-w: 280px;
+    }
+    [data-theme="dark"] {
+      --accent: #7eb0e0;
+      --accent-hover: #a8c8f0;
+      --accent-muted: rgba(126, 176, 224, 0.12);
+      --bg: #0f1114;
+      --surface: #1a1e24;
+      --surface-2: #252a32;
+      --border: #3a424e;
+      --text: #eef1f5;
+      --text-muted: #a8b0bc;
+      --text-faint: #6e7888;
+      --warn: #e8a84a;
+      --warn-muted: rgba(232, 168, 74, 0.12);
+      --loss: #e07070;
+      --loss-muted: rgba(224, 112, 112, 0.12);
+      --gain: #4db87a;
+      --gain-muted: rgba(77, 184, 122, 0.12);
+      --score-high: #4db87a;
+      --score-mid: #e8a84a;
+      --score-low: #e07070;
+      --shadow: 0 1px 3px rgba(0,0,0,0.35);
+    }
+    *, *::before, *::after { box-sizing: border-box; }
+    html { font-size: 14px; scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      font-family: var(--font);
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.45;
+      font-feature-settings: "tnum" 1, "lnum" 1;
+    }
+    .tabular { font-variant-numeric: tabular-nums lining-nums; }
+    button, input, select { font-family: inherit; font-size: inherit; }
+    a { color: var(--accent); }
+    :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+    .app-header {
+      position: sticky; top: 0; z-index: 100;
+      height: var(--header-h);
+      display: flex; align-items: center; gap: 12px;
+      padding: 0 16px;
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      box-shadow: var(--shadow);
+    }
+    .logo { display: flex; align-items: center; gap: 8px; text-decoration: none; color: var(--text); }
+    .logo svg { width: 28px; height: 28px; }
+    .logo-title { font-size: 0.95rem; font-weight: 600; }
+    .logo-sub { font-size: 0.68rem; color: var(--text-muted); }
+    .header-actions { margin-left: auto; display: flex; gap: 8px; flex-wrap: wrap; }
+    .btn {
+      padding: 6px 12px; border: 1px solid var(--border); border-radius: var(--radius);
+      background: var(--surface); color: var(--text); cursor: pointer; font-size: 0.8rem;
+      text-decoration: none; display: inline-flex; align-items: center;
+    }
+    .btn:hover { background: var(--surface-2); }
+    .btn-primary { background: var(--accent); border-color: var(--accent); color: #fff; }
+    [data-theme="dark"] .btn-primary { color: #0f1114; }
+    .btn-sm { padding: 4px 8px; font-size: 0.72rem; }
+
+    .layout { display: flex; min-height: calc(100vh - var(--header-h)); }
+    .sidebar {
+      width: var(--sidebar-w); flex-shrink: 0;
+      background: var(--surface); border-right: 1px solid var(--border);
+      position: sticky; top: var(--header-h);
+      max-height: calc(100vh - var(--header-h)); overflow-y: auto;
+      padding: 12px;
+    }
+    .main { flex: 1; min-width: 0; }
+
+    .panel-title {
+      font-size: 0.65rem; font-weight: 600; text-transform: uppercase;
+      letter-spacing: 0.08em; color: var(--text-faint); margin: 12px 0 8px;
+    }
+    .panel-title:first-child { margin-top: 0; }
+    .field { margin-bottom: 10px; }
+    .field label { display: block; font-size: 0.75rem; color: var(--text-muted); margin-bottom: 3px; }
+    .field input, .field select {
+      width: 100%; padding: 6px 8px; border: 1px solid var(--border);
+      border-radius: var(--radius); background: var(--bg); color: var(--text);
+    }
+    .field-hint { font-size: 0.65rem; color: var(--text-faint); margin-top: 2px; }
+    .mix-row { display: grid; grid-template-columns: 1fr 56px; gap: 6px; align-items: center; margin-bottom: 6px; }
+    .mix-row label { font-size: 0.72rem; color: var(--text-muted); margin: 0; }
+    .mix-row input { width: 100%; }
+    .mix-total { font-size: 0.7rem; margin-top: 4px; }
+    .mix-total.warn { color: var(--warn); font-weight: 600; }
+    .scenario-row { display: grid; grid-template-columns: repeat(2, 1fr); gap: 4px; margin-bottom: 10px; }
+    .scenario-row button {
+      padding: 6px; font-size: 0.68rem; border: 1px solid var(--border);
+      border-radius: var(--radius); background: var(--bg); color: var(--text-muted); cursor: pointer;
+    }
+    .scenario-row button.active { border-color: var(--accent); background: var(--accent-muted); color: var(--accent); font-weight: 600; }
+
+    .hero {
+      padding: 28px 24px 20px;
+      background: linear-gradient(180deg, var(--accent-muted) 0%, transparent 100%);
+      border-bottom: 1px solid var(--border);
+    }
+    .hero-badge {
+      display: inline-block; font-size: 0.62rem; font-weight: 700;
+      text-transform: uppercase; letter-spacing: 0.1em;
+      color: var(--accent); border: 1px solid var(--accent);
+      padding: 3px 8px; border-radius: var(--radius); margin-bottom: 10px;
+    }
+    .hero h1 {
+      font-size: 1.65rem; font-weight: 700; letter-spacing: -0.03em;
+      margin: 0 0 8px; line-height: 1.2; max-width: 38rem;
+    }
+    .hero p { margin: 0; color: var(--text-muted); font-size: 0.9rem; max-width: 42rem; }
+    .hero-pillars {
+      display: flex; flex-wrap: wrap; gap: 6px; margin-top: 14px;
+    }
+    .hero-pillars span {
+      font-size: 0.68rem; padding: 4px 8px; background: var(--surface);
+      border: 1px solid var(--border); border-radius: var(--radius); color: var(--text-muted);
+    }
+
+    .content { padding: 16px 20px 32px; }
+
+    .score-panel {
+      display: grid; grid-template-columns: auto 1fr; gap: 20px; align-items: center;
+      padding: 20px; margin-bottom: 20px;
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: var(--radius); box-shadow: var(--shadow);
+    }
+    @media (max-width: 640px) {
+      .score-panel { grid-template-columns: 1fr; text-align: center; justify-items: center; }
+    }
+    .score-ring-wrap { position: relative; width: 140px; height: 140px; }
+    .score-ring {
+      width: 140px; height: 140px; border-radius: 50%;
+      background: conic-gradient(var(--ring-color) calc(var(--score) * 3.6deg), var(--surface-2) 0);
+      display: flex; align-items: center; justify-content: center;
+    }
+    .score-ring-inner {
+      width: 108px; height: 108px; border-radius: 50%;
+      background: var(--surface); display: flex; flex-direction: column;
+      align-items: center; justify-content: center; border: 1px solid var(--border);
+    }
+    .score-ring-inner .num { font-size: 2.4rem; font-weight: 800; line-height: 1; color: var(--ring-color); }
+    .score-ring-inner .of { font-size: 0.65rem; color: var(--text-faint); text-transform: uppercase; letter-spacing: 0.06em; }
+    .score-meta h2 { margin: 0 0 6px; font-size: 1.05rem; }
+    .score-meta p { margin: 0; font-size: 0.85rem; color: var(--text-muted); }
+    .score-grade {
+      display: inline-block; margin-top: 10px; padding: 4px 10px;
+      font-size: 0.75rem; font-weight: 700; border-radius: var(--radius);
+      background: var(--grade-bg); color: var(--grade-color); border: 1px solid var(--grade-color);
+    }
+    .uplift-chip {
+      margin-top: 10px; font-size: 0.8rem; padding: 8px 12px;
+      background: var(--gain-muted); border-left: 3px solid var(--gain);
+      border-radius: var(--radius); max-width: 28rem;
+    }
+    .uplift-chip strong { color: var(--gain); }
+
+    .summary-grid {
+      display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+      gap: 8px; margin-bottom: 20px;
+    }
+    .summary-card {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: var(--radius); padding: 10px; box-shadow: var(--shadow);
+    }
+    .summary-card .label { font-size: 0.62rem; text-transform: uppercase; letter-spacing: 0.06em; color: var(--text-faint); }
+    .summary-card .value { font-size: 1.05rem; font-weight: 700; margin-top: 3px; }
+    .summary-card .sub { font-size: 0.68rem; color: var(--text-muted); margin-top: 2px; }
+
+    .card {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: var(--radius); margin-bottom: 16px; box-shadow: var(--shadow);
+    }
+    .card-header {
+      padding: 8px 12px; border-bottom: 1px solid var(--border);
+      font-size: 0.8rem; font-weight: 600;
+      display: flex; align-items: center; justify-content: space-between; gap: 8px;
+    }
+    .card-header .tag {
+      font-size: 0.62rem; font-weight: 600; text-transform: uppercase;
+      letter-spacing: 0.05em; color: var(--text-faint);
+    }
+    .card-body { padding: 12px; }
+
+    .category-list { display: flex; flex-direction: column; gap: 12px; }
+    .category-row {
+      display: grid; grid-template-columns: 140px 1fr 44px; gap: 10px; align-items: center;
+    }
+    @media (max-width: 520px) {
+      .category-row { grid-template-columns: 1fr; gap: 4px; }
+      .category-row .cat-score { text-align: left; }
+    }
+    .category-row .cat-name { font-size: 0.78rem; font-weight: 600; }
+    .category-row .cat-desc { font-size: 0.68rem; color: var(--text-faint); margin-top: 2px; }
+    .meter-track {
+      height: 10px; background: var(--surface-2); border-radius: 2px; overflow: hidden;
+      border: 1px solid var(--border);
+    }
+    .meter-fill {
+      height: 100%; border-radius: 1px; transition: width 0.35s ease;
+    }
+    .cat-score { font-size: 0.9rem; font-weight: 700; text-align: right; }
+
+    .flags-grid { display: grid; gap: 8px; }
+    .flag-item {
+      display: flex; gap: 10px; align-items: flex-start;
+      padding: 10px 12px; border-radius: var(--radius); font-size: 0.78rem;
+      border: 1px solid var(--border);
+    }
+    .flag-item.high { background: var(--loss-muted); border-color: var(--loss); }
+    .flag-item.medium { background: var(--warn-muted); border-color: var(--warn); }
+    .flag-item.low { background: var(--surface-2); }
+    .flag-severity {
+      flex-shrink: 0; font-size: 0.6rem; font-weight: 700; text-transform: uppercase;
+      letter-spacing: 0.05em; padding: 2px 6px; border-radius: 2px;
+    }
+    .flag-item.high .flag-severity { background: var(--loss); color: #fff; }
+    .flag-item.medium .flag-severity { background: var(--warn); color: #fff; }
+    .flag-item.low .flag-severity { background: var(--border); color: var(--text-muted); }
+
+    .rec-list { display: flex; flex-direction: column; gap: 10px; }
+    .rec-item {
+      padding: 12px 14px; border: 1px solid var(--border); border-radius: var(--radius);
+      border-left: 3px solid var(--accent);
+    }
+    .rec-item.priority-1 { border-left-color: var(--loss); }
+    .rec-item.priority-2 { border-left-color: var(--warn); }
+    .rec-item h4 { margin: 0 0 4px; font-size: 0.82rem; }
+    .rec-item p { margin: 0; font-size: 0.76rem; color: var(--text-muted); }
+    .rec-item .impact { font-size: 0.68rem; color: var(--gain); margin-top: 6px; font-weight: 600; }
+
+    .leaks-viz { margin-top: 8px; }
+    .chart-wrap { position: relative; height: 220px; }
+    .leak-bars { display: flex; flex-direction: column; gap: 8px; margin-top: 12px; }
+    .leak-bar-row { display: grid; grid-template-columns: 120px 1fr 52px; gap: 8px; align-items: center; font-size: 0.72rem; }
+    .leak-bar-row .leak-track {
+      height: 18px; background: var(--surface-2); border-radius: 2px; overflow: hidden;
+    }
+    .leak-bar-row .leak-fill { height: 100%; background: var(--loss); opacity: 0.85; }
+    .leak-bar-row .leak-pct { text-align: right; font-weight: 700; color: var(--loss); }
+
+    .cta-block {
+      text-align: center; padding: 28px 20px;
+      background: var(--accent-muted); border: 1px solid var(--border);
+      border-radius: var(--radius);
+    }
+    .cta-block h2 { margin: 0 0 8px; font-size: 1.15rem; }
+    .cta-block p { margin: 0 0 16px; color: var(--text-muted); font-size: 0.85rem; max-width: 34rem; margin-left: auto; margin-right: auto; }
+    .cta-steps {
+      display: flex; flex-wrap: wrap; justify-content: center; gap: 8px;
+      margin-bottom: 16px; font-size: 0.72rem; color: var(--text-muted);
+    }
+    .cta-steps span { padding: 4px 10px; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); }
+
+    .disclaimer {
+      font-size: 0.68rem; color: var(--text-faint); margin-top: 16px; text-align: center;
+    }
+
+    @media (max-width: 768px) {
+      .layout { flex-direction: column; }
+      .sidebar { width: 100%; max-height: none; position: static; }
+    }
+  </style>
+</head>
+<body>
+  <header class="app-header">
+    <a class="logo" href="/wealth-tools" aria-label="Back to Wealth Tools">
+      <svg viewBox="0 0 32 32" aria-hidden="true" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <rect width="32" height="32" rx="4" fill="currentColor" opacity="0.08"/>
+        <path d="M8 22 L8 14 L14 14 L14 10 L22 10 L22 22 Z" stroke="var(--accent)" stroke-width="1.5" fill="none"/>
+        <path d="M10 18 L18 12 L24 16" stroke="var(--gain)" stroke-width="2" stroke-linecap="round" fill="none"/>
+      </svg>
+      <div>
+        <div class="logo-title">Portfolio Efficiency Scorecard</div>
+        <div class="logo-sub">Diagnostic audit · browser-only</div>
+      </div>
+    </a>
+    <div class="header-actions">
+      <a href="/wealth-tools" class="btn btn-sm">Wealth Tools</a>
+      <button type="button" class="btn btn-sm" id="btnTheme" aria-label="Toggle theme">Dark</button>
+    </div>
+  </header>
+
+  <div class="layout">
+    <aside class="sidebar" aria-label="Diagnostic inputs">
+      <p class="panel-title">Quick presets</p>
+      <div class="scenario-row" role="group" aria-label="Portfolio presets">
+        <button type="button" data-preset="efficient">Efficient DIY</button>
+        <button type="button" data-preset="typical">Typical retail</button>
+        <button type="button" data-preset="leaky">Leaky portfolio</button>
+        <button type="button" data-preset="pre-retire">Pre-retirement</button>
+      </div>
+
+      <p class="panel-title">Asset mix (%)</p>
+      <div class="mix-row">
+        <label for="mixEquity">Equities</label>
+        <input type="number" id="mixEquity" min="0" max="100" step="1" value="70" class="tabular mix-input" />
+      </div>
+      <div class="mix-row">
+        <label for="mixBonds">Bonds / fixed income</label>
+        <input type="number" id="mixBonds" min="0" max="100" step="1" value="20" class="tabular mix-input" />
+      </div>
+      <div class="mix-row">
+        <label for="mixAlt">Alternatives / REITs</label>
+        <input type="number" id="mixAlt" min="0" max="100" step="1" value="5" class="tabular mix-input" />
+      </div>
+      <div class="mix-row">
+        <label for="mixCash">Cash &amp; equivalents</label>
+        <input type="number" id="mixCash" min="0" max="100" step="1" value="5" class="tabular mix-input" />
+      </div>
+      <p class="mix-total tabular" id="mixTotal" aria-live="polite">Total: 100%</p>
+
+      <p class="panel-title">Costs &amp; structure</p>
+      <div class="field">
+        <label for="totalFees">Total annual fees (% of invested assets)</label>
+        <input type="number" id="totalFees" min="0" max="5" step="0.05" value="0.45" class="tabular" />
+        <span class="field-hint">Fund ER + platform + advisory</span>
+      </div>
+      <div class="field">
+        <label for="cashAllocation">Cash allocation (%)</label>
+        <input type="number" id="cashAllocation" min="0" max="80" step="0.5" value="5" class="tabular" />
+      </div>
+      <div class="field">
+        <label for="numHoldings">Number of holdings</label>
+        <input type="number" id="numHoldings" min="1" max="200" step="1" value="18" class="tabular" />
+      </div>
+      <div class="field">
+        <label for="geoConcentration">Home-country geographic weight (%)</label>
+        <input type="number" id="geoConcentration" min="0" max="100" step="1" value="55" class="tabular" />
+      </div>
+
+      <p class="panel-title">Tax &amp; discipline</p>
+      <div class="field">
+        <label for="dividendTax">Dividend tax situation</label>
+        <select id="dividendTax">
+          <option value="efficient">Tax-efficient wrappers / low drag</option>
+          <option value="moderate" selected>Moderate — some leakage on distributions</option>
+          <option value="high">High — fully taxed distributions, no deferral</option>
+          <option value="unknown">Unclear / not optimized</option>
+        </select>
+      </div>
+      <div class="field">
+        <label for="rebalanceFreq">Rebalancing frequency</label>
+        <select id="rebalanceFreq">
+          <option value="threshold">Threshold-based (bands)</option>
+          <option value="quarterly">Quarterly</option>
+          <option value="annual" selected>Annual</option>
+          <option value="irregular">Irregular / ad hoc</option>
+          <option value="never">Rarely or never</option>
+        </select>
+      </div>
+
+      <p class="panel-title">Goals &amp; horizon</p>
+      <div class="field">
+        <label for="timeHorizon">Investment time horizon (years)</label>
+        <input type="number" id="timeHorizon" min="1" max="50" step="1" value="18" class="tabular" />
+      </div>
+      <div class="field">
+        <label for="objective">Primary objective</label>
+        <select id="objective">
+          <option value="growth">Long-term growth</option>
+          <option value="balanced" selected>Balanced growth &amp; stability</option>
+          <option value="income">Retirement / passive income</option>
+          <option value="preservation">Capital preservation</option>
+        </select>
+      </div>
+      <div class="field">
+        <label for="targetIncome">Target retirement income (monthly, today's money)</label>
+        <input type="number" id="targetIncome" min="0" step="100" value="4500" class="tabular" />
+        <span class="field-hint">Optional — used for goal mismatch context</span>
+      </div>
+      <div class="field">
+        <label for="portfolioValue">Portfolio value (for context)</label>
+        <input type="number" id="portfolioValue" min="0" step="5000" value="400000" class="tabular" />
+      </div>
+      <div class="field">
+        <label for="currency">Currency</label>
+        <select id="currency">
+          <option value="CHF" selected>CHF</option>
+          <option value="EUR">EUR</option>
+          <option value="USD">USD</option>
+          <option value="GBP">GBP</option>
+        </select>
+      </div>
+    </aside>
+
+    <div class="main">
+      <section class="hero">
+        <span class="hero-badge">Portfolio audit</span>
+        <h1>Where is your portfolio leaking returns?</h1>
+        <p>
+          This scorecard measures seven efficiency dimensions — fees, idle cash, concentration, tax drag, diversification, rebalancing discipline, and alignment with your goals — then surfaces priority fixes and estimated return uplift.
+        </p>
+        <div class="hero-pillars" aria-hidden="true">
+          <span>Fee drag</span>
+          <span>Cash drag</span>
+          <span>Overconcentration</span>
+          <span>Tax inefficiency</span>
+          <span>Diversification</span>
+          <span>Rebalancing</span>
+          <span>Goal mismatch</span>
+        </div>
+      </section>
+
+      <div class="content">
+        <section class="score-panel tabular" id="scorePanel" aria-live="polite">
+          <div class="score-ring-wrap">
+            <div class="score-ring" id="scoreRing">
+              <div class="score-ring-inner">
+                <span class="num" id="scoreNum">—</span>
+                <span class="of">/ 100</span>
+              </div>
+            </div>
+          </div>
+          <div class="score-meta">
+            <h2 id="scoreTitle">Portfolio efficiency score</h2>
+            <p id="scoreSummary">Complete the diagnostic form to generate your audit.</p>
+            <span class="score-grade" id="scoreGrade" hidden></span>
+            <p class="uplift-chip tabular" id="upliftChip" hidden></p>
+          </div>
+        </section>
+
+        <div class="summary-grid tabular" id="summaryGrid" aria-live="polite"></div>
+
+        <section class="card" aria-labelledby="breakdownTitle">
+          <div class="card-header">
+            <span id="breakdownTitle">Breakdown by category</span>
+            <span class="tag">Weighted audit</span>
+          </div>
+          <div class="card-body">
+            <div class="category-list" id="categoryList"></div>
+          </div>
+        </section>
+
+        <section class="card" aria-labelledby="leaksTitle">
+          <div class="card-header" id="leaksTitle">Biggest leaks in your portfolio</div>
+          <div class="card-body leaks-viz">
+            <p style="font-size:0.78rem;color:var(--text-muted);margin:0 0 8px">
+              Estimated annual return drag by category (basis points). Taller bars = more leakage relative to an efficient baseline.
+            </p>
+            <div class="chart-wrap"><canvas id="chartLeaks" aria-label="Portfolio leak breakdown chart"></canvas></div>
+            <div class="leak-bars tabular" id="leakBars"></div>
+          </div>
+        </section>
+
+        <section class="card" aria-labelledby="flagsTitle">
+          <div class="card-header" id="flagsTitle">Risk flag summary</div>
+          <div class="card-body">
+            <div class="flags-grid" id="flagsGrid"></div>
+          </div>
+        </section>
+
+        <section class="card" aria-labelledby="recTitle">
+          <div class="card-header" id="recTitle">Personalized recommendations</div>
+          <div class="card-body">
+            <div class="rec-list" id="recList"></div>
+          </div>
+        </section>
+
+        <section class="cta-block" id="cta">
+          <h2>Request a full portfolio review</h2>
+          <p>
+            This scorecard is illustrative. A full review maps your actual wrappers, tax residency, pension pillars, and cross-border exposure — not generic assumptions.
+          </p>
+          <div class="cta-steps" aria-hidden="true">
+            <span>1 · Holdings-level audit</span>
+            <span>2 · Tax &amp; wrapper plan</span>
+            <span>3 · Goal-aligned allocation</span>
+          </div>
+          <a href="/#contact" class="btn btn-primary">Book a portfolio review</a>
+        </section>
+
+        <p class="disclaimer">
+          Results run entirely in your browser. This tool does not constitute financial, tax, or legal advice.
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <script>
+(function () {
+  'use strict';
+
+  const CATEGORIES = [
+    { id: 'fees', name: 'Fee drag', weight: 0.15, desc: 'All-in cost vs low-cost benchmark' },
+    { id: 'cash', name: 'Cash drag', weight: 0.12, desc: 'Idle cash vs strategic reserve' },
+    { id: 'concentration', name: 'Overconcentration', weight: 0.14, desc: 'Holdings count & geographic home bias' },
+    { id: 'tax', name: 'Tax inefficiency', weight: 0.14, desc: 'Distribution & wrapper drag' },
+    { id: 'diversification', name: 'Diversification', weight: 0.14, desc: 'Asset classes & breadth of holdings' },
+    { id: 'rebalancing', name: 'Rebalancing discipline', weight: 0.12, desc: 'Systematic vs drift' },
+    { id: 'goals', name: 'Goals vs allocation', weight: 0.19, desc: 'Horizon, objective & equity mix fit' },
+  ];
+
+  const PRESETS = {
+    efficient: {
+      mixEquity: 75, mixBonds: 18, mixAlt: 5, mixCash: 2,
+      totalFees: 0.18, cashAllocation: 2, numHoldings: 28, geoConcentration: 42,
+      dividendTax: 'efficient', rebalanceFreq: 'threshold', timeHorizon: 22, objective: 'growth',
+      targetIncome: 0, portfolioValue: 350000,
+    },
+    typical: {
+      mixEquity: 70, mixBonds: 20, mixAlt: 5, mixCash: 5,
+      totalFees: 0.65, cashAllocation: 8, numHoldings: 14, geoConcentration: 62,
+      dividendTax: 'moderate', rebalanceFreq: 'annual', timeHorizon: 15, objective: 'balanced',
+      targetIncome: 4000, portfolioValue: 400000,
+    },
+    leaky: {
+      mixEquity: 88, mixBonds: 4, mixAlt: 0, mixCash: 8,
+      totalFees: 1.45, cashAllocation: 22, numHoldings: 6, geoConcentration: 88,
+      dividendTax: 'high', rebalanceFreq: 'never', timeHorizon: 8, objective: 'growth',
+      targetIncome: 6000, portfolioValue: 280000,
+    },
+    'pre-retire': {
+      mixEquity: 52, mixBonds: 35, mixAlt: 8, mixCash: 5,
+      totalFees: 0.55, cashAllocation: 12, numHoldings: 20, geoConcentration: 58,
+      dividendTax: 'moderate', rebalanceFreq: 'quarterly', timeHorizon: 6, objective: 'income',
+      targetIncome: 5500, portfolioValue: 850000,
+    },
+  };
+
+  const $ = (id) => document.getElementById(id);
+  let chartLeaks = null;
+
+  function pct(v) { return Number(v) / 100; }
+
+  function readInputs() {
+    return {
+      mixEquity: Number($('mixEquity').value),
+      mixBonds: Number($('mixBonds').value),
+      mixAlt: Number($('mixAlt').value),
+      mixCash: Number($('mixCash').value),
+      totalFees: Number($('totalFees').value),
+      cashAllocation: Number($('cashAllocation').value),
+      numHoldings: Number($('numHoldings').value),
+      geoConcentration: Number($('geoConcentration').value),
+      dividendTax: $('dividendTax').value,
+      rebalanceFreq: $('rebalanceFreq').value,
+      timeHorizon: Number($('timeHorizon').value),
+      objective: $('objective').value,
+      targetIncome: Number($('targetIncome').value),
+      portfolioValue: Number($('portfolioValue').value),
+      currency: $('currency').value,
+    };
+  }
+
+  function mixTotal(inp) {
+    return inp.mixEquity + inp.mixBonds + inp.mixAlt + inp.mixCash;
+  }
+
+  function scoreFees(feePct) {
+    if (feePct <= 0.25) return 96;
+    if (feePct <= 0.4) return 90;
+    if (feePct <= 0.6) return 82;
+    if (feePct <= 0.85) return 72;
+    if (feePct <= 1.1) return 58;
+    if (feePct <= 1.5) return 42;
+    if (feePct <= 2) return 28;
+    return 12;
+  }
+
+  function scoreCash(cashPct) {
+    if (cashPct <= 2) return 98;
+    if (cashPct <= 4) return 92;
+    if (cashPct <= 7) return 84;
+    if (cashPct <= 10) return 74;
+    if (cashPct <= 15) return 58;
+    if (cashPct <= 22) return 40;
+    if (cashPct <= 35) return 24;
+    return 10;
+  }
+
+  function scoreConcentration(holdings, geoHome) {
+    let h;
+    if (holdings >= 30) h = 94;
+    else if (holdings >= 22) h = 86;
+    else if (holdings >= 15) h = 74;
+    else if (holdings >= 10) h = 58;
+    else if (holdings >= 6) h = 38;
+    else h = 18;
+    let g;
+    if (geoHome <= 35) g = 95;
+    else if (geoHome <= 50) g = 82;
+    else if (geoHome <= 65) g = 66;
+    else if (geoHome <= 78) g = 48;
+    else if (geoHome <= 90) g = 28;
+    else g = 12;
+    return Math.round(h * 0.45 + g * 0.55);
+  }
+
+  function scoreTax(situation) {
+    const map = { efficient: 93, moderate: 68, high: 32, unknown: 48 };
+    return map[situation] ?? 50;
+  }
+
+  function scoreDiversification(inp) {
+    const classes = [inp.mixEquity > 8, inp.mixBonds > 8, inp.mixAlt > 3].filter(Boolean).length;
+    let classScore = classes >= 3 ? 88 : classes === 2 ? 68 : 38;
+    const maxSlice = Math.max(inp.mixEquity, inp.mixBonds, inp.mixAlt, inp.mixCash);
+    if (maxSlice > 92) classScore = Math.min(classScore, 35);
+    let h;
+    if (inp.numHoldings >= 25) h = 90;
+    else if (inp.numHoldings >= 18) h = 80;
+    else if (inp.numHoldings >= 12) h = 65;
+    else if (inp.numHoldings >= 8) h = 50;
+    else h = 30;
+    return Math.round(classScore * 0.5 + h * 0.5);
+  }
+
+  function scoreRebalancing(freq) {
+    const map = { threshold: 94, quarterly: 88, annual: 74, irregular: 48, never: 18 };
+    return map[freq] ?? 50;
+  }
+
+  function targetEquity(horizon, objective) {
+    if (horizon >= 25) {
+      if (objective === 'growth') return 85;
+      if (objective === 'balanced') return 70;
+      if (objective === 'income') return 55;
+      return 40;
+    }
+    if (horizon >= 15) {
+      if (objective === 'growth') return 78;
+      if (objective === 'balanced') return 62;
+      if (objective === 'income') return 48;
+      return 35;
+    }
+    if (horizon >= 8) {
+      if (objective === 'growth') return 65;
+      if (objective === 'balanced') return 52;
+      if (objective === 'income') return 40;
+      return 28;
+    }
+    if (objective === 'growth') return 50;
+    if (objective === 'balanced') return 42;
+    if (objective === 'income') return 35;
+    return 22;
+  }
+
+  function scoreGoals(inp) {
+    const target = targetEquity(inp.timeHorizon, inp.objective);
+    const diff = Math.abs(inp.mixEquity - target);
+    let base;
+    if (diff <= 5) base = 95;
+    else if (diff <= 10) base = 84;
+    else if (diff <= 18) base = 68;
+    else if (diff <= 28) base = 48;
+    else base = 25;
+    if (inp.objective === 'income' && inp.mixEquity > target + 15) base -= 12;
+    if (inp.objective === 'growth' && inp.timeHorizon >= 15 && inp.mixEquity < target - 15) base -= 10;
+    if (inp.objective === 'preservation' && inp.mixEquity > 45) base -= 15;
+    if (inp.targetIncome > 0 && inp.portfolioValue > 0) {
+      const impliedSwr = 0.04;
+      const need = inp.targetIncome * 12 / impliedSwr;
+      const gap = need - inp.portfolioValue;
+      if (gap > 0 && inp.timeHorizon < 10 && inp.mixEquity < 55) base -= 8;
+    }
+    return Math.max(10, Math.min(98, Math.round(base)));
+  }
+
+  function leakBps(categoryId, inp, catScore) {
+    const gap = (100 - catScore) / 100;
+    switch (categoryId) {
+      case 'fees':
+        return Math.max(0, (inp.totalFees - 0.25) * 100);
+      case 'cash': {
+        const excess = Math.max(0, inp.cashAllocation - 5);
+        return excess * 4.5;
+      }
+      case 'concentration':
+        return gap * 55;
+      case 'tax': {
+        const taxMap = { efficient: 5, moderate: 25, high: 55, unknown: 35 };
+        return taxMap[inp.dividendTax] ?? 30;
+      }
+      case 'diversification':
+        return gap * 40;
+      case 'rebalancing': {
+        const rbMap = { threshold: 3, quarterly: 8, annual: 18, irregular: 32, never: 48 };
+        return rbMap[inp.rebalanceFreq] ?? 20;
+      }
+      case 'goals':
+        return gap * 50;
+      default:
+        return gap * 30;
+    }
+  }
+
+  function compute(inp) {
+    const scores = {
+      fees: scoreFees(inp.totalFees),
+      cash: scoreCash(inp.cashAllocation),
+      concentration: scoreConcentration(inp.numHoldings, inp.geoConcentration),
+      tax: scoreTax(inp.dividendTax),
+      diversification: scoreDiversification(inp),
+      rebalancing: scoreRebalancing(inp.rebalanceFreq),
+      goals: scoreGoals(inp),
+    };
+
+    let overall = 0;
+    CATEGORIES.forEach(c => { overall += scores[c.id] * c.weight; });
+    overall = Math.round(overall);
+
+    const leaks = CATEGORIES.map(c => ({
+      id: c.id,
+      name: c.name,
+      bps: leakBps(c.id, inp, scores[c.id]),
+      score: scores[c.id],
+    })).sort((a, b) => b.bps - a.bps);
+
+    const totalBps = leaks.reduce((s, l) => s + l.bps, 0);
+    const upliftLow = totalBps * 0.55 / 100;
+    const upliftHigh = totalBps * 0.85 / 100;
+
+    return { scores, overall, leaks, totalBps, upliftLow, upliftHigh };
+  }
+
+  function grade(score) {
+    if (score >= 82) return { label: 'Efficient', color: 'var(--score-high)', bg: 'var(--gain-muted)' };
+    if (score >= 68) return { label: 'Adequate', color: 'var(--accent)', bg: 'var(--accent-muted)' };
+    if (score >= 52) return { label: 'Needs attention', color: 'var(--score-mid)', bg: 'var(--warn-muted)' };
+    return { label: 'High leakage', color: 'var(--score-low)', bg: 'var(--loss-muted)' };
+  }
+
+  function scoreColor(score) {
+    if (score >= 75) return 'var(--score-high)';
+    if (score >= 55) return 'var(--score-mid)';
+    return 'var(--score-low)';
+  }
+
+  function fmtMoney(n, c) {
+    if (!Number.isFinite(n) || n <= 0) return '—';
+    try {
+      return new Intl.NumberFormat(undefined, { style: 'currency', currency: c, maximumFractionDigits: 0 }).format(n);
+    } catch {
+      return `${c} ${Math.round(n).toLocaleString()}`;
+    }
+  }
+
+  function fmtPct(n, digits = 2) {
+    return `${Number(n).toFixed(digits)}%`;
+  }
+
+  function recommendations(inp, scores, leaks) {
+    const recs = [];
+    const push = (priority, title, body, impact) => recs.push({ priority, title, body, impact });
+
+    if (scores.fees < 70) {
+      push(1, 'Reduce all-in fee drag',
+        `At ${fmtPct(inp.totalFees)} per year, fees may cost ${fmtMoney(inp.portfolioValue * pct(inp.totalFees), inp.currency)} annually on ${fmtMoney(inp.portfolioValue, inp.currency)}. Target sub-0.40% with index funds and low platform costs.`,
+        `Potential uplift: ${fmtPct(Math.max(0, inp.totalFees - 0.35))} / yr`);
+    }
+    if (scores.cash < 70) {
+      push(1, 'Deploy excess cash strategically',
+        `${fmtPct(inp.cashAllocation)} in cash creates opportunity cost versus a 3–5% strategic reserve. Park near-term needs in T-bills or ultra-short bonds; invest the rest per your policy.`,
+        `Cash drag reduction: ~${fmtPct(Math.max(0, inp.cashAllocation - 5) * 0.04)} / yr opportunity cost`);
+    }
+    if (scores.concentration < 65) {
+      push(1, 'Broaden holdings and geographic exposure',
+        `${inp.numHoldings} holdings with ${inp.geoConcentration}% home-country weight increases idiosyncratic risk. Add global index exposure or tilt toward market-cap weights.`,
+        'Lowers single-market drawdown risk');
+    }
+    if (scores.tax < 65) {
+      push(2, 'Optimize dividend and wrapper tax treatment',
+        'Review pension wrappers, ISAs, 2nd/3rd pillar, or deferral-friendly structures. High distribution tax without reinvestment in tax-advantaged accounts compounds drag.',
+        'Often 0.3–1.0%+ annual net return at same gross exposure');
+    }
+    if (scores.diversification < 65) {
+      push(2, 'Improve asset-class and name diversification',
+        `Current mix: ${inp.mixEquity}% equity, ${inp.mixBonds}% bonds, ${inp.mixAlt}% alternatives. Consider a core-satellite approach with ≥15–25 uncorrelated positions or a global all-cap fund.`,
+        'Smoother path, similar expected return');
+    }
+    if (scores.rebalancing < 65) {
+      push(2, 'Institutionalize rebalancing rules',
+        'Ad-hoc trading lets winners overweight and raises behavioral risk. Set ±5% bands or calendar reviews and automate where possible.',
+        'Typical 0.2–0.5% behavioral + drift benefit over cycles');
+    }
+    if (scores.goals < 65) {
+      const tgt = targetEquity(inp.timeHorizon, inp.objective);
+      push(1, 'Realign allocation with horizon and objective',
+        `For a ${inp.timeHorizon}-year ${inp.objective} goal, equity near ${tgt}% is a reasonable anchor; you hold ${inp.mixEquity}%. Closing the gap reduces sequence and shortfall risk.`,
+        'Goal-fit often matters more than picking winners');
+    }
+    if (inp.targetIncome > 0 && inp.portfolioValue > 0) {
+      const need = inp.targetIncome * 12 / 0.04;
+      if (need > inp.portfolioValue * 1.15) {
+        push(2, 'Close the retirement income gap',
+          `Target ${fmtMoney(inp.targetIncome, inp.currency)}/mo implies ~${fmtMoney(need, inp.currency)} at 4% SWR; portfolio ${fmtMoney(inp.portfolioValue, inp.currency)}. Increase savings rate, extend horizon, or adjust income target.`,
+          'Planning priority — not just portfolio tuning');
+      }
+    }
+
+    if (!recs.length) {
+      push(3, 'Maintain discipline',
+        'Your inputs suggest a relatively efficient portfolio. Revisit annually after tax, residency, or goal changes.',
+        'Stay within efficient band');
+    }
+
+    return recs.sort((a, b) => a.priority - b.priority).slice(0, 6);
+  }
+
+  function riskFlags(inp, scores) {
+    const flags = [];
+    const add = (severity, title, detail) => flags.push({ severity, title, detail });
+
+    if (inp.totalFees > 1) add('high', 'Elevated fee stack', `All-in fees ${fmtPct(inp.totalFees)} materially erode compounding.`);
+    if (inp.cashAllocation > 15) add('high', 'Excess cash drag', `${fmtPct(inp.cashAllocation)} cash likely under-earns versus invested assets.`);
+    if (inp.numHoldings < 8) add('high', 'Concentrated book', `Only ${inp.numHoldings} positions — single-name risk dominates.`);
+    if (inp.geoConcentration > 75) add('medium', 'Geographic home bias', `${inp.geoConcentration}% in home market — currency and political risk concentrated.`);
+    if (inp.dividendTax === 'high') add('medium', 'Distribution tax leakage', 'Dividends taxed without deferral or wrapper optimization.');
+    if (inp.rebalanceFreq === 'never' || inp.rebalanceFreq === 'irregular') add('medium', 'Allocation drift', 'Without systematic rebalancing, risk profile may diverge from intent.');
+    const tgt = targetEquity(inp.timeHorizon, inp.objective);
+    if (Math.abs(inp.mixEquity - tgt) > 20) add('high', 'Goal–allocation mismatch', `Equity ${inp.mixEquity}% vs ~${tgt}% anchor for ${inp.objective} / ${inp.timeHorizon}y horizon.`);
+    else if (Math.abs(inp.mixEquity - tgt) > 12) add('medium', 'Moderate goal drift', 'Equity weight diverges from horizon-based target.');
+    if (inp.mixEquity > 85 && inp.timeHorizon < 10) add('high', 'Sequence risk', 'High equity with short horizon increases drawdown vulnerability before withdrawals.');
+    if (scores.diversification < 50 && inp.mixAlt < 2 && inp.mixBonds < 10) add('medium', 'Single-asset-class dependence', 'Portfolio heavily reliant on one risk factor.');
+
+    if (!flags.length) add('low', 'No critical flags', 'Inputs fall within typical efficient ranges — still validate with holdings-level data.');
+    return flags.sort((a, b) => {
+      const order = { high: 0, medium: 1, low: 2 };
+      return order[a.severity] - order[b.severity];
+    });
+  }
+
+  function chartColors() {
+    const dark = document.documentElement.getAttribute('data-theme') === 'dark';
+    return {
+      text: dark ? '#a8b0bc' : '#4a5260',
+      grid: dark ? '#3a424e' : '#e0e4ea',
+      leak: dark ? '#e07070' : '#9b2c2c',
+      accent: dark ? '#7eb0e0' : '#2c4a6e',
+    };
+  }
+
+  function renderMixTotal(inp) {
+    const t = mixTotal(inp);
+    const el = $('mixTotal');
+    el.textContent = `Total: ${t}%`;
+    el.classList.toggle('warn', Math.abs(t - 100) > 1);
+  }
+
+  function renderScore(res, inp) {
+    const g = grade(res.overall);
+    const ring = $('scoreRing');
+    ring.style.setProperty('--score', res.overall);
+    ring.style.setProperty('--ring-color', scoreColor(res.overall));
+    $('scoreNum').textContent = res.overall;
+    $('scoreNum').style.color = scoreColor(res.overall);
+
+    const topLeak = res.leaks[0];
+    $('scoreTitle').textContent = `Portfolio efficiency: ${g.label}`;
+    $('scoreSummary').textContent =
+      `Weighted across seven audit dimensions. Largest estimated leak: ${topLeak.name.toLowerCase()} (~${Math.round(topLeak.bps)} bps/yr).`;
+
+    const gradeEl = $('scoreGrade');
+    gradeEl.hidden = false;
+    gradeEl.textContent = g.label;
+    gradeEl.style.setProperty('--grade-color', g.color);
+    gradeEl.style.setProperty('--grade-bg', g.bg);
+    gradeEl.style.color = g.color;
+    gradeEl.style.borderColor = g.color;
+    gradeEl.style.background = g.bg;
+
+    const uplift = $('upliftChip');
+    uplift.hidden = false;
+    uplift.innerHTML =
+      `If top leaks are addressed, estimated net return improvement: <strong>${fmtPct(res.upliftLow)} – ${fmtPct(res.upliftHigh)}</strong> per year (illustrative, before tax and market path).`;
+  }
+
+  function renderSummary(res, inp) {
+    const highFlags = riskFlags(inp, res.scores).filter(f => f.severity === 'high').length;
+    $('summaryGrid').innerHTML = [
+      { label: 'Efficiency score', value: `${res.overall} / 100`, sub: grade(res.overall).label },
+      { label: 'Total leak estimate', value: `${Math.round(res.totalBps)} bps`, sub: 'Annualized drag vs baseline' },
+      { label: 'Priority fixes', value: String(recommendations(inp, res.scores, res.leaks).filter(r => r.priority === 1).length), sub: 'High-impact actions' },
+      { label: 'Risk flags', value: String(highFlags), sub: 'High severity items' },
+      { label: 'Portfolio context', value: fmtMoney(inp.portfolioValue, inp.currency), sub: `${inp.timeHorizon}y · ${inp.objective}` },
+    ].map(card => `
+      <div class="summary-card">
+        <div class="label">${card.label}</div>
+        <div class="value tabular">${card.value}</div>
+        <div class="sub">${card.sub}</div>
+      </div>
+    `).join('');
+  }
+
+  function renderCategories(res) {
+    const maxBps = Math.max(...res.leaks.map(l => l.bps), 1);
+    $('categoryList').innerHTML = CATEGORIES.map(c => {
+      const s = res.scores[c.id];
+      const leak = res.leaks.find(l => l.id === c.id);
+      const leakShare = Math.round((leak.bps / res.totalBps) * 100) || 0;
+      return `
+        <div class="category-row">
+          <div>
+            <div class="cat-name">${c.name}</div>
+            <div class="cat-desc">${c.desc} · weight ${Math.round(c.weight * 100)}%</div>
+          </div>
+          <div>
+            <div class="meter-track" role="meter" aria-valuenow="${s}" aria-valuemin="0" aria-valuemax="100" aria-label="${c.name} score">
+              <div class="meter-fill" style="width:${s}%;background:${scoreColor(s)}"></div>
+            </div>
+            <div style="font-size:0.65rem;color:var(--text-faint);margin-top:3px">~${Math.round(leak.bps)} bps leak · ${leakShare}% of total drag</div>
+          </div>
+          <div class="cat-score tabular" style="color:${scoreColor(s)}">${s}</div>
+        </div>
+      `;
+    }).join('');
+  }
+
+  function renderLeakBars(res) {
+    const maxBps = Math.max(...res.leaks.map(l => l.bps), 1);
+    $('leakBars').innerHTML = res.leaks.map(l => `
+      <div class="leak-bar-row">
+        <span>${l.name}</span>
+        <div class="leak-track"><div class="leak-fill" style="width:${Math.min(100, (l.bps / maxBps) * 100)}%"></div></div>
+        <span class="leak-pct">${Math.round(l.bps)} bps</span>
+      </div>
+    `).join('');
+  }
+
+  function renderFlags(inp, scores) {
+    $('flagsGrid').innerHTML = riskFlags(inp, scores).map(f => `
+      <div class="flag-item ${f.severity}">
+        <span class="flag-severity">${f.severity}</span>
+        <div>
+          <strong>${f.title}</strong>
+          <div style="color:var(--text-muted);margin-top:2px">${f.detail}</div>
+        </div>
+      </div>
+    `).join('');
+  }
+
+  function renderRecs(inp, scores, leaks) {
+    $('recList').innerHTML = recommendations(inp, scores, leaks).map(r => `
+      <article class="rec-item priority-${r.priority}">
+        <h4>${r.title}</h4>
+        <p>${r.body}</p>
+        ${r.impact ? `<p class="impact">${r.impact}</p>` : ''}
+      </article>
+    `).join('');
+  }
+
+  function destroyChart() {
+    if (chartLeaks) { chartLeaks.destroy(); chartLeaks = null; }
+  }
+
+  function renderChart(res) {
+    if (typeof Chart === 'undefined') return;
+    const colors = chartColors();
+    destroyChart();
+    chartLeaks = new Chart($('chartLeaks'), {
+      type: 'bar',
+      data: {
+        labels: res.leaks.map(l => l.name),
+        datasets: [{
+          label: 'Estimated drag (bps / yr)',
+          data: res.leaks.map(l => Math.round(l.bps)),
+          backgroundColor: res.leaks.map((_, i) => i === 0 ? colors.leak : colors.leak + (document.documentElement.getAttribute('data-theme') === 'dark' ? '99' : 'cc')),
+        }],
+      },
+      options: {
+        indexAxis: 'y',
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: { display: false },
+          tooltip: { callbacks: { label: ctx => `${ctx.raw} bps / yr` } },
+        },
+        scales: {
+          x: { ticks: { color: colors.text }, grid: { color: colors.grid }, title: { display: true, text: 'Basis points (annual drag)', color: colors.text } },
+          y: { ticks: { color: colors.text }, grid: { display: false } },
+        },
+      },
+    });
+  }
+
+  function recalc() {
+    const inp = readInputs();
+    renderMixTotal(inp);
+    if (inp.portfolioValue < 0 || inp.timeHorizon < 1) return;
+    const res = compute(inp);
+    renderScore(res, inp);
+    renderSummary(res, inp);
+    renderCategories(res);
+    renderLeakBars(res);
+    renderFlags(inp, res.scores);
+    renderRecs(inp, res.scores, res.leaks);
+    renderChart(res);
+  }
+
+  function applyPreset(name) {
+    const p = PRESETS[name];
+    if (!p) return;
+    document.querySelectorAll('[data-preset]').forEach(btn => {
+      btn.classList.toggle('active', btn.dataset.preset === name);
+    });
+    Object.keys(p).forEach(key => {
+      const el = $(key);
+      if (el) el.value = p[key];
+    });
+    if (p.dividendTax) $('dividendTax').value = p.dividendTax;
+    if (p.rebalanceFreq) $('rebalanceFreq').value = p.rebalanceFreq;
+    if (p.objective) $('objective').value = p.objective;
+    recalc();
+  }
+
+  document.querySelectorAll('[data-preset]').forEach(btn => {
+    btn.addEventListener('click', () => applyPreset(btn.dataset.preset));
+  });
+
+  const inputIds = [
+    'mixEquity', 'mixBonds', 'mixAlt', 'mixCash',
+    'totalFees', 'cashAllocation', 'numHoldings', 'geoConcentration',
+    'dividendTax', 'rebalanceFreq', 'timeHorizon', 'objective',
+    'targetIncome', 'portfolioValue', 'currency',
+  ];
+  inputIds.forEach(id => {
+    const el = $(id);
+    if (el) el.addEventListener('input', () => {
+      document.querySelectorAll('[data-preset]').forEach(b => b.classList.remove('active'));
+      recalc();
+    });
+    if (el && el.tagName === 'SELECT') el.addEventListener('change', () => {
+      document.querySelectorAll('[data-preset]').forEach(b => b.classList.remove('active'));
+      recalc();
+    });
+  });
+
+  $('btnTheme').addEventListener('click', () => {
+    const dark = document.documentElement.getAttribute('data-theme') === 'dark';
+    document.documentElement.setAttribute('data-theme', dark ? 'light' : 'dark');
+    $('btnTheme').textContent = dark ? 'Dark' : 'Light';
+    recalc();
+  });
+
+  function init() {
+    const dark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+    document.documentElement.setAttribute('data-theme', dark ? 'dark' : 'light');
+    $('btnTheme').textContent = dark ? 'Light' : 'Dark';
+    function wait() {
+      if (typeof Chart !== 'undefined') {
+        applyPreset('typical');
+      } else setTimeout(wait, 50);
+    }
+    wait();
+  }
+
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);
+  else init();
+})();
+  </script>
+</body>
+</html>

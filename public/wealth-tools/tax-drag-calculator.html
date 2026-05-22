@@ -1,0 +1,696 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="See how annual tax drag compounds away long-term investment returns — dividends, wealth tax, and capital gains." />
+  <title>Tax Drag Calculator — Lost Compounding</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js" defer></script>
+  <style>
+    :root {
+      --accent: #8b4518;
+      --accent-hover: #6d3612;
+      --accent-muted: rgba(139, 69, 24, 0.12);
+      --bg: #f6f4f0;
+      --surface: #ffffff;
+      --surface-2: #edeae4;
+      --border: #d6d0c6;
+      --text: #1c1916;
+      --text-muted: #5e5850;
+      --text-faint: #8a8378;
+      --loss: #9b2c2c;
+      --loss-muted: rgba(155, 44, 44, 0.12);
+      --gain: #1a6b3c;
+      --shadow: 0 1px 3px rgba(0,0,0,0.06);
+      --radius: 4px;
+      --font: "Helvetica Neue", Helvetica, Arial, system-ui, sans-serif;
+      --header-h: 48px;
+      --sidebar-w: 272px;
+    }
+    [data-theme="dark"] {
+      --accent: #d4a574;
+      --accent-hover: #e8bc8a;
+      --accent-muted: rgba(212, 165, 116, 0.15);
+      --bg: #141210;
+      --surface: #1f1c18;
+      --surface-2: #2a2620;
+      --border: #3d3830;
+      --text: #f0ebe3;
+      --text-muted: #b0a89a;
+      --text-faint: #7a7368;
+      --loss: #e07070;
+      --loss-muted: rgba(224, 112, 112, 0.15);
+      --gain: #4db87a;
+      --shadow: 0 1px 3px rgba(0,0,0,0.35);
+    }
+    *, *::before, *::after { box-sizing: border-box; }
+    html { font-size: 14px; scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      font-family: var(--font);
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.45;
+      font-feature-settings: "tnum" 1, "lnum" 1;
+    }
+    .tabular { font-variant-numeric: tabular-nums lining-nums; }
+    button, input, select { font-family: inherit; font-size: inherit; }
+    a { color: var(--accent); }
+    :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+    .app-header {
+      position: sticky; top: 0; z-index: 100;
+      height: var(--header-h);
+      display: flex; align-items: center; gap: 12px;
+      padding: 0 16px;
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      box-shadow: var(--shadow);
+    }
+    .logo { display: flex; align-items: center; gap: 8px; text-decoration: none; color: var(--text); }
+    .logo svg { width: 28px; height: 28px; }
+    .logo-title { font-size: 0.95rem; font-weight: 600; }
+    .logo-sub { font-size: 0.68rem; color: var(--text-muted); }
+    .header-actions { margin-left: auto; display: flex; gap: 8px; flex-wrap: wrap; }
+    .btn {
+      padding: 6px 12px; border: 1px solid var(--border); border-radius: var(--radius);
+      background: var(--surface); color: var(--text); cursor: pointer; font-size: 0.8rem;
+    }
+    .btn:hover { background: var(--surface-2); }
+    .btn-primary { background: var(--accent); border-color: var(--accent); color: #fff; }
+    [data-theme="dark"] .btn-primary { color: #1a1410; }
+    .btn-sm { padding: 4px 8px; font-size: 0.72rem; }
+    .btn.active { background: var(--accent-muted); color: var(--accent); font-weight: 600; }
+
+    .layout { display: flex; min-height: calc(100vh - var(--header-h)); }
+    .sidebar {
+      width: var(--sidebar-w); flex-shrink: 0;
+      background: var(--surface); border-right: 1px solid var(--border);
+      position: sticky; top: var(--header-h);
+      max-height: calc(100vh - var(--header-h)); overflow-y: auto;
+      padding: 12px;
+    }
+    .main { flex: 1; min-width: 0; }
+
+    .panel-title {
+      font-size: 0.65rem; font-weight: 600; text-transform: uppercase;
+      letter-spacing: 0.08em; color: var(--text-faint); margin: 12px 0 8px;
+    }
+    .panel-title:first-child { margin-top: 0; }
+    .field { margin-bottom: 10px; }
+    .field label { display: block; font-size: 0.75rem; color: var(--text-muted); margin-bottom: 3px; }
+    .field input, .field select {
+      width: 100%; padding: 6px 8px; border: 1px solid var(--border);
+      border-radius: var(--radius); background: var(--bg); color: var(--text);
+    }
+    .scenario-row { display: grid; grid-template-columns: repeat(2, 1fr); gap: 4px; margin-bottom: 10px; }
+    .scenario-row button {
+      padding: 6px; font-size: 0.68rem; border: 1px solid var(--border);
+      border-radius: var(--radius); background: var(--bg); color: var(--text-muted); cursor: pointer;
+    }
+    .scenario-row button.active { border-color: var(--accent); background: var(--accent-muted); color: var(--accent); font-weight: 600; }
+
+    /* Hero */
+    .hero {
+      padding: 28px 24px 24px;
+      background: linear-gradient(180deg, var(--loss-muted) 0%, transparent 100%);
+      border-bottom: 1px solid var(--border);
+    }
+    .hero h1 {
+      font-size: 1.65rem; font-weight: 700; letter-spacing: -0.03em;
+      margin: 0 0 8px; line-height: 1.2; max-width: 36rem;
+    }
+    .hero .loss-highlight { color: var(--loss); }
+    .hero p { margin: 0; color: var(--text-muted); font-size: 0.9rem; max-width: 40rem; }
+    .hero-stat {
+      display: inline-block; margin-top: 14px; padding: 10px 14px;
+      background: var(--surface); border: 1px solid var(--loss);
+      border-radius: var(--radius); font-size: 0.85rem;
+    }
+    .hero-stat strong { color: var(--loss); font-size: 1.15rem; }
+
+    .content { padding: 16px 20px 32px; }
+    .interpretation {
+      padding: 12px 14px; margin-bottom: 16px;
+      background: var(--loss-muted); border-left: 3px solid var(--loss);
+      border-radius: var(--radius); font-size: 0.88rem;
+    }
+
+    .summary-grid {
+      display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+      gap: 8px; margin-bottom: 20px;
+    }
+    .summary-card {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: var(--radius); padding: 10px; box-shadow: var(--shadow);
+    }
+    .summary-card.loss-card { border-color: var(--loss); }
+    .summary-card .label { font-size: 0.62rem; text-transform: uppercase; letter-spacing: 0.06em; color: var(--text-faint); }
+    .summary-card .value { font-size: 1.05rem; font-weight: 700; margin-top: 3px; }
+    .summary-card .value.loss { color: var(--loss); }
+    .summary-card .value.gain { color: var(--gain); }
+    .summary-card .sub { font-size: 0.68rem; color: var(--text-muted); margin-top: 2px; }
+
+    .card {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: var(--radius); margin-bottom: 16px; box-shadow: var(--shadow);
+    }
+    .card-header {
+      padding: 8px 12px; border-bottom: 1px solid var(--border);
+      font-size: 0.8rem; font-weight: 600;
+    }
+    .card-body { padding: 12px; }
+    .chart-wrap { position: relative; height: 260px; }
+    .chart-wrap.short { height: 200px; }
+
+    .compare-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    @media (max-width: 640px) { .compare-row { grid-template-columns: 1fr; } }
+    .compare-card {
+      padding: 14px; border-radius: var(--radius); border: 1px solid var(--border);
+    }
+    .compare-card.before { background: var(--surface-2); }
+    .compare-card.after { background: var(--loss-muted); border-color: var(--loss); }
+    .compare-card h3 { margin: 0 0 8px; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-faint); }
+    .compare-card .big { font-size: 1.35rem; font-weight: 700; }
+
+    /* Visual drag diagram */
+    .drag-viz {
+      display: flex; align-items: stretch; gap: 0; margin: 8px 0;
+      font-size: 0.72rem; text-align: center;
+    }
+    .drag-viz .col {
+      flex: 1; padding: 12px 8px; border: 1px solid var(--border);
+      display: flex; flex-direction: column; justify-content: center; gap: 4px;
+    }
+    .drag-viz .col.gross { background: var(--surface-2); border-radius: var(--radius) 0 0 var(--radius); }
+    .drag-viz .col.tax { background: var(--loss-muted); color: var(--loss); flex: 0.55; }
+    .drag-viz .col.net { background: var(--surface); border-radius: 0 var(--radius) var(--radius) 0; }
+    .drag-viz .arrow { align-self: center; color: var(--text-faint); font-size: 1rem; padding: 0 4px; }
+
+    .sources-grid { display: grid; gap: 10px; }
+    .source-item {
+      padding: 10px 12px; border: 1px solid var(--border); border-radius: var(--radius);
+      font-size: 0.78rem; color: var(--text-muted);
+    }
+    .source-item strong { display: block; color: var(--text); font-size: 0.82rem; margin-bottom: 4px; }
+
+    .cta-block {
+      text-align: center; padding: 24px 16px;
+      background: var(--accent-muted); border: 1px solid var(--border);
+      border-radius: var(--radius);
+    }
+    .cta-block h2 { margin: 0 0 8px; font-size: 1.1rem; }
+    .cta-block p { margin: 0 0 16px; color: var(--text-muted); font-size: 0.85rem; max-width: 32rem; margin-left: auto; margin-right: auto; }
+
+    @media (max-width: 768px) {
+      .layout { flex-direction: column; }
+      .sidebar { width: 100%; max-height: none; position: static; }
+    }
+  </style>
+</head>
+<body>
+  <header class="app-header">
+    <a class="logo" href="/wealth-tools" aria-label="Back to Wealth Tools">
+      <svg viewBox="0 0 32 32" aria-hidden="true" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <rect width="32" height="32" rx="4" fill="currentColor" opacity="0.08"/>
+        <path d="M8 20 L12 12 L16 16 L20 10 L24 14" stroke="var(--loss)" stroke-width="2" stroke-linecap="round"/>
+        <path d="M8 24 L24 24" stroke="currentColor" stroke-width="1" opacity="0.3"/>
+      </svg>
+      <div>
+        <div class="logo-title">Tax Drag Calculator</div>
+        <div class="logo-sub">Compounding lost to tax</div>
+      </div>
+    </a>
+    <div class="header-actions">
+      <a href="/wealth-tools" class="btn btn-sm">Wealth Tools</a>
+      <button type="button" class="btn btn-sm" id="btnTheme" aria-label="Toggle theme">Dark</button>
+    </div>
+  </header>
+
+  <div class="layout">
+    <aside class="sidebar" aria-label="Calculator inputs">
+      <p class="panel-title">Country / tax profile</p>
+      <div class="scenario-row" role="group" aria-label="Tax scenario presets">
+        <button type="button" data-preset="low">Low-tax</button>
+        <button type="button" data-preset="high">High-tax</button>
+        <button type="button" data-preset="nl">NL Box 3–style</button>
+        <button type="button" data-preset="ch">Switzerland</button>
+      </div>
+
+      <p class="panel-title">Portfolio</p>
+      <div class="field">
+        <label for="startingPortfolio">Starting portfolio</label>
+        <input type="number" id="startingPortfolio" min="0" step="1000" value="250000" />
+      </div>
+      <div class="field">
+        <label for="monthlyContributions">Monthly contributions</label>
+        <input type="number" id="monthlyContributions" min="0" step="100" value="2000" />
+      </div>
+      <div class="field">
+        <label for="currency">Currency</label>
+        <select id="currency">
+          <option value="CHF" selected>CHF</option>
+          <option value="EUR">EUR</option>
+          <option value="USD">USD</option>
+        </select>
+      </div>
+
+      <p class="panel-title">Returns & yield</p>
+      <div class="field">
+        <label for="expectedReturn">Expected annual return (%)</label>
+        <input type="number" id="expectedReturn" min="0" max="20" step="0.1" value="7" />
+      </div>
+      <div class="field">
+        <label for="dividendYield">Dividend yield (% of portfolio / yr)</label>
+        <input type="number" id="dividendYield" min="0" max="10" step="0.1" value="2" />
+      </div>
+      <div class="field">
+        <label for="inflation">Inflation (% / yr)</label>
+        <input type="number" id="inflation" min="0" max="15" step="0.1" value="2" />
+      </div>
+      <div class="field">
+        <label for="years">Years</label>
+        <input type="number" id="years" min="1" max="50" step="1" value="25" />
+      </div>
+
+      <p class="panel-title">Tax assumptions</p>
+      <div class="field">
+        <label for="dividendTaxRate">Tax rate on dividends (%)</label>
+        <input type="number" id="dividendTaxRate" min="0" max="60" step="0.5" value="25" />
+      </div>
+      <div class="field">
+        <label for="wealthTaxRate">Wealth tax / Box 3 drag (% of portfolio / yr)</label>
+        <input type="number" id="wealthTaxRate" min="0" max="5" step="0.05" value="1.2" />
+      </div>
+      <div class="field">
+        <label for="capGainsTaxRate">Capital gains tax rate (%)</label>
+        <input type="number" id="capGainsTaxRate" min="0" max="50" step="0.5" value="0" />
+      </div>
+      <div class="field">
+        <label for="cgTreatment">Capital gains treatment</label>
+        <select id="cgTreatment">
+          <option value="deferred" selected>Deferred (no annual realization)</option>
+          <option value="annual">Annual accrual / turnover</option>
+        </select>
+      </div>
+    </aside>
+
+    <div class="main">
+      <section class="hero">
+        <h1>Tax drag destroys <span class="loss-highlight">compounding</span> — see how much you lose</h1>
+        <p>Every year, dividends, wealth taxes, and realized gains leak out of your portfolio. That leakage compounds: the money you lose today is money that never grows tomorrow.</p>
+        <p class="hero-stat tabular" id="heroLoss" aria-live="polite">Calculating cumulative loss…</p>
+      </section>
+
+      <div class="content">
+        <p class="interpretation tabular" id="interpretation" aria-live="polite"></p>
+
+        <div class="summary-grid tabular" id="summaryGrid"></div>
+
+        <section class="card" aria-labelledby="vizTitle">
+          <div class="card-header" id="vizTitle">How tax drag works</div>
+          <div class="card-body">
+            <p style="font-size:0.78rem;color:var(--text-muted);margin:0 0 12px">
+              Gross return builds your portfolio. Each year, taxes skim dividends, wealth-based charges, and (if assumed) realized capital gains — shrinking the base that compounds forward.
+            </p>
+            <div class="drag-viz tabular" id="dragViz"></div>
+          </div>
+        </section>
+
+        <section class="card">
+          <div class="card-header">Long-term projection — gross vs after-tax</div>
+          <div class="card-body"><div class="chart-wrap"><canvas id="chartProjection" aria-label="Portfolio projection chart"></canvas></div></div>
+        </section>
+
+        <section class="card">
+          <div class="card-header">Annual tax leakage vs compounding gap</div>
+          <div class="card-body"><div class="chart-wrap short"><canvas id="chartAnnual" aria-label="Annual tax chart"></canvas></div></div>
+        </section>
+
+        <section class="card">
+          <div class="card-header">Before vs after tax</div>
+          <div class="card-body">
+            <div class="compare-row tabular" id="compareCards"></div>
+          </div>
+        </section>
+
+        <section class="card">
+          <div class="card-header">Low-tax vs high-tax scenario (same inputs, different jurisdiction)</div>
+          <div class="card-body"><div class="chart-wrap short"><canvas id="chartCompare" aria-label="Country comparison chart"></canvas></div></div>
+        </section>
+
+        <section class="card">
+          <div class="card-header">Common sources of tax drag</div>
+          <div class="card-body">
+            <div class="sources-grid">
+              <div class="source-item"><strong>Dividend withholding & income tax</strong> Cash flows out when distributions are taxed, even if you reinvest. High-yield markets amplify this drag.</div>
+              <div class="source-item"><strong>Wealth tax / Box 3–style deemed return</strong> You may owe tax on portfolio value or fictional returns regardless of whether you sold anything — a direct hit to compounding base.</div>
+              <div class="source-item"><strong>Annual capital gains realization</strong> Frequent trading or fund turnover triggers tax on gains each year. Deferred treatment lets more capital stay invested longer.</div>
+              <div class="source-item"><strong>Country & wrapper choice</strong> The same gross return can produce very different net outcomes — pensions, ISAs, 2nd pillar, or relocating can change effective drag materially.</div>
+            </div>
+          </div>
+        </section>
+
+        <section class="cta-block" id="cta">
+          <h2>Request a custom tax-drag analysis</h2>
+          <p>Model your actual wrappers, residency, and cross-border setup — not just generic assumptions.</p>
+          <a href="/#contact" class="btn btn-primary">Contact Shreshti</a>
+        </section>
+      </div>
+    </div>
+  </div>
+
+  <script>
+(function () {
+  'use strict';
+
+  const PRESETS = {
+    low: { dividendTaxRate: 10, wealthTaxRate: 0, capGainsTaxRate: 0, cgTreatment: 'deferred', dividendYield: 1.5 },
+    high: { dividendTaxRate: 35, wealthTaxRate: 1.8, capGainsTaxRate: 25, cgTreatment: 'annual', dividendYield: 2.5 },
+    nl: { dividendTaxRate: 26.9, wealthTaxRate: 1.76, capGainsTaxRate: 0, cgTreatment: 'deferred', dividendYield: 2, expectedReturn: 6.5 },
+    ch: { dividendTaxRate: 15, wealthTaxRate: 0, capGainsTaxRate: 0, cgTreatment: 'deferred', dividendYield: 2, expectedReturn: 6.5 },
+  };
+
+  const $ = (id) => document.getElementById(id);
+  let chartProj, chartAnnual, chartCompare;
+  let activePreset = null;
+
+  function pct(v) { return Number(v) / 100; }
+
+  function readInputs() {
+    return {
+      startingPortfolio: Number($('startingPortfolio').value),
+      monthlyContributions: Number($('monthlyContributions').value),
+      expectedReturn: Number($('expectedReturn').value),
+      dividendYield: Number($('dividendYield').value),
+      dividendTaxRate: Number($('dividendTaxRate').value),
+      wealthTaxRate: Number($('wealthTaxRate').value),
+      capGainsTaxRate: Number($('capGainsTaxRate').value),
+      cgTreatment: $('cgTreatment').value,
+      years: Number($('years').value),
+      inflation: Number($('inflation').value),
+      currency: $('currency').value,
+    };
+  }
+
+  function simulate(inp, taxOverride) {
+    const t = taxOverride || inp;
+    const months = Math.max(1, Math.round(inp.years * 12));
+    const r_m = Math.pow(1 + pct(inp.expectedReturn), 1 / 12) - 1;
+    const d_y = pct(inp.dividendYield);
+    const d_m = d_y / 12;
+    const t_div = pct(t.dividendTaxRate);
+    const t_wealth = pct(t.wealthTaxRate) / 12;
+    const t_cg = pct(t.capGainsTaxRate);
+    const cgAnnual = t.cgTreatment === 'annual';
+
+    let gross = inp.startingPortfolio;
+    let net = inp.startingPortfolio;
+    let totalTax = 0;
+    const byYear = [];
+
+    for (let m = 1; m <= months; m++) {
+      gross += inp.monthlyContributions;
+      net += inp.monthlyContributions;
+
+      const grossGrowth = gross * r_m;
+      gross += grossGrowth;
+
+      const balBeforeGrowth = net;
+      const netGrowth = balBeforeGrowth * r_m;
+      const divIncome = balBeforeGrowth * d_m;
+      const capGain = Math.max(0, netGrowth - divIncome);
+
+      let tax = 0;
+      tax += divIncome * t_div;
+      tax += balBeforeGrowth * t_wealth;
+      if (cgAnnual) tax += capGain * t_cg;
+
+      net += netGrowth - tax;
+      totalTax += tax;
+
+      if (m % 12 === 0) {
+        const prevCum = byYear.length ? byYear[byYear.length - 1].cumTax : 0;
+        byYear.push({
+          year: m / 12,
+          gross,
+          net,
+          cumTax: totalTax,
+          taxThisYear: totalTax - prevCum,
+        });
+      }
+    }
+
+    const lost = gross - net;
+    const effectiveDrag = inp.years > 0 && gross > inp.startingPortfolio
+      ? (1 - Math.pow(net / gross, 1 / inp.years)) * 100
+      : 0;
+
+    return { gross, net, totalTax, lost, effectiveDrag, byYear, months };
+  }
+
+  function fmtMoney(n, c) {
+    if (!Number.isFinite(n)) return '—';
+    try {
+      return new Intl.NumberFormat(undefined, { style: 'currency', currency: c, maximumFractionDigits: 0 }).format(n);
+    } catch {
+      return `${c} ${Math.round(n).toLocaleString()}`;
+    }
+  }
+
+  function fmtPct(n) { return `${Number(n).toFixed(2)}%`; }
+
+  function chartColors() {
+    const dark = document.documentElement.getAttribute('data-theme') === 'dark';
+    return {
+      text: dark ? '#b0a89a' : '#5e5850',
+      grid: dark ? '#3d3830' : '#e0dcd4',
+      gross: dark ? '#6a9fd4' : '#2a5f8f',
+      net: dark ? '#4db87a' : '#1a6b3c',
+      loss: dark ? '#e07070' : '#9b2c2c',
+      tax: dark ? '#d4a574' : '#8b4518',
+    };
+  }
+
+  function renderDragViz(inp, res) {
+    const annualReturn = inp.startingPortfolio * pct(inp.expectedReturn);
+    const annualDiv = inp.startingPortfolio * pct(inp.dividendYield);
+    const annualWealth = inp.startingPortfolio * pct(inp.wealthTaxRate);
+    const capPortion = Math.max(0, annualReturn - annualDiv);
+    const annualCg = inp.cgTreatment === 'annual' ? capPortion * pct(inp.capGainsTaxRate) : 0;
+    const totalLeak = annualDiv * pct(inp.dividendTaxRate) + annualWealth + annualCg;
+    const c = inp.currency;
+
+    $('dragViz').innerHTML = `
+      <div class="col gross">
+        <span>Gross return</span>
+        <strong>${fmtMoney(annualReturn, c)}/yr</strong>
+        <span style="color:var(--text-faint)">on ${fmtMoney(inp.startingPortfolio, c)}</span>
+      </div>
+      <span class="arrow" aria-hidden="true">→</span>
+      <div class="col tax">
+        <span>Tax leakage</span>
+        <strong>−${fmtMoney(totalLeak, c)}/yr</strong>
+        <span>div · wealth · CG</span>
+      </div>
+      <span class="arrow" aria-hidden="true">→</span>
+      <div class="col net">
+        <span>Net reinvested</span>
+        <strong>${fmtMoney(annualReturn - totalLeak, c)}/yr</strong>
+        <span>stays compounding</span>
+      </div>
+    `;
+  }
+
+  function renderSummary(inp, res) {
+    const c = inp.currency;
+    const infl = Math.pow(1 + pct(inp.inflation), inp.years);
+    const real = (v) => v / infl;
+
+    $('summaryGrid').innerHTML = [
+      { label: 'Gross ending portfolio', value: fmtMoney(res.gross, c), sub: 'No tax drag', cls: 'gain' },
+      { label: 'Net ending portfolio', value: fmtMoney(res.net, c), sub: `Real: ${fmtMoney(real(res.net), c)}`, cls: '' },
+      { label: 'Total tax paid', value: fmtMoney(res.totalTax, c), sub: `Over ${inp.years} years`, cls: 'loss', loss: true },
+      { label: 'Compounding lost', value: fmtMoney(res.lost, c), sub: 'Gross minus net', cls: 'loss', loss: true },
+      { label: 'Effective annual drag', value: fmtPct(res.effectiveDrag), sub: 'Implied yearly haircut', cls: 'loss', loss: true },
+    ].map(card => `
+      <div class="summary-card ${card.loss ? 'loss-card' : ''}">
+        <div class="label">${card.label}</div>
+        <div class="value tabular ${card.cls}">${card.value}</div>
+        <div class="sub">${card.sub}</div>
+      </div>
+    `).join('');
+
+    $('heroLoss').innerHTML = `Over <strong>${inp.years} years</strong>, tax drag could cost you <strong>${fmtMoney(res.lost, c)}</strong> in lost compounding — about <strong>${fmtPct(res.effectiveDrag)}</strong> per year in effective drag.`;
+
+    $('interpretation').textContent =
+      `At ${fmtPct(inp.expectedReturn)} gross return with ${fmtPct(inp.dividendTaxRate)} dividend tax, ${fmtPct(inp.wealthTaxRate)} wealth drag, and ${inp.cgTreatment === 'annual' ? 'annual' : 'deferred'} capital gains, you keep ${fmtMoney(res.net, c)} instead of ${fmtMoney(res.gross, c)} — paying ${fmtMoney(res.totalTax, c)} in tax along the way.`;
+  }
+
+  function renderCompare(inp, res) {
+    const c = inp.currency;
+    $('compareCards').innerHTML = `
+      <div class="compare-card before">
+        <h3>Before tax (gross)</h3>
+        <div class="big gain">${fmtMoney(res.gross, c)}</div>
+        <p style="margin:8px 0 0;font-size:0.75rem;color:var(--text-muted)">Full compounding of stated return</p>
+      </div>
+      <div class="compare-card after">
+        <h3>After tax (net)</h3>
+        <div class="big loss" style="color:var(--loss)">${fmtMoney(res.net, c)}</div>
+        <p style="margin:8px 0 0;font-size:0.75rem;color:var(--text-muted)">−${fmtMoney(res.lost, c)} vs gross path</p>
+      </div>
+    `;
+  }
+
+  function destroyCharts() {
+    [chartProj, chartAnnual, chartCompare].forEach(ch => { if (ch) ch.destroy(); });
+    chartProj = chartAnnual = chartCompare = null;
+  }
+
+  function renderCharts(inp, res) {
+    if (typeof Chart === 'undefined') return;
+    const colors = chartColors();
+    const labels = res.byYear.map(y => y.year);
+    const c = inp.currency;
+
+    destroyCharts();
+
+    chartProj = new Chart($('chartProjection'), {
+      type: 'line',
+      data: {
+        labels,
+        datasets: [
+          { label: 'Gross portfolio', data: res.byYear.map(y => y.gross), borderColor: colors.gross, tension: 0.2, pointRadius: 0, borderWidth: 2 },
+          { label: 'Net after tax', data: res.byYear.map(y => y.net), borderColor: colors.net, tension: 0.2, pointRadius: 0, borderWidth: 2 },
+          { label: 'Tax paid (cumulative)', data: res.byYear.map(y => y.cumTax), borderColor: colors.loss, borderDash: [4, 4], tension: 0.2, pointRadius: 0, borderWidth: 1.5, yAxisID: 'y1' },
+        ],
+      },
+      options: {
+        responsive: true, maintainAspectRatio: false,
+        interaction: { mode: 'index', intersect: false },
+        plugins: { legend: { labels: { color: colors.text, boxWidth: 12 } } },
+        scales: {
+          x: { ticks: { color: colors.text }, grid: { color: colors.grid } },
+          y: { position: 'left', ticks: { color: colors.text }, grid: { color: colors.grid }, title: { display: true, text: `Portfolio (${c})`, color: colors.text } },
+          y1: { position: 'right', ticks: { color: colors.loss }, grid: { drawOnChartArea: false } },
+        },
+      },
+    });
+
+    const annualTax = res.byYear.map((y, i) => {
+      const prev = i > 0 ? res.byYear[i - 1].cumTax : 0;
+      return y.cumTax - prev;
+    });
+    const annualGap = res.byYear.map(y => y.gross - y.net);
+
+    chartAnnual = new Chart($('chartAnnual'), {
+      type: 'bar',
+      data: {
+        labels,
+        datasets: [
+          { label: 'Tax paid each year', data: annualTax, backgroundColor: colors.tax },
+          { label: 'Compounding gap (gross − net)', data: annualGap, backgroundColor: colors.loss },
+        ],
+      },
+      options: {
+        responsive: true, maintainAspectRatio: false,
+        plugins: { legend: { labels: { color: colors.text } } },
+        scales: {
+          x: { ticks: { color: colors.text }, grid: { color: colors.grid } },
+          y: { ticks: { color: colors.text }, grid: { color: colors.grid } },
+        },
+      },
+    });
+
+    const low = simulate(inp, { ...inp, ...PRESETS.low });
+    const high = simulate(inp, { ...inp, ...PRESETS.high });
+
+    chartCompare = new Chart($('chartCompare'), {
+      type: 'bar',
+      data: {
+        labels: ['Low-tax profile', 'Your inputs', 'High-tax profile'],
+        datasets: [{
+          label: `Net portfolio after ${inp.years}y`,
+          data: [low.net, res.net, high.net],
+          backgroundColor: [colors.net, colors.tax, colors.loss],
+        }],
+      },
+      options: {
+        responsive: true, maintainAspectRatio: false,
+        plugins: {
+          legend: { display: false },
+          tooltip: { callbacks: { label: ctx => fmtMoney(ctx.raw, c) } },
+        },
+        scales: {
+          x: { ticks: { color: colors.text }, grid: { display: false } },
+          y: { ticks: { color: colors.text }, grid: { color: colors.grid } },
+        },
+      },
+    });
+  }
+
+  function applyPreset(name) {
+    const p = PRESETS[name];
+    if (!p) return;
+    activePreset = name;
+    document.querySelectorAll('[data-preset]').forEach(btn => {
+      btn.classList.toggle('active', btn.dataset.preset === name);
+    });
+    Object.keys(p).forEach(key => {
+      const el = $(key);
+      if (el) el.value = p[key];
+    });
+    if (p.cgTreatment) $('cgTreatment').value = p.cgTreatment;
+    recalc();
+  }
+
+  function recalc() {
+    const inp = readInputs();
+    if (inp.years < 1 || inp.startingPortfolio < 0) return;
+    const res = simulate(inp);
+    renderSummary(inp, res);
+    renderDragViz(inp, res);
+    renderCompare(inp, res);
+    renderCharts(inp, res);
+  }
+
+  document.querySelectorAll('[data-preset]').forEach(btn => {
+    btn.addEventListener('click', () => applyPreset(btn.dataset.preset));
+  });
+
+  ['startingPortfolio', 'monthlyContributions', 'expectedReturn', 'dividendYield',
+    'dividendTaxRate', 'wealthTaxRate', 'capGainsTaxRate', 'cgTreatment', 'years', 'inflation', 'currency'
+  ].forEach(id => {
+    const el = $(id);
+    if (el) el.addEventListener('input', () => {
+      document.querySelectorAll('[data-preset]').forEach(b => b.classList.remove('active'));
+      activePreset = null;
+      recalc();
+    });
+  });
+
+  $('btnTheme').addEventListener('click', () => {
+    const dark = document.documentElement.getAttribute('data-theme') === 'dark';
+    document.documentElement.setAttribute('data-theme', dark ? 'light' : 'dark');
+    $('btnTheme').textContent = dark ? 'Dark' : 'Light';
+    recalc();
+  });
+
+  function init() {
+    const dark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+    document.documentElement.setAttribute('data-theme', dark ? 'dark' : 'light');
+    $('btnTheme').textContent = dark ? 'Light' : 'Dark';
+    function wait() {
+      if (typeof Chart !== 'undefined') recalc();
+      else setTimeout(wait, 50);
+    }
+    wait();
+  }
+
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);
+  else init();
+})();
+  </script>
+</body>
+</html>
