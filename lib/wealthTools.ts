@@ -21,7 +21,7 @@ export const wealthTools: WealthTool[] = [
       'Growth charts, sensitivity grid, and CSV export',
       'Nominal vs real values and shareable URL state',
     ],
-    href: '/wealth-tools/retirement-income-planner.html',
+    href: '/wealth-tools/retirement-income-planner',
     icon: 'retirement',
     ctaLabel: 'Open planner',
   },

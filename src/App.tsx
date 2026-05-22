@@ -5,6 +5,7 @@ import Software from '../pages/Software';
 import Profile from '../pages/Profile';
 import BJP from '../pages/BJP';
 import WealthTools from '../pages/WealthTools';
+import RetirementPlannerFrame from '../components/RetirementPlannerFrame';
 
 function LegacyHashRedirect() {
   const location = useLocation();
@@ -75,6 +76,11 @@ export default function App() {
         <Route path="/" element={<Home {...shaderProps} />} />
         <Route path="/software" element={<Software />} />
         <Route path="/wealth-tools" element={<WealthTools />} />
+        <Route path="/wealth-tools/retirement-income-planner" element={<RetirementPlannerFrame />} />
+        <Route
+          path="/wealth-tools/retirement-income-planner.html"
+          element={<Navigate to="/wealth-tools/retirement-income-planner" replace />}
+        />
         <Route path="/profile" element={<Profile />} />
         <Route path="/bjp" element={<BJP />} />
         <Route path="*" element={<Navigate to="/" replace />} />
