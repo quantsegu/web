@@ -2,7 +2,6 @@ import { useEffect } from 'react';
 import { BrowserRouter, Navigate, Route, Routes, useLocation, useNavigate } from 'react-router-dom';
 import Home from '../pages/Home';
 import Software from '../pages/Software';
-import Profile from '../pages/Profile';
 import BJP from '../pages/BJP';
 import IndianCommunities from '../pages/IndianCommunities';
 import WealthTools from '../pages/WealthTools';
@@ -20,7 +19,6 @@ function LegacyHashRedirect() {
     const legacyRoutes: Record<string, string> = {
       software: '/software',
       'wealth-tools': '/wealth-tools',
-      profile: '/profile',
       'bjp-support': '/bjp',
     };
 
@@ -78,10 +76,18 @@ export default function App() {
         <Route path="/" element={<Home {...shaderProps} />} />
         <Route path="/software" element={<Software />} />
         <Route path="/wealth-tools" element={<WealthTools />} />
-        <Route path="/investment-universe" element={<InvestmentUniverse />} />
+        <Route path="/wealth-tools/investment-universe" element={<InvestmentUniverse />} />
+        <Route
+          path="/wealth-tools/investment-universe.html"
+          element={<Navigate to="/wealth-tools/investment-universe" replace />}
+        />
+        <Route
+          path="/investment-universe"
+          element={<Navigate to="/wealth-tools/investment-universe" replace />}
+        />
         <Route
           path="/investment-universe.html"
-          element={<Navigate to="/investment-universe" replace />}
+          element={<Navigate to="/wealth-tools/investment-universe" replace />}
         />
         <Route
           path="/wealth-tools/retirement-income-planner"
@@ -136,7 +142,6 @@ export default function App() {
           path="/wealth-tools/global-wealth-preservation-comparison.html"
           element={<Navigate to="/wealth-tools/global-wealth-preservation-comparison" replace />}
         />
-        <Route path="/profile" element={<Profile />} />
         <Route path="/bjp" element={<BJP />} />
         <Route path="/communities" element={<IndianCommunities />} />
         <Route path="*" element={<Navigate to="/" replace />} />

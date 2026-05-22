@@ -4,11 +4,27 @@ export interface WealthTool {
   description: string;
   features: string[];
   href: string;
-  icon: 'retirement' | 'portfolio' | 'tax' | 'mortgage' | 'globe';
+  icon: 'retirement' | 'portfolio' | 'tax' | 'mortgage' | 'globe' | 'universe';
   ctaLabel?: string;
 }
 
 export const wealthTools: WealthTool[] = [
+  {
+    id: 'investment-universe',
+    title: 'The Investment Universe',
+    description:
+      'Structured reference comparing traditional markets, alternatives, and niche exposures—liquidity, volatility, portfolio roles, and suitability maps before you allocate capital.',
+    features: [
+      'Asset-class spectrum and category comparison tables',
+      'Filters for traditional, alternative, niche, and collectible sleeves',
+      'Deep dives on equities, FX, metals, derivatives, weather, wine, crypto',
+      'Portfolio role groupings and suitability goal mapping',
+      'Educational only—not product recommendations or advice',
+    ],
+    href: '/wealth-tools/investment-universe',
+    icon: 'universe',
+    ctaLabel: 'Explore universe',
+  },
   {
     id: 'retirement-income-planner',
     title: 'Retirement Income Planner',

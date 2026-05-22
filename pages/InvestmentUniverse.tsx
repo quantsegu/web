@@ -102,6 +102,10 @@ export default function InvestmentUniverse() {
         <div className={`${universeUi.container} max-w-4xl`}>
           <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.7 }}>
             <p className="text-saffron-400 text-xs font-semibold tracking-widest uppercase mb-3">
+              <Link to="/wealth-tools" className="hover:text-saffron-200 transition-colors">
+                Wealth Tools
+              </Link>
+              <span className="text-gray-500 mx-2" aria-hidden="true">/</span>
               Reference · education
             </p>
             <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold text-white mb-4 tracking-tight">
