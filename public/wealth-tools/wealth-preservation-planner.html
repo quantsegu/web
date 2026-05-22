@@ -1,0 +1,1366 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Wealth preservation planner — net worth, tax drag, pensions, and country comparison for Switzerland and the Netherlands." />
+  <title>Wealth Preservation Planner</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js" defer></script>
+  <style>
+    :root {
+      --accent: #0d6e6e;
+      --accent-hover: #0a5858;
+      --accent-muted: rgba(13, 110, 110, 0.12);
+      --bg: #f4f4f2;
+      --surface: #ffffff;
+      --surface-2: #ebebea;
+      --border: #d4d4d0;
+      --text: #1a1a18;
+      --text-muted: #5c5c58;
+      --text-faint: #8a8a85;
+      --positive: #1a6b3c;
+      --negative: #9b2c2c;
+      --warning: #8a6d1a;
+      --shadow: 0 1px 3px rgba(0,0,0,0.06);
+      --radius: 4px;
+      --font: "Helvetica Neue", Helvetica, Arial, system-ui, sans-serif;
+      --mono: ui-monospace, "SF Mono", Menlo, monospace;
+      --sidebar-w: 300px;
+      --header-h: 48px;
+    }
+    [data-theme="dark"] {
+      --accent: #3db8b0;
+      --accent-hover: #5cc9c2;
+      --accent-muted: rgba(61, 184, 176, 0.15);
+      --bg: #141413;
+      --surface: #1e1e1c;
+      --surface-2: #282826;
+      --border: #3a3a36;
+      --text: #ecece8;
+      --text-muted: #a8a8a2;
+      --text-faint: #72726c;
+      --positive: #4db87a;
+      --negative: #e07070;
+      --warning: #d4b84a;
+      --shadow: 0 1px 3px rgba(0,0,0,0.35);
+    }
+    *, *::before, *::after { box-sizing: border-box; }
+    html { font-size: 14px; scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      font-family: var(--font);
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.45;
+      min-height: 100vh;
+      font-feature-settings: "tnum" 1, "lnum" 1;
+    }
+    .tabular { font-variant-numeric: tabular-nums lining-nums; }
+    button, input, select { font-family: inherit; font-size: inherit; }
+    a { color: var(--accent); }
+    :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+    .sr-only {
+      position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
+      overflow: hidden; clip: rect(0,0,0,0); border: 0;
+    }
+
+    .app-header {
+      position: sticky; top: 0; z-index: 100;
+      height: var(--header-h);
+      display: flex; align-items: center; gap: 12px;
+      padding: 0 16px;
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      box-shadow: var(--shadow);
+    }
+    .logo { display: flex; align-items: center; gap: 8px; text-decoration: none; color: var(--text); }
+    .logo svg { width: 28px; height: 28px; flex-shrink: 0; }
+    .logo-title { font-size: 0.95rem; font-weight: 600; letter-spacing: -0.02em; }
+    .logo-sub { font-size: 0.7rem; color: var(--text-muted); font-weight: 400; }
+    .header-actions { margin-left: auto; display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+    .btn {
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 6px 12px;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      background: var(--surface);
+      color: var(--text);
+      cursor: pointer;
+      font-size: 0.8rem;
+      white-space: nowrap;
+    }
+    .btn:hover { background: var(--surface-2); }
+    .btn-primary {
+      background: var(--accent);
+      border-color: var(--accent);
+      color: #fff;
+    }
+    [data-theme="dark"] .btn-primary { color: #0a1414; }
+    .btn-primary:hover { background: var(--accent-hover); border-color: var(--accent-hover); }
+    .btn-sm { padding: 4px 8px; font-size: 0.75rem; }
+    .btn-group { display: flex; border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; }
+    .btn-group .btn { border: none; border-radius: 0; border-right: 1px solid var(--border); }
+    .btn-group .btn:last-child { border-right: none; }
+    .btn-group .btn.active { background: var(--accent-muted); color: var(--accent); font-weight: 600; }
+
+    .app-shell { display: flex; min-height: calc(100vh - var(--header-h)); }
+    .sidebar {
+      width: var(--sidebar-w);
+      flex-shrink: 0;
+      background: var(--surface);
+      border-right: 1px solid var(--border);
+      overflow-y: auto;
+      max-height: calc(100vh - var(--header-h));
+      position: sticky;
+      top: var(--header-h);
+    }
+    .sidebar-inner { padding: 12px; }
+    .main { flex: 1; min-width: 0; display: flex; flex-direction: column; }
+    .main-scroll { flex: 1; overflow-y: auto; padding: 12px 16px 32px; }
+
+    .panel-title {
+      font-size: 0.65rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--text-faint);
+      margin: 14px 0 8px;
+    }
+    .panel-title:first-child { margin-top: 0; }
+    .field { margin-bottom: 10px; }
+    .field label {
+      display: flex; align-items: center; gap: 4px;
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      margin-bottom: 3px;
+    }
+    .field input, .field select {
+      width: 100%;
+      padding: 6px 8px;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      background: var(--bg);
+      color: var(--text);
+    }
+    .field-hint { font-size: 0.68rem; color: var(--text-faint); margin-top: 2px; }
+    .input-row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+    .slider-row { display: flex; align-items: center; gap: 8px; }
+    .slider-row input[type="range"] { flex: 1; accent-color: var(--accent); }
+    .slider-val { min-width: 48px; text-align: right; font-size: 0.75rem; color: var(--text-muted); }
+    .toggle-row {
+      display: flex; align-items: center; justify-content: space-between;
+      font-size: 0.75rem; color: var(--text-muted);
+      margin-bottom: 8px;
+    }
+    .toggle-row input { width: auto; accent-color: var(--accent); }
+
+    .scenario-tabs { display: grid; grid-template-columns: repeat(2, 1fr); gap: 4px; margin-bottom: 10px; }
+    .scenario-tabs button {
+      padding: 8px 6px;
+      font-size: 0.72rem;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      background: var(--bg);
+      color: var(--text-muted);
+      cursor: pointer;
+      text-align: center;
+    }
+    .scenario-tabs button.active {
+      background: var(--accent-muted);
+      border-color: var(--accent);
+      color: var(--accent);
+      font-weight: 600;
+    }
+
+    .hero {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 20px 20px 18px;
+      margin-bottom: 12px;
+      box-shadow: var(--shadow);
+    }
+    .hero-eyebrow {
+      font-size: 0.65rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--accent);
+      margin: 0 0 6px;
+    }
+    .hero h1 {
+      margin: 0 0 8px;
+      font-size: 1.35rem;
+      font-weight: 600;
+      letter-spacing: -0.03em;
+      line-height: 1.2;
+    }
+    .hero-lead {
+      margin: 0;
+      font-size: 0.88rem;
+      color: var(--text-muted);
+      max-width: 52rem;
+      line-height: 1.55;
+    }
+    .hero-points {
+      display: flex; flex-wrap: wrap; gap: 8px 16px;
+      margin-top: 14px;
+      padding-top: 12px;
+      border-top: 1px solid var(--border);
+      font-size: 0.72rem;
+      color: var(--text-faint);
+    }
+    .hero-points span::before { content: "— "; color: var(--border); }
+
+    .interpretation {
+      background: var(--accent-muted);
+      border: 1px solid var(--border);
+      border-left: 3px solid var(--accent);
+      border-radius: var(--radius);
+      padding: 10px 12px;
+      font-size: 0.85rem;
+      margin-bottom: 12px;
+      line-height: 1.5;
+    }
+    .summary-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+      gap: 8px;
+      margin-bottom: 12px;
+    }
+    .summary-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 10px;
+      box-shadow: var(--shadow);
+    }
+    .summary-card .label { font-size: 0.65rem; color: var(--text-faint); text-transform: uppercase; letter-spacing: 0.05em; }
+    .summary-card .value { font-size: 1.05rem; font-weight: 600; margin-top: 2px; }
+    .summary-card .sub { font-size: 0.68rem; color: var(--text-muted); margin-top: 2px; }
+    .summary-card.highlight { border-color: var(--accent); }
+    .positive { color: var(--positive); }
+    .negative { color: var(--negative); }
+
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      margin-bottom: 12px;
+      box-shadow: var(--shadow);
+    }
+    .card-header {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 8px 12px;
+      border-bottom: 1px solid var(--border);
+      font-size: 0.8rem;
+      font-weight: 600;
+    }
+    .card-body { padding: 12px; }
+    .chart-wrap { position: relative; height: 220px; }
+    .charts-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    @media (max-width: 960px) { .charts-row { grid-template-columns: 1fr; } }
+
+    .table-toolbar {
+      display: flex; flex-wrap: wrap; gap: 8px; align-items: center;
+      padding: 8px 12px;
+      border-bottom: 1px solid var(--border);
+      font-size: 0.75rem;
+    }
+    .table-wrap { overflow-x: auto; max-height: 340px; overflow-y: auto; }
+    table { width: 100%; border-collapse: collapse; font-size: 0.75rem; }
+    th, td {
+      padding: 6px 10px;
+      text-align: right;
+      border-bottom: 1px solid var(--border);
+      white-space: nowrap;
+    }
+    th { position: sticky; top: 0; background: var(--surface-2); font-weight: 600; color: var(--text-muted); z-index: 1; }
+    th:first-child, td:first-child { text-align: left; }
+    tr:hover td { background: var(--accent-muted); }
+    tr.best-row td { font-weight: 600; }
+    tr.best-row td:first-child { color: var(--accent); }
+
+    details.method {
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      background: var(--surface);
+      margin-bottom: 12px;
+    }
+    details.method summary {
+      padding: 10px 12px;
+      cursor: pointer;
+      font-weight: 600;
+      font-size: 0.8rem;
+    }
+    details.method .method-body {
+      padding: 0 12px 12px;
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      line-height: 1.55;
+    }
+    details.method code { font-family: var(--mono); font-size: 0.72rem; background: var(--surface-2); padding: 1px 4px; border-radius: 2px; }
+
+    .cta-block {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-left: 3px solid var(--accent);
+      border-radius: var(--radius);
+      padding: 16px 18px;
+      display: flex; flex-wrap: wrap; align-items: center; gap: 12px 20px;
+      margin-top: 4px;
+    }
+    .cta-block h2 { margin: 0; font-size: 0.95rem; font-weight: 600; flex: 1 1 200px; }
+    .cta-block p { margin: 4px 0 0; font-size: 0.78rem; color: var(--text-muted); flex: 1 1 100%; }
+
+    .tip {
+      display: inline-flex; align-items: center; justify-content: center;
+      width: 14px; height: 14px;
+      border-radius: 50%;
+      background: var(--surface-2);
+      color: var(--text-faint);
+      font-size: 0.6rem;
+      font-weight: 700;
+      cursor: help;
+      border: none;
+      padding: 0;
+    }
+    .tip-popover {
+      position: fixed;
+      max-width: 280px;
+      padding: 8px 10px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      font-size: 0.72rem;
+      color: var(--text-muted);
+      z-index: 200;
+      pointer-events: none;
+    }
+    .state-banner {
+      display: none;
+      padding: 8px 12px;
+      font-size: 0.75rem;
+      border-radius: var(--radius);
+      margin-bottom: 8px;
+    }
+    .state-banner.visible { display: block; }
+    .state-banner.error { background: rgba(155,44,44,0.12); color: var(--negative); border: 1px solid var(--negative); }
+
+    @media print {
+      .sidebar, .app-header .header-actions, .no-print { display: none !important; }
+      .app-shell { display: block; }
+      .hero { break-after: avoid; }
+    }
+    @media (max-width: 768px) {
+      .app-shell { flex-direction: column; }
+      .sidebar {
+        width: 100%;
+        max-height: none;
+        position: static;
+        border-right: none;
+        border-bottom: 1px solid var(--border);
+      }
+      .summary-grid { grid-template-columns: repeat(2, 1fr); }
+    }
+  </style>
+</head>
+<body>
+  <header class="app-header no-print">
+    <a class="logo" href="/" aria-label="Back to site home">
+      <svg viewBox="0 0 32 32" aria-hidden="true" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <rect width="32" height="32" rx="4" fill="currentColor" opacity="0.08"/>
+        <path d="M8 24 V12 M16 24 V8 M24 24 V14" stroke="currentColor" stroke-width="1.75" stroke-linecap="round"/>
+        <line x1="6" y1="26" x2="26" y2="26" stroke="currentColor" stroke-width="1" opacity="0.35"/>
+      </svg>
+      <div>
+        <div class="logo-title">Wealth Preservation Planner</div>
+        <div class="logo-sub">Net worth · tax drag · CH / NL comparison</div>
+      </div>
+    </a>
+    <div class="header-actions">
+      <div class="btn-group" role="group" aria-label="Display currency">
+        <button type="button" class="btn btn-sm active" id="btnDisplayCHF" aria-pressed="true">CHF</button>
+        <button type="button" class="btn btn-sm" id="btnDisplayEUR" aria-pressed="false">EUR (FX)</button>
+      </div>
+      <div class="btn-group" role="group" aria-label="Value mode">
+        <button type="button" class="btn btn-sm active" id="btnNominal" aria-pressed="true">Nominal</button>
+        <button type="button" class="btn btn-sm" id="btnReal" aria-pressed="false">Real</button>
+      </div>
+      <button type="button" class="btn btn-sm" id="btnPrint">Print</button>
+      <button type="button" class="btn btn-sm" id="btnTheme" aria-label="Toggle dark mode">Dark</button>
+    </div>
+  </header>
+
+  <div class="app-shell">
+    <aside class="sidebar no-print" aria-label="Assumptions">
+      <div class="sidebar-inner">
+        <p class="panel-title">Active view</p>
+        <div class="scenario-tabs" role="tablist" aria-label="Scenario for charts and table">
+          <button type="button" role="tab" data-view="switzerland" aria-selected="true">Switzerland</button>
+          <button type="button" role="tab" data-view="netherlands">Netherlands</button>
+          <button type="button" role="tab" data-view="stay">Stay (current)</button>
+          <button type="button" role="tab" data-view="moveLater">Move later</button>
+        </div>
+        <button type="button" class="btn btn-primary" style="width:100%;margin-bottom:8px" id="btnReset">Reset assumptions</button>
+
+        <p class="panel-title">Timeline</p>
+        <div class="input-row">
+          <div class="field">
+            <label for="currentAge">Current age</label>
+            <input type="number" id="currentAge" min="25" max="75" value="42" />
+          </div>
+          <div class="field">
+            <label for="retirementAge">Retirement age</label>
+            <input type="number" id="retirementAge" min="55" max="75" value="65" />
+          </div>
+        </div>
+        <div class="field">
+          <label for="planningHorizon">Planning horizon (years from today)</label>
+          <input type="number" id="planningHorizon" min="5" max="45" value="30" />
+        </div>
+        <div class="input-row" id="moveLaterFields" hidden>
+          <div class="field">
+            <label for="moveAge">Move at age</label>
+            <input type="number" id="moveAge" min="30" max="70" value="50" />
+          </div>
+          <div class="field">
+            <label for="moveTarget">Move to</label>
+            <select id="moveTarget">
+              <option value="CH">Switzerland</option>
+              <option value="NL">Netherlands</option>
+            </select>
+          </div>
+        </div>
+        <div class="field">
+          <label for="currentCountry">Current country (stay scenario)</label>
+          <select id="currentCountry">
+            <option value="CH">Switzerland</option>
+            <option value="NL" selected>Netherlands</option>
+          </select>
+        </div>
+
+        <p class="panel-title">Salary & savings</p>
+        <div class="field">
+          <label for="grossSalary">Gross annual salary</label>
+          <input type="number" id="grossSalary" min="0" step="1000" value="145000" class="tabular" />
+        </div>
+        <div class="input-row">
+          <div class="field">
+            <label for="annualBonus">Annual bonus</label>
+            <input type="number" id="annualBonus" min="0" step="500" value="15000" class="tabular" />
+          </div>
+          <div class="field">
+            <label for="sideIncome">Side income / yr</label>
+            <input type="number" id="sideIncome" min="0" step="500" value="0" class="tabular" />
+          </div>
+        </div>
+        <div class="field">
+          <label for="salaryGrowth">Salary growth (%/yr)</label>
+          <input type="number" id="salaryGrowth" min="0" max="15" step="0.1" value="2.5" />
+        </div>
+        <div class="input-row">
+          <div class="field">
+            <label for="savingsRate">Savings rate (% of gross)</label>
+            <input type="number" id="savingsRate" min="0" max="60" step="1" value="25" />
+          </div>
+          <div class="field">
+            <label for="monthlyInvestment">Extra monthly invest.</label>
+            <input type="number" id="monthlyInvestment" min="0" step="100" value="800" class="tabular" />
+          </div>
+        </div>
+
+        <p class="panel-title">Portfolio</p>
+        <div class="field">
+          <label for="portfolioValue">Portfolio value</label>
+          <input type="number" id="portfolioValue" min="0" step="5000" value="380000" class="tabular" />
+        </div>
+        <div class="input-row">
+          <div class="field">
+            <label for="portfolioReturn">Return (%/yr)</label>
+            <input type="number" id="portfolioReturn" min="-5" max="15" step="0.1" value="5.5" />
+          </div>
+          <div class="field">
+            <label for="dividendYield">Dividend yield (%)</label>
+            <input type="number" id="dividendYield" min="0" max="8" step="0.1" value="1.8" />
+          </div>
+        </div>
+        <div class="field">
+          <label for="feeDrag">Fee drag (%/yr)</label>
+          <input type="number" id="feeDrag" min="0" max="3" step="0.05" value="0.35" />
+        </div>
+
+        <p class="panel-title">Swiss pensions</p>
+        <div class="field">
+          <label for="pillar1Annual">Pillar 1 (est. annual at 65)</label>
+          <input type="number" id="pillar1Annual" min="0" step="1000" value="28000" class="tabular" />
+        </div>
+        <div class="input-row">
+          <div class="field">
+            <label for="pillar2Balance">Pillar 2 balance</label>
+            <input type="number" id="pillar2Balance" min="0" step="5000" value="210000" class="tabular" />
+          </div>
+          <div class="field">
+            <label for="pillar2Contrib">Pillar 2 contrib. (% salary)</label>
+            <input type="number" id="pillar2Contrib" min="0" max="25" step="0.5" value="10" />
+          </div>
+        </div>
+        <div class="input-row">
+          <div class="field">
+            <label for="pillar3aBalance">Pillar 3a balance</label>
+            <input type="number" id="pillar3aBalance" min="0" step="1000" value="85000" class="tabular" />
+          </div>
+          <div class="field">
+            <label for="pillar3aAnnual">3a annual contribution</label>
+            <input type="number" id="pillar3aAnnual" min="0" step="100" value="7056" class="tabular" />
+          </div>
+        </div>
+
+        <p class="panel-title">Dutch pensions</p>
+        <div class="field">
+          <label for="aowAccrual">AOW accrual value (capital equiv.)</label>
+          <input type="number" id="aowAccrual" min="0" step="5000" value="95000" class="tabular" />
+        </div>
+        <div class="input-row">
+          <div class="field">
+            <label for="supplementaryPension">Supplementary pension pot</label>
+            <input type="number" id="supplementaryPension" min="0" step="5000" value="120000" class="tabular" />
+          </div>
+          <div class="field">
+            <label for="privatePension">Private pension / yr contrib.</label>
+            <input type="number" id="privatePension" min="0" step="500" value="6000" class="tabular" />
+          </div>
+        </div>
+
+        <p class="panel-title">Real estate</p>
+        <div class="input-row">
+          <div class="field">
+            <label for="propertyValue">Property value</label>
+            <input type="number" id="propertyValue" min="0" step="10000" value="650000" class="tabular" />
+          </div>
+          <div class="field">
+            <label for="mortgageBalance">Mortgage balance</label>
+            <input type="number" id="mortgageBalance" min="0" step="5000" value="420000" class="tabular" />
+          </div>
+        </div>
+        <div class="input-row">
+          <div class="field">
+            <label for="propertyAppreciation">Appreciation (%/yr)</label>
+            <input type="number" id="propertyAppreciation" min="-5" max="12" step="0.1" value="2" />
+          </div>
+          <div class="field">
+            <label for="mortgagePaydown">Mortgage paydown (%/yr)</label>
+            <input type="number" id="mortgagePaydown" min="0" max="10" step="0.1" value="2.5" />
+          </div>
+        </div>
+        <div class="input-row">
+          <div class="field">
+            <label for="rentalIncome">Rental income / yr</label>
+            <input type="number" id="rentalIncome" min="0" step="500" value="0" class="tabular" />
+          </div>
+          <div class="field">
+            <label for="maintenancePct">Maintenance (% of value)</label>
+            <input type="number" id="maintenancePct" min="0" max="5" step="0.1" value="1" />
+          </div>
+        </div>
+
+        <p class="panel-title">Tax assumptions</p>
+        <div class="field">
+          <label>CH effective income tax (%)</label>
+          <input type="number" id="taxIncomeCH" min="0" max="45" step="0.5" value="22" />
+        </div>
+        <div class="field">
+          <label>CH wealth tax on financial assets (%)</label>
+          <input type="number" id="taxWealthCH" min="0" max="2" step="0.05" value="0.35" />
+        </div>
+        <div class="field">
+          <label>NL box 1 income tax (%)</label>
+          <input type="number" id="taxIncomeNL" min="0" max="55" step="0.5" value="37" />
+        </div>
+        <div class="field">
+          <label>NL box 3 deemed return (% on portfolio)</label>
+          <input type="number" id="taxBox3NL" min="0" max="10" step="0.1" value="1.8" />
+        </div>
+        <div class="field">
+          <label>NL box 3 effective tax rate (%)</label>
+          <input type="number" id="taxBox3RateNL" min="0" max="40" step="0.5" value="32" />
+        </div>
+
+        <p class="panel-title">Targets & macro</p>
+        <div class="field">
+          <label for="targetNetWorth">Target net worth (today's terms)</label>
+          <input type="number" id="targetNetWorth" min="0" step="50000" value="2500000" class="tabular" />
+        </div>
+        <div class="field">
+          <label for="targetRetirementIncome">Target retirement income / mo (real)</label>
+          <input type="number" id="targetRetirementIncome" min="0" step="100" value="6500" class="tabular" />
+        </div>
+        <div class="field">
+          <label for="inflation">Inflation (%/yr)</label>
+          <input type="number" id="inflation" min="0" max="10" step="0.1" value="2" />
+        </div>
+        <div class="field">
+          <label for="pensionReturn">Pension pot return (%/yr)</label>
+          <input type="number" id="pensionReturn" min="0" max="10" step="0.1" value="3" />
+        </div>
+        <div class="field">
+          <label for="withdrawalRate">Portfolio withdrawal rate (%)</label>
+          <input type="number" id="withdrawalRate" min="2" max="6" step="0.1" value="3.5" />
+        </div>
+        <div class="toggle-row">
+          <label for="useFx">Convert NL results via EUR/CHF</label>
+          <input type="checkbox" id="useFx" checked />
+        </div>
+        <div class="field" id="fxField">
+          <label for="eurChfRate">EUR/CHF rate</label>
+          <input type="number" id="eurChfRate" min="0.5" max="1.5" step="0.001" value="0.94" />
+        </div>
+      </div>
+    </aside>
+
+    <main class="main">
+      <div class="main-scroll">
+        <section class="hero" aria-labelledby="heroTitle">
+          <p class="hero-eyebrow">Wealth preservation · analytical</p>
+          <h1 id="heroTitle">Improve outcomes, reduce tax drag, and track total net worth</h1>
+          <p class="hero-lead">
+            Model salary, savings, liquid portfolio, occupational and state pensions, real-estate equity, and simplified tax rules for Switzerland and the Netherlands. Compare staying in your current country, relocating, or deferring a move — then stress-test retirement income and the gap to your wealth target.
+          </p>
+          <div class="hero-points">
+            <span>Salary &amp; portfolio growth</span>
+            <span>CH pillars &amp; NL AOW / pension pots</span>
+            <span>Property equity &amp; rental cash flow</span>
+            <span>Annual tax drag by jurisdiction</span>
+          </div>
+        </section>
+
+        <div id="stateBanner" class="state-banner" role="status" aria-live="polite"></div>
+        <p class="interpretation tabular" id="interpretation" aria-live="polite"></p>
+        <div class="summary-grid tabular" id="summaryGrid" aria-label="Key results for active scenario"></div>
+
+        <div class="charts-row">
+          <section class="card">
+            <div class="card-header">Total net worth over time</div>
+            <div class="card-body"><div class="chart-wrap"><canvas id="chartNetWorth"></canvas></div></div>
+          </section>
+          <section class="card">
+            <div class="card-header">Annual tax drag</div>
+            <div class="card-body"><div class="chart-wrap"><canvas id="chartTaxDrag"></canvas></div></div>
+          </section>
+        </div>
+        <div class="charts-row">
+          <section class="card">
+            <div class="card-header">Asset composition (end of horizon)</div>
+            <div class="card-body"><div class="chart-wrap"><canvas id="chartAssets"></canvas></div></div>
+          </section>
+          <section class="card">
+            <div class="card-header">Retirement income breakdown</div>
+            <div class="card-body"><div class="chart-wrap"><canvas id="chartRetirement"></canvas></div></div>
+          </section>
+        </div>
+
+        <section class="card">
+          <div class="card-header">Country &amp; scenario comparison</div>
+          <div class="table-wrap">
+            <table id="compareTable">
+              <thead>
+                <tr>
+                  <th scope="col">Scenario</th>
+                  <th scope="col">Net worth (now)</th>
+                  <th scope="col">Net worth (horizon)</th>
+                  <th scope="col">Pension wealth</th>
+                  <th scope="col">RE equity</th>
+                  <th scope="col">Ret. income / mo</th>
+                  <th scope="col">Tax drag (avg/yr)</th>
+                  <th scope="col">Gap to target</th>
+                </tr>
+              </thead>
+              <tbody id="compareBody"></tbody>
+            </table>
+          </div>
+        </section>
+
+        <section class="card">
+          <div class="card-header">Year-by-year projection</div>
+          <div class="table-toolbar no-print">
+            <button type="button" class="btn btn-sm btn-primary" id="btnExportCsv">Export CSV</button>
+            <span id="tableMeta" style="color:var(--text-muted)"></span>
+          </div>
+          <div class="table-wrap">
+            <table id="projectionTable">
+              <thead>
+                <tr>
+                  <th>Year</th>
+                  <th>Age</th>
+                  <th>Country</th>
+                  <th>Gross income</th>
+                  <th>Savings</th>
+                  <th>Portfolio</th>
+                  <th>Pension</th>
+                  <th>RE equity</th>
+                  <th>Net worth</th>
+                  <th>Tax drag</th>
+                  <th>Ret. income/mo</th>
+                </tr>
+              </thead>
+              <tbody id="projectionBody"></tbody>
+            </table>
+          </div>
+        </section>
+
+        <details class="method">
+          <summary>Methodology &amp; disclaimer</summary>
+          <div class="method-body">
+            <p><strong>Net worth</strong> = liquid portfolio + pension capital (CH pillars 1–3a and NL AOW / supplementary / private pots) + property equity (value − mortgage). Liabilities are embedded in mortgage only.</p>
+            <p><strong>Accumulation (pre-retirement):</strong> annual savings = gross compensation × savings rate + extra monthly investments × 12, grown with salary. Portfolio return is net of fee drag; dividend yield is taxed per jurisdiction. Pension pots grow at the pension return; CH pillar 2 receives salary-linked contributions; 3a and NL private receive fixed contributions until retirement.</p>
+            <p><strong>Tax drag (simplified):</strong> Switzerland — income tax on salary, bonus, side income, and net rental; wealth tax on portfolio; dividend tax at income rate. Netherlands — box 1 on labour and rental; box 3 on portfolio using deemed return × effective rate (notional wealth tax). No double-tax treaties or cantonal/municipal detail.</p>
+            <p><strong>Retirement income:</strong> CH — pillar 1 annuity + pillar 2/3a draw (4% capital rule on 2/3a); NL — AOW + supplementary + private annuity factors. Portfolio withdrawal uses your safe withdrawal rate on remaining liquid assets. Rental net of maintenance continues.</p>
+            <p><strong>Scenarios:</strong> Switzerland and Netherlands apply respective rules throughout. Stay uses <em>current country</em>. Move later switches country at the move age. FX toggle converts EUR-denominated NL flows to CHF for display using your EUR/CHF rate.</p>
+            <p>This model is illustrative only — not tax, legal, or investment advice. Consult qualified advisers before relocating or restructuring wealth.</p>
+          </div>
+        </details>
+
+        <section class="cta-block no-print" aria-labelledby="ctaTitle">
+          <div>
+            <h2 id="ctaTitle">Request a custom wealth review</h2>
+            <p>Share your actual tax residency, pension statements, and property structure for a tailored preservation plan — not a generic projection.</p>
+          </div>
+          <a class="btn btn-primary" href="/#contact">Contact for wealth review</a>
+        </section>
+      </div>
+    </main>
+  </div>
+
+  <div id="tipPopover" class="tip-popover" hidden role="tooltip"></div>
+
+  <script>
+(function () {
+  'use strict';
+
+  const SCENARIO_KEYS = ['switzerland', 'netherlands', 'stay', 'moveLater'];
+  const SCENARIO_LABELS = {
+    switzerland: 'Switzerland',
+    netherlands: 'Netherlands',
+    stay: 'Stay (current)',
+    moveLater: 'Move later'
+  };
+
+  const $ = (id) => document.getElementById(id);
+  const state = {
+    activeView: 'switzerland',
+    displayCurrency: 'CHF',
+    valueMode: 'nominal',
+    theme: 'light',
+    charts: {},
+    debounceTimer: null,
+    lastResult: null
+  };
+
+  const inputIds = [
+    'currentAge', 'retirementAge', 'planningHorizon', 'moveAge', 'moveTarget', 'currentCountry',
+    'grossSalary', 'annualBonus', 'sideIncome', 'salaryGrowth', 'savingsRate', 'monthlyInvestment',
+    'portfolioValue', 'portfolioReturn', 'dividendYield', 'feeDrag',
+    'pillar1Annual', 'pillar2Balance', 'pillar2Contrib', 'pillar3aBalance', 'pillar3aAnnual',
+    'aowAccrual', 'supplementaryPension', 'privatePension',
+    'propertyValue', 'mortgageBalance', 'propertyAppreciation', 'mortgagePaydown', 'rentalIncome', 'maintenancePct',
+    'taxIncomeCH', 'taxWealthCH', 'taxIncomeNL', 'taxBox3NL', 'taxBox3RateNL',
+    'targetNetWorth', 'targetRetirementIncome', 'inflation', 'pensionReturn', 'withdrawalRate',
+    'eurChfRate', 'useFx'
+  ];
+
+  function pct(v) { return Number(v) / 100; }
+
+  function readInputs() {
+    const currentAge = Number($('currentAge').value);
+    const retirementAge = Number($('retirementAge').value);
+    const planningHorizon = Number($('planningHorizon').value);
+    return {
+      currentAge,
+      retirementAge,
+      planningHorizon,
+      years: planningHorizon,
+      moveAge: Number($('moveAge').value),
+      moveTarget: $('moveTarget').value,
+      currentCountry: $('currentCountry').value,
+      grossSalary: Number($('grossSalary').value),
+      annualBonus: Number($('annualBonus').value),
+      sideIncome: Number($('sideIncome').value),
+      salaryGrowth: Number($('salaryGrowth').value),
+      savingsRate: Number($('savingsRate').value),
+      monthlyInvestment: Number($('monthlyInvestment').value),
+      portfolioValue: Number($('portfolioValue').value),
+      portfolioReturn: Number($('portfolioReturn').value),
+      dividendYield: Number($('dividendYield').value),
+      feeDrag: Number($('feeDrag').value),
+      pillar1Annual: Number($('pillar1Annual').value),
+      pillar2Balance: Number($('pillar2Balance').value),
+      pillar2Contrib: Number($('pillar2Contrib').value),
+      pillar3aBalance: Number($('pillar3aBalance').value),
+      pillar3aAnnual: Number($('pillar3aAnnual').value),
+      aowAccrual: Number($('aowAccrual').value),
+      supplementaryPension: Number($('supplementaryPension').value),
+      privatePension: Number($('privatePension').value),
+      propertyValue: Number($('propertyValue').value),
+      mortgageBalance: Number($('mortgageBalance').value),
+      propertyAppreciation: Number($('propertyAppreciation').value),
+      mortgagePaydown: Number($('mortgagePaydown').value),
+      rentalIncome: Number($('rentalIncome').value),
+      maintenancePct: Number($('maintenancePct').value),
+      taxIncomeCH: Number($('taxIncomeCH').value),
+      taxWealthCH: Number($('taxWealthCH').value),
+      taxIncomeNL: Number($('taxIncomeNL').value),
+      taxBox3NL: Number($('taxBox3NL').value),
+      taxBox3RateNL: Number($('taxBox3RateNL').value),
+      targetNetWorth: Number($('targetNetWorth').value),
+      targetRetirementIncome: Number($('targetRetirementIncome').value),
+      inflation: Number($('inflation').value),
+      pensionReturn: Number($('pensionReturn').value),
+      withdrawalRate: Number($('withdrawalRate').value),
+      eurChfRate: Number($('eurChfRate').value),
+      useFx: $('useFx').checked
+    };
+  }
+
+  function resolveCountry(scenarioKey, age, inp) {
+    if (scenarioKey === 'switzerland') return 'CH';
+    if (scenarioKey === 'netherlands') return 'NL';
+    if (scenarioKey === 'stay') return inp.currentCountry;
+    if (scenarioKey === 'moveLater') {
+      return age >= inp.moveAge ? inp.moveTarget : inp.currentCountry;
+    }
+    return 'CH';
+  }
+
+  function toDisplay(amount, inp) {
+    if (!Number.isFinite(amount)) return amount;
+    if (inp.useFx && state.displayCurrency === 'EUR') return amount / inp.eurChfRate;
+    return amount;
+  }
+
+  function displayCurrencyLabel(inp) {
+    return inp.useFx && state.displayCurrency === 'EUR' ? 'EUR' : 'CHF';
+  }
+
+  function inflFactor(years, inp) {
+    return Math.pow(1 + pct(inp.inflation), years);
+  }
+
+  function deflate(amount, factor, realMode) {
+    return realMode && factor > 0 ? amount / factor : amount;
+  }
+
+  function calcTaxes(country, ctx, inp) {
+    const { grossIncome, portfolio, dividendIncome, rentalNet, pensionContrib } = ctx;
+    let tax = 0;
+    if (country === 'CH') {
+      const incomeBase = Math.max(0, grossIncome + rentalNet - pensionContrib);
+      tax += incomeBase * pct(inp.taxIncomeCH);
+      tax += dividendIncome * pct(inp.taxIncomeCH);
+      tax += portfolio * pct(inp.taxWealthCH);
+    } else {
+      const incomeBase = Math.max(0, grossIncome + rentalNet);
+      tax += incomeBase * pct(inp.taxIncomeNL);
+      const deemed = portfolio * pct(inp.taxBox3NL);
+      tax += deemed * pct(inp.taxBox3RateNL);
+    }
+    return tax;
+  }
+
+  function pensionWealthCH(p1, p2, p3) {
+    return p2 + p3 + p1 * 12;
+  }
+
+  function pensionWealthNL(aow, supp, priv) {
+    return aow + supp + priv;
+  }
+
+  function retirementIncomeCH(inp, p1, p2, p3, portfolio, rentalNet) {
+    const p1mo = p1 / 12;
+    const capital = p2 + p3;
+    const draw = capital * pct(inp.withdrawalRate) / 12;
+    const port = portfolio * pct(inp.withdrawalRate) / 12;
+    const rent = rentalNet / 12;
+    return { total: p1mo + draw + port + rent, p1: p1mo, pension: draw, portfolio: port, rental: rent };
+  }
+
+  function retirementIncomeNL(inp, aow, supp, priv, portfolio, rentalNet) {
+    const aowFactor = 0.045;
+    const suppFactor = 0.04;
+    const privFactor = 0.04;
+    const aowMo = (aow * aowFactor) / 12;
+    const suppMo = (supp * suppFactor) / 12;
+    const privMo = (priv * privFactor) / 12;
+    const port = portfolio * pct(inp.withdrawalRate) / 12;
+    const rent = rentalNet / 12;
+    return { total: aowMo + suppMo + privMo + port + rent, p1: aowMo, pension: suppMo + privMo, portfolio: port, rental: rent };
+  }
+
+  function projectScenario(scenarioKey, inp) {
+    const rows = [];
+    let portfolio = inp.portfolioValue;
+    let p2 = inp.pillar2Balance;
+    let p3 = inp.pillar3aBalance;
+    let aow = inp.aowAccrual;
+    let supp = inp.supplementaryPension;
+    let priv = inp.privatePension;
+    let property = inp.propertyValue;
+    let mortgage = inp.mortgageBalance;
+    const pr = pct(inp.pensionReturn);
+    const portR = pct(inp.portfolioReturn) - pct(inp.feeDrag);
+    const propR = pct(inp.propertyAppreciation);
+    const mortR = pct(inp.mortgagePaydown);
+    const maintR = pct(inp.maintenancePct);
+    let totalTax = 0;
+
+    const startCountry = resolveCountry(scenarioKey, inp.currentAge, inp);
+    const rentalNet = () => Math.max(0, inp.rentalIncome - property * maintR);
+
+    function snapshot(year, age, country, grossIncome, savings, tax) {
+      const pension = country === 'CH'
+        ? pensionWealthCH(inp.pillar1Annual, p2, p3)
+        : pensionWealthNL(aow, supp, priv);
+      const reEquity = property - mortgage;
+      const netWorth = portfolio + pension + reEquity;
+      let retIncomeMo = 0;
+      if (age >= inp.retirementAge) {
+        const inc = country === 'CH'
+          ? retirementIncomeCH(inp, inp.pillar1Annual, p2, p3, portfolio, rentalNet())
+          : retirementIncomeNL(inp, aow, supp, priv, portfolio, rentalNet());
+        retIncomeMo = inc.total;
+      }
+      return { year, age, country, grossIncome, savings, portfolio, pension, reEquity, netWorth, tax, retIncomeMo };
+    }
+
+    rows.push(snapshot(0, inp.currentAge, startCountry, inp.grossSalary + inp.annualBonus + inp.sideIncome, 0, 0));
+    const startNW = rows[0].netWorth;
+
+    for (let y = 1; y <= inp.years; y++) {
+      const age = inp.currentAge + y;
+      const country = resolveCountry(scenarioKey, age, inp);
+      const retired = age >= inp.retirementAge;
+      const salary = (inp.grossSalary + inp.annualBonus + inp.sideIncome) * Math.pow(1 + pct(inp.salaryGrowth), y - 1);
+      const grossIncome = retired ? 0 : salary;
+      const savings = retired ? 0 : salary * pct(inp.savingsRate) + inp.monthlyInvestment * 12;
+      const dividendIncome = portfolio * pct(inp.dividendYield);
+
+      let pensionContrib = 0;
+      if (!retired) {
+        if (country === 'CH') {
+          pensionContrib = salary * pct(inp.pillar2Contrib) + inp.pillar3aAnnual;
+          p2 += salary * pct(inp.pillar2Contrib);
+          p3 += inp.pillar3aAnnual;
+        } else {
+          pensionContrib = inp.privatePension + salary * 0.05;
+          priv += inp.privatePension;
+          supp += salary * 0.05;
+          aow += salary * 0.02;
+        }
+      }
+
+      p2 *= (1 + pr);
+      p3 *= (1 + pr);
+      aow *= (1 + pr);
+      supp *= (1 + pr);
+      priv *= (1 + pr);
+
+      portfolio = portfolio * (1 + portR) + savings;
+      property *= (1 + propR);
+      mortgage = Math.max(0, mortgage * (1 - mortR));
+
+      const tax = calcTaxes(country, {
+        grossIncome,
+        portfolio,
+        dividendIncome,
+        rentalNet: rentalNet(),
+        pensionContrib
+      }, inp);
+      totalTax += tax;
+      portfolio = Math.max(0, portfolio - tax);
+
+      rows.push(snapshot(y, age, country, grossIncome, savings, tax));
+    }
+
+    const last = rows[rows.length - 1];
+    const retBreakdown = last.country === 'CH'
+      ? retirementIncomeCH(inp, inp.pillar1Annual, p2, p3, last.portfolio, rentalNet())
+      : retirementIncomeNL(inp, aow, supp, priv, last.portfolio, rentalNet());
+    const horizonInfl = inflFactor(inp.years, inp);
+    const avgTax = inp.years > 0 ? totalTax / inp.years : 0;
+
+    return {
+      scenarioKey,
+      rows,
+      startNW,
+      endNW: last.netWorth,
+      pensionEnd: last.pension,
+      reEnd: last.reEquity,
+      retIncome: retBreakdown.total,
+      retBreakdown,
+      avgTax,
+      gapNW: last.netWorth - inp.targetNetWorth * horizonInfl,
+      lastCountry: last.country
+    };
+  }
+
+  function validate(inp) {
+    const err = [];
+    if (inp.retirementAge <= inp.currentAge) err.push('Retirement age must exceed current age.');
+    if (inp.years < 1 || inp.years > 45) err.push('Planning horizon should be 1–45 years.');
+    if (inp.moveAge < inp.currentAge && state.activeView === 'moveLater') err.push('Move age must be at or above current age.');
+    return err;
+  }
+
+  function formatMoney(amount, inp, yearsFromNow) {
+    if (!Number.isFinite(amount)) return '—';
+    let v = toDisplay(amount, inp);
+    if (state.valueMode === 'real') {
+      v = deflate(v, inflFactor(yearsFromNow || 0, inp), true);
+    }
+    const cur = displayCurrencyLabel(inp);
+    try {
+      return new Intl.NumberFormat(undefined, { style: 'currency', currency: cur, maximumFractionDigits: 0 }).format(v);
+    } catch {
+      return `${cur} ${Math.round(v).toLocaleString()}`;
+    }
+  }
+
+  function calculateAll() {
+    const inp = readInputs();
+    const errors = validate(inp);
+    const banner = $('stateBanner');
+    if (errors.length) {
+      banner.textContent = errors.join(' ');
+      banner.className = 'state-banner visible error';
+      return null;
+    }
+    banner.className = 'state-banner';
+    const scenarios = {};
+    SCENARIO_KEYS.forEach(key => { scenarios[key] = projectScenario(key, inp); });
+    return { inp, scenarios };
+  }
+
+  function renderSummary(res) {
+    if (!res) return;
+    const active = res.scenarios[state.activeView];
+    const { inp } = res;
+    const y = inp.years;
+    const fm = (n, yr) => formatMoney(n, inp, yr);
+    const gapCls = active.gapNW >= 0 ? 'positive' : 'negative';
+    const cards = [
+      { label: 'Current net worth', value: fm(active.startNW, 0), sub: `Active: ${SCENARIO_LABELS[state.activeView]}`, highlight: true },
+      { label: 'Projected net worth', value: fm(active.endNW, y), sub: `Age ${inp.currentAge + y} · ${y} yrs`, highlight: true },
+      { label: 'Pension wealth', value: fm(active.pensionEnd, y), sub: 'Occupational + private pots', highlight: false },
+      { label: 'Real-estate equity', value: fm(active.reEnd, y), sub: 'Value − mortgage', highlight: false },
+      { label: 'Retirement income / mo', value: fm(active.retIncome, y), sub: `Target ${fm(inp.targetRetirementIncome * inflFactor(y, inp), y)}`, highlight: true },
+      { label: 'Avg annual tax drag', value: fm(active.avgTax, y), sub: 'Income + wealth / box 3', highlight: false },
+      { label: 'Gap to wealth target', value: fm(Math.abs(active.gapNW), y), sub: active.gapNW >= 0 ? 'Above target' : 'Below target', highlight: false, cls: gapCls }
+    ];
+    $('summaryGrid').innerHTML = cards.map(c => `
+      <div class="summary-card ${c.highlight ? 'highlight' : ''}">
+        <div class="label">${c.label}</div>
+        <div class="value tabular ${c.cls || ''}">${c.value}</div>
+        <div class="sub">${c.sub}</div>
+      </div>
+    `).join('');
+  }
+
+  function renderInterpretation(res) {
+    if (!res) return;
+    const active = res.scenarios[state.activeView];
+    const { inp } = res;
+    const fm = (n) => formatMoney(n, inp, inp.years);
+    const best = SCENARIO_KEYS.reduce((a, k) =>
+      res.scenarios[k].endNW > res.scenarios[a].endNW ? k : a, 'switzerland');
+    const gap = active.gapNW >= 0 ? 'above' : 'below';
+    $('interpretation').textContent =
+      `Under ${SCENARIO_LABELS[state.activeView]}, you are projected to reach ${fm(active.endNW)} net worth in ${inp.years} years ` +
+      `(${gap} your inflation-adjusted target), with retirement income near ${fm(active.retIncome)}/month and ` +
+      `average tax drag of ${fm(active.avgTax)}/year. Highest horizon net worth among scenarios: ${SCENARIO_LABELS[best]}.`;
+  }
+
+  function renderCompare(res) {
+    if (!res) return;
+    const { inp, scenarios } = res;
+    const fm = (n) => formatMoney(n, inp, inp.years);
+    const fm0 = (n) => formatMoney(n, inp, 0);
+    let bestKey = SCENARIO_KEYS[0];
+    SCENARIO_KEYS.forEach(k => {
+      if (scenarios[k].endNW > scenarios[bestKey].endNW) bestKey = k;
+    });
+    $('compareBody').innerHTML = SCENARIO_KEYS.map(key => {
+      const s = scenarios[key];
+      const gapCls = s.gapNW >= 0 ? 'positive' : 'negative';
+      return `<tr class="${key === bestKey ? 'best-row' : ''}">
+        <td>${SCENARIO_LABELS[key]}</td>
+        <td class="tabular">${fm0(s.startNW)}</td>
+        <td class="tabular">${fm(s.endNW)}</td>
+        <td class="tabular">${fm(s.pensionEnd)}</td>
+        <td class="tabular">${fm(s.reEnd)}</td>
+        <td class="tabular">${fm(s.retIncome)}</td>
+        <td class="tabular">${fm(s.avgTax)}</td>
+        <td class="tabular ${gapCls}">${fm(Math.abs(s.gapNW))}</td>
+      </tr>`;
+    }).join('');
+  }
+
+  function renderTable(res) {
+    if (!res) return;
+    const rows = res.scenarios[state.activeView].rows;
+    const { inp } = res;
+    const fm = (n, yr) => formatMoney(n, inp, yr);
+    $('projectionBody').innerHTML = rows.map(r => `
+      <tr>
+        <td>${r.year}</td>
+        <td>${r.age}</td>
+        <td>${r.country}</td>
+        <td class="tabular">${fm(r.grossIncome, r.year)}</td>
+        <td class="tabular">${fm(r.savings, r.year)}</td>
+        <td class="tabular">${fm(r.portfolio, r.year)}</td>
+        <td class="tabular">${fm(r.pension, r.year)}</td>
+        <td class="tabular">${fm(r.reEquity, r.year)}</td>
+        <td class="tabular">${fm(r.netWorth, r.year)}</td>
+        <td class="tabular">${fm(r.tax, r.year)}</td>
+        <td class="tabular">${r.retIncomeMo ? fm(r.retIncomeMo, r.year) : '—'}</td>
+      </tr>
+    `).join('');
+    $('tableMeta').textContent = `${SCENARIO_LABELS[state.activeView]} · ${displayCurrencyLabel(inp)} · ${state.valueMode}`;
+  }
+
+  function chartColors() {
+    const dark = document.documentElement.getAttribute('data-theme') === 'dark';
+    return {
+      text: dark ? '#a8a8a2' : '#5c5c58',
+      grid: dark ? '#3a3a36' : '#e0e0dc',
+      accent: dark ? '#3db8b0' : '#0d6e6e',
+      accent2: dark ? '#6a9fd4' : '#2a5f8f',
+      accent3: dark ? '#9a8f6a' : '#6a5f3a',
+      accent4: dark ? '#b87a4d' : '#8a5a2a',
+      target: dark ? '#d4b84a' : '#8a6d1a'
+    };
+  }
+
+  function destroyChart(key) {
+    if (state.charts[key]) { state.charts[key].destroy(); state.charts[key] = null; }
+  }
+
+  function chartOpts(colors, yTitle) {
+    return {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: { legend: { labels: { color: colors.text, boxWidth: 12, font: { size: 11 } } } },
+      scales: {
+        x: { ticks: { color: colors.text, maxTicksLimit: 12 }, grid: { color: colors.grid } },
+        y: {
+          title: yTitle ? { display: true, text: yTitle, color: colors.text } : undefined,
+          ticks: { color: colors.text },
+          grid: { color: colors.grid }
+        }
+      }
+    };
+  }
+
+  function renderCharts(res) {
+    if (!res || typeof Chart === 'undefined') return;
+    const active = res.scenarios[state.activeView];
+    const { inp } = res;
+    const colors = chartColors();
+    const cur = displayCurrencyLabel(inp);
+    const real = state.valueMode === 'real';
+    const def = (v, yr) => {
+      let x = toDisplay(v, inp);
+      if (real) x = deflate(x, inflFactor(yr, inp), true);
+      return x;
+    };
+
+    const labels = active.rows.map(r => r.age);
+    destroyChart('netWorth');
+    state.charts.netWorth = new Chart($('chartNetWorth'), {
+      type: 'line',
+      data: {
+        labels,
+        datasets: [{
+          label: 'Net worth',
+          data: active.rows.map(r => def(r.netWorth, r.year)),
+          borderColor: colors.accent,
+          backgroundColor: 'transparent',
+          tension: 0.12,
+          pointRadius: 0,
+          borderWidth: 2
+        }, {
+          label: 'Target (real)',
+          data: active.rows.map(r => def(inp.targetNetWorth * inflFactor(r.year, inp), r.year)),
+          borderColor: colors.target,
+          borderDash: [4, 4],
+          pointRadius: 0,
+          borderWidth: 1.5
+        }]
+      },
+      options: chartOpts(colors, cur)
+    });
+
+    destroyChart('tax');
+    state.charts.tax = new Chart($('chartTaxDrag'), {
+      type: 'bar',
+      data: {
+        labels: active.rows.filter(r => r.year > 0).map(r => r.age),
+        datasets: [{
+          label: 'Tax drag',
+          data: active.rows.filter(r => r.year > 0).map(r => def(r.tax, r.year)),
+          backgroundColor: colors.accent2
+        }]
+      },
+      options: chartOpts(colors, cur + ' / yr')
+    });
+
+    const last = active.rows[active.rows.length - 1];
+    const port = def(last.portfolio, inp.years);
+    const pen = def(last.pension, inp.years);
+    const re = def(last.reEquity, inp.years);
+    destroyChart('assets');
+    state.charts.assets = new Chart($('chartAssets'), {
+      type: 'doughnut',
+      data: {
+        labels: ['Portfolio', 'Pensions', 'Real estate'],
+        datasets: [{ data: [port, pen, re], backgroundColor: [colors.accent, colors.accent2, colors.accent3] }]
+      },
+      options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom', labels: { color: colors.text } } } }
+    });
+
+    const rb = active.retBreakdown;
+    destroyChart('retirement');
+    state.charts.retirement = new Chart($('chartRetirement'), {
+      type: 'bar',
+      data: {
+        labels: ['State / AOW', 'Occupational', 'Portfolio', 'Rental'],
+        datasets: [{
+          label: 'Monthly at horizon',
+          data: [
+            def(rb.p1, inp.years),
+            def(rb.pension, inp.years),
+            def(rb.portfolio, inp.years),
+            def(rb.rental, inp.years)
+          ],
+          backgroundColor: [colors.accent, colors.accent2, colors.accent3, colors.accent4]
+        }]
+      },
+      options: { ...chartOpts(colors, cur + '/mo'), indexAxis: 'y' }
+    });
+  }
+
+  function exportCsv(res) {
+    if (!res) return;
+    const rows = res.scenarios[state.activeView].rows;
+    const headers = ['Year','Age','Country','GrossIncome','Savings','Portfolio','Pension','REEquity','NetWorth','TaxDrag','RetIncomePerMonth'];
+    const lines = [headers.join(',')];
+    rows.forEach(r => {
+      lines.push([
+        r.year, r.age, r.country,
+        r.grossIncome.toFixed(0), r.savings.toFixed(0), r.portfolio.toFixed(0),
+        r.pension.toFixed(0), r.reEquity.toFixed(0), r.netWorth.toFixed(0),
+        r.tax.toFixed(0), r.retIncomeMo.toFixed(0)
+      ].join(','));
+    });
+    const blob = new Blob([lines.join('\n')], { type: 'text/csv;charset=utf-8' });
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = `wealth-preservation-${state.activeView}.csv`;
+    a.click();
+    URL.revokeObjectURL(a.href);
+  }
+
+  function setActiveView(view) {
+    state.activeView = view;
+    document.querySelectorAll('.scenario-tabs button').forEach(btn => {
+      const on = btn.dataset.view === view;
+      btn.classList.toggle('active', on);
+      btn.setAttribute('aria-selected', on);
+    });
+    $('moveLaterFields').hidden = view !== 'moveLater';
+  }
+
+  function setDisplayCurrency(cur) {
+    state.displayCurrency = cur;
+    $('btnDisplayCHF').classList.toggle('active', cur === 'CHF');
+    $('btnDisplayEUR').classList.toggle('active', cur === 'EUR');
+    $('btnDisplayCHF').setAttribute('aria-pressed', cur === 'CHF');
+    $('btnDisplayEUR').setAttribute('aria-pressed', cur === 'EUR');
+  }
+
+  function setValueMode(mode) {
+    state.valueMode = mode;
+    $('btnNominal').classList.toggle('active', mode === 'nominal');
+    $('btnReal').classList.toggle('active', mode === 'real');
+    $('btnNominal').setAttribute('aria-pressed', mode === 'nominal');
+    $('btnReal').setAttribute('aria-pressed', mode === 'real');
+  }
+
+  function setTheme(theme) {
+    state.theme = theme;
+    document.documentElement.setAttribute('data-theme', theme);
+    $('btnTheme').textContent = theme === 'dark' ? 'Light' : 'Dark';
+  }
+
+  function recalc() {
+    const res = calculateAll();
+    state.lastResult = res;
+    renderSummary(res);
+    renderInterpretation(res);
+    renderCompare(res);
+    renderTable(res);
+    renderCharts(res);
+  }
+
+  function scheduleRecalc() {
+    clearTimeout(state.debounceTimer);
+    state.debounceTimer = setTimeout(recalc, 80);
+  }
+
+  inputIds.forEach(id => {
+    const el = $(id);
+    if (el) el.addEventListener('input', scheduleRecalc);
+    if (el && el.type === 'checkbox') el.addEventListener('change', scheduleRecalc);
+  });
+
+  document.querySelectorAll('.scenario-tabs button').forEach(btn => {
+    btn.addEventListener('click', () => { setActiveView(btn.dataset.view); recalc(); });
+  });
+
+  $('btnReset').addEventListener('click', () => {
+    $('currentAge').value = 42;
+    $('retirementAge').value = 65;
+    $('planningHorizon').value = 30;
+    $('grossSalary').value = 145000;
+    $('portfolioValue').value = 380000;
+    $('targetNetWorth').value = 2500000;
+    setActiveView('switzerland');
+    recalc();
+  });
+
+  $('btnTheme').addEventListener('click', () => {
+    setTheme(state.theme === 'dark' ? 'light' : 'dark');
+    recalc();
+  });
+  $('btnNominal').addEventListener('click', () => { setValueMode('nominal'); recalc(); });
+  $('btnReal').addEventListener('click', () => { setValueMode('real'); recalc(); });
+  $('btnDisplayCHF').addEventListener('click', () => { setDisplayCurrency('CHF'); recalc(); });
+  $('btnDisplayEUR').addEventListener('click', () => { setDisplayCurrency('EUR'); recalc(); });
+  $('btnPrint').addEventListener('click', () => window.print());
+  $('btnExportCsv').addEventListener('click', () => exportCsv(state.lastResult));
+  $('useFx').addEventListener('change', () => { $('fxField').style.opacity = $('useFx').checked ? '1' : '0.5'; });
+
+  setActiveView('switzerland');
+  setDisplayCurrency('CHF');
+  setValueMode('nominal');
+  setTheme(window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+
+  function waitChart() {
+    if (typeof Chart !== 'undefined') recalc();
+    else setTimeout(waitChart, 50);
+  }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', waitChart);
+  else waitChart();
+})();
+  </script>
+</body>
+</html>

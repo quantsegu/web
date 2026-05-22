@@ -21,8 +21,24 @@ export const wealthTools: WealthTool[] = [
       'Growth charts, sensitivity grid, and CSV export',
       'Nominal vs real values and shareable URL state',
     ],
-    href: '/wealth-tools/retirement-income-planner',
+    href: '/wealth-tools/retirement-income-planner.html',
     icon: 'retirement',
+    ctaLabel: 'Open planner',
+  },
+  {
+    id: 'wealth-preservation-planner',
+    title: 'Wealth Preservation Planner',
+    description:
+      'Model net worth, tax drag, pensions, and real-estate equity across Switzerland and the Netherlands. Compare staying, relocating, or moving later with yearly projections and CSV export.',
+    features: [
+      'Salary, portfolio, CH pillars, and NL pension pots',
+      'Property equity, rental income, and simplified tax rules',
+      'Switzerland, Netherlands, stay, and move-later scenarios',
+      'Net worth, tax drag, asset mix, and retirement income charts',
+      'Nominal vs real values and EUR/CHF display toggle',
+    ],
+    href: '/wealth-tools/wealth-preservation-planner.html',
+    icon: 'portfolio',
     ctaLabel: 'Open planner',
   },
 ];
