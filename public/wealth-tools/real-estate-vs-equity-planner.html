@@ -1,0 +1,952 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Compare long-term wealth from leveraged real estate versus a liquid equity portfolio — net worth, cash flow, leverage, and tax drag." />
+  <title>Real Estate vs Equity Planner — Long-Term Wealth Comparison</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js" defer></script>
+  <style>
+    :root {
+      --accent: #2c4a6e;
+      --accent-hover: #1e3550;
+      --accent-muted: rgba(44, 74, 110, 0.1);
+      --re: #8b5a2b;
+      --re-muted: rgba(139, 90, 43, 0.12);
+      --eq: #1a5c38;
+      --eq-muted: rgba(26, 92, 56, 0.12);
+      --bg: #f4f5f7;
+      --surface: #ffffff;
+      --surface-2: #e8eaed;
+      --border: #c4c9d0;
+      --text: #12151a;
+      --text-muted: #4a5260;
+      --text-faint: #7a8494;
+      --loss: #9b2c2c;
+      --gain: #1a5c38;
+      --shadow: 0 1px 3px rgba(0,0,0,0.06);
+      --radius: 4px;
+      --font: "Helvetica Neue", Helvetica, Arial, system-ui, sans-serif;
+      --header-h: 48px;
+      --sidebar-w: 280px;
+    }
+    [data-theme="dark"] {
+      --accent: #8eb4e0;
+      --accent-hover: #a8c8eb;
+      --accent-muted: rgba(142, 180, 224, 0.12);
+      --re: #d4a574;
+      --re-muted: rgba(212, 165, 116, 0.15);
+      --eq: #4db87a;
+      --eq-muted: rgba(77, 184, 122, 0.12);
+      --bg: #0d0f12;
+      --surface: #181b21;
+      --surface-2: #232830;
+      --border: #3a424f;
+      --text: #eef1f5;
+      --text-muted: #a8b0bc;
+      --text-faint: #6e7785;
+      --loss: #e07070;
+      --gain: #4db87a;
+      --shadow: 0 1px 3px rgba(0,0,0,0.35);
+    }
+    *, *::before, *::after { box-sizing: border-box; }
+    html { font-size: 14px; scroll-behavior: smooth; }
+    body {
+      margin: 0; font-family: var(--font); background: var(--bg); color: var(--text);
+      line-height: 1.45; font-feature-settings: "tnum" 1, "lnum" 1;
+    }
+    .tabular { font-variant-numeric: tabular-nums lining-nums; }
+    button, input, select { font-family: inherit; font-size: inherit; }
+    a { color: var(--accent); }
+    :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+    .app-header {
+      position: sticky; top: 0; z-index: 100; height: var(--header-h);
+      display: flex; align-items: center; gap: 12px; padding: 0 16px;
+      background: var(--surface); border-bottom: 1px solid var(--border); box-shadow: var(--shadow);
+    }
+    .logo { display: flex; align-items: center; gap: 8px; text-decoration: none; color: var(--text); }
+    .logo svg { width: 28px; height: 28px; }
+    .logo-title { font-size: 0.95rem; font-weight: 600; }
+    .logo-sub { font-size: 0.68rem; color: var(--text-muted); }
+    .header-actions { margin-left: auto; display: flex; gap: 8px; }
+    .btn {
+      padding: 6px 12px; border: 1px solid var(--border); border-radius: var(--radius);
+      background: var(--surface); color: var(--text); cursor: pointer; font-size: 0.8rem;
+      text-decoration: none; display: inline-flex; align-items: center;
+    }
+    .btn:hover { background: var(--surface-2); }
+    .btn-primary { background: var(--accent); border-color: var(--accent); color: #fff; }
+    [data-theme="dark"] .btn-primary { color: #0d0f12; }
+    .btn-sm { padding: 4px 8px; font-size: 0.72rem; }
+
+    .layout { display: flex; min-height: calc(100vh - var(--header-h)); }
+    .sidebar {
+      width: var(--sidebar-w); flex-shrink: 0; background: var(--surface);
+      border-right: 1px solid var(--border); position: sticky; top: var(--header-h);
+      max-height: calc(100vh - var(--header-h)); overflow-y: auto; padding: 12px;
+    }
+    .main { flex: 1; min-width: 0; }
+
+    .panel-title {
+      font-size: 0.65rem; font-weight: 600; text-transform: uppercase;
+      letter-spacing: 0.08em; color: var(--text-faint); margin: 12px 0 8px;
+    }
+    .panel-title:first-child { margin-top: 0; }
+    .field { margin-bottom: 10px; }
+    .field label { display: block; font-size: 0.75rem; color: var(--text-muted); margin-bottom: 3px; }
+    .field input, .field select {
+      width: 100%; padding: 6px 8px; border: 1px solid var(--border);
+      border-radius: var(--radius); background: var(--bg); color: var(--text);
+    }
+    .field-hint { font-size: 0.65rem; color: var(--text-faint); margin-top: 2px; }
+    .scenario-row { display: grid; grid-template-columns: 1fr 1fr; gap: 4px; margin-bottom: 10px; }
+    .scenario-row button {
+      padding: 6px; font-size: 0.68rem; border: 1px solid var(--border);
+      border-radius: var(--radius); background: var(--bg); color: var(--text-muted); cursor: pointer;
+    }
+    .scenario-row button.active { border-color: var(--accent); background: var(--accent-muted); color: var(--accent); font-weight: 600; }
+
+    .hero {
+      padding: 26px 24px 22px;
+      background: linear-gradient(135deg, var(--re-muted) 0%, var(--eq-muted) 55%, transparent 100%);
+      border-bottom: 1px solid var(--border);
+    }
+    .hero h1 { font-size: 1.6rem; font-weight: 700; letter-spacing: -0.03em; margin: 0 0 10px; max-width: 40rem; line-height: 1.2; }
+    .hero p { margin: 0 0 8px; color: var(--text-muted); font-size: 0.88rem; max-width: 44rem; }
+    .hero-compare {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 18px; max-width: 640px;
+    }
+    .hero-compare .col {
+      padding: 12px 14px; border-radius: var(--radius); border: 1px solid var(--border);
+      background: var(--surface);
+    }
+    .hero-compare .col.re { border-color: var(--re); background: var(--re-muted); }
+    .hero-compare .col.eq { border-color: var(--eq); background: var(--eq-muted); }
+    .hero-compare .tag { font-size: 0.62rem; text-transform: uppercase; letter-spacing: 0.06em; font-weight: 600; }
+    .hero-compare .col.re .tag { color: var(--re); }
+    .hero-compare .col.eq .tag { color: var(--eq); }
+    .hero-compare .val { font-size: 1.35rem; font-weight: 800; margin-top: 4px; }
+    @media (max-width: 520px) { .hero-compare { grid-template-columns: 1fr; } }
+
+    .content { padding: 16px 20px 32px; }
+    .verdict {
+      padding: 14px 16px; margin-bottom: 16px; font-size: 0.88rem;
+      background: var(--surface); border-left: 3px solid var(--accent);
+      border-radius: var(--radius); border: 1px solid var(--border); border-left-width: 3px;
+    }
+    .verdict strong.winner-re { color: var(--re); }
+    .verdict strong.winner-eq { color: var(--eq); }
+
+    .summary-grid {
+      display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+      gap: 8px; margin-bottom: 20px;
+    }
+    .summary-card {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: var(--radius); padding: 10px 12px; box-shadow: var(--shadow);
+    }
+    .summary-card.re { border-color: var(--re); }
+    .summary-card.eq { border-color: var(--eq); }
+    .summary-card .label { font-size: 0.62rem; text-transform: uppercase; letter-spacing: 0.06em; color: var(--text-faint); }
+    .summary-card .value { font-size: 1rem; font-weight: 700; margin-top: 3px; }
+    .summary-card .sub { font-size: 0.68rem; color: var(--text-muted); margin-top: 2px; }
+
+    .card {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: var(--radius); margin-bottom: 16px; box-shadow: var(--shadow);
+    }
+    .card-header {
+      padding: 8px 12px; border-bottom: 1px solid var(--border);
+      font-size: 0.8rem; font-weight: 600;
+    }
+    .card-body { padding: 12px; }
+    .chart-wrap { position: relative; height: 280px; }
+    .chart-wrap.short { height: 220px; }
+
+    .engine-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    @media (max-width: 700px) { .engine-grid { grid-template-columns: 1fr; } }
+    .engine-col {
+      padding: 14px; border-radius: var(--radius); border: 1px solid var(--border);
+    }
+    .engine-col.re { background: var(--re-muted); border-color: var(--re); }
+    .engine-col.eq { background: var(--eq-muted); border-color: var(--eq); }
+    .engine-col h3 { margin: 0 0 10px; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em; }
+    .engine-col.re h3 { color: var(--re); }
+    .engine-col.eq h3 { color: var(--eq); }
+    .metric-row {
+      display: flex; justify-content: space-between; gap: 8px;
+      padding: 6px 0; border-bottom: 1px solid var(--border); font-size: 0.78rem;
+    }
+    .metric-row:last-child { border-bottom: none; }
+    .metric-row dt { color: var(--text-muted); margin: 0; }
+    .metric-row dd { margin: 0; font-weight: 600; text-align: right; }
+
+    .breakdown-table { width: 100%; border-collapse: collapse; font-size: 0.75rem; }
+    .breakdown-table th, .breakdown-table td {
+      padding: 6px 8px; text-align: right; border-bottom: 1px solid var(--border);
+    }
+    .breakdown-table th { text-align: left; color: var(--text-faint); font-weight: 600; }
+    .breakdown-table th:first-child, .breakdown-table td:first-child { text-align: left; }
+
+    .guide-list { margin: 0; padding: 0; list-style: none; }
+    .guide-list li {
+      padding: 10px 12px; margin-bottom: 8px; border: 1px solid var(--border);
+      border-radius: var(--radius); font-size: 0.8rem; color: var(--text-muted);
+    }
+    .guide-list li strong { display: block; color: var(--text); margin-bottom: 4px; font-size: 0.85rem; }
+
+    .irr-bar {
+      display: flex; height: 28px; border-radius: var(--radius); overflow: hidden;
+      margin: 10px 0; border: 1px solid var(--border);
+    }
+    .irr-bar .re { background: var(--re); display: flex; align-items: center; justify-content: center;
+      font-size: 0.7rem; font-weight: 700; color: #fff; min-width: 2rem; }
+    .irr-bar .eq { background: var(--eq); display: flex; align-items: center; justify-content: center;
+      font-size: 0.7rem; font-weight: 700; color: #fff; min-width: 2rem; }
+
+    .cta-block {
+      text-align: center; padding: 28px 16px;
+      background: var(--accent-muted); border: 1px solid var(--border);
+      border-radius: var(--radius);
+    }
+    .cta-block h2 { margin: 0 0 8px; font-size: 1.15rem; }
+    .cta-block p { margin: 0 0 16px; color: var(--text-muted); font-size: 0.85rem; max-width: 34rem; margin-left: auto; margin-right: auto; }
+
+    @media (max-width: 768px) {
+      .layout { flex-direction: column; }
+      .sidebar { width: 100%; max-height: none; position: static; }
+    }
+  </style>
+</head>
+<body>
+  <header class="app-header">
+    <a class="logo" href="/wealth-tools" aria-label="Back to Wealth Tools">
+      <svg viewBox="0 0 32 32" aria-hidden="true" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <rect width="32" height="32" rx="4" fill="currentColor" opacity="0.08"/>
+        <path d="M6 22 L10 14 L16 18 L22 10 L26 14" stroke="var(--eq)" stroke-width="2" stroke-linecap="round"/>
+        <rect x="6" y="20" width="8" height="6" rx="1" stroke="var(--re)" stroke-width="1.5" fill="none"/>
+      </svg>
+      <div>
+        <div class="logo-title">RE vs Equity Planner</div>
+        <div class="logo-sub">Long-term wealth comparison</div>
+      </div>
+    </a>
+    <div class="header-actions">
+      <a href="/wealth-tools" class="btn btn-sm">Wealth Tools</a>
+      <button type="button" class="btn btn-sm" id="btnTheme" aria-label="Toggle theme">Dark</button>
+    </div>
+  </header>
+
+  <div class="layout">
+    <aside class="sidebar" aria-label="Assumptions">
+      <p class="panel-title">Scenario presets</p>
+      <div class="scenario-row" role="group">
+        <button type="button" data-preset="landlord">Leveraged landlord</button>
+        <button type="button" data-preset="balanced" class="active">Balanced</button>
+        <button type="button" data-preset="growth">Equity growth</button>
+        <button type="button" data-preset="conservative">Conservative</button>
+      </div>
+
+      <p class="panel-title">Property</p>
+      <div class="field">
+        <label for="propertyValue">Property value</label>
+        <input type="number" id="propertyValue" min="0" step="10000" value="650000" />
+      </div>
+      <div class="field">
+        <label for="mortgage">Mortgage (outstanding)</label>
+        <input type="number" id="mortgage" min="0" step="10000" value="420000" />
+      </div>
+      <div class="field">
+        <label for="mortgageInterest">Mortgage interest (% / yr)</label>
+        <input type="number" id="mortgageInterest" min="0" max="15" step="0.05" value="3.2" />
+      </div>
+      <div class="field">
+        <label for="mortgageTermYears">Remaining mortgage term (years)</label>
+        <input type="number" id="mortgageTermYears" min="1" max="40" step="1" value="22" />
+      </div>
+      <div class="field">
+        <label for="rentalIncome">Rental income (gross / yr)</label>
+        <input type="number" id="rentalIncome" min="0" step="500" value="26400" />
+      </div>
+      <div class="field">
+        <label for="vacancy">Vacancy (%)</label>
+        <input type="number" id="vacancy" min="0" max="50" step="0.5" value="5" />
+      </div>
+      <div class="field">
+        <label for="maintenance">Maintenance & costs (% of value / yr)</label>
+        <input type="number" id="maintenance" min="0" max="10" step="0.1" value="1.2" />
+        <span class="field-hint">Repairs, insurance, management — excl. mortgage</span>
+      </div>
+      <div class="field">
+        <label for="appreciation">Appreciation (% / yr)</label>
+        <input type="number" id="appreciation" min="-10" max="20" step="0.1" value="2.5" />
+      </div>
+      <div class="field">
+        <label for="rentalTaxRate">Tax on rental income (%)</label>
+        <input type="number" id="rentalTaxRate" min="0" max="60" step="0.5" value="28" />
+      </div>
+
+      <p class="panel-title">Equity portfolio</p>
+      <div class="field">
+        <label for="portfolioValue">Starting portfolio value</label>
+        <input type="number" id="portfolioValue" min="0" step="10000" value="230000" />
+        <span class="field-hint">Defaults to property equity; edit to compare other capital</span>
+      </div>
+      <div class="field">
+        <label for="equityReturn">Expected return (% / yr)</label>
+        <input type="number" id="equityReturn" min="-20" max="25" step="0.1" value="7" />
+      </div>
+      <div class="field">
+        <label for="dividends">Dividend yield (% / yr)</label>
+        <input type="number" id="dividends" min="0" max="15" step="0.1" value="2" />
+      </div>
+      <div class="field">
+        <label for="fees">Fees (% / yr)</label>
+        <input type="number" id="fees" min="0" max="5" step="0.05" value="0.35" />
+      </div>
+      <div class="field">
+        <label for="taxDrag">Portfolio tax drag (% / yr)</label>
+        <input type="number" id="taxDrag" min="0" max="10" step="0.05" value="1.1" />
+        <span class="field-hint">Wealth tax, dividend/CG leakage on portfolio</span>
+      </div>
+
+      <p class="panel-title">Horizon & display</p>
+      <div class="field">
+        <label for="horizon">Time horizon (years)</label>
+        <input type="number" id="horizon" min="1" max="50" step="1" value="20" />
+      </div>
+      <div class="field">
+        <label for="currency">Currency</label>
+        <select id="currency">
+          <option value="EUR" selected>EUR</option>
+          <option value="CHF">CHF</option>
+          <option value="USD">USD</option>
+          <option value="GBP">GBP</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>
+          <input type="checkbox" id="linkPortfolio" checked />
+          Link portfolio start to property equity
+        </label>
+      </div>
+      <div class="field">
+        <label>
+          <input type="checkbox" id="reinvestCashflow" />
+          Reinvest positive rental surplus into portfolio
+        </label>
+      </div>
+    </aside>
+
+    <div class="main">
+      <section class="hero">
+        <h1>Real estate vs equities — which path builds more net worth?</h1>
+        <p>Model leveraged property (mortgage, rent, maintenance, appreciation) against a liquid portfolio (return, dividends, fees, tax drag) over your horizon. See when equity compounding overtakes property equity — and how income compares.</p>
+        <div class="hero-compare tabular" id="heroCompare" aria-live="polite">
+          <div class="col re"><span class="tag">Real estate</span><span class="val" id="heroRe">—</span></div>
+          <div class="col eq"><span class="tag">Equities</span><span class="val" id="heroEq">—</span></div>
+        </div>
+      </section>
+
+      <div class="content">
+        <p class="verdict tabular" id="verdict" aria-live="polite"></p>
+        <div class="summary-grid tabular" id="summaryGrid"></div>
+
+        <section class="card" aria-labelledby="engineTitle">
+          <div class="card-header" id="engineTitle">Scenario comparison engine</div>
+          <div class="card-body">
+            <div class="engine-grid tabular" id="engineGrid"></div>
+            <p style="margin:12px 0 0;font-size:0.72rem;color:var(--text-faint)" id="crossoverNote"></p>
+          </div>
+        </section>
+
+        <section class="card">
+          <div class="card-header">Net worth growth — property equity + cash vs portfolio</div>
+          <div class="card-body"><div class="chart-wrap"><canvas id="chartNetWorth" aria-label="Net worth comparison"></canvas></div></div>
+        </section>
+
+        <section class="card">
+          <div class="card-header">Annual cash flow — rental net vs portfolio income</div>
+          <div class="card-body"><div class="chart-wrap short"><canvas id="chartIncome" aria-label="Income comparison"></canvas></div></div>
+        </section>
+
+        <section class="card">
+          <div class="card-header">Risk & liquidity lens (illustrative)</div>
+          <div class="card-body"><div class="chart-wrap short"><canvas id="chartRisk" aria-label="Risk comparison"></canvas></div></div>
+        </section>
+
+        <section class="card">
+          <div class="card-header">Comparative return summary (IRR-style)</div>
+          <div class="card-body tabular">
+            <div class="irr-bar" id="irrBar" aria-hidden="true"></div>
+            <p id="irrExplain" style="margin:0;font-size:0.78rem;color:var(--text-muted)"></p>
+          </div>
+        </section>
+
+        <section class="card">
+          <div class="card-header">Real-estate equity breakdown</div>
+          <div class="card-body tabular" style="overflow-x:auto">
+            <table class="breakdown-table" id="reBreakdown">
+              <thead>
+                <tr>
+                  <th>Year</th><th>Property value</th><th>Mortgage</th><th>Equity</th>
+                  <th>Rent (net)</th><th>Owner cash flow</th><th>Equity built (yr)</th>
+                </tr>
+              </thead>
+              <tbody></tbody>
+            </table>
+          </div>
+        </section>
+
+        <section class="card">
+          <div class="card-header">Equity portfolio breakdown</div>
+          <div class="card-body tabular" style="overflow-x:auto">
+            <table class="breakdown-table" id="eqBreakdown">
+              <thead>
+                <tr>
+                  <th>Year</th><th>Portfolio</th><th>Growth</th><th>Dividends (net)</th>
+                  <th>Tax & fees</th><th>Portfolio income</th>
+                </tr>
+              </thead>
+              <tbody></tbody>
+            </table>
+          </div>
+        </section>
+
+        <section class="card">
+          <div class="card-header">Trade-offs & decision guide</div>
+          <div class="card-body">
+            <ul class="guide-list" id="guideList"></ul>
+          </div>
+        </section>
+
+        <section class="cta-block" id="cta">
+          <h2>Request an allocation review</h2>
+          <p>Stress-test property leverage, liquidity needs, and portfolio tax drag for your residency — not generic benchmarks.</p>
+          <a href="/#contact" class="btn btn-primary">Contact Shreshti</a>
+        </section>
+      </div>
+    </div>
+  </div>
+
+  <script>
+(function () {
+  'use strict';
+
+  const PRESETS = {
+    landlord: {
+      propertyValue: 750000, mortgage: 550000, mortgageInterest: 3.5, mortgageTermYears: 25,
+      rentalIncome: 30000, vacancy: 6, maintenance: 1.5, appreciation: 2, rentalTaxRate: 30,
+      equityReturn: 7, dividends: 2, fees: 0.4, taxDrag: 1.2, horizon: 20,
+    },
+    balanced: {
+      propertyValue: 650000, mortgage: 420000, mortgageInterest: 3.2, mortgageTermYears: 22,
+      rentalIncome: 26400, vacancy: 5, maintenance: 1.2, appreciation: 2.5, rentalTaxRate: 28,
+      equityReturn: 7, dividends: 2, fees: 0.35, taxDrag: 1.1, horizon: 20,
+    },
+    growth: {
+      propertyValue: 500000, mortgage: 200000, mortgageInterest: 2.9, mortgageTermYears: 18,
+      rentalIncome: 18000, vacancy: 8, maintenance: 1, appreciation: 1.5, rentalTaxRate: 25,
+      equityReturn: 8.5, dividends: 1.5, fees: 0.25, taxDrag: 0.6, horizon: 25,
+    },
+    conservative: {
+      propertyValue: 400000, mortgage: 120000, mortgageInterest: 2.5, mortgageTermYears: 12,
+      rentalIncome: 16800, vacancy: 3, maintenance: 0.9, appreciation: 1.8, rentalTaxRate: 32,
+      equityReturn: 5.5, dividends: 2.5, fees: 0.5, taxDrag: 1.8, horizon: 15,
+    },
+  };
+
+  const $ = (id) => document.getElementById(id);
+  let chartNW, chartInc, chartRisk;
+
+  function pct(v) { return Number(v) / 100; }
+
+  function readInputs() {
+    const propertyValue = Number($('propertyValue').value);
+    const mortgage = Number($('mortgage').value);
+    const link = $('linkPortfolio').checked;
+    let portfolioValue = Number($('portfolioValue').value);
+    if (link) portfolioValue = Math.max(0, propertyValue - mortgage);
+
+    return {
+      propertyValue, mortgage,
+      mortgageInterest: Number($('mortgageInterest').value),
+      mortgageTermYears: Number($('mortgageTermYears').value),
+      rentalIncome: Number($('rentalIncome').value),
+      vacancy: Number($('vacancy').value),
+      maintenance: Number($('maintenance').value),
+      appreciation: Number($('appreciation').value),
+      rentalTaxRate: Number($('rentalTaxRate').value),
+      portfolioValue,
+      equityReturn: Number($('equityReturn').value),
+      dividends: Number($('dividends').value),
+      fees: Number($('fees').value),
+      taxDrag: Number($('taxDrag').value),
+      horizon: Number($('horizon').value),
+      currency: $('currency').value,
+      reinvestCashflow: $('reinvestCashflow').checked,
+      linkPortfolio: link,
+    };
+  }
+
+  function mortgagePayment(balance, ratePct, yearsLeft) {
+    if (balance <= 0 || yearsLeft <= 0) return { payment: 0, interest: 0, principal: 0 };
+    const r = pct(ratePct);
+    const n = yearsLeft;
+    if (r < 1e-9) {
+      const principal = balance / n;
+      return { payment: principal, interest: 0, principal };
+    }
+    const payment = balance * (r * Math.pow(1 + r, n)) / (Math.pow(1 + r, n) - 1);
+    const interest = balance * r;
+    const principal = Math.min(Math.max(0, payment - interest), balance);
+    return { payment, interest, principal };
+  }
+
+  function simulateRealEstate(inp) {
+    let propValue = inp.propertyValue;
+    let mortgage = inp.mortgage;
+    let cashReserve = 0;
+    const startEquity = propValue - mortgage;
+    const years = Math.max(1, Math.round(inp.horizon));
+    const rows = [];
+    let cumEquityBuilt = 0;
+    let totalCashFlow = 0;
+
+    for (let y = 1; y <= years; y++) {
+      const valueBefore = propValue;
+      propValue = valueBefore * (1 + pct(inp.appreciation));
+      const appreciationGain = propValue - valueBefore;
+
+      const yearsRem = Math.max(1, inp.mortgageTermYears - y + 1);
+      const { payment, interest, principal } = mortgagePayment(mortgage, inp.mortgageInterest, yearsRem);
+      mortgage = Math.max(0, mortgage - principal);
+
+      const rentGross = inp.rentalIncome * (1 - pct(inp.vacancy));
+      const maint = propValue * pct(inp.maintenance);
+      const rentTax = rentGross * pct(inp.rentalTaxRate);
+      const ownerCashFlow = rentGross - maint - payment - rentTax;
+      cashReserve += ownerCashFlow;
+      totalCashFlow += ownerCashFlow;
+
+      const equityBuiltYr = principal + appreciationGain;
+      cumEquityBuilt += equityBuiltYr;
+      const equity = propValue - mortgage;
+      const netWorth = equity + cashReserve;
+
+      rows.push({
+        year: y,
+        propertyValue: propValue,
+        mortgage,
+        equity,
+        cashReserve,
+        netWorth,
+        rentNet: rentGross - maint - rentTax,
+        ownerCashFlow,
+        equityBuiltYr,
+        interest,
+        principal,
+        appreciationGain,
+      });
+    }
+
+    const last = rows[rows.length - 1];
+    return {
+      rows,
+      startEquity,
+      endingNetWorth: last.netWorth,
+      endingEquity: last.equity,
+      annualCashFlowAvg: totalCashFlow / years,
+      lastYearCashFlow: last.ownerCashFlow,
+      cumEquityBuilt,
+      endingProperty: last.propertyValue,
+      endingMortgage: last.mortgage,
+    };
+  }
+
+  function simulateEquity(inp, re) {
+    let portfolio = inp.portfolioValue;
+    const years = Math.max(1, Math.round(inp.horizon));
+    const rows = [];
+    const netReturn = pct(inp.equityReturn) - pct(inp.fees) - pct(inp.taxDrag);
+    const divYield = pct(inp.dividends);
+    const divTax = pct(inp.taxDrag) * 0.6;
+
+    for (let y = 1; y <= years; y++) {
+      let start = portfolio;
+      if (inp.reinvestCashflow && re) {
+        const cf = re.rows[y - 1]?.ownerCashFlow ?? 0;
+        if (cf > 0) start += cf;
+      }
+      const growth = start * netReturn;
+      const dividendsGross = start * divYield;
+      const dividendsNet = dividendsGross * (1 - divTax);
+      const taxAndFees = start * (pct(inp.fees) + pct(inp.taxDrag)) + dividendsGross * divTax;
+      portfolio = start + growth + dividendsNet;
+      rows.push({
+        year: y,
+        portfolio,
+        growth,
+        dividendsNet,
+        taxAndFees,
+        portfolioIncome: dividendsNet,
+      });
+    }
+
+    const last = rows[rows.length - 1];
+    return {
+      rows,
+      endingNetWorth: last.portfolio,
+      annualIncomeAvg: rows.reduce((s, r) => s + r.dividendsNet, 0) / years,
+      lastYearIncome: last.dividendsNet,
+      cumGrowth: rows.reduce((s, r) => s + r.growth, 0),
+    };
+  }
+
+  function computeIRR(cashFlows) {
+    if (!cashFlows.length) return null;
+    let rate = 0.08;
+    for (let iter = 0; iter < 80; iter++) {
+      let npv = 0;
+      let dnpv = 0;
+      for (let t = 0; t < cashFlows.length; t++) {
+        const cf = cashFlows[t];
+        const denom = Math.pow(1 + rate, t);
+        npv += cf / denom;
+        if (t > 0) dnpv -= t * cf / Math.pow(1 + rate, t + 1);
+      }
+      if (Math.abs(npv) < 1e-4) return rate * 100;
+      if (Math.abs(dnpv) < 1e-12) break;
+      rate -= npv / dnpv;
+      if (rate < -0.99) rate = -0.5;
+      if (rate > 5) rate = 2;
+    }
+    return rate * 100;
+  }
+
+  function irrFromPath(initial, rows, netWorthKey, cashKey) {
+    const cfs = [-initial];
+    rows.forEach((r, i) => {
+      const cf = cashKey ? r[cashKey] : 0;
+      if (i < rows.length - 1) cfs.push(cf);
+    });
+    cfs[cfs.length - 1] += rows[rows.length - 1][netWorthKey];
+    return computeIRR(cfs);
+  }
+
+  function fmtMoney(n, c) {
+    if (!Number.isFinite(n)) return '—';
+    try {
+      return new Intl.NumberFormat(undefined, { style: 'currency', currency: c, maximumFractionDigits: 0 }).format(n);
+    } catch {
+      return `${c} ${Math.round(n).toLocaleString()}`;
+    }
+  }
+
+  function fmtPct(n, d = 1) {
+    if (!Number.isFinite(n)) return '—';
+    return `${Number(n).toFixed(d)}%`;
+  }
+
+  function chartColors() {
+    const dark = document.documentElement.getAttribute('data-theme') === 'dark';
+    return {
+      text: dark ? '#a8b0bc' : '#4a5260',
+      grid: dark ? '#3a424f' : '#dde1e6',
+      re: dark ? '#d4a574' : '#8b5a2b',
+      eq: dark ? '#4db87a' : '#1a5c38',
+      reFill: dark ? 'rgba(212,165,116,0.25)' : 'rgba(139,90,43,0.2)',
+      eqFill: dark ? 'rgba(77,184,122,0.25)' : 'rgba(26,92,56,0.2)',
+    };
+  }
+
+  function findCrossover(reRows, eqRows) {
+    for (let i = 0; i < reRows.length; i++) {
+      if (eqRows[i].portfolio > reRows[i].netWorth) return reRows[i].year;
+    }
+    return null;
+  }
+
+  function renderGuide(inp, re, eq, winner, crossover) {
+    const items = [];
+    if (winner === 'eq') {
+      items.push({ t: 'Equities lead on ending net worth', b: `Over ${inp.horizon} years, the portfolio reaches ${fmtMoney(eq.endingNetWorth, inp.currency)} vs property track ${fmtMoney(re.endingNetWorth, inp.currency)} — compounding and liquidity dominate at these assumptions.` });
+    } else {
+      items.push({ t: 'Real estate leads on ending net worth', b: `Leverage plus appreciation and principal paydown build ${fmtMoney(re.endingNetWorth, inp.currency)} vs ${fmtMoney(eq.endingNetWorth, inp.currency)} in the portfolio — mortgage acts as structured leverage on the asset.` });
+    }
+    if (crossover) {
+      items.push({ t: 'When equities overtake property', b: `On this path, portfolio net worth exceeds the property track from year ${crossover}. Before that, illiquid equity in the home dominates; after, liquid compounding wins unless you add more property.` });
+    } else if (winner === 'eq') {
+      items.push({ t: 'Equities ahead from the start', b: 'At these return and leverage assumptions, liquid net worth never trails property — typical when LTV is moderate and equity returns are strong.' });
+    } else {
+      items.push({ t: 'Property stays ahead throughout', b: 'Leverage and rent may keep property net worth above the portfolio for the full horizon — especially with high LTV and conservative equity return inputs.' });
+    }
+    items.push({ t: 'Mortgage, maintenance & taxes', b: `Interest (${fmtPct(inp.mortgageInterest)}) and maintenance (${fmtPct(inp.maintenance)} of value) reduce owner cash flow; rental tax at ${fmtPct(inp.rentalTaxRate)} further trims spendable income. Equity drag: fees ${fmtPct(inp.fees)} + tax ${fmtPct(inp.taxDrag)}.` });
+    items.push({ t: 'Income vs withdrawals', b: `Avg rental cash flow ${fmtMoney(re.annualCashFlowAvg, inp.currency)}/yr vs portfolio dividends (net) ${fmtMoney(eq.annualIncomeAvg, inp.currency)}/yr. Rent can beat yield early; portfolios scale income with NAV without vacancy or boilers.` });
+    items.push({ t: 'Liquidity & concentration', b: 'Property ties capital to one market and one asset; equities diversify but mark-to-market. Use this model for direction — not transaction costs, refinancing, or CG on sale.' });
+
+    $('guideList').innerHTML = items.map(it => `<li><strong>${it.t}</strong>${it.b}</li>`).join('');
+  }
+
+  function renderTables(inp, re, eq) {
+    const show = (rows, max) => rows.filter((_, i) => i === 0 || i === rows.length - 1 || (i + 1) % Math.ceil(rows.length / max) === 0);
+    const reShow = show(re.rows, 8);
+    const eqShow = show(eq.rows, 8);
+
+    $('reBreakdown').querySelector('tbody').innerHTML = reShow.map(r => `
+      <tr>
+        <td>${r.year}</td>
+        <td>${fmtMoney(r.propertyValue, inp.currency)}</td>
+        <td>${fmtMoney(r.mortgage, inp.currency)}</td>
+        <td>${fmtMoney(r.equity, inp.currency)}</td>
+        <td>${fmtMoney(r.rentNet, inp.currency)}</td>
+        <td>${fmtMoney(r.ownerCashFlow, inp.currency)}</td>
+        <td>${fmtMoney(r.equityBuiltYr, inp.currency)}</td>
+      </tr>
+    `).join('');
+
+    $('eqBreakdown').querySelector('tbody').innerHTML = eqShow.map(r => `
+      <tr>
+        <td>${r.year}</td>
+        <td>${fmtMoney(r.portfolio, inp.currency)}</td>
+        <td>${fmtMoney(r.growth, inp.currency)}</td>
+        <td>${fmtMoney(r.dividendsNet, inp.currency)}</td>
+        <td>${fmtMoney(r.taxAndFees, inp.currency)}</td>
+        <td>${fmtMoney(r.portfolioIncome, inp.currency)}</td>
+      </tr>
+    `).join('');
+  }
+
+  function destroyCharts() {
+    [chartNW, chartInc, chartRisk].forEach(ch => { if (ch) ch.destroy(); });
+    chartNW = chartInc = chartRisk = null;
+  }
+
+  function renderCharts(inp, re, eq) {
+    if (typeof Chart === 'undefined') return;
+    const colors = chartColors();
+    const labels = re.rows.map(r => r.year);
+    const c = inp.currency;
+    destroyCharts();
+
+    chartNW = new Chart($('chartNetWorth'), {
+      type: 'line',
+      data: {
+        labels,
+        datasets: [
+          { label: 'Real estate net worth', data: re.rows.map(r => r.netWorth), borderColor: colors.re, backgroundColor: colors.reFill, fill: true, tension: 0.2, pointRadius: 0, borderWidth: 2 },
+          { label: 'Equity portfolio', data: eq.rows.map(r => r.portfolio), borderColor: colors.eq, backgroundColor: colors.eqFill, fill: true, tension: 0.2, pointRadius: 0, borderWidth: 2 },
+        ],
+      },
+      options: {
+        responsive: true, maintainAspectRatio: false,
+        interaction: { mode: 'index', intersect: false },
+        plugins: {
+          legend: { labels: { color: colors.text } },
+          tooltip: { callbacks: { label: ctx => `${ctx.dataset.label}: ${fmtMoney(ctx.raw, c)}` } },
+        },
+        scales: {
+          x: { ticks: { color: colors.text }, grid: { color: colors.grid } },
+          y: { ticks: { color: colors.text, callback: v => fmtMoney(v, c) }, grid: { color: colors.grid } },
+        },
+      },
+    });
+
+    chartInc = new Chart($('chartIncome'), {
+      type: 'bar',
+      data: {
+        labels,
+        datasets: [
+          { label: 'Rental owner cash flow', data: re.rows.map(r => r.ownerCashFlow), backgroundColor: colors.re },
+          { label: 'Portfolio dividends (net)', data: eq.rows.map(r => r.dividendsNet), backgroundColor: colors.eq },
+        ],
+      },
+      options: {
+        responsive: true, maintainAspectRatio: false,
+        plugins: { legend: { labels: { color: colors.text } } },
+        scales: {
+          x: { ticks: { color: colors.text }, grid: { color: colors.grid } },
+          y: { ticks: { color: colors.text, callback: v => fmtMoney(v, c) }, grid: { color: colors.grid } },
+        },
+      },
+    });
+
+    const ltv = inp.mortgage / inp.propertyValue;
+    const volEq = 15;
+    const illiqRe = Math.min(100, 40 + ltv * 40);
+    chartRisk = new Chart($('chartRisk'), {
+      type: 'radar',
+      data: {
+        labels: ['Liquidity', 'Diversification', 'Volatility (inverse)', 'Income stability', 'Leverage exposure'],
+        datasets: [
+          {
+            label: 'Real estate',
+            data: [25, 20, 55, 65, Math.min(100, ltv * 100)],
+            borderColor: colors.re,
+            backgroundColor: colors.reFill,
+          },
+          {
+            label: 'Equities',
+            data: [90, 85, 100 - volEq, 50, 10],
+            borderColor: colors.eq,
+            backgroundColor: colors.eqFill,
+          },
+        ],
+      },
+      options: {
+        responsive: true, maintainAspectRatio: false,
+        scales: {
+          r: {
+            min: 0, max: 100,
+            ticks: { display: false, stepSize: 25 },
+            grid: { color: colors.grid },
+            pointLabels: { color: colors.text, font: { size: 10 } },
+          },
+        },
+        plugins: { legend: { labels: { color: colors.text } } },
+      },
+    });
+  }
+
+  function recalc() {
+    const inp = readInputs();
+    if (inp.linkPortfolio) $('portfolioValue').value = Math.max(0, inp.propertyValue - inp.mortgage);
+
+    const re = simulateRealEstate(inp);
+    const eq = simulateEquity(inp, re);
+    const c = inp.currency;
+
+    const winner = eq.endingNetWorth >= re.endingNetWorth ? 'eq' : 're';
+    const diff = Math.abs(eq.endingNetWorth - re.endingNetWorth);
+    const crossover = findCrossover(re.rows, eq.rows);
+
+    $('heroRe').textContent = fmtMoney(re.endingNetWorth, c);
+    $('heroEq').textContent = fmtMoney(eq.endingNetWorth, c);
+
+    const irrRe = irrFromPath(re.startEquity, re.rows, 'netWorth', 'ownerCashFlow');
+    const irrEq = irrFromPath(inp.portfolioValue, eq.rows, 'portfolio', 'dividendsNet');
+
+    $('verdict').innerHTML = winner === 'eq'
+      ? `At year <strong>${inp.horizon}</strong>, <strong class="winner-eq">equities</strong> finish <strong>${fmtMoney(diff, c)}</strong> ahead on net worth. Rental cash flow averages ${fmtMoney(re.annualCashFlowAvg, c)}/yr; portfolio dividends average ${fmtMoney(eq.annualIncomeAvg, c)}/yr.`
+      : `At year <strong>${inp.horizon}</strong>, <strong class="winner-re">real estate</strong> finishes <strong>${fmtMoney(diff, c)}</strong> ahead — leverage and appreciation outweigh portfolio compounding at these inputs.`;
+
+    $('crossoverNote').textContent = crossover
+      ? `Equity portfolio net worth overtakes the property track in year ${crossover}.`
+      : winner === 'eq'
+        ? 'Portfolio net worth leads for the entire horizon at these assumptions.'
+        : 'Property net worth leads for the entire horizon — equity does not overtake on this path.';
+
+    $('summaryGrid').innerHTML = [
+      { label: 'RE ending net worth', value: fmtMoney(re.endingNetWorth, c), cls: 're', sub: `Equity ${fmtMoney(re.endingEquity, c)}` },
+      { label: 'Portfolio ending', value: fmtMoney(eq.endingNetWorth, c), cls: 'eq', sub: 'Liquid NAV' },
+      { label: 'RE avg cash flow', value: fmtMoney(re.annualCashFlowAvg, c), cls: 're', sub: `/yr owner` },
+      { label: 'Portfolio income', value: fmtMoney(eq.annualIncomeAvg, c), cls: 'eq', sub: 'Net dividends /yr' },
+      { label: 'RE equity built', value: fmtMoney(re.cumEquityBuilt, c), cls: 're', sub: 'Cumulative' },
+      { label: 'RE IRR-style', value: fmtPct(irrRe), cls: 're', sub: 'On initial equity' },
+      { label: 'Equity IRR-style', value: fmtPct(irrEq), cls: 'eq', sub: 'On portfolio start' },
+      { label: 'LTV (start)', value: fmtPct(100 * inp.mortgage / inp.propertyValue), cls: '', sub: 'Leverage' },
+    ].map(card => `
+      <div class="summary-card ${card.cls}">
+        <div class="label">${card.label}</div>
+        <div class="value">${card.value}</div>
+        <div class="sub">${card.sub}</div>
+      </div>
+    `).join('');
+
+    $('engineGrid').innerHTML = `
+      <div class="engine-col re">
+        <h3>Real estate path</h3>
+        <dl>
+          <div class="metric-row"><dt>Ending net worth</dt><dd>${fmtMoney(re.endingNetWorth, c)}</dd></div>
+          <div class="metric-row"><dt>Property / mortgage</dt><dd>${fmtMoney(re.endingProperty, c)} / ${fmtMoney(re.endingMortgage, c)}</dd></div>
+          <div class="metric-row"><dt>Annual cash flow (avg)</dt><dd>${fmtMoney(re.annualCashFlowAvg, c)}</dd></div>
+          <div class="metric-row"><dt>Equity built (cum.)</dt><dd>${fmtMoney(re.cumEquityBuilt, c)}</dd></div>
+          <div class="metric-row"><dt>IRR-style return</dt><dd>${fmtPct(irrRe)}</dd></div>
+        </dl>
+      </div>
+      <div class="engine-col eq">
+        <h3>Equity path</h3>
+        <dl>
+          <div class="metric-row"><dt>Ending net worth</dt><dd>${fmtMoney(eq.endingNetWorth, c)}</dd></div>
+          <div class="metric-row"><dt>Starting capital</dt><dd>${fmtMoney(inp.portfolioValue, c)}</dd></div>
+          <div class="metric-row"><dt>Portfolio income (avg)</dt><dd>${fmtMoney(eq.annualIncomeAvg, c)}</dd></div>
+          <div class="metric-row"><dt>Cumulative growth</dt><dd>${fmtMoney(eq.cumGrowth, c)}</dd></div>
+          <div class="metric-row"><dt>IRR-style return</dt><dd>${fmtPct(irrEq)}</dd></div>
+        </dl>
+      </div>
+    `;
+
+    const irrSum = Math.max(0.01, (irrRe || 0) + (irrEq || 0));
+    const wRe = Math.max(0, (irrRe || 0)) / irrSum * 100;
+    const wEq = Math.max(0, (irrEq || 0)) / irrSum * 100;
+    $('irrBar').innerHTML = `
+      <div class="re" style="flex:${wRe}">${fmtPct(irrRe, 1)}</div>
+      <div class="eq" style="flex:${wEq}">${fmtPct(irrEq, 1)}</div>
+    `;
+    $('irrExplain').textContent =
+      `Money-weighted IRR-style summary on initial equity (${fmtMoney(re.startEquity, c)}) vs portfolio (${fmtMoney(inp.portfolioValue, c)}), including interim cash flows and terminal net worth. Illustrative — not a formal investment recommendation.`;
+
+    renderTables(inp, re, eq);
+    renderGuide(inp, re, eq, winner, crossover);
+    renderCharts(inp, re, eq);
+  }
+
+  function applyPreset(name) {
+    const p = PRESETS[name];
+    if (!p) return;
+    document.querySelectorAll('[data-preset]').forEach(btn => {
+      btn.classList.toggle('active', btn.dataset.preset === name);
+    });
+    Object.entries(p).forEach(([key, val]) => {
+      const el = $(key);
+      if (el) el.value = val;
+    });
+    recalc();
+  }
+
+  const inputIds = [
+    'propertyValue', 'mortgage', 'mortgageInterest', 'mortgageTermYears', 'rentalIncome',
+    'vacancy', 'maintenance', 'appreciation', 'rentalTaxRate', 'portfolioValue',
+    'equityReturn', 'dividends', 'fees', 'taxDrag', 'horizon', 'currency',
+  ];
+  inputIds.forEach(id => {
+    const el = $(id);
+    if (el) el.addEventListener('input', () => {
+      document.querySelectorAll('[data-preset]').forEach(b => b.classList.remove('active'));
+      recalc();
+    });
+  });
+  ['linkPortfolio', 'reinvestCashflow'].forEach(id => {
+    const el = $(id);
+    if (el) el.addEventListener('change', recalc);
+  });
+
+  document.querySelectorAll('[data-preset]').forEach(btn => {
+    btn.addEventListener('click', () => applyPreset(btn.dataset.preset));
+  });
+
+  $('btnTheme').addEventListener('click', () => {
+    const dark = document.documentElement.getAttribute('data-theme') === 'dark';
+    document.documentElement.setAttribute('data-theme', dark ? 'light' : 'dark');
+    $('btnTheme').textContent = dark ? 'Dark' : 'Light';
+    recalc();
+  });
+
+  function init() {
+    const dark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+    document.documentElement.setAttribute('data-theme', dark ? 'dark' : 'light');
+    $('btnTheme').textContent = dark ? 'Light' : 'Dark';
+    function wait() {
+      if (typeof Chart !== 'undefined') recalc();
+      else setTimeout(wait, 50);
+    }
+    wait();
+  }
+
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);
+  else init();
+})();
+  </script>
+</body>
+</html>

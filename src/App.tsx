@@ -123,6 +123,19 @@ export default function App() {
           element={<Navigate to="/wealth-tools/portfolio-efficiency-scorecard" replace />}
         />
         <Route
+          path="/wealth-tools/real-estate-vs-equity-planner"
+          element={
+            <WealthToolFrame
+              src="/wealth-tools/real-estate-vs-equity-planner.html"
+              title="Real Estate vs Equity Planner"
+            />
+          }
+        />
+        <Route
+          path="/wealth-tools/real-estate-vs-equity-planner.html"
+          element={<Navigate to="/wealth-tools/real-estate-vs-equity-planner" replace />}
+        />
+        <Route
           path="/wealth-tools/additional-mortgage-capacity"
           element={<WealthToolFrame src="/wealth-tools/additional-mortgage-capacity.html" title="Additional Mortgage Capacity" />}
         />

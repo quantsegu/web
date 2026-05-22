@@ -4,7 +4,7 @@ export interface WealthTool {
   description: string;
   features: string[];
   href: string;
-  icon: 'retirement' | 'portfolio' | 'tax' | 'mortgage' | 'globe' | 'universe' | 'policy';
+  icon: 'retirement' | 'portfolio' | 'tax' | 'mortgage' | 'globe' | 'universe' | 'policy' | 'realestate';
   ctaLabel?: string;
 }
 
@@ -104,6 +104,22 @@ export const wealthTools: WealthTool[] = [
     href: '/wealth-tools/portfolio-efficiency-scorecard',
     icon: 'portfolio',
     ctaLabel: 'Run scorecard',
+  },
+  {
+    id: 'real-estate-vs-equity-planner',
+    title: 'Real Estate vs Equity Planner',
+    description:
+      'Compare leveraged property against a liquid portfolio over your horizon — net worth, rental cash flow vs dividends, mortgage leverage, maintenance, tax drag, and IRR-style returns.',
+    features: [
+      'Side-by-side property and portfolio projection',
+      'Mortgage amortization, vacancy, maintenance, and appreciation',
+      'Equity return, dividends, fees, and portfolio tax drag',
+      'Net worth, income, and risk radar charts',
+      'RE vs equity breakdown tables and decision guide',
+    ],
+    href: '/wealth-tools/real-estate-vs-equity-planner',
+    icon: 'realestate',
+    ctaLabel: 'Open planner',
   },
   {
     id: 'additional-mortgage-capacity',
