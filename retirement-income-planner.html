@@ -1,0 +1,1260 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Retirement passive income planner — equity-heavy portfolio scenarios with monthly compounding." />
+  <title>Retirement Income Planner</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js" defer></script>
+  <style>
+    :root {
+      --accent: #0d6e6e;
+      --accent-hover: #0a5858;
+      --accent-muted: rgba(13, 110, 110, 0.12);
+      --bg: #f4f4f2;
+      --surface: #ffffff;
+      --surface-2: #ebebea;
+      --border: #d4d4d0;
+      --text: #1a1a18;
+      --text-muted: #5c5c58;
+      --text-faint: #8a8a85;
+      --positive: #1a6b3c;
+      --negative: #9b2c2c;
+      --warning: #8a6d1a;
+      --shadow: 0 1px 3px rgba(0,0,0,0.06);
+      --radius: 4px;
+      --font: "Helvetica Neue", Helvetica, Arial, system-ui, sans-serif;
+      --mono: ui-monospace, "SF Mono", Menlo, monospace;
+      --sidebar-w: 280px;
+      --header-h: 48px;
+      --summary-h: auto;
+    }
+    [data-theme="dark"] {
+      --accent: #3db8b0;
+      --accent-hover: #5cc9c2;
+      --accent-muted: rgba(61, 184, 176, 0.15);
+      --bg: #141413;
+      --surface: #1e1e1c;
+      --surface-2: #282826;
+      --border: #3a3a36;
+      --text: #ecece8;
+      --text-muted: #a8a8a2;
+      --text-faint: #72726c;
+      --positive: #4db87a;
+      --negative: #e07070;
+      --warning: #d4b84a;
+      --shadow: 0 1px 3px rgba(0,0,0,0.35);
+    }
+    *, *::before, *::after { box-sizing: border-box; }
+    html { font-size: 14px; scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      font-family: var(--font);
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.45;
+      min-height: 100vh;
+      font-feature-settings: "tnum" 1, "lnum" 1;
+    }
+    .tabular { font-variant-numeric: tabular-nums lining-nums; }
+    button, input, select { font-family: inherit; font-size: inherit; }
+    a { color: var(--accent); }
+    :focus-visible {
+      outline: 2px solid var(--accent);
+      outline-offset: 2px;
+    }
+    .sr-only {
+      position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
+      overflow: hidden; clip: rect(0,0,0,0); border: 0;
+    }
+
+    /* Header */
+    .app-header {
+      position: sticky; top: 0; z-index: 100;
+      height: var(--header-h);
+      display: flex; align-items: center; gap: 12px;
+      padding: 0 16px;
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      box-shadow: var(--shadow);
+    }
+    .logo { display: flex; align-items: center; gap: 8px; text-decoration: none; color: var(--text); }
+    .logo svg { width: 28px; height: 28px; flex-shrink: 0; }
+    .logo-title { font-size: 0.95rem; font-weight: 600; letter-spacing: -0.02em; }
+    .logo-sub { font-size: 0.7rem; color: var(--text-muted); font-weight: 400; }
+    .header-actions { margin-left: auto; display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+    .btn {
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 6px 12px;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      background: var(--surface);
+      color: var(--text);
+      cursor: pointer;
+      font-size: 0.8rem;
+      white-space: nowrap;
+    }
+    .btn:hover { background: var(--surface-2); }
+    .btn-primary {
+      background: var(--accent);
+      border-color: var(--accent);
+      color: #fff;
+    }
+    [data-theme="dark"] .btn-primary { color: #0a1414; }
+    .btn-primary:hover { background: var(--accent-hover); border-color: var(--accent-hover); }
+    .btn-ghost { border-color: transparent; background: transparent; }
+    .btn-ghost:hover { background: var(--surface-2); }
+    .btn-sm { padding: 4px 8px; font-size: 0.75rem; }
+    .btn-group { display: flex; border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; }
+    .btn-group .btn { border: none; border-radius: 0; border-right: 1px solid var(--border); }
+    .btn-group .btn:last-child { border-right: none; }
+    .btn-group .btn.active { background: var(--accent-muted); color: var(--accent); font-weight: 600; }
+
+    /* Layout */
+    .app-shell { display: flex; min-height: calc(100vh - var(--header-h)); }
+    .sidebar {
+      width: var(--sidebar-w);
+      flex-shrink: 0;
+      background: var(--surface);
+      border-right: 1px solid var(--border);
+      overflow-y: auto;
+      max-height: calc(100vh - var(--header-h));
+      position: sticky;
+      top: var(--header-h);
+    }
+    .sidebar-inner { padding: 12px; }
+    .main {
+      flex: 1;
+      min-width: 0;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+    .main-scroll { flex: 1; overflow-y: auto; padding: 12px 16px 24px; }
+
+    /* Sections */
+    .panel-title {
+      font-size: 0.65rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--text-faint);
+      margin: 0 0 8px;
+    }
+    .field { margin-bottom: 10px; }
+    .field label {
+      display: flex; align-items: center; gap: 4px;
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      margin-bottom: 3px;
+    }
+    .field input, .field select {
+      width: 100%;
+      padding: 6px 8px;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      background: var(--bg);
+      color: var(--text);
+    }
+    .field input:invalid, .field input.field-error { border-color: var(--negative); }
+    .field-hint { font-size: 0.68rem; color: var(--text-faint); margin-top: 2px; }
+    .field-error-msg { font-size: 0.68rem; color: var(--negative); margin-top: 2px; }
+    .input-row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+    .slider-row { display: flex; align-items: center; gap: 8px; }
+    .slider-row input[type="range"] { flex: 1; accent-color: var(--accent); }
+    .slider-val { min-width: 48px; text-align: right; font-size: 0.75rem; color: var(--text-muted); }
+
+    .scenario-tabs { display: grid; grid-template-columns: repeat(4, 1fr); gap: 4px; margin-bottom: 10px; }
+    .scenario-tabs button {
+      padding: 6px 4px;
+      font-size: 0.68rem;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      background: var(--bg);
+      color: var(--text-muted);
+      cursor: pointer;
+    }
+    .scenario-tabs button.active {
+      background: var(--accent-muted);
+      border-color: var(--accent);
+      color: var(--accent);
+      font-weight: 600;
+    }
+
+    /* Summary */
+    .interpretation {
+      background: var(--accent-muted);
+      border: 1px solid var(--border);
+      border-left: 3px solid var(--accent);
+      border-radius: var(--radius);
+      padding: 10px 12px;
+      font-size: 0.85rem;
+      margin-bottom: 12px;
+      line-height: 1.5;
+    }
+    .summary-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+      gap: 8px;
+      margin-bottom: 12px;
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      background: var(--bg);
+      padding-bottom: 4px;
+    }
+    .summary-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 10px;
+      box-shadow: var(--shadow);
+    }
+    .summary-card .label { font-size: 0.65rem; color: var(--text-faint); text-transform: uppercase; letter-spacing: 0.05em; }
+    .summary-card .value { font-size: 1.05rem; font-weight: 600; margin-top: 2px; }
+    .summary-card .sub { font-size: 0.68rem; color: var(--text-muted); margin-top: 2px; }
+    .summary-card.highlight { border-color: var(--accent); }
+    .positive { color: var(--positive); }
+    .negative { color: var(--negative); }
+
+    /* Cards & charts */
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      margin-bottom: 12px;
+      box-shadow: var(--shadow);
+    }
+    .card-header {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 8px 12px;
+      border-bottom: 1px solid var(--border);
+      font-size: 0.8rem;
+      font-weight: 600;
+    }
+    .card-body { padding: 12px; }
+    .chart-wrap { position: relative; height: 220px; }
+    .chart-wrap.tall { height: 260px; }
+    .charts-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    @media (max-width: 900px) { .charts-row { grid-template-columns: 1fr; } }
+
+    /* Table */
+    .table-toolbar {
+      display: flex; flex-wrap: wrap; gap: 8px; align-items: center;
+      padding: 8px 12px;
+      border-bottom: 1px solid var(--border);
+      font-size: 0.75rem;
+    }
+    .table-wrap { overflow-x: auto; max-height: 320px; overflow-y: auto; }
+    table { width: 100%; border-collapse: collapse; font-size: 0.75rem; }
+    th, td {
+      padding: 6px 10px;
+      text-align: right;
+      border-bottom: 1px solid var(--border);
+      white-space: nowrap;
+    }
+    th { position: sticky; top: 0; background: var(--surface-2); font-weight: 600; color: var(--text-muted); text-align: right; z-index: 1; }
+    th:first-child, td:first-child { text-align: left; }
+    tr:hover td { background: var(--accent-muted); }
+
+    /* Method */
+    details.method {
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      background: var(--surface);
+      margin-bottom: 12px;
+    }
+    details.method summary {
+      padding: 10px 12px;
+      cursor: pointer;
+      font-weight: 600;
+      font-size: 0.8rem;
+    }
+    details.method .method-body {
+      padding: 0 12px 12px;
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      line-height: 1.55;
+    }
+    details.method code { font-family: var(--mono); font-size: 0.72rem; background: var(--surface-2); padding: 1px 4px; border-radius: 2px; }
+
+    /* Tooltip */
+    .tip {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 14px; height: 14px;
+      border-radius: 50%;
+      background: var(--surface-2);
+      color: var(--text-faint);
+      font-size: 0.6rem;
+      font-weight: 700;
+      cursor: help;
+      border: none;
+      padding: 0;
+    }
+    .tip[aria-expanded="true"] { background: var(--accent-muted); color: var(--accent); }
+    .tip-popover {
+      position: fixed;
+      max-width: 260px;
+      padding: 8px 10px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      font-size: 0.72rem;
+      color: var(--text-muted);
+      z-index: 200;
+      pointer-events: none;
+    }
+
+    /* States */
+    .state-banner {
+      display: none;
+      padding: 8px 12px;
+      font-size: 0.75rem;
+      border-radius: var(--radius);
+      margin-bottom: 8px;
+    }
+    .state-banner.visible { display: block; }
+    .state-banner.error { background: rgba(155,44,44,0.12); color: var(--negative); border: 1px solid var(--negative); }
+    .state-banner.loading { background: var(--surface-2); color: var(--text-muted); }
+
+    /* Mode bar */
+    .mode-bar {
+      display: flex; flex-wrap: wrap; gap: 6px;
+      margin-bottom: 10px;
+    }
+
+    /* Print */
+    @media print {
+      .sidebar, .app-header .header-actions, .no-print { display: none !important; }
+      .sidebar { display: none; }
+      .app-shell { display: block; }
+      .main-scroll { overflow: visible; padding: 0; }
+      .summary-grid { position: static; }
+      .chart-wrap { height: 180px; page-break-inside: avoid; }
+      body { background: #fff; color: #000; }
+      .card { break-inside: avoid; }
+    }
+
+    @media (max-width: 768px) {
+      .app-shell { flex-direction: column; }
+      .sidebar {
+        width: 100%;
+        max-height: none;
+        position: static;
+        border-right: none;
+        border-bottom: 1px solid var(--border);
+      }
+      .summary-grid { grid-template-columns: repeat(2, 1fr); }
+    }
+  </style>
+</head>
+<body>
+  <header class="app-header no-print">
+    <a class="logo" href="#" aria-label="Retirement Income Planner home">
+      <svg viewBox="0 0 32 32" aria-hidden="true" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <rect width="32" height="32" rx="4" fill="currentColor" opacity="0.08"/>
+        <path d="M6 22 L10 14 L14 18 L18 10 L22 16 L26 8" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"/>
+        <circle cx="26" cy="8" r="2" fill="var(--accent)"/>
+        <line x1="6" y1="24" x2="26" y2="24" stroke="currentColor" stroke-width="1" opacity="0.35"/>
+      </svg>
+      <div>
+        <div class="logo-title">Retirement Income Planner</div>
+        <div class="logo-sub">Equity portfolio · monthly compounding</div>
+      </div>
+    </a>
+    <div class="header-actions">
+      <div class="btn-group" role="group" aria-label="Value display mode">
+        <button type="button" class="btn btn-sm" id="btnNominal" data-value-mode="nominal" aria-pressed="true">Nominal</button>
+        <button type="button" class="btn btn-sm" id="btnReal" data-value-mode="real" aria-pressed="false">Real (today's CHF)</button>
+      </div>
+      <button type="button" class="btn btn-sm" id="btnPrint" title="Print report">Print</button>
+      <button type="button" class="btn btn-sm" id="btnShare" title="Copy shareable URL">Share URL</button>
+      <button type="button" class="btn btn-sm" id="btnTheme" aria-label="Toggle dark mode">Dark</button>
+    </div>
+  </header>
+
+  <div class="app-shell">
+    <aside class="sidebar no-print" aria-label="Assumptions and controls">
+      <div class="sidebar-inner">
+        <p class="panel-title">Scenario</p>
+        <div class="scenario-tabs" role="tablist" aria-label="Scenario presets">
+          <button type="button" role="tab" data-scenario="conservative" aria-selected="false">Conservative</button>
+          <button type="button" role="tab" data-scenario="base" aria-selected="true">Base</button>
+          <button type="button" role="tab" data-scenario="equity" aria-selected="false">Equity-heavy</button>
+          <button type="button" role="tab" data-scenario="custom" aria-selected="false">Custom</button>
+        </div>
+
+        <div class="mode-bar">
+          <button type="button" class="btn btn-sm active" id="modeStandard" data-mode="standard">Standard</button>
+          <button type="button" class="btn btn-sm" id="modeCurrentPlan" data-mode="currentPlan" title="Solve sustainable income from current savings">Current plan</button>
+          <button type="button" class="btn btn-sm" id="modeSolveSavings" data-mode="solveSavings" title="Solve monthly savings for target">Solve savings</button>
+        </div>
+
+        <button type="button" class="btn btn-primary" style="width:100%;margin-bottom:12px" id="btnReset">Reset to base scenario</button>
+
+        <p class="panel-title">Profile</p>
+        <div class="input-row">
+          <div class="field">
+            <label for="currentAge">Current age</label>
+            <input type="number" id="currentAge" min="18" max="90" step="1" value="44" required />
+          </div>
+          <div class="field">
+            <label for="retirementAge">Retirement age</label>
+            <input type="number" id="retirementAge" min="40" max="95" step="1" value="62" required />
+          </div>
+        </div>
+        <div class="field">
+          <label for="currency">Currency</label>
+          <select id="currency" aria-label="Currency">
+            <option value="CHF" selected>CHF — Swiss franc</option>
+            <option value="EUR">EUR — Euro</option>
+            <option value="USD">USD — US dollar</option>
+            <option value="GBP">GBP — British pound</option>
+          </select>
+        </div>
+
+        <p class="panel-title">Portfolio & savings</p>
+        <div class="field">
+          <label for="currentPortfolio">Current invested portfolio</label>
+          <input type="number" id="currentPortfolio" min="0" step="1000" value="200000" class="tabular" required />
+        </div>
+        <div class="field">
+          <label for="monthlySavings">Current monthly savings</label>
+          <input type="number" id="monthlySavings" min="0" step="100" value="5000" class="tabular" required />
+        </div>
+        <div class="field">
+          <label for="contributionGrowth">Annual contribution increase (%)
+            <button type="button" class="tip" data-tip="contrib" aria-label="Contribution growth help">?</button>
+          </label>
+          <input type="number" id="contributionGrowth" min="0" max="20" step="0.1" value="0" />
+        </div>
+
+        <p class="panel-title">Returns & inflation</p>
+        <div class="field">
+          <label for="returnBefore">Return before retirement (%/yr)
+            <button type="button" class="tip" data-tip="return" aria-label="Return help">?</button>
+          </label>
+          <div class="slider-row">
+            <input type="range" id="returnBeforeSlider" min="0" max="12" step="0.1" value="6.5" aria-label="Return before retirement slider" />
+            <span class="slider-val tabular" id="returnBeforeVal">6.5%</span>
+          </div>
+          <input type="number" id="returnBefore" min="-5" max="20" step="0.1" value="6.5" />
+        </div>
+        <div class="field">
+          <label for="returnAfter">Return during retirement (%/yr)</label>
+          <div class="slider-row">
+            <input type="range" id="returnAfterSlider" min="0" max="10" step="0.1" value="4.5" />
+            <span class="slider-val tabular" id="returnAfterVal">4.5%</span>
+          </div>
+          <input type="number" id="returnAfter" min="-5" max="15" step="0.1" value="4.5" />
+        </div>
+        <div class="field">
+          <label for="inflation">Inflation (%/yr)
+            <button type="button" class="tip" data-tip="inflation" aria-label="Inflation help">?</button>
+          </label>
+          <div class="slider-row">
+            <input type="range" id="inflationSlider" min="0" max="8" step="0.1" value="2" />
+            <span class="slider-val tabular" id="inflationVal">2.0%</span>
+          </div>
+          <input type="number" id="inflation" min="0" max="15" step="0.1" value="2" />
+        </div>
+        <div class="field">
+          <label for="taxDrag">Taxes & fees drag (%/yr)</label>
+          <input type="number" id="taxDrag" min="0" max="5" step="0.1" value="0.5" />
+        </div>
+
+        <p class="panel-title">Retirement income</p>
+        <div class="field">
+          <label for="targetIncome">Target monthly income (today's purchasing power)
+            <button type="button" class="tip" data-tip="target" aria-label="Target income help">?</button>
+          </label>
+          <input type="number" id="targetIncome" min="0" step="100" value="5000" class="tabular" required />
+        </div>
+        <div class="field">
+          <label for="swr">Safe withdrawal rate (%/yr)
+            <button type="button" class="tip" data-tip="swr" aria-label="Withdrawal rate help">?</button>
+          </label>
+          <div class="slider-row">
+            <input type="range" id="swrSlider" min="2" max="6" step="0.1" value="3.5" />
+            <span class="slider-val tabular" id="swrVal">3.5%</span>
+          </div>
+          <input type="number" id="swr" min="1" max="10" step="0.1" value="3.5" />
+        </div>
+      </div>
+    </aside>
+
+    <main class="main" id="mainContent">
+      <div class="main-scroll">
+        <div id="stateBanner" class="state-banner" role="status" aria-live="polite"></div>
+        <p class="interpretation tabular" id="interpretation" aria-live="polite"></p>
+
+        <div class="summary-grid tabular" id="summaryGrid" aria-label="Key results"></div>
+
+        <details class="method">
+          <summary>Method & assumptions</summary>
+          <div class="method-body">
+            <p>All accumulation uses <strong>monthly compounding</strong>. Effective monthly return: <code>r_m = (1 + r_annual − tax_drag)^(1/12) − 1</code>. Contribution growth uses monthly rate <code>g_m = (1 + g_annual)^(1/12) − 1</code>.</p>
+            <p>Portfolio at retirement: <code>FV = PV·(1+r_m)^n + PMT·[(1+r_m)^n − (1+g_m)^n] / (r_m − g_m)</code> (if <code>r_m = g_m</code>, limit form is used).</p>
+            <p>Target income is entered in <strong>today's real terms</strong>. Nominal monthly need at retirement: <code>target × (1 + inflation)^years</code>. Capital required: <code>nominal_annual_need / SWR</code>. Sustainable income: <code>portfolio × (SWR − tax_drag_on_withdrawal) / 12</code> where withdrawal tax drag equals annual tax/fees %.</p>
+            <p><strong>Sequence-of-returns risk:</strong> equity-heavy portfolios may show higher long-term expected returns but larger drawdowns; realized paths can fall short of the deterministic projection. Bands on the growth chart show pessimistic (−2% return), base, and optimistic (+2% return) paths.</p>
+            <p>This tool is illustrative only — not financial advice.</p>
+          </div>
+        </details>
+
+        <div class="charts-row">
+          <section class="card" aria-labelledby="chartGrowthTitle">
+            <div class="card-header"><span id="chartGrowthTitle">Portfolio growth to retirement</span></div>
+            <div class="card-body"><div class="chart-wrap"><canvas id="chartGrowth" aria-label="Portfolio growth chart"></canvas></div></div>
+          </section>
+          <section class="card" aria-labelledby="chartIncomeTitle">
+            <div class="card-header"><span id="chartIncomeTitle">Income: target vs sustainable</span></div>
+            <div class="card-body"><div class="chart-wrap"><canvas id="chartIncome" aria-label="Income comparison chart"></canvas></div></div>
+          </section>
+        </div>
+
+        <section class="card" aria-labelledby="chartSensTitle">
+          <div class="card-header"><span id="chartSensTitle">Sensitivity: return × withdrawal rate</span></div>
+          <div class="card-body"><div class="chart-wrap tall"><canvas id="chartSensitivity" aria-label="Sensitivity chart"></canvas></div></div>
+        </section>
+
+        <section class="card" aria-labelledby="tableTitle">
+          <div class="card-header"><span id="tableTitle">Year-by-year projection</span></div>
+          <div class="table-toolbar no-print">
+            <button type="button" class="btn btn-sm btn-primary" id="btnExportCsv">Export CSV</button>
+            <span id="tableMeta" class="tabular" style="color:var(--text-muted)"></span>
+          </div>
+          <div class="table-wrap">
+            <table id="projectionTable">
+              <thead>
+                <tr>
+                  <th scope="col">Year</th>
+                  <th scope="col">Age</th>
+                  <th scope="col">Contributions</th>
+                  <th scope="col">Growth</th>
+                  <th scope="col">End portfolio</th>
+                  <th scope="col">Sustainable income/mo</th>
+                </tr>
+              </thead>
+              <tbody id="projectionBody"></tbody>
+            </table>
+          </div>
+        </section>
+
+        <section class="card print-only-block" id="printReport" hidden aria-hidden="true"></section>
+      </div>
+    </main>
+  </div>
+
+  <div id="tipPopover" class="tip-popover" hidden role="tooltip"></div>
+
+  <script>
+(function () {
+  'use strict';
+
+  const SCENARIOS = {
+    conservative: { returnBefore: 4, returnAfter: 3, inflation: 2.5, swr: 3 },
+    base: { returnBefore: 6.5, returnAfter: 4.5, inflation: 2, swr: 3.5 },
+    equity: { returnBefore: 7.5, returnAfter: 5, inflation: 2, swr: 3.5 },
+    custom: null
+  };
+
+  const TIPS = {
+    return: 'Expected annual portfolio return before retirement (nominal). Equity-heavy allocations often cluster around 6–8% long-term but with deep drawdowns and sequence risk.',
+    inflation: 'Used to inflate your real target income to nominal amounts at retirement and to convert results into today\'s purchasing power when "Real" mode is on.',
+    swr: 'Annual percentage of retirement capital withdrawn in year one. Lower rates (3–3.5%) are more conservative; 4% is a common rule-of-thumb with higher depletion risk.',
+    target: 'Monthly passive income in today\'s currency — the planner inflates this to retirement-year nominal amounts for comparison.',
+    contrib: 'Optional annual step-up of monthly contributions (e.g. salary increases). Applied with monthly compounding.',
+    sequence: 'Equity-heavy investing may increase expected return but raises drawdown and sequence-of-returns risk — early losses near retirement hurt more.'
+  };
+
+  const $ = (id) => document.getElementById(id);
+  const state = {
+    scenario: 'base',
+    mode: 'standard', // standard | currentPlan | solveSavings
+    valueMode: 'nominal', // nominal | real
+    theme: 'light',
+    charts: {},
+    debounceTimer: null
+  };
+
+  const fields = [
+    'currentAge', 'retirementAge', 'currentPortfolio', 'monthlySavings',
+    'returnBefore', 'returnAfter', 'inflation', 'swr', 'targetIncome',
+    'taxDrag', 'contributionGrowth', 'currency'
+  ];
+
+  function pctToDec(v) { return Number(v) / 100; }
+  function monthlyRate(annualPct, taxDragPct) {
+    const annual = pctToDec(annualPct) - pctToDec(taxDragPct);
+    return Math.pow(1 + annual, 1 / 12) - 1;
+  }
+  function monthlyGrowth(annualPct) {
+    return Math.pow(1 + pctToDec(annualPct), 1 / 12) - 1;
+  }
+
+  function readInputs() {
+    const currentAge = Number($('currentAge').value);
+    const retirementAge = Number($('retirementAge').value);
+    const years = retirementAge - currentAge;
+    return {
+      currentAge,
+      retirementAge,
+      years,
+      months: Math.max(0, years * 12),
+      currency: $('currency').value,
+      currentPortfolio: Number($('currentPortfolio').value),
+      monthlySavings: Number($('monthlySavings').value),
+      returnBefore: Number($('returnBefore').value),
+      returnAfter: Number($('returnAfter').value),
+      inflation: Number($('inflation').value),
+      swr: Number($('swr').value),
+      targetIncome: Number($('targetIncome').value),
+      taxDrag: Number($('taxDrag').value),
+      contributionGrowth: Number($('contributionGrowth').value),
+      r: monthlyRate(Number($('returnBefore').value), Number($('taxDrag').value)),
+      g: monthlyGrowth(Number($('contributionGrowth').value))
+    };
+  }
+
+  function fvLumpSum(pv, r, n) {
+    if (n <= 0) return pv;
+    return pv * Math.pow(1 + r, n);
+  }
+
+  function fvContributions(pmt, r, g, n) {
+    if (n <= 0 || pmt <= 0) return 0;
+    if (Math.abs(r - g) < 1e-12) {
+      return pmt * n * Math.pow(1 + r, n - 1);
+    }
+    return pmt * (Math.pow(1 + r, n) - Math.pow(1 + g, n)) / (r - g);
+  }
+
+  function solvePayment(targetFv, pv, r, g, n) {
+    const fvPv = fvLumpSum(pv, r, n);
+    const need = targetFv - fvPv;
+    if (need <= 0) return 0;
+    if (n <= 0) return need;
+    let denom;
+    if (Math.abs(r - g) < 1e-12) {
+      denom = n * Math.pow(1 + r, Math.max(0, n - 1));
+    } else {
+      denom = (Math.pow(1 + r, n) - Math.pow(1 + g, n)) / (r - g);
+    }
+    if (denom <= 0) return 0;
+    return need / denom;
+  }
+
+  function sustainableMonthly(portfolio, swrPct, taxDragPct) {
+    const netSwr = Math.max(0, pctToDec(swrPct) - pctToDec(taxDragPct));
+    return portfolio * netSwr / 12;
+  }
+
+  function capitalForTarget(targetMonthlyToday, inflationPct, years, swrPct) {
+    const infl = Math.pow(1 + pctToDec(inflationPct), years);
+    const nominalMonthly = targetMonthlyToday * infl;
+    const nominalAnnual = nominalMonthly * 12;
+    const swr = pctToDec(swrPct);
+    if (swr <= 0) return Infinity;
+    return nominalAnnual / swr;
+  }
+
+  function projectYearByYear(inp, monthlySavingsOverride) {
+    const rows = [];
+    const years = inp.years;
+    if (years <= 0) return rows;
+    let balance = inp.currentPortfolio;
+    const pmt = monthlySavingsOverride ?? inp.monthlySavings;
+    const r = inp.r;
+    const g = inp.g;
+    for (let y = 1; y <= years; y++) {
+      let yearContrib = 0;
+      let yearGrowth = 0;
+      const startBal = balance;
+      for (let m = 0; m < 12; m++) {
+        const monthIndex = (y - 1) * 12 + m;
+        const contrib = pmt * Math.pow(1 + g, monthIndex);
+        const growth = balance * r;
+        balance += growth + contrib;
+        yearContrib += contrib;
+        yearGrowth += growth;
+      }
+      const sust = sustainableMonthly(balance, inp.swr, inp.taxDrag);
+      rows.push({
+        year: y,
+        age: inp.currentAge + y,
+        contributions: yearContrib,
+        growth: yearGrowth,
+        endPortfolio: balance,
+        sustainableMonthly: sust
+      });
+    }
+    return rows;
+  }
+
+  function projectPath(inp, annualReturnOverride) {
+    const r = monthlyRate(annualReturnOverride ?? inp.returnBefore, inp.taxDrag);
+    const g = inp.g;
+    const n = inp.months;
+    const points = [{ age: inp.currentAge, portfolio: inp.currentPortfolio }];
+    let balance = inp.currentPortfolio;
+    for (let m = 1; m <= n; m++) {
+      const contrib = inp.monthlySavings * Math.pow(1 + g, m - 1);
+      balance = balance * (1 + r) + contrib;
+      if (m % 12 === 0) {
+        points.push({ age: inp.currentAge + m / 12, portfolio: balance });
+      }
+    }
+    return points;
+  }
+
+  function validate(inp) {
+    const errors = [];
+    if (!Number.isFinite(inp.currentAge) || inp.currentAge < 18 || inp.currentAge > 90) {
+      errors.push('Current age must be between 18 and 90.');
+    }
+    if (!Number.isFinite(inp.retirementAge) || inp.retirementAge <= inp.currentAge) {
+      errors.push('Retirement age must be greater than current age.');
+    }
+    if (inp.years > 50) errors.push('Horizon exceeds 50 years — check ages.');
+    if (inp.currentPortfolio < 0) errors.push('Portfolio cannot be negative.');
+    if (inp.monthlySavings < 0) errors.push('Monthly savings cannot be negative.');
+    if (inp.returnBefore < -5 || inp.returnBefore > 20) errors.push('Pre-retirement return looks unrealistic.');
+    if (inp.swr < 1 || inp.swr > 10) errors.push('Withdrawal rate should be between 1% and 10%.');
+    if (inp.targetIncome < 0) errors.push('Target income cannot be negative.');
+    if (inp.inflation < 0 || inp.inflation > 15) errors.push('Inflation rate looks unrealistic.');
+    return errors;
+  }
+
+  function formatMoney(amount, currency, realMode, inflFactor) {
+    if (!Number.isFinite(amount)) return '—';
+    let v = amount;
+    if (realMode && inflFactor > 0) v = amount / inflFactor;
+    const opts = { maximumFractionDigits: 0, minimumFractionDigits: 0 };
+    try {
+      return new Intl.NumberFormat(undefined, { style: 'currency', currency, ...opts }).format(v);
+    } catch {
+      return `${currency} ${Math.round(v).toLocaleString()}`;
+    }
+  }
+
+  function formatPct(v) {
+    return `${Number(v).toFixed(1)}%`;
+  }
+
+  function deflate(amount, inflFactor) {
+    return inflFactor > 0 ? amount / inflFactor : amount;
+  }
+
+  function calculate() {
+    const inp = readInputs();
+    const errors = validate(inp);
+    const banner = $('stateBanner');
+    banner.className = 'state-banner';
+    if (errors.length) {
+      banner.textContent = errors.join(' ');
+      banner.classList.add('visible', 'error');
+      $('interpretation').textContent = 'Fix the highlighted inputs to see projections.';
+      $('summaryGrid').innerHTML = '';
+      return null;
+    }
+    banner.classList.remove('visible');
+
+    const inflFactor = Math.pow(1 + pctToDec(inp.inflation), inp.years);
+    const realMode = state.valueMode === 'real';
+    const capRequired = capitalForTarget(inp.targetIncome, inp.inflation, inp.years, inp.swr);
+    const fvPort = fvLumpSum(inp.currentPortfolio, inp.r, inp.months);
+    let monthlySavings = inp.monthlySavings;
+
+    if (state.mode === 'solveSavings') {
+      monthlySavings = solvePayment(capRequired, inp.currentPortfolio, inp.r, inp.g, inp.months);
+      $('monthlySavings').value = Math.max(0, Math.round(monthlySavings));
+    }
+
+    const fvContrib = fvContributions(monthlySavings, inp.r, inp.g, inp.months);
+    const totalPortfolio = fvPort + fvContrib;
+    const sustMonthlyNominal = sustainableMonthly(totalPortfolio, inp.swr, inp.taxDrag);
+    const targetNominalMonthly = inp.targetIncome * inflFactor;
+    const requiredMonthlySavings = solvePayment(capRequired, inp.currentPortfolio, inp.r, inp.g, inp.months);
+
+    let solvedTargetIncome = inp.targetIncome;
+    if (state.mode === 'currentPlan') {
+      solvedTargetIncome = deflate(sustMonthlyNominal, inflFactor);
+      $('targetIncome').value = Math.round(solvedTargetIncome);
+    }
+
+    const capGap = totalPortfolio - capRequired;
+    const incomeGap = sustMonthlyNominal - targetNominalMonthly;
+    const incomeGapReal = deflate(sustMonthlyNominal, inflFactor) - inp.targetIncome;
+
+    const rows = projectYearByYear({ ...inp, monthlySavings }, monthlySavings);
+
+    return {
+      inp,
+      inflFactor,
+      realMode,
+      capRequired,
+      fvPort,
+      fvContrib,
+      totalPortfolio,
+      sustMonthlyNominal,
+      targetNominalMonthly,
+      requiredMonthlySavings,
+      capGap,
+      incomeGap,
+      incomeGapReal,
+      monthlySavings,
+      rows,
+      solvedTargetIncome
+    };
+  }
+
+  function renderSummary(res) {
+    if (!res) return;
+    const { inp, inflFactor, realMode, capRequired, fvPort, fvContrib, totalPortfolio,
+      sustMonthlyNominal, targetNominalMonthly, requiredMonthlySavings, capGap,
+      incomeGapReal, monthlySavings } = res;
+    const c = inp.currency;
+    const fm = (n) => formatMoney(n, c, realMode, inflFactor);
+    const gapClass = (v) => v >= 0 ? 'positive' : 'negative';
+    const gapLabel = (v) => v >= 0 ? 'Surplus' : 'Gap';
+
+    const cards = [
+      { label: 'Years to retirement', value: `${inp.years} yrs`, sub: `Age ${inp.retirementAge}`, highlight: false },
+      { label: 'Portfolio at retirement', value: fm(totalPortfolio), sub: `FV current ${fm(fvPort)} + contrib ${fm(fvContrib)}`, highlight: true },
+      { label: 'Capital required', value: fm(capRequired), sub: `For ${fm(targetNominalMonthly)}/mo nominal target`, highlight: false },
+      { label: 'Sustainable income / mo', value: fm(sustMonthlyNominal), sub: `Target ${fm(targetNominalMonthly)} at retirement`, highlight: true },
+      { label: 'Monthly savings required', value: fm(requiredMonthlySavings), sub: `Current plan ${fm(monthlySavings)}`, highlight: false },
+      { label: `${gapLabel(res.capGap)} (capital)`, value: fm(Math.abs(res.capGap)), sub: res.capGap >= 0 ? 'Above required capital' : 'Short of required capital', highlight: false, cls: gapClass(res.capGap) },
+      { label: `${gapLabel(incomeGapReal)} (income)`, value: fm(Math.abs(realMode ? incomeGapReal : res.incomeGap)), sub: realMode ? "In today's purchasing power" : 'Nominal at retirement', highlight: false, cls: gapClass(incomeGapReal) },
+      { label: 'Inflation-adj. target / mo', value: fm(targetNominalMonthly), sub: `Today's target ${fm(inp.targetIncome)}`, highlight: false }
+    ];
+
+    $('summaryGrid').innerHTML = cards.map(card => `
+      <div class="summary-card ${card.highlight ? 'highlight' : ''}">
+        <div class="label">${card.label}</div>
+        <div class="value tabular ${card.cls || ''}">${card.value}</div>
+        <div class="sub">${card.sub}</div>
+      </div>
+    `).join('');
+  }
+
+  function renderInterpretation(res) {
+    if (!res) return;
+    const { inp, totalPortfolio, sustMonthlyNominal, incomeGapReal, monthlySavings, requiredMonthlySavings } = res;
+    const c = inp.currency;
+    const realMode = state.valueMode === 'real';
+    const port = formatMoney(totalPortfolio, c, realMode, res.inflFactor);
+    const sust = formatMoney(sustMonthlyNominal, c, realMode, res.inflFactor);
+    const modeNote = state.mode === 'solveSavings'
+      ? ` Saving ${formatMoney(monthlySavings, c, realMode, res.inflFactor)}/month would be required to hit your target.`
+      : state.mode === 'currentPlan'
+        ? ' Income target reflects what your current savings plan could support.'
+        : '';
+    const gapText = incomeGapReal >= 0
+      ? `about ${sust}/month — roughly ${formatMoney(Math.abs(incomeGapReal) * (realMode ? 1 : res.inflFactor), c, realMode, res.inflFactor)} above your target.`
+      : `about ${sust}/month — roughly ${formatMoney(Math.abs(incomeGapReal) * (realMode ? 1 : res.inflFactor), c, realMode, res.inflFactor)} below your target.`;
+    $('interpretation').textContent =
+      `At your current plan, you are projected to retire at ${inp.retirementAge} with ${port} and support ${gapText}${modeNote}`;
+    if (state.mode === 'solveSavings' && requiredMonthlySavings > monthlySavings + 1) {
+      $('interpretation').textContent += ` Required savings: ${formatMoney(requiredMonthlySavings, c, realMode, res.inflFactor)}/month.`;
+    }
+  }
+
+  function renderTable(res) {
+    if (!res) return;
+    const { rows, inp, inflFactor, realMode } = res;
+    const c = inp.currency;
+    const fm = (n) => formatMoney(n, c, realMode, inflFactor);
+    $('projectionBody').innerHTML = rows.map(r => `
+      <tr>
+        <td>${r.year}</td>
+        <td>${r.age}</td>
+        <td class="tabular">${fm(r.contributions)}</td>
+        <td class="tabular">${fm(r.growth)}</td>
+        <td class="tabular">${fm(r.endPortfolio)}</td>
+        <td class="tabular">${fm(r.sustainableMonthly)}</td>
+      </tr>
+    `).join('');
+    $('tableMeta').textContent = `${rows.length} years · ${inp.currency} · ${realMode ? 'real values' : 'nominal at each date'}`;
+  }
+
+  function destroyChart(key) {
+    if (state.charts[key]) {
+      state.charts[key].destroy();
+      state.charts[key] = null;
+    }
+  }
+
+  function chartColors() {
+    const dark = document.documentElement.getAttribute('data-theme') === 'dark';
+    return {
+      text: dark ? '#a8a8a2' : '#5c5c58',
+      grid: dark ? '#3a3a36' : '#e0e0dc',
+      accent: dark ? '#3db8b0' : '#0d6e6e',
+      accent2: dark ? '#6a9fd4' : '#2a5f8f',
+      bandLow: dark ? 'rgba(224,112,112,0.35)' : 'rgba(155,44,44,0.25)',
+      bandHigh: dark ? 'rgba(77,184,122,0.35)' : 'rgba(26,107,60,0.25)',
+      target: dark ? '#d4b84a' : '#8a6d1a'
+    };
+  }
+
+  function renderCharts(res) {
+    if (!res || typeof Chart === 'undefined') {
+      $('stateBanner').textContent = 'Charts loading…';
+      $('stateBanner').className = 'state-banner visible loading';
+      return;
+    }
+    $('stateBanner').classList.remove('visible');
+    const { inp, inflFactor, realMode } = res;
+    const colors = chartColors();
+    const c = inp.currency;
+    const deflator = (v) => realMode ? v / inflFactor : v;
+
+    const basePath = projectPath(inp);
+    const pessimistic = projectPath(inp, inp.returnBefore - 2);
+    const optimistic = projectPath(inp, inp.returnBefore + 2);
+    const ages = basePath.map(p => p.age);
+
+    destroyChart('growth');
+    state.charts.growth = new Chart($('chartGrowth'), {
+      type: 'line',
+      data: {
+        labels: ages,
+        datasets: [
+          { label: 'Pessimistic (−2% return)', data: pessimistic.map(p => deflator(p.portfolio)), borderColor: '#9b2c2c', backgroundColor: colors.bandLow, fill: false, tension: 0.15, pointRadius: 0, borderWidth: 1.5 },
+          { label: 'Optimistic (+2% return)', data: optimistic.map(p => deflator(p.portfolio)), borderColor: '#1a6b3c', backgroundColor: colors.bandHigh, fill: '-1', tension: 0.15, pointRadius: 0, borderWidth: 1.5 },
+          { label: 'Base', data: basePath.map(p => deflator(p.portfolio)), borderColor: colors.accent, tension: 0.15, pointRadius: 0, borderWidth: 2.5, order: 0 }
+        ]
+      },
+      options: chartOpts(colors, `Portfolio (${c})`)
+    });
+
+    const target = deflator(res.targetNominalMonthly);
+    const sust = deflator(res.sustMonthlyNominal);
+    destroyChart('income');
+    state.charts.income = new Chart($('chartIncome'), {
+      type: 'bar',
+      data: {
+        labels: ['At retirement'],
+        datasets: [
+          { label: 'Target monthly', data: [target], backgroundColor: colors.target },
+          { label: 'Sustainable monthly', data: [sust], backgroundColor: colors.accent }
+        ]
+      },
+      options: { ...chartOpts(colors, `Monthly (${c})`), scales: { ...chartOpts(colors).scales, x: { grid: { display: false } } } }
+    });
+
+    const returns = [];
+    const swrs = [];
+    const zData = [];
+    for (let ri = 3; ri <= 10; ri += 0.5) returns.push(ri);
+    for (let wi = 2.5; wi <= 5; wi += 0.25) swrs.push(wi);
+    returns.forEach(rv => {
+      swrs.forEach(wv => {
+        const r = monthlyRate(rv, inp.taxDrag);
+        const fv = fvLumpSum(inp.currentPortfolio, r, inp.months) +
+          fvContributions(res.monthlySavings, r, inp.g, inp.months);
+        zData.push({ x: rv, y: wv, v: deflate(sustainableMonthly(fv, wv, inp.taxDrag), inflFactor) });
+      });
+    });
+
+    destroyChart('sensitivity');
+    state.charts.sensitivity = new Chart($('chartSensitivity'), {
+      type: 'scatter',
+      data: {
+        datasets: [{
+          label: 'Sustainable monthly income',
+          data: zData.map(d => ({ x: d.x, y: d.y, v: d.v })),
+          parsing: false,
+          backgroundColor: (ctx) => {
+            const v = ctx.raw?.v ?? 0;
+            const t = res.inp.targetIncome;
+            const alpha = Math.min(1, Math.max(0.2, v / (t * 2)));
+            return v >= t ? `rgba(26,107,60,${alpha})` : `rgba(155,44,44,${alpha})`;
+          },
+          pointRadius: (ctx) => 5 + (ctx.raw?.v ?? 0) / res.inp.targetIncome,
+          pointHoverRadius: 8
+        },
+        {
+          label: 'Current assumption',
+          data: [{ x: inp.returnBefore, y: inp.swr }],
+          type: 'scatter',
+          pointRadius: 10,
+          pointStyle: 'rectRot',
+          borderColor: colors.accent2,
+          backgroundColor: colors.accent2
+        }]
+      },
+      options: {
+        ...chartOpts(colors, `Income (${c})`),
+        scales: {
+          x: { title: { display: true, text: 'Return before retirement (%)', color: colors.text }, ticks: { color: colors.text }, grid: { color: colors.grid } },
+          y: { title: { display: true, text: 'Withdrawal rate (%)', color: colors.text }, ticks: { color: colors.text }, grid: { color: colors.grid } }
+        },
+        plugins: {
+          ...chartOpts(colors).plugins,
+          tooltip: {
+            callbacks: {
+              label: (ctx) => {
+                if (ctx.datasetIndex === 1) return `Current: ${inp.returnBefore}% / ${inp.swr}% SWR`;
+                const v = ctx.raw?.v;
+                return `Return ${ctx.raw.x}%, SWR ${ctx.raw.y}% → ${formatMoney(v, c, false, 1)}/mo`;
+              }
+            }
+          }
+        }
+      }
+    });
+  }
+
+  function chartOpts(colors, yTitle) {
+    return {
+      responsive: true,
+      maintainAspectRatio: false,
+      interaction: { mode: 'index', intersect: false },
+      plugins: {
+        legend: { labels: { color: colors.text, boxWidth: 12, font: { size: 11 } } },
+        tooltip: { titleFont: { size: 11 }, bodyFont: { size: 11 } }
+      },
+      scales: {
+        x: { ticks: { color: colors.text, maxTicksLimit: 10 }, grid: { color: colors.grid } },
+        y: {
+          title: yTitle ? { display: true, text: yTitle, color: colors.text } : undefined,
+          ticks: { color: colors.text },
+          grid: { color: colors.grid }
+        }
+      }
+    };
+  }
+
+  function exportCsv(res) {
+    if (!res) return;
+    const { rows, inp } = res;
+    const headers = ['Year', 'Age', 'Contributions', 'Growth', 'EndPortfolio', 'SustainableIncomePerMonth'];
+    const lines = [headers.join(',')];
+    rows.forEach(r => {
+      lines.push([r.year, r.age, r.contributions.toFixed(2), r.growth.toFixed(2), r.endPortfolio.toFixed(2), r.sustainableMonthly.toFixed(2)].join(','));
+    });
+    const blob = new Blob([lines.join('\n')], { type: 'text/csv;charset=utf-8' });
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = `retirement-projection-${inp.retirementAge}.csv`;
+    a.click();
+    URL.revokeObjectURL(a.href);
+  }
+
+  function syncSliders() {
+    const pairs = [
+      ['returnBefore', 'returnBeforeSlider', 'returnBeforeVal', v => formatPct(v)],
+      ['returnAfter', 'returnAfterSlider', 'returnAfterVal', v => formatPct(v)],
+      ['inflation', 'inflationSlider', 'inflationVal', v => formatPct(v)],
+      ['swr', 'swrSlider', 'swrVal', v => formatPct(v)]
+    ];
+    pairs.forEach(([id, sliderId, valId, fmt]) => {
+      const el = $(id);
+      const sl = $(sliderId);
+      const vl = $(valId);
+      if (!el || !sl) return;
+      sl.value = el.value;
+      if (vl) vl.textContent = fmt(el.value);
+    });
+  }
+
+  function applyScenario(name) {
+    const preset = SCENARIOS[name];
+    state.scenario = name;
+    document.querySelectorAll('.scenario-tabs button').forEach(btn => {
+      const active = btn.dataset.scenario === name;
+      btn.classList.toggle('active', active);
+      btn.setAttribute('aria-selected', active);
+    });
+    if (!preset) return;
+    $('returnBefore').value = preset.returnBefore;
+    $('returnAfter').value = preset.returnAfter;
+    $('inflation').value = preset.inflation;
+    $('swr').value = preset.swr;
+    syncSliders();
+  }
+
+  function setMode(mode) {
+    state.mode = mode;
+    ['modeStandard', 'modeCurrentPlan', 'modeSolveSavings'].forEach(id => {
+      const el = $(id);
+      if (el) el.classList.toggle('active', el.dataset.mode === mode);
+    });
+    $('monthlySavings').disabled = mode === 'solveSavings';
+    $('targetIncome').disabled = mode === 'currentPlan';
+  }
+
+  function hashFromState() {
+    const data = {};
+    fields.forEach(f => { data[f] = $(f).value; });
+    data.scenario = state.scenario;
+    data.mode = state.mode;
+    data.valueMode = state.valueMode;
+    return '#' + encodeURIComponent(JSON.stringify(data));
+  }
+
+  function loadFromHash() {
+    if (!location.hash || location.hash.length < 2) return;
+    try {
+      const data = JSON.parse(decodeURIComponent(location.hash.slice(1)));
+      fields.forEach(f => { if (data[f] != null && $(f)) $(f).value = data[f]; });
+      if (data.scenario) applyScenario(data.scenario);
+      if (data.mode) setMode(data.mode);
+      if (data.valueMode) setValueMode(data.valueMode);
+      syncSliders();
+    } catch (_) { /* ignore bad hash */ }
+  }
+
+  function setValueMode(mode) {
+    state.valueMode = mode;
+    $('btnNominal').classList.toggle('active', mode === 'nominal');
+    $('btnReal').classList.toggle('active', mode === 'real');
+    $('btnNominal').setAttribute('aria-pressed', mode === 'nominal');
+    $('btnReal').setAttribute('aria-pressed', mode === 'real');
+  }
+
+  function setTheme(theme) {
+    state.theme = theme;
+    document.documentElement.setAttribute('data-theme', theme);
+    $('btnTheme').textContent = theme === 'dark' ? 'Light' : 'Dark';
+    $('btnTheme').setAttribute('aria-label', theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode');
+  }
+
+  function recalc() {
+    syncSliders();
+    const res = calculate();
+    renderSummary(res);
+    renderInterpretation(res);
+    renderTable(res);
+    renderCharts(res);
+    history.replaceState(null, '', hashFromState());
+  }
+
+  function scheduleRecalc() {
+    clearTimeout(state.debounceTimer);
+    state.debounceTimer = setTimeout(recalc, 60);
+  }
+
+  // Tooltips
+  let activeTip = null;
+  document.querySelectorAll('.tip').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const key = btn.dataset.tip;
+      const pop = $('tipPopover');
+      if (activeTip === btn) {
+        pop.hidden = true;
+        btn.setAttribute('aria-expanded', 'false');
+        activeTip = null;
+        return;
+      }
+      activeTip = btn;
+      document.querySelectorAll('.tip').forEach(b => b.setAttribute('aria-expanded', 'false'));
+      btn.setAttribute('aria-expanded', 'true');
+      pop.textContent = TIPS[key] || TIPS.sequence;
+      pop.hidden = false;
+      const rect = btn.getBoundingClientRect();
+      pop.style.left = `${Math.min(rect.left, window.innerWidth - 270)}px`;
+      pop.style.top = `${rect.bottom + 6}px`;
+    });
+  });
+  document.addEventListener('click', () => {
+    if (activeTip) {
+      $('tipPopover').hidden = true;
+      activeTip.setAttribute('aria-expanded', 'false');
+      activeTip = null;
+    }
+  });
+
+  // Events
+  fields.forEach(id => {
+    const el = $(id);
+    if (el) el.addEventListener('input', () => {
+      if (state.scenario !== 'custom') applyScenario('custom');
+      scheduleRecalc();
+    });
+  });
+
+  [['returnBefore', 'returnBeforeSlider'], ['returnAfter', 'returnAfterSlider'], ['inflation', 'inflationSlider'], ['swr', 'swrSlider']].forEach(([id, sliderId]) => {
+    $(id).addEventListener('input', () => { $(sliderId).value = $(id).value; scheduleRecalc(); });
+    $(sliderId).addEventListener('input', () => { $(id).value = $(sliderId).value; scheduleRecalc(); });
+  });
+
+  document.querySelectorAll('.scenario-tabs button').forEach(btn => {
+    btn.addEventListener('click', () => {
+      applyScenario(btn.dataset.scenario);
+      recalc();
+    });
+  });
+
+  $('modeStandard').addEventListener('click', () => { setMode('standard'); recalc(); });
+  $('modeCurrentPlan').addEventListener('click', () => { setMode('currentPlan'); recalc(); });
+  $('modeSolveSavings').addEventListener('click', () => { setMode('solveSavings'); recalc(); });
+
+  $('btnReset').addEventListener('click', () => {
+    $('currentAge').value = 44;
+    $('retirementAge').value = 62;
+    $('currentPortfolio').value = 200000;
+    $('monthlySavings').value = 5000;
+    $('targetIncome').value = 5000;
+    $('returnBefore').value = 6.5;
+    $('returnAfter').value = 4.5;
+    $('inflation').value = 2;
+    $('swr').value = 3.5;
+    $('taxDrag').value = 0.5;
+    $('contributionGrowth').value = 0;
+    $('currency').value = 'CHF';
+    setMode('standard');
+    applyScenario('base');
+    recalc();
+  });
+
+  $('btnTheme').addEventListener('click', () => {
+    setTheme(state.theme === 'dark' ? 'light' : 'dark');
+    recalc();
+  });
+
+  $('btnNominal').addEventListener('click', () => { setValueMode('nominal'); recalc(); });
+  $('btnReal').addEventListener('click', () => { setValueMode('real'); recalc(); });
+
+  $('btnPrint').addEventListener('click', () => window.print());
+  $('btnShare').addEventListener('click', async () => {
+    const url = location.origin + location.pathname + hashFromState();
+    try {
+      await navigator.clipboard.writeText(url);
+      $('stateBanner').textContent = 'Share URL copied to clipboard.';
+      $('stateBanner').className = 'state-banner visible';
+      setTimeout(() => $('stateBanner').classList.remove('visible'), 2500);
+    } catch {
+      prompt('Copy this URL:', url);
+    }
+  });
+
+  $('btnExportCsv').addEventListener('click', () => exportCsv(calculate()));
+
+  // Init
+  loadFromHash();
+  if (!location.hash) applyScenario('base');
+  setMode('standard');
+  setValueMode('nominal');
+  const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+  setTheme(prefersDark ? 'dark' : 'light');
+
+  function waitChart() {
+    if (typeof Chart !== 'undefined') recalc();
+    else setTimeout(waitChart, 50);
+  }
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', waitChart);
+  } else {
+    waitChart();
+  }
+})();
+  </script>
+</body>
+</html>
