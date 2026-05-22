@@ -22,6 +22,8 @@ export default function Footer() {
               <li><a href="/#subsidiaries" className="text-gray-300 hover:text-saffron-300 transition-colors duration-200">Subsidiaries</a></li>
               <li><a href="/#collaborations" className="text-gray-300 hover:text-saffron-300 transition-colors duration-200">Collaborations</a></li>
               <li><Link to="/software" className="text-gray-300 hover:text-saffron-300 transition-colors duration-200">Software</Link></li>
+              <li><Link to="/wealth-tools" className="text-gray-300 hover:text-saffron-300 transition-colors duration-200">Wealth Tools</Link></li>
+              <li><a href="/wealth-tools/retirement-income-planner.html" className="text-gray-300 hover:text-saffron-300 transition-colors duration-200">Retirement Income Planner</a></li>
               <li><a href="https://disciplined-recreation-production.up.railway.app/login" target="_blank" rel="noopener noreferrer" className="text-gray-300 hover:text-saffron-300 transition-colors duration-200">Balaji POS Login</a></li>
               <li><Link to="/profile" className="text-gray-300 hover:text-saffron-300 transition-colors duration-200">Founder Profile</Link></li>
               <li><a href="/#contact" className="text-gray-300 hover:text-saffron-300 transition-colors duration-200">Contact</a></li>

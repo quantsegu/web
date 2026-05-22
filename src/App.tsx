@@ -4,6 +4,7 @@ import Home from '../pages/Home';
 import Software from '../pages/Software';
 import Profile from '../pages/Profile';
 import BJP from '../pages/BJP';
+import WealthTools from '../pages/WealthTools';
 
 function LegacyHashRedirect() {
   const location = useLocation();
@@ -15,6 +16,7 @@ function LegacyHashRedirect() {
 
     const legacyRoutes: Record<string, string> = {
       software: '/software',
+      'wealth-tools': '/wealth-tools',
       profile: '/profile',
       'bjp-support': '/bjp',
     };
@@ -72,6 +74,7 @@ export default function App() {
       <Routes>
         <Route path="/" element={<Home {...shaderProps} />} />
         <Route path="/software" element={<Software />} />
+        <Route path="/wealth-tools" element={<WealthTools />} />
         <Route path="/profile" element={<Profile />} />
         <Route path="/bjp" element={<BJP />} />
         <Route path="*" element={<Navigate to="/" replace />} />

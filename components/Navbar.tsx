@@ -13,6 +13,7 @@ const navItems: NavItem[] = [
   { type: 'section', hash: 'collaborations', label: 'Collaborations' },
   { type: 'section', hash: 'founders', label: 'Founders' },
   { type: 'route', to: '/software', label: 'Software' },
+  { type: 'route', to: '/wealth-tools', label: 'Wealth Tools' },
   { type: 'route', to: '/profile', label: 'Founder' },
   { type: 'section', hash: 'contact', label: 'Contact' },
 ];
