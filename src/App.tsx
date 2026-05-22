@@ -4,6 +4,7 @@ import Home from '../pages/Home';
 import Software from '../pages/Software';
 import Profile from '../pages/Profile';
 import BJP from '../pages/BJP';
+import IndianCommunities from '../pages/IndianCommunities';
 import WealthTools from '../pages/WealthTools';
 import InvestmentUniverse from '../pages/InvestmentUniverse';
 import WealthToolFrame from '../components/WealthToolFrame';
@@ -124,6 +125,7 @@ export default function App() {
         />
         <Route path="/profile" element={<Profile />} />
         <Route path="/bjp" element={<BJP />} />
+        <Route path="/communities" element={<IndianCommunities />} />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </BrowserRouter>
