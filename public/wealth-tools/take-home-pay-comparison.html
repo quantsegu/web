@@ -1,0 +1,870 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Compare take-home pay across permanent employment, contracting, and payrolling in NL, CH, LU, DE, BE, UAE, and Singapore." />
+<title>Global Take-Home Pay Comparison — Shreshti Wealth</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=DM+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --bg: #f4f6f9; --surface: #fff; --surface-2: #eef1f6;
+  --border: #d8dee8; --text: #0f172a; --text-muted: #64748b;
+  --accent: #1e40af; --green: #15803d; --green-bg: #dcfce7;
+  --perm: #2563eb; --perm-bg: #dbeafe;
+  --contract: #d97706; --contract-bg: #ffedd5;
+  --payroll: #0d9488; --payroll-bg: #ccfbf1;
+  --tax-bar: #3b82f6; --ss-bar: #f59e0b; --other-bar: #94a3b8;
+  --shadow: 0 1px 3px rgba(15,23,42,0.08);
+  --mono: "IBM Plex Mono", ui-monospace, monospace;
+  --sans: "DM Sans", system-ui, sans-serif;
+}
+[data-theme="dark"] {
+  --bg: #0b1120; --surface: #131c31; --surface-2: #1a2744;
+  --border: #2a3a5c; --text: #e8eef7; --text-muted: #94a3b8;
+  --accent: #60a5fa; --green: #4ade80; --green-bg: rgba(74,222,128,0.12);
+  --perm-bg: rgba(37,99,235,0.2); --contract-bg: rgba(217,119,6,0.2); --payroll-bg: rgba(13,148,136,0.2);
+  --shadow: 0 1px 3px rgba(0,0,0,0.35);
+}
+html { font-size: 15px; scroll-behavior: smooth; }
+body { font-family: var(--sans); background: var(--bg); color: var(--text); line-height: 1.5; min-height: 100vh; }
+.mono { font-family: var(--mono); font-variant-numeric: tabular-nums; }
+button, input, select { font-family: inherit; font-size: inherit; }
+a { color: var(--accent); text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+.topbar {
+  display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px;
+  padding: 14px 24px; background: var(--surface); border-bottom: 1px solid var(--border);
+  position: sticky; top: 0; z-index: 50;
+}
+.topbar h1 { font-size: 0.95rem; font-weight: 700; letter-spacing: -0.02em; }
+.topbar p { font-size: 0.72rem; color: var(--text-muted); }
+.topbar-actions { display: flex; gap: 8px; align-items: center; }
+.btn {
+  padding: 6px 12px; border: 1px solid var(--border); border-radius: 6px;
+  background: var(--surface); color: var(--text); cursor: pointer; font-size: 0.8rem;
+}
+.btn:hover { background: var(--surface-2); }
+.btn-icon { width: 36px; height: 36px; padding: 0; display: grid; place-items: center; }
+
+.wrap { max-width: 1280px; margin: 0 auto; padding: 20px 24px 48px; }
+
+.panel {
+  background: var(--surface); border: 1px solid var(--border); border-radius: 10px;
+  padding: 18px 20px; margin-bottom: 20px; box-shadow: var(--shadow);
+}
+.panel-title { font-size: 0.65rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: var(--text-muted); margin-bottom: 14px; }
+
+.input-row { display: flex; flex-wrap: wrap; gap: 16px 24px; align-items: flex-end; }
+.field label { display: block; font-size: 0.72rem; font-weight: 600; color: var(--text-muted); margin-bottom: 6px; }
+.field input[type=number] {
+  width: 140px; padding: 8px 10px; border: 1px solid var(--border); border-radius: 6px;
+  background: var(--bg); color: var(--text); font-family: var(--mono);
+}
+.currency-toggle { display: flex; gap: 4px; margin-top: 6px; flex-wrap: wrap; }
+.currency-toggle button {
+  padding: 4px 8px; font-size: 0.68rem; border: 1px solid var(--border); border-radius: 4px;
+  background: var(--surface-2); cursor: pointer; font-family: var(--mono);
+}
+.currency-toggle button.active { background: var(--accent); color: #fff; border-color: var(--accent); }
+.fx-note { font-size: 0.68rem; color: var(--text-muted); margin-top: 6px; max-width: 280px; }
+
+.segmented { display: flex; border: 1px solid var(--border); border-radius: 8px; overflow: hidden; }
+.segmented button {
+  padding: 8px 14px; border: none; background: var(--surface-2); color: var(--text-muted);
+  cursor: pointer; font-size: 0.78rem; font-weight: 600; border-right: 1px solid var(--border);
+}
+.segmented button:last-child { border-right: none; }
+.segmented button.active-perm { background: var(--perm); color: #fff; }
+.segmented button.active-contract { background: var(--contract); color: #fff; }
+.segmented button.active-payroll { background: var(--payroll); color: #fff; }
+
+.pills { display: flex; flex-wrap: wrap; gap: 8px; }
+.pill {
+  padding: 6px 12px; border-radius: 999px; border: 1px solid var(--border);
+  background: var(--surface-2); cursor: pointer; font-size: 0.78rem; user-select: none;
+}
+.pill.selected { background: var(--accent); color: #fff; border-color: var(--accent); }
+
+.advanced-toggle {
+  width: 100%; text-align: left; padding: 10px 0 0; border: none; background: none;
+  color: var(--accent); font-size: 0.8rem; font-weight: 600; cursor: pointer;
+}
+.advanced { display: none; margin-top: 16px; padding-top: 16px; border-top: 1px solid var(--border); }
+.advanced.open { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 14px 20px; }
+.advanced label.chk { display: flex; align-items: center; gap: 8px; font-size: 0.8rem; cursor: pointer; }
+.advanced select { width: 100%; padding: 6px 8px; border: 1px solid var(--border); border-radius: 6px; background: var(--bg); color: var(--text); }
+.advanced .field-hint { font-size: 0.68rem; color: var(--text-muted); margin-top: 4px; }
+
+.cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 16px; margin-bottom: 24px; }
+.card {
+  background: var(--surface); border: 1px solid var(--border); border-radius: 10px;
+  overflow: hidden; box-shadow: var(--shadow); transition: box-shadow 0.2s;
+}
+.card.best { border-color: var(--green); box-shadow: 0 0 0 1px var(--green); }
+.card-head {
+  padding: 14px 16px; border-bottom: 1px solid var(--border);
+  display: flex; justify-content: space-between; align-items: flex-start; gap: 8px;
+}
+.card-head h3 { font-size: 1rem; font-weight: 700; }
+.badges { display: flex; flex-wrap: wrap; gap: 6px; justify-content: flex-end; }
+.badge {
+  font-size: 0.62rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em;
+  padding: 3px 8px; border-radius: 4px;
+}
+.badge-perm { background: var(--perm-bg); color: var(--perm); }
+.badge-contract { background: var(--contract-bg); color: var(--contract); }
+.badge-payroll { background: var(--payroll-bg); color: var(--payroll); }
+.badge-best { background: var(--green-bg); color: var(--green); }
+
+.card-body { padding: 14px 16px; }
+.metric { margin-bottom: 12px; }
+.metric-label { font-size: 0.68rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 4px; }
+.metric-value { font-family: var(--mono); font-size: 1.1rem; font-weight: 600; }
+.metric-sub { font-family: var(--mono); font-size: 0.72rem; color: var(--text-muted); }
+
+.stack-bar {
+  display: flex; height: 10px; border-radius: 5px; overflow: hidden; margin: 8px 0 4px;
+  background: var(--surface-2);
+}
+.stack-bar span { display: block; height: 100%; transition: width 0.3s; }
+.stack-legend { display: flex; flex-wrap: wrap; gap: 10px; font-size: 0.65rem; color: var(--text-muted); }
+.stack-legend i { display: inline-block; width: 8px; height: 8px; border-radius: 2px; margin-right: 4px; vertical-align: middle; }
+
+.net-hero { font-family: var(--mono); font-size: 1.65rem; font-weight: 600; color: var(--green); }
+.effective { font-family: var(--mono); font-size: 0.85rem; color: var(--text-muted); }
+
+.toggle-breakdown {
+  width: 100%; margin-top: 10px; padding: 8px; border: 1px dashed var(--border);
+  border-radius: 6px; background: var(--surface-2); cursor: pointer; font-size: 0.75rem;
+  font-weight: 600; color: var(--accent);
+}
+.breakdown { display: none; margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--border); font-size: 0.78rem; }
+.breakdown.open { display: block; }
+.bd-row {
+  display: flex; justify-content: space-between; gap: 8px; padding: 5px 0;
+  border-bottom: 1px dotted var(--border);
+}
+.bd-row:last-child { border-bottom: none; }
+.bd-row.positive span:last-child { color: var(--green); }
+.bd-row.total { font-weight: 700; margin-top: 6px; padding-top: 8px; border-top: 1px solid var(--border); }
+.bd-label { position: relative; cursor: help; }
+.bd-label:hover::after {
+  content: attr(data-tip); position: absolute; left: 0; bottom: 100%; z-index: 10;
+  width: 220px; padding: 8px; background: var(--text); color: var(--surface);
+  font-size: 0.68rem; font-weight: 400; border-radius: 6px; line-height: 1.4; pointer-events: none;
+}
+.bracket-note { font-size: 0.68rem; color: var(--text-muted); margin: 6px 0; line-height: 1.45; }
+
+.chart-panel { margin-bottom: 24px; }
+.chart-title { font-size: 0.85rem; font-weight: 700; margin-bottom: 14px; }
+.chart-row {
+  display: grid; grid-template-columns: 100px 1fr 90px; align-items: center; gap: 12px;
+  margin-bottom: 10px;
+}
+.chart-label { font-size: 0.78rem; font-weight: 600; }
+.chart-track { height: 22px; background: var(--surface-2); border-radius: 4px; overflow: hidden; }
+.chart-fill { height: 100%; border-radius: 4px; transition: width 0.35s; min-width: 2px; }
+.chart-val { font-family: var(--mono); font-size: 0.75rem; text-align: right; }
+
+.table-wrap { overflow-x: auto; margin-bottom: 24px; }
+table { width: 100%; border-collapse: collapse; font-size: 0.78rem; background: var(--surface); border: 1px solid var(--border); border-radius: 10px; overflow: hidden; }
+th, td { padding: 10px 12px; text-align: right; border-bottom: 1px solid var(--border); }
+th:first-child, td:first-child { text-align: left; }
+th { background: var(--surface-2); font-size: 0.65rem; text-transform: uppercase; letter-spacing: 0.06em; color: var(--text-muted); }
+tr:last-child td { border-bottom: none; }
+tr.cheapest td { background: var(--green-bg); }
+
+.footer-note {
+  font-size: 0.72rem; color: var(--text-muted); padding: 16px; border: 1px solid var(--border);
+  border-radius: 8px; background: var(--surface);
+}
+
+@media print {
+  .topbar, .advanced-toggle, .toggle-breakdown, .btn-icon { display: none !important; }
+  .advanced { display: grid !important; }
+  .breakdown { display: block !important; }
+  body { background: #fff; color: #000; }
+  .card { break-inside: avoid; }
+}
+@media (max-width: 640px) {
+  .wrap { padding: 12px; }
+  .chart-row { grid-template-columns: 72px 1fr 72px; }
+}
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <div>
+    <h1>Global Take-Home Pay Comparison</h1>
+    <p>Permanent · Contractor · Payrolling — NL · CH · LU · DE · BE · UAE · SG</p>
+  </div>
+  <div class="topbar-actions">
+    <a href="/wealth-tools" class="btn">← Wealth Tools</a>
+    <button type="button" class="btn btn-icon" id="themeBtn" title="Toggle theme">◐</button>
+  </div>
+</header>
+
+<main class="wrap">
+  <section class="panel" id="inputPanel">
+    <div class="panel-title">Inputs</div>
+    <div class="input-row">
+      <div class="field">
+        <label for="grossInput">Gross annual compensation</label>
+        <input type="number" id="grossInput" value="120000" step="1000" min="20000" max="2000000">
+        <div class="currency-toggle" id="currencyToggle"></div>
+        <p class="fx-note" id="fxNote"></p>
+      </div>
+      <div class="field">
+        <label>Engagement type</label>
+        <div class="segmented" id="engagementToggle">
+          <button type="button" data-eng="permanent" class="active-perm">Permanent</button>
+          <button type="button" data-eng="contractor">Contractor</button>
+          <button type="button" data-eng="payrolling">Payrolling</button>
+        </div>
+      </div>
+      <div class="field" style="flex:1;min-width:200px">
+        <label>Countries</label>
+        <div class="pills" id="countryPills"></div>
+      </div>
+    </div>
+    <button type="button" class="advanced-toggle" id="advancedToggle">▸ Advanced options</button>
+    <div class="advanced" id="advancedPanel">
+      <div class="field">
+        <label class="chk"><input type="checkbox" id="nlRuling30"> NL 30% ruling</label>
+        <p class="field-hint">Taxable base = 70% of gross. Permanent &amp; payrolling only. Requires recruitment from abroad.</p>
+      </div>
+      <div class="field">
+        <label>NL expat status</label>
+        <select id="nlExpat">
+          <option value="expat">Recruited from abroad (eligible)</option>
+          <option value="local">Local hire (not eligible)</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>CH canton</label>
+        <select id="chCanton">
+          <option value="zug">Zug</option>
+          <option value="zurich">Zurich</option>
+          <option value="geneva">Geneva</option>
+          <option value="basel">Basel</option>
+          <option value="bern">Bern</option>
+        </select>
+      </div>
+      <div class="field">
+        <label class="chk"><input type="checkbox" id="deChurch"> DE church tax (+8–9% of income tax)</label>
+      </div>
+      <div class="field">
+        <label class="chk"><input type="checkbox" id="beExpat"> BE special expat regime (~30% exempt)</label>
+      </div>
+      <div class="field">
+        <label class="chk"><input type="checkbox" id="sgNor"> SG NOR scheme (ended 2020 — reference only)</label>
+      </div>
+      <div class="field">
+        <label>Family status</label>
+        <select id="familyStatus">
+          <option value="single">Single</option>
+          <option value="married">Married, no children</option>
+          <option value="married2">Married, 2 children</option>
+        </select>
+      </div>
+      <div class="field">
+        <label class="chk"><input type="checkbox" id="employerCosts"> Include employer costs</label>
+      </div>
+      <div class="field" id="nlContractorModeWrap">
+        <label>NL contractor structure</label>
+        <select id="nlContractorMode">
+          <option value="bv">Via BV (dividend)</option>
+          <option value="zzp">Via ZZP (sole trader)</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>SG status</label>
+        <select id="sgCpf">
+          <option value="ep">EP / Work pass (no CPF)</option>
+          <option value="pr">Citizen / PR (CPF applies)</option>
+        </select>
+      </div>
+    </div>
+  </section>
+
+  <section class="cards" id="cardsRoot"></section>
+
+  <section class="panel chart-panel">
+    <div class="chart-title">Net take-home ranking (EUR equivalent)</div>
+    <div id="chartRoot"></div>
+  </section>
+
+  <section class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>Country</th><th>Engagement</th><th>Gross</th><th>Tax %</th><th>SS employee</th>
+          <th>SS employer</th><th>Net / yr</th><th>Net / mo</th><th>Employer cost</th>
+        </tr>
+      </thead>
+      <tbody id="tableBody"></tbody>
+    </table>
+  </section>
+
+  <p class="footer-note">Estimates based on 2024/2025 tax rates. Exchange rates approximate. Not tax advice — always verify with a licensed advisor in each jurisdiction.</p>
+</main>
+
+<script>
+(function () {
+  'use strict';
+
+  const FX_TO_EUR = { EUR: 1, CHF: 0.99, SGD: 0.68, AED: 0.25, USD: 0.92 };
+  const CURRENCIES = ['EUR', 'CHF', 'SGD', 'AED', 'USD'];
+
+  const COUNTRIES = {
+    nl: { flag: '🇳🇱', name: 'Netherlands', currency: 'EUR', sym: '€' },
+    ch: { flag: '🇨🇭', name: 'Switzerland', currency: 'CHF', sym: 'CHF' },
+    lu: { flag: '🇱🇺', name: 'Luxembourg', currency: 'EUR', sym: '€' },
+    de: { flag: '🇩🇪', name: 'Germany', currency: 'EUR', sym: '€' },
+    be: { flag: '🇧🇪', name: 'Belgium', currency: 'EUR', sym: '€' },
+    ae: { flag: '🇦🇪', name: 'Dubai (UAE)', currency: 'AED', sym: 'AED' },
+    sg: { flag: '🇸🇬', name: 'Singapore', currency: 'SGD', sym: 'S$' },
+  };
+
+  const ENG_LABELS = { permanent: 'Permanent', contractor: 'Contractor', payrolling: 'Payrolling' };
+  const ENG_CLASS = { permanent: 'perm', contractor: 'contract', payrolling: 'payroll' };
+
+  const CH_CANTON_RATE = {
+    zug: 0.16, zurich: 0.25, geneva: 0.34, basel: 0.28, bern: 0.29,
+  };
+
+  let state = {
+    currency: 'EUR',
+    engagement: 'permanent',
+    selected: new Set(Object.keys(COUNTRIES)),
+  };
+
+  function toEur(amount, cur) { return amount * (FX_TO_EUR[cur] || 1); }
+  function fromEur(eur, cur) { return eur / (FX_TO_EUR[cur] || 1); }
+  function fmt(n, sym, dec) {
+    const d = dec != null ? dec : 0;
+    const s = sym === 'S$' ? 'S$' : sym;
+    return s + Number(n).toLocaleString('en-US', { minimumFractionDigits: d, maximumFractionDigits: d });
+  }
+  function pct(part, whole) { return whole > 0 ? Math.round((part / whole) * 1000) / 10 : 0; }
+
+  function bracketTax(income, brackets) {
+    let tax = 0, prev = 0;
+    for (const b of brackets) {
+      const top = b.to === Infinity ? income : Math.min(income, b.to);
+      const slice = Math.max(0, top - prev);
+      tax += slice * b.rate;
+      prev = b.to;
+      if (income <= b.to) break;
+    }
+    return Math.max(0, tax);
+  }
+
+  function bracketText(income, brackets, sym) {
+    const parts = [];
+    let prev = 0;
+    for (const b of brackets) {
+      if (income <= prev) break;
+      const top = b.to === Infinity ? income : Math.min(income, b.to);
+      const slice = Math.max(0, top - prev);
+      if (slice > 0) {
+        parts.push(`${sym}${Math.round(prev).toLocaleString()}–${b.to === Infinity ? '∞' : sym + Math.round(b.to).toLocaleString()} @ ${(b.rate * 100).toFixed(1)}%`);
+      }
+      prev = b.to;
+    }
+    return parts.join('; ') || '—';
+  }
+
+  function nlHeffingskorting(taxable) {
+    if (taxable <= 23201) return 3362;
+    if (taxable >= 76817) return 0;
+    return Math.max(0, 3362 - (taxable - 23201) * 0.06095);
+  }
+
+  function nlArbeidskorting(taxable) {
+    if (taxable <= 39898) return Math.min(5158, 0 + taxable * 0.08425);
+    if (taxable >= 124935) return 0;
+    return Math.max(0, 5158 - (taxable - 39898) * 0.0651);
+  }
+
+  function deIncomeTax(taxable, married) {
+    const split = married ? taxable / 2 : taxable;
+    let tax = 0;
+    if (split <= 11604) tax = 0;
+    else if (split <= 17005) tax = (split - 11604) * 0.14;
+    else if (split <= 66760) tax = 742 + (split - 17005) * 0.24;
+    else if (split <= 277826) tax = 15264 + (split - 66760) * 0.42;
+    else tax = 103159 + (split - 277826) * 0.45;
+    return married ? tax * 2 : tax;
+  }
+
+  function sgIncomeTax(taxableSgd) {
+    const b = [
+      { to: 20000, rate: 0 }, { to: 30000, rate: 0.02 }, { to: 40000, rate: 0.035 },
+      { to: 80000, rate: 0.07 }, { to: 120000, rate: 0.115 }, { to: 160000, rate: 0.15 },
+      { to: 200000, rate: 0.18 }, { to: 240000, rate: 0.19 }, { to: 280000, rate: 0.195 },
+      { to: 320000, rate: 0.20 }, { to: Infinity, rate: 0.22 },
+    ];
+    return bracketTax(taxableSgd, b);
+  }
+
+  function luIncomeTax(taxable, family) {
+    const mult = family === 'married2' ? 0.88 : family === 'married' ? 0.92 : 1;
+    const b = [
+      { to: 12438, rate: 0 }, { to: 14508, rate: 0.09 }, { to: 17388, rate: 0.11 },
+      { to: 19848, rate: 0.15 }, { to: 35472, rate: 0.21 }, { to: 50484, rate: 0.33 },
+      { to: 100416, rate: 0.37 }, { to: 175008, rate: 0.40 }, { to: 220788, rate: 0.42 },
+      { to: Infinity, rate: 0.42 },
+    ];
+    return bracketTax(taxable, b) * mult;
+  }
+
+  function beIncomeTax(taxable, allowance) {
+    const b = [
+      { to: 15820, rate: 0.25 }, { to: 27920, rate: 0.40 },
+      { to: 48320, rate: 0.45 }, { to: Infinity, rate: 0.50 },
+    ];
+    return Math.max(0, bracketTax(taxable, b) - allowance);
+  }
+
+  function chFederalTax(chfIncome) {
+    const b = [
+      { to: 14800, rate: 0 }, { to: 25600, rate: 0.0077 }, { to: 32800, rate: 0.0088 },
+      { to: 42000, rate: 0.0264 }, { to: 58800, rate: 0.0297 }, { to: 76000, rate: 0.0525 },
+      { to: 103600, rate: 0.0585 }, { to: 134600, rate: 0.066 }, { to: 176000, rate: 0.088 },
+      { to: 228800, rate: 0.11 }, { to: 293200, rate: 0.132 }, { to: 384400, rate: 0.143 },
+      { to: 818400, rate: 0.115 }, { to: Infinity, rate: 0.115 },
+    ];
+    return bracketTax(chfIncome, b);
+  }
+
+  function getOpts() {
+    return {
+      nlRuling30: document.getElementById('nlRuling30').checked,
+      nlExpat: document.getElementById('nlExpat').value,
+      chCanton: document.getElementById('chCanton').value,
+      deChurch: document.getElementById('deChurch').checked,
+      beExpat: document.getElementById('beExpat').checked,
+      sgNor: document.getElementById('sgNor').checked,
+      family: document.getElementById('familyStatus').value,
+      employerCosts: document.getElementById('employerCosts').checked,
+      nlContractorMode: document.getElementById('nlContractorMode').value,
+      sgCpf: document.getElementById('sgCpf').value,
+    };
+  }
+
+  function compute(countryId, grossEur, engagement, opts) {
+    const c = COUNTRIES[countryId];
+    const grossLocal = fromEur(grossEur, c.currency);
+    const sym = c.sym;
+    const lines = [];
+    const brackets = [];
+    let incomeTax = 0, ssEmp = 0, ssEr = 0, other = 0, special = 0;
+    let notes = [];
+
+    if (countryId === 'nl') {
+      if (engagement === 'permanent' || engagement === 'payrolling') {
+        let taxable = grossEur;
+        if (opts.nlRuling30 && opts.nlExpat === 'expat') {
+          taxable = grossEur * 0.7;
+          special = grossEur * 0.3;
+          lines.push({ label: '30% ruling exemption', amount: -special, tip: '30% of gross excluded from taxable base', positive: true });
+          notes.push('30% ruling applied');
+        } else if (opts.nlRuling30 && opts.nlExpat === 'local') {
+          notes.push('30% ruling not applied (local hire)');
+        }
+        const b = [{ to: 75518, rate: 0.3697 }, { to: Infinity, rate: 0.495 }];
+        brackets.push(...b);
+        incomeTax = bracketTax(taxable, b);
+        const hk = nlHeffingskorting(taxable);
+        const ak = nlArbeidskorting(taxable);
+        incomeTax = Math.max(0, incomeTax - hk - ak);
+        lines.push({ label: 'Heffingskorting', amount: -hk, tip: 'General tax credit', positive: true });
+        lines.push({ label: 'Arbeidskorting', amount: -ak, tip: 'Labour credit', positive: true });
+        ssEmp = Math.min(grossEur, 70000) * 0.0274 + Math.min(grossEur, 71628) * 0.0532;
+        if (engagement === 'payrolling') {
+          ssEr = grossEur * 0.23;
+          notes.push('Payroll co. employer premiums ~23%');
+        } else {
+          ssEr = grossEur * 0.18;
+        }
+        lines.push({ label: 'WW + Zvw (employee)', amount: ssEmp, tip: 'Unemployment + health employee share' });
+      } else {
+        if (opts.nlContractorMode === 'bv') {
+          const profit = grossEur * 0.92;
+          const vpb = bracketTax(profit, [{ to: 200000, rate: 0.19 }, { to: Infinity, rate: 0.258 }]);
+          const afterVpb = profit - vpb;
+          incomeTax = vpb;
+          other = afterVpb * 0.15;
+          lines.push({ label: 'VPB (corporate tax)', amount: vpb, tip: '19% / 25.8% on profit' });
+          lines.push({ label: 'Dividend withholding 15%', amount: other, tip: 'If profit distributed as dividend' });
+          notes.push('BV: ~8% costs assumed; dividend route');
+        } else {
+          const taxable = grossEur * 0.75;
+          const b = [{ to: 75518, rate: 0.3697 }, { to: Infinity, rate: 0.495 }];
+          incomeTax = Math.max(0, bracketTax(taxable, b) - nlHeffingskorting(taxable) - nlArbeidskorting(taxable));
+          other = grossEur * 0.08;
+          notes.push('ZZP: entrepreneur deduction approximated');
+        }
+        ssEmp = 0;
+        ssEr = 0;
+      }
+    }
+
+    if (countryId === 'ch') {
+      const chf = grossLocal;
+      const fed = chFederalTax(chf);
+      const cantonRate = CH_CANTON_RATE[opts.chCanton] || 0.25;
+      incomeTax = (fed + chf * cantonRate) * FX_TO_EUR.CHF;
+      brackets.push({ to: chf, rate: cantonRate + 0.11 });
+      const ahvBase = Math.min(chf, 148200);
+      ssEmp = ahvBase * 0.053 * FX_TO_EUR.CHF + ahvBase * 0.011 * FX_TO_EUR.CHF;
+      ssEr = ahvBase * 0.053 * FX_TO_EUR.CHF + ahvBase * 0.011 * FX_TO_EUR.CHF + chf * 0.02 * FX_TO_EUR.CHF;
+      notes.push('KVG health ~CHF 450–600/mo paid separately (not deducted)');
+      if (engagement === 'contractor') notes.push('GmbH: manage AHV + Privatanteil separately');
+    }
+
+    if (countryId === 'lu') {
+      const married = opts.family !== 'single';
+      incomeTax = luIncomeTax(grossEur, opts.family);
+      const ssBase = Math.min(grossEur, 130000);
+      ssEmp = ssBase * 0.1245;
+      ssEr = ssBase * 0.13;
+      brackets.push({ to: 12438, rate: 0 }, { to: 220788, rate: 0.21 }, { to: Infinity, rate: 0.42 });
+      if (engagement === 'contractor') {
+        incomeTax = grossEur * 0.24;
+        ssEmp = ssBase * 0.1245;
+        notes.push('Contractor SARL: simplified effective rate');
+      }
+    }
+
+    if (countryId === 'de') {
+      const married = opts.family.startsWith('married');
+      let taxable = grossEur;
+      if (engagement === 'contractor') {
+        incomeTax = grossEur * 0.28;
+        ssEmp = 0;
+        ssEr = 0;
+        notes.push('Freelance/GmbH: flat effective estimate');
+      } else {
+        incomeTax = deIncomeTax(taxable, married);
+        if (incomeTax > 18130) incomeTax += incomeTax * 0.055;
+        if (opts.deChurch) incomeTax += incomeTax * 0.09;
+        const rvCap = 90600, careCap = 66150;
+        ssEmp = Math.min(grossEur, rvCap) * 0.093 + Math.min(grossEur, rvCap) * 0.013
+          + Math.min(grossEur, careCap) * 0.073 + Math.min(grossEur, careCap) * 0.017;
+        ssEr = ssEmp;
+        if (engagement === 'payrolling') ssEr = grossEur * 0.21;
+      }
+      brackets.push({ to: 11604, rate: 0 }, { to: 277826, rate: 0.42 }, { to: Infinity, rate: 0.45 });
+    }
+
+    if (countryId === 'be') {
+      let allowance = 10160;
+      if (opts.family === 'married2') allowance = 18500;
+      if (opts.family === 'married') allowance = 15200;
+      let taxable = grossEur;
+      if (opts.beExpat && engagement !== 'contractor') {
+        const fullTax = beIncomeTax(taxable, allowance);
+        incomeTax = beIncomeTax(taxable * 0.7, allowance);
+        special = fullTax - incomeTax;
+        lines.push({ label: 'Expat regime (~30% exempt)', amount: -special, tip: 'Simplified expat concession', positive: true });
+      } else {
+        incomeTax = beIncomeTax(taxable, allowance);
+      }
+      ssEmp = grossEur * 0.1307;
+      ssEr = grossEur * 0.25;
+      if (engagement === 'contractor') {
+        incomeTax = grossEur * 0.32;
+        ssEmp = grossEur * 0.1307;
+        ssEr = 0;
+        notes.push('Independent: personal income tax simplified');
+      }
+      if (engagement === 'payrolling') notes.push('Payroll markup ~3–5% typical');
+    }
+
+    if (countryId === 'ae') {
+      if (engagement === 'contractor') {
+        const profit = grossEur;
+        const thresholdAed = 375000;
+        const profitAed = fromEur(profit, 'AED');
+        incomeTax = profitAed > thresholdAed ? (profitAed - thresholdAed) * 0.09 * FX_TO_EUR.AED : 0;
+        notes.push('UAE corporate tax 9% above AED 375k profit');
+      } else {
+        incomeTax = 0;
+        other = engagement === 'payrolling' ? grossEur * 0.04 : 0;
+        if (other) notes.push('EOR agency fee ~4% of gross');
+        notes.push('Mandatory health insurance ~AED 5–15k/yr (employer)');
+      }
+      ssEmp = 0;
+      ssEr = 0;
+    }
+
+    if (countryId === 'sg') {
+      const sgd = grossLocal;
+      if (engagement === 'contractor') {
+        incomeTax = sgd * 0.17 * FX_TO_EUR.SGD;
+        notes.push('Contractor: flat 17% effective on revenue');
+      } else {
+        incomeTax = sgIncomeTax(sgd) * FX_TO_EUR.SGD;
+        if (opts.sgNor) notes.push('NOR ended 2020 — shown for reference only');
+        if (opts.sgCpf === 'pr') {
+          const cpfBase = Math.min(sgd, 6000 * 12);
+          ssEmp = cpfBase * 0.2 * FX_TO_EUR.SGD;
+          ssEr = cpfBase * 0.17 * FX_TO_EUR.SGD;
+        }
+        if (engagement === 'payrolling') {
+          other = grossEur * 0.035;
+          notes.push('Payroll/EOR fee ~3.5%');
+        }
+      }
+      brackets.push({ to: 320000, rate: 0.22 });
+    }
+
+    const totalDeductions = incomeTax + ssEmp + other;
+    const netEur = Math.max(0, grossEur - totalDeductions);
+    const netLocal = fromEur(netEur, c.currency);
+    const employerCostEur = grossEur + ssEr + (engagement === 'payrolling' ? grossEur * 0.04 : 0);
+
+    return {
+      countryId, grossLocal, grossEur, netEur, netLocal, incomeTax, ssEmp, ssEr, other,
+      effectiveRate: pct(totalDeductions - special, grossEur),
+      taxPct: pct(incomeTax, grossEur), ssPct: pct(ssEmp, grossEur), otherPct: pct(other, grossEur),
+      takePct: pct(netEur, grossEur),
+      employerCostEur, lines, brackets, bracketText: bracketText(grossEur, brackets.length ? brackets : [{ to: grossEur, rate: 0.2 }], sym),
+      notes, sym, currency: c.currency, special,
+    };
+  }
+
+  function renderCard(r, engagement, isBest, opts) {
+    const c = COUNTRIES[r.countryId];
+    const engClass = ENG_CLASS[engagement];
+    const grossDisp = fmt(r.grossLocal, r.sym);
+    const netDisp = fmt(r.netLocal, r.sym);
+    const eurDisp = '€' + Math.round(r.netEur).toLocaleString();
+
+    const bdRows = [
+      { label: 'Income tax', amount: r.incomeTax, tip: 'Income tax / PIT / corporate layer' },
+      ...r.lines,
+      { label: 'Employee social security', amount: r.ssEmp, tip: 'Pension, health, unemployment (employee)' },
+      { label: 'Other deductions', amount: r.other, tip: 'Dividend tax, fees, etc.' },
+    ];
+    if (opts.employerCosts) {
+      bdRows.push({ label: 'Employer social security', amount: r.ssEr, tip: 'Employer-side contributions' });
+    }
+
+    const bdHtml = bdRows
+      .filter((x) => x.amount > 0 || x.positive)
+      .map(
+        (row) => `
+      <div class="bd-row ${row.positive ? 'positive' : ''}">
+        <span class="bd-label" data-tip="${row.tip || ''}">${row.label}</span>
+        <span class="mono">${row.positive ? '−' : ''}${fmt(fromEur(Math.abs(row.amount), r.currency), r.sym)}</span>
+      </div>`
+      )
+      .join('');
+
+    return `
+    <article class="card ${isBest ? 'best' : ''}" data-country="${r.countryId}">
+      <div class="card-head">
+        <h3>${c.flag} ${c.name}</h3>
+        <div class="badges">
+          <span class="badge badge-${engClass}">${ENG_LABELS[engagement]}</span>
+          ${isBest ? '<span class="badge badge-best">Best take-home</span>' : ''}
+        </div>
+      </div>
+      <div class="card-body">
+        <div class="metric">
+          <div class="metric-label">Gross (local)</div>
+          <div class="metric-value">${grossDisp}</div>
+        </div>
+        <div class="metric">
+          <div class="metric-label">Deductions</div>
+          <div class="stack-bar">
+            <span style="width:${r.taxPct}%;background:var(--tax-bar)"></span>
+            <span style="width:${r.ssPct}%;background:var(--ss-bar)"></span>
+            <span style="width:${r.otherPct}%;background:var(--other-bar)"></span>
+          </div>
+          <div class="stack-legend">
+            <span><i style="background:var(--tax-bar)"></i>Tax ${r.taxPct}%</span>
+            <span><i style="background:var(--ss-bar)"></i>SS ${r.ssPct}%</span>
+            <span><i style="background:var(--other-bar)"></i>Other ${r.otherPct}%</span>
+          </div>
+        </div>
+        <div class="metric">
+          <div class="metric-label">Net take-home / year</div>
+          <div class="net-hero">${netDisp}</div>
+          <div class="metric-sub">≈ ${eurDisp} EUR</div>
+        </div>
+        <div class="metric">
+          <div class="metric-label">Effective tax + SS rate</div>
+          <div class="effective mono">${r.effectiveRate}%</div>
+        </div>
+        <button type="button" class="toggle-breakdown">See breakdown</button>
+        <div class="breakdown">
+          <p class="bracket-note">${r.bracketText}</p>
+          ${r.notes.map((n) => `<p class="bracket-note">• ${n}</p>`).join('')}
+          ${bdHtml}
+          <div class="bd-row total">
+            <span>Net take-home</span>
+            <span class="mono">${netDisp}</span>
+          </div>
+          <div class="bd-row">
+            <span>Monthly net</span>
+            <span class="mono">${fmt(r.netLocal / 12, r.sym)}</span>
+          </div>
+          ${
+            opts.employerCosts
+              ? `<div class="bd-row"><span>Employer total cost</span><span class="mono">${fmt(fromEur(r.employerCostEur, r.currency), r.sym)}</span></div>`
+              : ''
+          }
+        </div>
+      </div>
+    </article>`;
+  }
+
+  function render() {
+    const grossInput = parseFloat(document.getElementById('grossInput').value) || 0;
+    const grossEur = toEur(grossInput, state.currency);
+    const engagement = state.engagement;
+    const opts = getOpts();
+
+    document.getElementById('fxNote').textContent =
+      `Entered in ${state.currency}. ≈ €${Math.round(grossEur).toLocaleString()} at indicative rates (EUR 1 · CHF ${(1 / FX_TO_EUR.CHF).toFixed(2)} · SGD ${(1 / FX_TO_EUR.SGD).toFixed(2)} · AED ${(1 / FX_TO_EUR.AED).toFixed(0)} · USD ${(1 / FX_TO_EUR.USD).toFixed(2)}).`;
+
+    const results = [...state.selected]
+      .map((id) => compute(id, grossEur, engagement, opts))
+      .sort((a, b) => b.netEur - a.netEur);
+
+    const bestId = results[0]?.countryId;
+
+    document.getElementById('cardsRoot').innerHTML = results
+      .map((r) => renderCard(r, engagement, r.countryId === bestId, opts))
+      .join('');
+
+    document.querySelectorAll('.toggle-breakdown').forEach((btn) => {
+      btn.onclick = () => {
+        const bd = btn.nextElementSibling;
+        bd.classList.toggle('open');
+        btn.textContent = bd.classList.contains('open') ? 'Hide breakdown' : 'See breakdown';
+      };
+    });
+
+    const maxNet = results[0]?.netEur || 1;
+    document.getElementById('chartRoot').innerHTML = results
+      .map((r) => {
+        const w = Math.round((r.netEur / maxNet) * 100);
+        const col = engagement === 'permanent' ? 'var(--perm)' : engagement === 'contractor' ? 'var(--contract)' : 'var(--payroll)';
+        return `
+        <div class="chart-row">
+          <span class="chart-label">${COUNTRIES[r.countryId].flag} ${COUNTRIES[r.countryId].name}</span>
+          <div class="chart-track"><div class="chart-fill" style="width:${w}%;background:${col}"></div></div>
+          <span class="chart-val">€${Math.round(r.netEur).toLocaleString()}</span>
+        </div>`;
+      })
+      .join('');
+
+    document.getElementById('tableBody').innerHTML = results
+      .map((r, i) => {
+        const erDisp = opts.employerCosts ? fmt(fromEur(r.employerCostEur, r.currency), r.sym) : '—';
+        return `<tr class="${i === 0 ? 'cheapest' : ''}">
+          <td>${COUNTRIES[r.countryId].flag} ${COUNTRIES[r.countryId].name}</td>
+          <td>${ENG_LABELS[engagement]}</td>
+          <td class="mono">${fmt(r.grossLocal, r.sym)}</td>
+          <td class="mono">${r.taxPct}%</td>
+          <td class="mono">${r.ssPct}%</td>
+          <td class="mono">${opts.employerCosts ? pct(r.ssEr, r.grossEur) + '%' : '—'}</td>
+          <td class="mono">${fmt(r.netLocal, r.sym)}</td>
+          <td class="mono">${fmt(r.netLocal / 12, r.sym)}</td>
+          <td class="mono">${erDisp}</td>
+        </tr>`;
+      })
+      .join('');
+
+    document.getElementById('nlContractorModeWrap').style.display =
+      engagement === 'contractor' && state.selected.has('nl') ? 'block' : 'none';
+    document.getElementById('nlRuling30').disabled =
+      engagement === 'contractor' || (opts.nlExpat === 'local' && engagement !== 'contractor');
+    if (engagement === 'contractor') document.getElementById('nlRuling30').checked = false;
+  }
+
+  function initCurrencyToggle() {
+    const el = document.getElementById('currencyToggle');
+    el.innerHTML = CURRENCIES.map(
+      (cur) => `<button type="button" data-cur="${cur}" class="${cur === state.currency ? 'active' : ''}">${cur}</button>`
+    ).join('');
+    el.querySelectorAll('button').forEach((btn) => {
+      btn.onclick = () => {
+        state.currency = btn.dataset.cur;
+        el.querySelectorAll('button').forEach((b) => b.classList.toggle('active', b === btn));
+        render();
+      };
+    });
+  }
+
+  function initCountryPills() {
+    const el = document.getElementById('countryPills');
+    el.innerHTML = Object.entries(COUNTRIES)
+      .map(
+        ([id, c]) =>
+          `<span class="pill selected" data-id="${id}">${c.flag} ${c.name}</span>`
+      )
+      .join('');
+    el.querySelectorAll('.pill').forEach((pill) => {
+      pill.onclick = () => {
+        const id = pill.dataset.id;
+        if (state.selected.has(id)) {
+          if (state.selected.size > 1) state.selected.delete(id);
+        } else state.selected.add(id);
+        pill.classList.toggle('selected', state.selected.has(id));
+        render();
+      };
+    });
+  }
+
+  function initEngagement() {
+    const el = document.getElementById('engagementToggle');
+    el.querySelectorAll('button').forEach((btn) => {
+      btn.onclick = () => {
+        state.engagement = btn.dataset.eng;
+        el.querySelectorAll('button').forEach((b) => {
+          b.className = '';
+          if (b === btn) b.classList.add('active-' + ENG_CLASS[state.engagement]);
+        });
+        render();
+      };
+    });
+  }
+
+  document.getElementById('advancedToggle').onclick = () => {
+    const p = document.getElementById('advancedPanel');
+    p.classList.toggle('open');
+    document.getElementById('advancedToggle').textContent = p.classList.contains('open')
+      ? '▾ Advanced options'
+      : '▸ Advanced options';
+  };
+
+  document.getElementById('themeBtn').onclick = () => {
+    const html = document.documentElement;
+    html.dataset.theme = html.dataset.theme === 'dark' ? 'light' : 'dark';
+  };
+
+  ['grossInput', 'nlRuling30', 'nlExpat', 'chCanton', 'deChurch', 'beExpat', 'sgNor', 'familyStatus', 'employerCosts', 'nlContractorMode', 'sgCpf'].forEach((id) => {
+    const el = document.getElementById(id);
+    if (el) el.addEventListener('change', render);
+    if (el && el.type === 'number') el.addEventListener('input', render);
+  });
+  document.getElementById('grossInput').addEventListener('input', render);
+
+  initCurrencyToggle();
+  initCountryPills();
+  initEngagement();
+  render();
+})();
+</script>
+</body>
+</html>

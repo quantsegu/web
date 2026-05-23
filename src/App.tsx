@@ -130,6 +130,19 @@ export default function App() {
           element={<Navigate to="/wealth-tools/portfolio-efficiency-scorecard" replace />}
         />
         <Route
+          path="/wealth-tools/take-home-pay-comparison"
+          element={
+            <WealthToolFrame
+              src="/wealth-tools/take-home-pay-comparison.html"
+              title="Global Take-Home Pay Comparison"
+            />
+          }
+        />
+        <Route
+          path="/wealth-tools/take-home-pay-comparison.html"
+          element={<Navigate to="/wealth-tools/take-home-pay-comparison" replace />}
+        />
+        <Route
           path="/wealth-tools/nl-ch-vehicle-cost-comparison"
           element={
             <WealthToolFrame

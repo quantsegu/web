@@ -10,6 +10,22 @@ export interface WealthTool {
 
 export const wealthTools: WealthTool[] = [
   {
+    id: 'take-home-pay-comparison',
+    title: 'Global Take-Home Pay Comparison',
+    description:
+      'Compare net pay across permanent employment, contracting, and payrolling in NL, CH, LU, DE, BE, UAE, and Singapore — with 30% ruling, cantonal tax, CPF, and expat regime options.',
+    features: [
+      'Seven jurisdictions with currency conversion (EUR, CHF, SGD, AED, USD)',
+      'Engagement types: permanent, contractor (BV/ZZP), payrolling / EOR',
+      'Advanced: NL 30% ruling, CH canton, DE church tax, BE expat, SG CPF',
+      'Ranked bar chart, deduction stack bars, and full breakdown per country',
+      'Employer cost toggle for total cost-to-company view',
+    ],
+    href: '/wealth-tools/take-home-pay-comparison',
+    icon: 'tax',
+    ctaLabel: 'Compare take-home',
+  },
+  {
     id: 'investment-universe',
     title: 'The Investment Universe',
     description:
