@@ -59,6 +59,23 @@ export const wealthTools: WealthTool[] = [
     ctaLabel: 'Open dashboard',
   },
   {
+    id: 'pension-scope',
+    title: 'PensionScope — Global Retirement Intelligence',
+    description:
+      'Calculate projected pension income across Netherlands, Switzerland, Germany, Luxembourg, Belgium, Austria, and Singapore. Three-pillar breakdown, country comparison, replacement rate explorer, and retirement destination scoring.',
+    features: [
+      'Hero calculator with NL 30% ruling, CH canton/BVG, DE church tax, SG CPF status',
+      'State, occupational, and private pillar cards with capital accumulation chart',
+      'Eight-country comparison dashboard with Mercer grades and ranking charts',
+      'Replacement rate explorer by salary with ceiling table',
+      'Best places to retire with preference sliders and radar chart',
+      'Scenario planner: early retirement, Swiss max 3a, SG relocation at 50',
+    ],
+    href: '/wealth-tools/pension-scope',
+    icon: 'retirement',
+    ctaLabel: 'Calculate pension',
+  },
+  {
     id: 'retirement-income-planner',
     title: 'Retirement Income Planner',
     description:

@@ -1,0 +1,1124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="PensionScope — Global Retirement Intelligence. Calculate projected pension income across 8 countries and compare where you'll thrive." />
+  <title>PensionScope — Global Retirement Intelligence</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js" defer></script>
+  <style>
+    :root {
+      --ink: #0D1117; --ink-60: rgba(13,17,23,0.6); --ink-15: rgba(13,17,23,0.1);
+      --surface: #F7F5F0; --white: #FFFFFF; --accent: #1A3A5C; --gold: #C49A28;
+      --green: #2A6B42; --green-bg: #EBF4EF; --amber: #B8680A; --amber-bg: #FDF3E3;
+      --red: #C0392B; --red-bg: #FBEAEA; --nl: #AE1C28; --ch: #D52B1E; --de: #2B2B2B;
+      --lu: #EF3340; --be: #FAE042; --be-dark: #8B6914; --at: #ED2939; --sg: #EF3340;
+      --sp: 8px; --radius: 12px; --shadow: 0 1px 3px rgba(0,0,0,0.06);
+      --sans: "DM Sans", system-ui, sans-serif; --mono: "DM Mono", ui-monospace, monospace;
+      --max-w: 1200px;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --ink: #E8ECF0; --ink-60: rgba(232,236,240,0.65); --ink-15: rgba(232,236,240,0.12);
+        --surface: #141820; --white: #1C2330; --accent: #5B8FC7; --green-bg: rgba(42,107,66,0.2);
+        --amber-bg: rgba(184,104,10,0.2); --red-bg: rgba(192,57,43,0.2); --shadow: 0 1px 3px rgba(0,0,0,0.4);
+      }
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; font-size: 16px; }
+    body { font-family: var(--sans); color: var(--ink); background: var(--white); line-height: 1.5; }
+    .mono { font-family: var(--mono); font-variant-numeric: tabular-nums; }
+    a { color: var(--accent); }
+    :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+    .skip-link { position: absolute; left: -9999px; top: 0; z-index: 9999; padding: 8px 16px; background: var(--accent); color: #fff; }
+    .skip-link:focus { left: 8px; top: 8px; }
+
+    .site-nav {
+      position: sticky; top: 0; z-index: 100; background: var(--white);
+      border-bottom: 1px solid var(--ink-15); box-shadow: var(--shadow);
+    }
+    .nav-inner {
+      max-width: var(--max-w); margin: 0 auto; padding: calc(var(--sp) * 1.5) calc(var(--sp) * 2);
+      display: flex; align-items: center; gap: calc(var(--sp) * 2); flex-wrap: wrap;
+    }
+    .nav-logo { font-weight: 700; font-size: 1rem; color: var(--ink); text-decoration: none; display: flex; align-items: center; gap: 8px; }
+    .nav-flags { font-size: 0.75rem; letter-spacing: 1px; }
+    .nav-links { display: flex; flex-wrap: wrap; gap: 4px 12px; flex: 1; justify-content: center; }
+    .nav-links a { font-size: 0.8rem; font-weight: 500; color: var(--ink-60); text-decoration: none; padding: 4px 8px; border-radius: 6px; }
+    .nav-links a:hover, .nav-links a.active { color: var(--accent); background: var(--ink-15); }
+    .btn {
+      display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+      padding: 10px 20px; border-radius: 8px; font-weight: 600; font-size: 0.875rem;
+      cursor: pointer; border: none; transition: opacity 0.15s;
+    }
+    .btn:hover { opacity: 0.9; }
+    .btn-accent { background: var(--accent); color: #fff; width: 100%; padding: 16px; font-size: 1rem; }
+    .btn-outline { background: transparent; border: 1px solid var(--ink-15); color: var(--ink); }
+    .btn-sm { padding: 6px 12px; font-size: 0.75rem; }
+
+    .container { max-width: var(--max-w); margin: 0 auto; padding: calc(var(--sp) * 4) calc(var(--sp) * 2); }
+    section { scroll-margin-top: 72px; }
+    .section-alt { background: var(--surface); }
+    h1 { font-size: clamp(1.75rem, 4vw, 2.5rem); font-weight: 700; letter-spacing: -0.02em; line-height: 1.15; }
+    h2 { font-size: clamp(1.35rem, 3vw, 1.75rem); font-weight: 700; margin-bottom: calc(var(--sp) * 1); }
+    .sub { color: var(--ink-60); font-size: 1rem; max-width: 640px; margin-top: calc(var(--sp) * 1); }
+    .card {
+      background: var(--white); border: 1px solid rgba(13,17,23,0.08); border-radius: var(--radius);
+      box-shadow: var(--shadow); padding: calc(var(--sp) * 2.5);
+    }
+    .grid-2 { display: grid; gap: calc(var(--sp) * 2); grid-template-columns: 1fr; }
+    .grid-3 { display: grid; gap: calc(var(--sp) * 2); grid-template-columns: 1fr; }
+    .grid-4 { display: grid; gap: calc(var(--sp) * 2); grid-template-columns: 1fr; }
+    @media (min-width: 640px) { .grid-2, .grid-3 { grid-template-columns: repeat(2, 1fr); } .grid-4 { grid-template-columns: repeat(2, 1fr); } }
+    @media (min-width: 960px) { .grid-3 { grid-template-columns: repeat(3, 1fr); } .grid-4 { grid-template-columns: repeat(4, 1fr); } }
+
+    .hero {
+      background: var(--surface);
+      background-image: url("data:image/svg+xml,%3Csvg width='40' height='40' viewBox='0 0 40 40' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%230D1117' fill-opacity='0.03' fill-rule='evenodd'%3E%3Cpath d='M0 40L40 0H20L0 20M40 40V20L20 40'/%3E%3C/g%3E%3C/svg%3E");
+      padding: calc(var(--sp) * 6) calc(var(--sp) * 2) calc(var(--sp) * 4);
+    }
+    .hero .container { padding-top: 0; padding-bottom: 0; }
+    .calc-bar { display: flex; flex-wrap: wrap; gap: calc(var(--sp) * 2); margin-top: calc(var(--sp) * 4); }
+    .field { flex: 1 1 140px; min-width: 120px; }
+    .field label { display: block; font-size: 0.75rem; font-weight: 600; color: var(--ink-60); margin-bottom: 6px; }
+    .field input, .field select {
+      width: 100%; padding: 10px 12px; border: 1px solid var(--ink-15); border-radius: 8px;
+      background: var(--white); color: var(--ink); font-family: var(--mono); font-size: 0.9rem;
+    }
+    .field input[type=range] { font-family: var(--sans); padding: 0; }
+    .range-val { font-family: var(--mono); font-size: 0.8rem; color: var(--accent); }
+    details.advanced { margin-top: calc(var(--sp) * 2); border: 1px solid var(--ink-15); border-radius: var(--radius); padding: calc(var(--sp) * 2); background: var(--white); }
+    details.advanced summary { cursor: pointer; font-weight: 600; color: var(--accent); }
+    .advanced-grid { display: grid; gap: calc(var(--sp) * 2); margin-top: calc(var(--sp) * 2); grid-template-columns: 1fr; }
+    @media (min-width: 640px) { .advanced-grid { grid-template-columns: repeat(2, 1fr); } }
+    .checkbox-row { display: flex; align-items: flex-start; gap: 8px; font-size: 0.85rem; }
+    .checkbox-row input { margin-top: 4px; }
+    .note { font-size: 0.75rem; color: var(--ink-60); margin-top: 4px; }
+
+    .hidden-until-calc { display: none; }
+    .hidden-until-calc.visible { display: block; }
+    .pillar-card { border-top: 4px solid var(--accent); }
+    .pillar-card.p1 { border-top-color: var(--accent); }
+    .pillar-card.p2 { border-top-color: var(--gold); }
+    .pillar-card.p3 { border-top-color: var(--green); }
+    .pillar-card h3 { font-size: 0.95rem; margin-bottom: calc(var(--sp) * 1); }
+    .pillar-amount { font-size: 1.5rem; font-weight: 700; color: var(--accent); }
+    .pillar-detail { font-size: 0.8rem; color: var(--ink-60); margin-top: 8px; }
+
+    .summary-bar {
+      display: flex; flex-wrap: wrap; gap: calc(var(--sp) * 3); align-items: center;
+      padding: calc(var(--sp) * 3); background: var(--accent); color: #fff; border-radius: var(--radius); margin: calc(var(--sp) * 3) 0;
+    }
+    .summary-bar .big { font-size: clamp(1.5rem, 4vw, 2rem); font-weight: 700; }
+    .traffic { padding: 4px 12px; border-radius: 20px; font-size: 0.75rem; font-weight: 600; }
+    .traffic.green { background: var(--green-bg); color: var(--green); }
+    .traffic.amber { background: var(--amber-bg); color: var(--amber); }
+    .traffic.red { background: var(--red-bg); color: var(--red); }
+
+    .chart-wrap { position: relative; height: 320px; margin: calc(var(--sp) * 2) 0; }
+    .chart-legend { display: flex; flex-wrap: wrap; gap: 12px 20px; margin-bottom: 12px; font-size: 0.8rem; }
+    .chart-legend span { display: flex; align-items: center; gap: 6px; }
+    .chart-legend i { width: 12px; height: 12px; border-radius: 2px; display: inline-block; }
+
+    .gap-box { background: var(--amber-bg); border: 1px solid var(--amber); border-radius: var(--radius); padding: calc(var(--sp) * 2.5); margin-top: calc(var(--sp) * 2); }
+    .gap-box.critical { background: var(--red-bg); border-color: var(--red); }
+    .lever-sliders { margin-top: calc(var(--sp) * 2); display: grid; gap: calc(var(--sp) * 2); }
+
+    .country-card { border-top: 4px solid var(--accent); position: relative; }
+    .country-card[data-c="NL"] { border-top-color: var(--nl); }
+    .country-card[data-c="CH"] { border-top-color: var(--ch); }
+    .country-card[data-c="DE"] { border-top-color: var(--de); }
+    .country-card[data-c="LU"] { border-top-color: var(--lu); }
+    .country-card[data-c="BE"] { border-top-color: var(--be); }
+    .country-card[data-c="AT"] { border-top-color: var(--at); }
+    .country-card[data-c="SG"] { border-top-color: var(--sg); }
+    .grade { display: inline-block; padding: 2px 8px; border-radius: 4px; font-size: 0.7rem; font-weight: 700; }
+    .grade-A { background: var(--green-bg); color: var(--green); }
+    .grade-Bp { background: #E8F0FA; color: var(--accent); }
+    .grade-B { background: var(--amber-bg); color: var(--amber); }
+    .progress-bar { height: 8px; background: var(--ink-15); border-radius: 4px; overflow: hidden; margin: 8px 0; }
+    .progress-bar span { display: block; height: 100%; border-radius: 4px; }
+    .tag { font-size: 0.65rem; padding: 2px 6px; border-radius: 4px; background: var(--ink-15); display: inline-block; margin-top: 4px; }
+
+    .compare-table-wrap { overflow-x: auto; margin-top: calc(var(--sp) * 2); }
+    table.compare { width: 100%; border-collapse: collapse; font-size: 0.8rem; }
+    table.compare th, table.compare td { padding: 10px 12px; text-align: left; border-bottom: 1px solid var(--ink-15); }
+    table.compare th { cursor: pointer; font-weight: 600; color: var(--ink-60); }
+    table.compare tr.highlight { background: rgba(26,58,92,0.08); }
+    table.compare tr:hover { background: var(--surface); }
+
+    .insight-box { padding: calc(var(--sp) * 2); border-radius: var(--radius); margin-bottom: calc(var(--sp) * 2); }
+    .insight-box.blue { background: #E8F0FA; border-left: 4px solid var(--accent); }
+    .insight-box.green { background: var(--green-bg); border-left: 4px solid var(--green); }
+    .insight-box.amber { background: var(--amber-bg); border-left: 4px solid var(--amber); }
+
+    .dest-card .score-badge { font-size: 1.25rem; font-weight: 700; color: var(--gold); }
+    .stars { display: flex; gap: 4px; flex-wrap: wrap; margin: calc(var(--sp) * 2) 0; }
+    .stars label { font-size: 0.75rem; width: 100%; }
+    .stars input[type=range] { flex: 1; min-width: 120px; }
+
+    .scenario-btns { display: flex; flex-wrap: wrap; gap: calc(var(--sp) * 1); margin-bottom: calc(var(--sp) * 3); }
+    .scenario-result { display: grid; gap: calc(var(--sp) * 2); grid-template-columns: 1fr 1fr; }
+    @media (max-width: 639px) { .scenario-result { grid-template-columns: 1fr; } }
+    .delta-pos { color: var(--green); }
+    .delta-neg { color: var(--red); }
+
+    .honourable { background: var(--surface); border-radius: var(--radius); padding: calc(var(--sp) * 2); margin-top: calc(var(--sp) * 2); }
+    footer.methodology { background: var(--ink); color: rgba(255,255,255,0.85); padding: calc(var(--sp) * 5) calc(var(--sp) * 2); font-size: 0.8rem; }
+    footer.methodology a { color: #fff; }
+    .disclaimer { font-size: 0.75rem; color: var(--ink-60); margin-top: calc(var(--sp) * 2); }
+    .chart-fallback { margin-top: 8px; }
+
+    @media print {
+      .site-nav, .hero, .calc-bar, details.advanced, .scenario-btns, .stars, .btn-outline, .no-print { display: none !important; }
+      section { page-break-before: always; }
+      body { background: #fff; color: #000; }
+      .chart-wrap { height: 280px; }
+      .print-header::before { content: "PensionScope Report — Generated " attr(data-date); display: block; font-weight: 700; margin-bottom: 16px; }
+    }
+  </style>
+</head>
+<body>
+  <a href="#main" class="skip-link">Skip to main content</a>
+
+  <nav class="site-nav no-print" aria-label="Main navigation">
+    <div class="nav-inner">
+      <a href="/wealth-tools" class="nav-logo">
+        PensionScope <span class="nav-flags" aria-hidden="true">🇳🇱🇨🇭🇩🇪🇱🇺🇧🇪🇦🇹🇸🇬</span>
+      </a>
+      <div class="nav-links" id="navLinks">
+        <a href="#calculator">Calculator</a>
+        <a href="#projection">Projection</a>
+        <a href="#compare">Compare</a>
+        <a href="#replacement">Replacement</a>
+        <a href="#best-places">Best Places</a>
+        <a href="#scenarios">Scenarios</a>
+        <a href="#methodology">Methodology</a>
+      </div>
+      <button type="button" class="btn btn-outline btn-sm no-print" onclick="window.print()">Download PDF report</button>
+    </div>
+  </nav>
+
+  <main id="main">
+    <!-- SECTION A: HERO -->
+    <section id="calculator" class="hero">
+      <div class="container">
+        <p style="font-size:0.8rem;font-weight:600;color:var(--accent);text-transform:uppercase;letter-spacing:0.08em;">PensionScope — Global Retirement Intelligence</p>
+        <h1>What will your pension actually be?</h1>
+        <p class="sub">Enter your details. We calculate your projected income across 8 countries — and show where you'll retire best.</p>
+        <p class="sub" style="font-size:0.85rem;font-style:italic;">Calculate what you'll receive. Compare where you'll thrive.</p>
+
+        <form id="calcForm" class="card calc-bar" style="margin-top:32px;" aria-label="Pension calculator inputs">
+          <div class="field">
+            <label for="currentAge">Current age</label>
+            <input type="number" id="currentAge" min="22" max="64" value="43" inputmode="numeric" />
+          </div>
+          <div class="field">
+            <label for="retireAge">Retirement age</label>
+            <input type="number" id="retireAge" min="55" max="72" value="65" inputmode="numeric" />
+          </div>
+          <div class="field" style="flex:2 1 200px;">
+            <label for="salary">Current annual gross salary</label>
+            <input type="number" id="salary" min="30000" step="5000" value="200000" inputmode="numeric" />
+          </div>
+          <div class="field">
+            <label for="currency">Salary currency</label>
+            <select id="currency">
+              <option value="EUR">EUR</option>
+              <option value="CHF">CHF</option>
+              <option value="SGD">SGD</option>
+              <option value="USD">USD</option>
+              <option value="GBP">GBP</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="salaryGrowth">Annual salary growth <span class="range-val" id="salaryGrowthVal">2%</span></label>
+            <input type="range" id="salaryGrowth" min="0" max="8" step="0.5" value="2" />
+          </div>
+          <div class="field">
+            <label for="country">Country of employment</label>
+            <select id="country">
+              <option value="NL">Netherlands</option>
+              <option value="CH">Switzerland</option>
+              <option value="DE">Germany</option>
+              <option value="LU">Luxembourg</option>
+              <option value="BE">Belgium</option>
+              <option value="AT">Austria</option>
+              <option value="SG">Singapore</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="empType">Employment type</label>
+            <select id="empType">
+              <option value="employed">Employed</option>
+              <option value="self">Self-employed (GmbH/BV)</option>
+              <option value="contractor">Contractor</option>
+            </select>
+          </div>
+        </form>
+
+        <details class="advanced card" style="margin-top:16px;">
+          <summary>Advanced options</summary>
+          <div class="advanced-grid">
+            <div class="checkbox-row">
+              <input type="checkbox" id="nlRuling" />
+              <label for="nlRuling">NL: 30% ruling (70% taxable gross). Eligibility: recruited from abroad.</label>
+            </div>
+            <div class="field">
+              <label for="chCanton">CH: Canton</label>
+              <select id="chCanton">
+                <option value="ZG">Zug</option>
+                <option value="ZH">Zurich</option>
+                <option value="GE">Geneva</option>
+                <option value="BS">Basel</option>
+                <option value="BE">Bern</option>
+              </select>
+            </div>
+            <div class="checkbox-row">
+              <input type="checkbox" id="chBvgExtra" />
+              <label for="chBvgExtra">CH: Pensionskasse above-mandatory (+30% BVG capital)</label>
+            </div>
+            <div class="checkbox-row">
+              <input type="checkbox" id="deChurch" />
+              <label for="deChurch">DE: Church tax (+8.5% on income tax)</label>
+            </div>
+            <div class="field">
+              <label for="sgStatus">SG: Citizenship status</label>
+              <select id="sgStatus">
+                <option value="ep">EP / Work Pass (no CPF)</option>
+                <option value="pr">PR or Citizen (CPF)</option>
+              </select>
+            </div>
+            <div class="field">
+              <label for="family">Family status</label>
+              <select id="family">
+                <option value="single">Single</option>
+                <option value="married">Married</option>
+                <option value="family">Married + 2 children</option>
+              </select>
+            </div>
+            <div class="field">
+              <label for="pillar3">Pillar 3a / voluntary contributions /yr</label>
+              <input type="number" id="pillar3" value="7056" step="100" inputmode="numeric" />
+            </div>
+            <div class="checkbox-row">
+              <input type="checkbox" id="includeEmployer" checked />
+              <label for="includeEmployer">Include employer contributions in projection</label>
+            </div>
+            <div class="field">
+              <label for="inflation">Inflation assumption <span class="range-val" id="inflationVal">2%</span></label>
+              <input type="range" id="inflation" min="0" max="4" step="0.5" value="2" />
+            </div>
+            <div class="field">
+              <label for="invReturn">Pillar 2/3 investment return <span class="range-val" id="invReturnVal">3%</span></label>
+              <input type="range" id="invReturn" min="1" max="8" step="0.5" value="3" />
+            </div>
+          </div>
+        </details>
+
+        <button type="button" class="btn btn-accent" id="calcBtn" style="margin-top:24px;">Calculate my pension →</button>
+      </div>
+    </section>
+
+    <!-- SECTION B: PROJECTION -->
+    <section id="projection" class="hidden-until-calc">
+      <div class="container print-header" data-date="">
+        <h2>Your retirement income projection</h2>
+        <p class="sub" id="projectionSub"></p>
+
+        <div class="grid-3" style="margin-top:32px;">
+          <div class="card pillar-card p1" id="pillar1Card"></div>
+          <div class="card pillar-card p2" id="pillar2Card"></div>
+          <div class="card pillar-card p3" id="pillar3Card"></div>
+        </div>
+
+        <div class="summary-bar" id="summaryBar" aria-live="polite"></div>
+
+        <h3 style="margin-top:32px;">Capital accumulation over time</h3>
+        <p class="disclaimer">Projections are estimates based on 2025 tax and pension rules. Not financial advice.</p>
+        <div class="chart-legend" id="accumLegend"></div>
+        <div class="chart-wrap" role="img" aria-label="Pillar 2 and 3 capital accumulation chart">
+          <canvas id="accumChart"></canvas>
+        </div>
+        <details class="chart-fallback"><summary>Chart data table</summary><div id="accumTable"></div></details>
+
+        <div class="gap-box hidden-until-calc" id="gapBox"></div>
+        <div class="lever-sliders hidden-until-calc" id="leverSliders"></div>
+      </div>
+    </section>
+
+    <!-- SECTION C: COMPARE -->
+    <section id="compare" class="section-alt hidden-until-calc">
+      <div class="container">
+        <h2>If you worked your whole career in each country…</h2>
+        <p class="sub">Same salary, same years — how does each system compare?</p>
+        <div class="grid-4" id="countryCards" style="margin-top:32px;"></div>
+
+        <h3 style="margin-top:40px;">Ranking by projected monthly pension (EUR)</h3>
+        <div class="chart-legend" id="rankLegend"></div>
+        <div class="chart-wrap" style="height:360px;" aria-label="Country pension ranking chart">
+          <canvas id="rankChart"></canvas>
+        </div>
+        <details class="chart-fallback"><summary>Ranking data table</summary><div id="rankTable"></div></details>
+
+        <details style="margin-top:24px;">
+          <summary style="cursor:pointer;font-weight:600;color:var(--accent);">Full comparison table (click to expand)</summary>
+          <div class="compare-table-wrap">
+            <table class="compare" id="compareTable" aria-label="Country pension comparison">
+              <thead>
+                <tr>
+                  <th data-sort="country">Country</th>
+                  <th data-sort="p1">State</th>
+                  <th data-sort="p2">Occupational</th>
+                  <th data-sort="p3">Private</th>
+                  <th data-sort="monthly">Total/mo</th>
+                  <th data-sort="yearly">Total/yr</th>
+                  <th data-sort="rr">Replacement %</th>
+                  <th data-sort="mercer">Mercer</th>
+                  <th data-sort="age">Pension age</th>
+                  <th data-sort="system">System</th>
+                </tr>
+              </thead>
+              <tbody id="compareTableBody"></tbody>
+            </table>
+          </div>
+        </details>
+      </div>
+    </section>
+
+    <!-- SECTION D: REPLACEMENT -->
+    <section id="replacement" class="hidden-until-calc">
+      <div class="container">
+        <h2>Replacement rate: how much of your salary will you keep?</h2>
+        <p class="sub">Your replacement rate is projected pension income divided by your final pre-retirement salary. A rate of 70% or higher is often cited as a comfortable retirement target in OECD literature — though individual needs vary with housing costs, debt, and lifestyle.</p>
+        <div class="chart-wrap" style="height:400px;" aria-label="Replacement rate by salary chart">
+          <canvas id="replacementChart"></canvas>
+        </div>
+        <details class="chart-fallback"><summary>Replacement rate data</summary><div id="replacementTable"></div></details>
+
+        <div class="grid-3" style="margin-top:32px;">
+          <div class="insight-box blue"><strong>High earners hit a ceiling</strong> in PAYG systems — Austria caps benefits regardless of salary.</div>
+          <div class="insight-box green"><strong>Netherlands and Switzerland</strong> have the strongest occupational layers — funded systems that scale with salary.</div>
+          <div class="insight-box amber"><strong>Singapore's CPF</strong> delivers only for citizens — expats on EP need aggressive private savings.</div>
+        </div>
+
+        <h3 style="margin-top:32px;">Salary ceilings &amp; workarounds</h3>
+        <div class="compare-table-wrap">
+          <table class="compare" id="ceilingTable">
+            <thead><tr><th>Country</th><th>Max pensionable salary</th><th>Above ceiling</th><th>High-earner workaround</th></tr></thead>
+            <tbody id="ceilingTableBody"></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- SECTION E: BEST PLACES -->
+    <section id="best-places" class="section-alt hidden-until-calc">
+      <div class="container">
+        <h2>Where will your money go furthest?</h2>
+        <p class="sub">Financial score + lifestyle quality for your retirement income. Scored 0–100 across pension adequacy, tax, cost of living, healthcare, safety, and climate (user-adjustable).</p>
+
+        <div class="card stars" id="prefSliders"></div>
+
+        <div class="grid-2" id="destCards" style="margin-top:24px;"></div>
+
+        <div class="chart-wrap" style="height:380px;margin-top:32px;" aria-label="Retirement lifestyle radar chart">
+          <canvas id="radarChart"></canvas>
+        </div>
+        <details class="chart-fallback"><summary>Radar chart data</summary><div id="radarTable"></div></details>
+
+        <div class="honourable">
+          <h3>Honourable mentions — EU tax-efficient retirement</h3>
+          <p style="font-size:0.9rem;margin:12px 0;">For EU citizens looking for tax-efficient EU retirement, Portugal (NHR), Malta, and Cyprus offer reduced flat-rate pension tax under special regimes.</p>
+          <table class="compare">
+            <thead><tr><th>Country</th><th>Regime</th><th>Typical pension tax</th></tr></thead>
+            <tbody>
+              <tr><td>🇵🇹 Portugal</td><td>NHR / IFICI</td><td>10% flat on foreign pension (regime-dependent)</td></tr>
+              <tr><td>🇲🇹 Malta</td><td>Retirement Programme</td><td>15% flat on remitted pension income</td></tr>
+              <tr><td>🇨🇾 Cyprus</td><td>Non-dom / 60-day rule</td><td>5% on pension over €3,420/yr (special cases)</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- SECTION F: SCENARIOS -->
+    <section id="scenarios" class="hidden-until-calc">
+      <div class="container">
+        <h2>Run your scenarios</h2>
+        <p class="sub">Pre-set scenarios show before/after impact on your three-pillar projection.</p>
+        <div class="scenario-btns">
+          <button type="button" class="btn btn-outline" data-scenario="early">Scenario A: Early retirement at 60</button>
+          <button type="button" class="btn btn-outline" data-scenario="swiss">Scenario B: Maximise Swiss Pillar 3a + BVG buyback</button>
+          <button type="button" class="btn btn-outline" data-scenario="relocate">Scenario C: Relocate to Singapore at 50</button>
+        </div>
+        <div id="scenarioOutput"></div>
+      </div>
+    </section>
+  </main>
+
+  <footer id="methodology" class="methodology">
+    <div class="container" style="max-width:var(--max-w);margin:0 auto;color:inherit;">
+      <h2 style="color:#fff;margin-bottom:16px;">Methodology &amp; disclaimer</h2>
+      <p>Projections are estimates based on 2025 tax and pension rules. Rules change — verify all figures with a licensed pension advisor in each jurisdiction. Exchange rates are approximate. This tool does not constitute financial advice. Replacement rates assume a full career from age 22 unless otherwise specified.</p>
+      <ul style="margin:16px 0;padding-left:20px;">
+        <li><strong>NL:</strong> AOW linked to Dutch minimum wage, adjusted twice yearly.</li>
+        <li><strong>CH:</strong> BVG conversion rate may be reduced for above-mandatory capital.</li>
+        <li><strong>DE:</strong> Subject to Nachhaltigkeitsfaktor demographic adjustment.</li>
+        <li><strong>LU:</strong> CNAP contributions required; cross-border workers differ.</li>
+        <li><strong>SG:</strong> CPF LIFE zero for non-citizens/non-PR; EP holders must self-fund.</li>
+        <li><strong>AT:</strong> Reform ongoing; early retirement penalties before statutory age.</li>
+      </ul>
+      <p><a href="/wealth-tools">← Back to Wealth Tools</a></p>
+    </div>
+  </footer>
+
+  <script>
+(function () {
+  'use strict';
+
+  const FX = { EUR: 1, CHF: 1.05, SGD: 0.68, USD: 0.92, GBP: 1.17 };
+  const COUNTRY_META = {
+    NL: { name: 'Netherlands', flag: '🇳🇱', color: '#AE1C28', currency: 'EUR', mercer: 83.5, grade: 'A', pensionAge: 67, system: 'Mixed', strength: 'World-class three-pillar system', weakness: 'High tax on pension above AOW', tag: 'Best for average earners' },
+    CH: { name: 'Switzerland', flag: '🇨🇭', color: '#D52B1E', currency: 'CHF', mercer: 82.1, grade: 'A', pensionAge: 65, system: 'Funded', strength: 'Strong BVG occupational layer', weakness: 'Health insurance not covered by pension', tag: 'Best for high earners' },
+    DE: { name: 'Germany', flag: '🇩🇪', color: '#2B2B2B', currency: 'EUR', mercer: 78.2, grade: 'B+', pensionAge: 67, system: 'PAYG', strength: 'Predictable GRV points system', weakness: 'Demographic sustainability risk', tag: '' },
+    LU: { name: 'Luxembourg', flag: '🇱🇺', color: '#EF3340', currency: 'EUR', mercer: 80.5, grade: 'A', pensionAge: 65, system: 'Mixed', strength: 'Highest EU replacement potential', weakness: 'Requires LU career for full entitlement', tag: 'Best for high earners' },
+    BE: { name: 'Belgium', flag: '🇧🇪', color: '#8B6914', currency: 'EUR', mercer: 77.8, grade: 'B+', pensionAge: 65, system: 'PAYG', strength: 'Central EU location', weakness: 'High overall taxation', tag: '' },
+    AT: { name: 'Austria', flag: '🇦🇹', color: '#ED2939', currency: 'EUR', mercer: 79.5, grade: 'B+', pensionAge: 65, system: 'PAYG', strength: '80% replacement at full career', weakness: 'Pure PAYG sustainability risk', tag: 'Best for average earners' },
+    SG: { name: 'Singapore', flag: '🇸🇬', color: '#EF3340', currency: 'SGD', mercer: 76.2, grade: 'B+', pensionAge: 65, system: 'Funded', strength: '0% tax on CPF LIFE', weakness: 'EP holders get zero CPF', tag: '' },
+  };
+
+  const DEST = {
+    NL: { cost: '€3,500–4,500', tax: 'Progressive Box 1', health: 'Excellent ZVW', pro: 'Best pension system; English widely spoken', con: 'Expensive housing; tax on pension above AOW', visa: 'EU FOM; non-EU needs MVV', rec: 'Career professionals' },
+    CH: { cost: 'CHF 5,500–7,500', tax: 'AHV/BVG income; 3a lump sum reduced', health: 'Mandatory KVG CHF 500–700/person', pro: 'Safety; Zug low tax ~15%', con: 'Extremely expensive; health not in pension', visa: 'EU/EFTA free; B→C permit', rec: 'High earners' },
+    DE: { cost: '€2,800–3,800', tax: '84–100% of pension taxable', health: 'GKV from pension', pro: 'Strong healthcare; lower cost outside cities', con: 'Pension reform risk; church tax', visa: 'EU FOM; Blue Card', rec: 'Families' },
+    LU: { cost: '€3,200–4,200', tax: 'Generous tax classes', health: 'CNS excellent', pro: 'Highest EU replacement rate', con: 'Expensive housing; LU career needed', visa: 'EU FOM', rec: 'EU cross-border workers' },
+    BE: { cost: '€2,900–3,800', tax: 'Reduced vs employment; 10% lump sums', health: 'INAMI excellent', pro: 'Central EU; good services', con: 'High tax; language complexity', visa: 'EU FOM; expat regime', rec: 'EU retirees' },
+    AT: { cost: '€2,800–3,500', tax: 'Pensionistenabsetzbetrag ~€900/yr', health: 'ÖGK excellent', pro: 'High replacement; Vienna livability', con: 'PAYG sustainability risk', visa: 'EU FOM', rec: 'Active retirement' },
+    SG: { cost: 'SGD 5,000–7,000', tax: '0% on CPF LIFE', health: 'Medisave + MediShield', pro: '0% pension tax; safe; English', con: 'EP gets no CPF; heat; expensive', visa: 'LTVP limited; PR track', rec: 'Citizens/PR only for CPF' },
+  };
+
+  const CEILINGS = [
+    ['Netherlands', '€137,800', 'Excess not pensionable in 2nd pillar', 'Pillar 3, DC schemes, international'],
+    ['Switzerland', 'CHF 90,720 coordinated', 'Above-mandatory BVG voluntary', 'Pillar 3a max CHF 7,056/yr'],
+    ['Germany', '€90,600 (BBG)', 'Capped at 2 Entgeltpunkte/yr', 'bAV, Riester, Rürup'],
+    ['Luxembourg', '5× minimum wage', 'Capped at max pension ~€9,500/mo', 'Complementary régime'],
+    ['Belgium', 'Reference wage avg', 'Cap ~€3,200/mo gross', 'IPT, group insurance'],
+    ['Austria', 'Assessment base avg', 'Max ~€6,800/mo', 'Voluntary pension funds'],
+    ['Singapore', 'SGD 6,000/mo OW', 'CPF on ceiling only', 'SRS SGD 35,700 for foreigners'],
+  ];
+
+  let state = { calculated: false, baseline: null };
+  let charts = {};
+
+  const $ = (id) => document.getElementById(id);
+  const fmt = (n, dec = 0) => new Intl.NumberFormat('en-US', { maximumFractionDigits: dec, minimumFractionDigits: dec }).format(n);
+  const fmtCur = (n, cur) => `${cur === 'EUR' ? '€' : cur === 'CHF' ? 'CHF ' : cur === 'SGD' ? 'SGD ' : cur + ' '}${fmt(Math.round(n))}`;
+
+  function getInputs() {
+    return {
+      currentAge: +$('currentAge').value,
+      retireAge: +$('retireAge').value,
+      salary: +$('salary').value,
+      currency: $('currency').value,
+      salaryGrowth: +$('salaryGrowth').value / 100,
+      country: $('country').value,
+      empType: $('empType').value,
+      nlRuling: $('nlRuling').checked,
+      chCanton: $('chCanton').value,
+      chBvgExtra: $('chBvgExtra').checked,
+      deChurch: $('deChurch').checked,
+      sgStatus: $('sgStatus').value,
+      family: $('family').value,
+      pillar3: +$('pillar3').value,
+      includeEmployer: $('includeEmployer').checked,
+      inflation: +$('inflation').value / 100,
+      invReturn: +$('invReturn').value / 100,
+    };
+  }
+
+  function salaryInLocal(salary, fromCur, toCur) {
+    const eur = salary * (FX[fromCur] || 1);
+    return eur / (FX[toCur] || 1);
+  }
+
+  function finalSalary(inp, countryCode) {
+    const meta = COUNTRY_META[countryCode];
+    const localStart = salaryInLocal(inp.salary, inp.currency, meta.currency);
+    const years = Math.max(0, inp.retireAge - inp.currentAge);
+    return localStart * Math.pow(1 + inp.salaryGrowth, years);
+  }
+
+  function contributionYears(inp) {
+    const careerStart = 22;
+    const start = Math.max(careerStart, inp.currentAge - (65 - inp.currentAge));
+    return Math.min(inp.retireAge - Math.max(careerStart, inp.currentAge), inp.retireAge - careerStart);
+  }
+
+  function yearsToRetire(inp) {
+    return Math.max(0, inp.retireAge - inp.currentAge);
+  }
+
+  function totalCareerYears(inp) {
+    return Math.max(1, inp.retireAge - 22);
+  }
+
+  function bvgRate(age) {
+    if (age < 35) return 0.07;
+    if (age < 45) return 0.10;
+    if (age < 55) return 0.15;
+    return 0.18;
+  }
+
+  function projectCapital(annualContrib, years, rate, startAge, currentAge) {
+    let cap = 0;
+    for (let y = 0; y < years; y++) {
+      const age = currentAge + y;
+      const contrib = annualContrib * Math.pow(1 + 0.02, y);
+      cap = (cap + contrib) * (1 + rate);
+    }
+    return cap;
+  }
+
+  function calcCountry(countryCode, inp, overrides = {}) {
+    const o = { ...inp, ...overrides };
+    const meta = COUNTRY_META[countryCode];
+    const finalSal = finalSalary(o, countryCode);
+    const yrsLeft = yearsToRetire(o);
+    const careerYrs = totalCareerYears(o);
+    const ret = o.invReturn;
+    let p1 = 0, p2 = 0, p3 = 0, p1Note = '', p2Note = '', p3Note = '';
+
+    const p3Annual = countryCode === 'CH' ? Math.min(o.pillar3, 7056) : o.pillar3;
+    const p3Cap = projectCapital(p3Annual, yrsLeft, ret, o.currentAge, o.currentAge);
+    p3 = (p3Cap / 20) / 12;
+    p3Note = `Capital ${fmtCur(p3Cap, meta.currency)} at retirement; 20yr drawdown. Top up private savings — powerful for late starters.`;
+
+    if (countryCode === 'NL') {
+      const taxable = o.nlRuling ? finalSal * 0.7 : finalSal;
+      const franchise = 17000;
+      const cap = 137800;
+      const pensionable = Math.max(0, Math.min(taxable, cap) - franchise);
+      const residencyPct = Math.min(1, careerYrs / 50);
+      p1 = (17358 * residencyPct) / 12;
+      p1Note = `AOW €17,358/yr at 50yr residency; ${(residencyPct * 100).toFixed(0)}% (${careerYrs}yr) = ${fmtCur(p1 * 12, 'EUR')}/yr`;
+      const accrual = 0.01875;
+      const annualRight = pensionable * accrual * careerYrs;
+      p2 = annualRight / 12;
+      p2Note = `Sector fund 1.875%/yr × (gross − €17k franchise); accumulated right over career.`;
+    } else if (countryCode === 'CH') {
+      const ahvPct = Math.min(1, careerYrs / 44);
+      p1 = (29400 * ahvPct) / 12;
+      p1Note = `AHV max CHF 29,400/yr; ${careerYrs}/44 yr = ${(ahvPct * 100).toFixed(0)}%`;
+      const coord = Math.max(3675, Math.min(90720, finalSal - 26460));
+      let cap = 0;
+      for (let y = 0; y < yrsLeft; y++) {
+        const age = o.currentAge + y;
+        const rate = bvgRate(age);
+        const contrib = coord * rate * (o.includeEmployer ? 1 : 0.5);
+        cap = (cap + contrib) * (1 + Math.max(ret, 0.0125));
+      }
+      const existing = coord * 0.15 * Math.max(0, o.currentAge - 25) * Math.pow(1 + ret, yrsLeft * 0.5);
+      cap += existing;
+      if (o.chBvgExtra) cap *= 1.3;
+      p2 = (cap * 0.068) / 12;
+      p2Note = `BVG coordinated CHF ${fmt(coord)}; ${(bvgRate(o.currentAge) * 100).toFixed(0)}% contributions; 6.8% conversion${o.chBvgExtra ? '; +30% überobligatorisch' : ''}.`;
+    } else if (countryCode === 'DE') {
+      const avgWage = 43142;
+      const bbg = 90600;
+      const capped = Math.min(finalSal, bbg);
+      const points = Math.min(2, capped / avgWage) * careerYrs;
+      let factor = 1;
+      if (o.retireAge < 67) factor -= (67 - o.retireAge) * 12 * 0.003;
+      p1 = (points * 37.6 * factor);
+      p1Note = `${points.toFixed(1)} Entgeltpunkte × €37.60/mo Rentenwert${factor < 1 ? '; early reduction applied' : ''}`;
+      const bavBase = Math.min(finalSal, bbg) * (o.includeEmployer ? 0.06 : 0.03);
+      const bavCap = projectCapital(bavBase, yrsLeft, ret, o.currentAge, o.currentAge);
+      p2 = (bavCap / 20) / 12;
+      p2Note = `bAV 3%+3% of gross to BBG; capital ${fmtCur(bavCap, 'EUR')}; 20yr annuity.`;
+    } else if (countryCode === 'LU') {
+      const accrual = 0.0185;
+      p1 = Math.min((finalSal * accrual * careerYrs) / 12, 9500);
+      p1Note = `1.85%/yr × revalued salary; min guarantee ~€2,350/mo at 40yr`;
+      const p2Annual = finalSal * 0.015 * (o.includeEmployer ? 1 : 0.5);
+      const p2Cap = projectCapital(p2Annual, yrsLeft, ret, o.currentAge, o.currentAge);
+      p2 = (p2Cap / 20) / 12;
+      p2Note = `Complémentaire ~1.5%/yr; fund growth at ${(ret * 100).toFixed(1)}%`;
+    } else if (countryCode === 'BE') {
+      const fraction = Math.min(1, careerYrs / 45);
+      const rate = o.family === 'married' || o.family === 'family' ? 0.75 : 0.60;
+      p1 = Math.min(finalSal * rate * fraction / 12, 3200);
+      p1Note = `${(rate * 100).toFixed(0)}% reference wage × ${(fraction * 100).toFixed(0)}% career (45yr base)`;
+      const emp = finalSal * 0.05 * (o.includeEmployer ? 1 : 0);
+      const beCap = projectCapital(emp, yrsLeft, 0.025, o.currentAge, o.currentAge);
+      p2 = (beCap / 20) / 12;
+      p2Note = `Groepsverzekering ~5% employer; 2.5% growth`;
+    } else if (countryCode === 'AT') {
+      const accrual = 0.0178;
+      const pct = Math.min(0.80, accrual * careerYrs);
+      p1 = Math.min(finalSal * pct / 12, 6800);
+      p1Note = `${(pct * 100).toFixed(0)}% of average career (1.78%/yr; max 80% at 45yr)`;
+      const mvk = finalSal * 0.0153 * (o.includeEmployer ? 1 : 0.5);
+      const atCap = projectCapital(mvk, yrsLeft, ret, o.currentAge, o.currentAge);
+      p2 = (atCap / 20) / 12;
+      p2Note = `Abfertigung Neu 1.53% to MVK`;
+    } else if (countryCode === 'SG') {
+      if (o.sgStatus === 'pr') {
+        p1 = 1550;
+        p1Note = 'CPF LIFE FRS ~SGD 1,550/mo at 65 (projected)';
+        const monthly = Math.min(finalSal / 12, 6000);
+        let balance = 0;
+        for (let y = 0; y < yrsLeft; y++) {
+          const age = o.currentAge + y;
+          let er = 0.17, ee = 0.20;
+          if (age >= 55 && age < 60) { er = 0.15; ee = 0.15; }
+          else if (age >= 60 && age < 65) { er = 0.115; ee = 0.095; }
+          else if (age >= 65) { er = 0.09; ee = 0.07; }
+          const annual = monthly * 12 * (er + ee) * (o.includeEmployer ? 1 : ee / (er + ee));
+          balance = (balance + annual) * (1 + ret);
+        }
+        p2 = (balance * 0.04) / 12;
+        p2Note = `CPF OA+SA projected; employer ${o.includeEmployer ? 'included' : 'excluded'}`;
+      } else {
+        p1 = 0;
+        p1Note = 'EP / Work Pass: SGD 0 state pension — plan via private savings';
+        p2 = p3;
+        p3 = 0;
+        p3Note = 'Voluntary savings shown in occupational column for EP holders';
+        p2Note = `Private/SRS projection from CHF/€ ${fmt(o.pillar3)}/yr contributions`;
+      }
+    }
+
+    const totalMo = p1 + p2 + p3;
+    const totalYr = totalMo * 12;
+    const rr = finalSal > 0 ? (totalYr / finalSal) * 100 : 0;
+    const eurMo = totalMo * (FX[meta.currency] || 1);
+
+    return { countryCode, meta, finalSal, p1, p2, p3, p1Note, p2Note, p3Note, totalMo, totalYr, rr, eurMo, p3Cap, p2Cap: p2 * 12 * 20 };
+  }
+
+  function trafficClass(rr) {
+    if (rr >= 70) return 'green';
+    if (rr >= 50) return 'amber';
+    return 'red';
+  }
+
+  function showResults() {
+    const inp = getInputs();
+    state.calculated = true;
+    state.baseline = calcCountry(inp.country, inp);
+    const primary = state.baseline;
+
+    document.querySelectorAll('.hidden-until-calc').forEach((el) => el.classList.add('visible'));
+    document.querySelector('.print-header')?.setAttribute('data-date', new Date().toLocaleDateString());
+
+    $('projectionSub').textContent = `Based on ${totalCareerYears(inp)} years of contributions starting at age ${Math.max(22, inp.currentAge - yearsToRetire(inp))}, retiring at ${inp.retireAge} with final salary of ${fmtCur(primary.finalSal, primary.meta.currency)}.`;
+
+    $('pillar1Card').innerHTML = `<h3>State pension (Pillar 1)</h3><div class="pillar-amount mono">${fmtCur(primary.p1, primary.meta.currency)}/mo</div><div class="pillar-detail">${primary.p1Note}</div>`;
+    $('pillar2Card').innerHTML = `<h3>Occupational (Pillar 2)</h3><div class="pillar-amount mono">${fmtCur(primary.p2, primary.meta.currency)}/mo</div><div class="pillar-detail">${primary.p2Note}</div>`;
+    $('pillar3Card').innerHTML = `<h3>Private / voluntary (Pillar 3)</h3><div class="pillar-amount mono">${fmtCur(primary.p3, primary.meta.currency)}/mo</div><div class="pillar-detail">${primary.p3Note}</div>`;
+
+    const eurTotal = primary.totalMo * (FX[primary.meta.currency] || 1);
+    $('summaryBar').innerHTML = `
+      <div><div style="font-size:0.8rem;opacity:0.9;">Total monthly pension</div><div class="big mono">${fmtCur(primary.totalMo, primary.meta.currency)}</div></div>
+      <div><div style="font-size:0.8rem;opacity:0.9;">In EUR</div><div class="mono">€${fmt(Math.round(eurTotal))}/mo</div></div>
+      <div><div style="font-size:0.8rem;opacity:0.9;">Replacement rate</div><div class="mono">${primary.rr.toFixed(1)}%</div></div>
+      <span class="traffic ${trafficClass(primary.rr)}">${primary.rr >= 70 ? 'Comfortable' : primary.rr >= 50 ? 'Moderate gap' : 'Significant gap'}</span>`;
+
+    renderGap(inp, primary);
+    renderAccumChart(inp, primary);
+    renderCompare(inp);
+    renderReplacementChart(inp);
+    renderDestinations(inp, primary);
+    renderCeilings();
+    renderPrefs();
+  }
+
+  function renderGap(inp, r) {
+    const box = $('gapBox');
+    const levers = $('leverSliders');
+    if (r.rr >= 60) { box.classList.remove('visible', 'critical'); levers.classList.remove('visible'); return; }
+    box.classList.add('visible', r.rr < 50 ? 'critical' : '');
+    const gap = 70 - r.rr;
+    const extraP3 = Math.max(0, (r.finalSal * (gap / 100)) / 12 * 0.3);
+    box.innerHTML = `<strong>Gap analysis</strong><p>Your projected replacement rate is <strong>${r.rr.toFixed(1)}%</strong>. To reach 70%, you could:</p>
+      <ul style="margin:12px 0 0 20px;"><li>Increase Pillar 3 by ~${fmtCur(extraP3 * 12, r.meta.currency)}/yr</li>
+      <li>Retire ${Math.ceil(gap / 3)} years later</li>
+      <li>Achieve ${(inp.invReturn * 100 + 1.5).toFixed(1)}%+ return on Pillar 2/3</li></ul>`;
+    levers.classList.add('visible');
+    levers.innerHTML = `
+      <div class="field"><label>Extra Pillar 3 /yr: <span class="mono" id="leverP3Val">${fmt(extraP3 * 12)}</span></label><input type="range" id="leverP3" min="0" max="${Math.round(extraP3 * 24)}" value="${Math.round(extraP3 * 12)}" /></div>
+      <div class="field"><label>Retirement age: <span class="mono" id="leverAgeVal">${inp.retireAge}</span></label><input type="range" id="leverAge" min="60" max="72" value="${inp.retireAge}" /></div>
+      <div class="field"><label>Investment return: <span class="mono" id="leverRetVal">${(inp.invReturn * 100).toFixed(1)}%</span></label><input type="range" id="leverRet" min="1" max="8" step="0.5" value="${inp.invReturn * 100}" /></div>`;
+    ['leverP3', 'leverAge', 'leverRet'].forEach((id) => {
+      $(id)?.addEventListener('input', () => {
+        if (id === 'leverP3') { $('pillar3').value = +$('leverP3').value; $('leverP3Val').textContent = fmt(+$('leverP3').value); }
+        if (id === 'leverAge') { $('retireAge').value = +$('leverAge').value; $('leverAgeVal').textContent = $('leverAge').value; }
+        if (id === 'leverRet') { $('invReturn').value = +$('leverRet').value; $('invReturnVal').textContent = $('leverRet').value + '%'; $('leverRetVal').textContent = $('leverRet').value + '%'; }
+        if (state.calculated) showResults();
+      });
+    });
+  }
+
+  function ensureChart(cb) {
+    if (typeof Chart !== 'undefined') return cb();
+    window.addEventListener('load', cb, { once: true });
+  }
+
+  function renderAccumChart(inp, r) {
+    ensureChart(() => renderAccumChartInner(inp, r));
+  }
+  function renderAccumChartInner(inp, r) {
+    const yrs = yearsToRetire(inp);
+    const labels = [];
+    const d2 = [], d3 = [], dComb = [], income = [];
+    let c2 = 0, c3 = 0;
+    const p3a = inp.country === 'CH' ? Math.min(inp.pillar3, 7056) : inp.pillar3;
+    const p2rate = inp.country === 'CH' ? bvgRate(inp.currentAge) : 0.06;
+
+    for (let a = inp.currentAge; a <= 90; a++) {
+      labels.push(a);
+      if (a < inp.retireAge) {
+        c2 = (c2 + r.finalSal * p2rate * 0.5) * (1 + inp.invReturn);
+        c3 = (c3 + p3a) * (1 + inp.invReturn);
+      }
+      d2.push(Math.round(c2));
+      d3.push(Math.round(c3));
+      dComb.push(Math.round(c2 + c3));
+      income.push(a >= inp.retireAge ? Math.round((c2 + c3) * (inp.country === 'CH' ? 0.068 / 12 : 1 / 240)) : 0);
+    }
+
+    $('accumLegend').innerHTML = '<span><i style="background:#C49A28"></i> Pillar 2</span><span><i style="background:#2A6B42"></i> Pillar 3</span><span><i style="background:#1A3A5C"></i> Combined</span>';
+    $('accumTable').innerHTML = '<table class="compare"><tr><th>Age</th><th>P2</th><th>P3</th><th>Combined</th></tr>' +
+      labels.filter((_, i) => i % 5 === 0).map((a, i) => `<tr><td>${a}</td><td class="mono">${fmt(d2[i * 5])}</td><td class="mono">${fmt(d3[i * 5])}</td><td class="mono">${fmt(dComb[i * 5])}</td></tr>`).join('');
+
+    if (charts.accum) charts.accum.destroy();
+    const retIdx = inp.retireAge - inp.currentAge;
+    charts.accum = new Chart($('accumChart'), {
+      type: 'line',
+      data: {
+        labels,
+        datasets: [
+          { label: 'Pillar 2', data: d2, borderColor: '#C49A28', tension: 0.2, yAxisID: 'y' },
+          { label: 'Pillar 3', data: d3, borderColor: '#2A6B42', tension: 0.2, yAxisID: 'y' },
+          { label: 'Combined', data: dComb, borderColor: '#1A3A5C', tension: 0.2, yAxisID: 'y' },
+          { label: 'Monthly income', data: income, borderColor: '#AE1C28', borderDash: [4, 4], tension: 0.2, yAxisID: 'y1' },
+        ],
+      },
+      options: {
+        responsive: true, maintainAspectRatio: false,
+        plugins: { legend: { display: false }, annotation: {} },
+        scales: {
+          x: { title: { display: true, text: 'Age' }, ticks: { font: { family: 'DM Mono' } } },
+          y: { position: 'left', ticks: { font: { family: 'DM Mono' } } },
+          y1: { position: 'right', grid: { drawOnChartArea: false }, ticks: { font: { family: 'DM Mono' } } },
+        },
+      },
+    });
+  }
+
+  function renderCompare(inp) {
+    ensureChart(() => renderCompareInner(inp));
+  }
+  function renderCompareInner(inp) {
+    const all = Object.keys(COUNTRY_META).map((c) => calcCountry(c, inp));
+    all.sort((a, b) => b.eurMo - a.eurMo);
+
+    $('countryCards').innerHTML = all.map((r) => {
+      const m = r.meta;
+      const barW = Math.min(100, r.rr);
+      const barColor = r.rr >= 70 ? 'var(--green)' : r.rr >= 50 ? 'var(--amber)' : 'var(--red)';
+      return `<div class="card country-card" data-c="${r.countryCode}">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;">
+          <strong>${m.flag} ${m.name}</strong>
+          <span class="grade grade-${m.grade.replace('+', 'p')}">${m.grade}</span>
+        </div>
+        <p style="font-size:0.75rem;color:var(--ink-60);margin:8px 0;">Mercer 2025: ${m.mercer}</p>
+        <div class="mono" style="font-size:1.1rem;font-weight:700;">€${fmt(Math.round(r.eurMo))}/mo</div>
+        <div class="progress-bar"><span style="width:${barW}%;background:${barColor}"></span></div>
+        <p class="mono" style="font-size:0.8rem;">${r.rr.toFixed(1)}% replacement</p>
+        <p style="font-size:0.75rem;margin-top:8px;">Age ${m.pensionAge} · ${m.system}</p>
+        <p style="font-size:0.75rem;color:var(--green);">+ ${m.strength}</p>
+        <p style="font-size:0.75rem;color:var(--red);">− ${m.weakness}</p>
+        ${m.tag ? `<span class="tag">${m.tag}</span>` : ''}
+      </div>`;
+    }).join('');
+
+    if (charts.rank) charts.rank.destroy();
+    charts.rank = new Chart($('rankChart'), {
+      type: 'bar',
+      data: {
+        labels: all.map((r) => r.meta.name),
+        datasets: [
+          { label: 'Monthly EUR', data: all.map((r) => Math.round(r.eurMo)), backgroundColor: all.map((r) => r.meta.color) },
+          { label: 'Replacement %', data: all.map((r) => r.rr), backgroundColor: 'rgba(26,58,92,0.4)', xAxisID: 'x1' },
+        ],
+      },
+      options: {
+        indexAxis: 'y', responsive: true, maintainAspectRatio: false,
+        plugins: { legend: { display: false } },
+        scales: { x: { ticks: { font: { family: 'DM Mono' } } } },
+      },
+    });
+
+    $('rankTable').innerHTML = '<table class="compare"><tr><th>Country</th><th>EUR/mo</th><th>RR%</th></tr>' +
+      all.map((r) => `<tr><td>${r.meta.name}</td><td class="mono">€${fmt(Math.round(r.eurMo))}</td><td class="mono">${r.rr.toFixed(1)}%</td></tr>`).join('') + '</table>';
+
+    $('compareTableBody').innerHTML = all.map((r) => {
+      const hl = r.countryCode === inp.country ? ' class="highlight"' : '';
+      return `<tr${hl}><td>${r.meta.flag} ${r.meta.name}</td><td class="mono">€${fmt(Math.round(r.p1 * (FX[r.meta.currency] || 1)))}</td>
+        <td class="mono">€${fmt(Math.round(r.p2 * (FX[r.meta.currency] || 1)))}</td><td class="mono">€${fmt(Math.round(r.p3 * (FX[r.meta.currency] || 1)))}</td>
+        <td class="mono">€${fmt(Math.round(r.eurMo))}</td><td class="mono">€${fmt(Math.round(r.eurMo * 12))}</td>
+        <td class="mono">${r.rr.toFixed(1)}%</td><td>${r.meta.mercer}</td><td>${r.meta.pensionAge}</td><td>${r.meta.system}</td></tr>`;
+    }).join('');
+
+    $('compareTable').querySelectorAll('th[data-sort]').forEach((th) => {
+      th.onclick = () => {
+        const key = th.dataset.sort;
+        const rows = [...$('compareTableBody').querySelectorAll('tr')];
+        const idx = ['country', 'p1', 'p2', 'p3', 'monthly', 'yearly', 'rr', 'mercer', 'age', 'system'].indexOf(key);
+        rows.sort((a, b) => (a.cells[idx]?.textContent || '').localeCompare(b.cells[idx]?.textContent || '', undefined, { numeric: true }));
+        $('compareTableBody').append(...rows);
+      };
+    });
+  }
+
+  function renderReplacementChart(inp) {
+    ensureChart(() => renderReplacementChartInner(inp));
+  }
+  function renderReplacementChartInner(inp) {
+    const salaries = [];
+    for (let s = 30000; s <= 500000; s += 10000) salaries.push(s);
+    const datasets = Object.keys(COUNTRY_META).map((code) => {
+      const m = COUNTRY_META[code];
+      return {
+        label: m.name,
+        data: salaries.map((sal) => {
+          const sub = { ...inp, salary: sal * (FX[m.currency] || 1), currency: m.currency };
+          return calcCountry(code, sub).rr;
+        }),
+        borderColor: m.color,
+        backgroundColor: m.color,
+        tension: 0.3,
+        pointRadius: 0,
+      };
+    });
+
+    const userSalEur = inp.salary * (FX[inp.currency] || 1);
+    if (charts.replacement) charts.replacement.destroy();
+    charts.replacement = new Chart($('replacementChart'), {
+      type: 'line',
+      data: { labels: salaries.map((s) => '€' + fmt(s / 1000) + 'k'), datasets },
+      options: {
+        responsive: true, maintainAspectRatio: false,
+        plugins: {
+          legend: { display: false },
+          tooltip: {
+            callbacks: {
+              label: (ctx) => `${ctx.dataset.label}: ${ctx.parsed.y.toFixed(1)}% at €${fmt(salaries[ctx.dataIndex])}`,
+            },
+          },
+        },
+        scales: {
+          y: { min: 0, max: 100, title: { display: true, text: 'Replacement %' }, ticks: { font: { family: 'DM Mono' } } },
+          x: { title: { display: true, text: 'Gross annual salary' }, ticks: { maxTicksLimit: 12, font: { family: 'DM Mono' } } },
+        },
+      },
+      plugins: [{
+        id: 'target70',
+        afterDraw(chart) {
+          const y = chart.scales.y.getPixelForValue(70);
+          const ctx = chart.ctx;
+          ctx.save();
+          ctx.strokeStyle = '#C49A28';
+          ctx.setLineDash([6, 4]);
+          ctx.beginPath();
+          ctx.moveTo(chart.chartArea.left, y);
+          ctx.lineTo(chart.chartArea.right, y);
+          ctx.stroke();
+          ctx.restore();
+        },
+      }],
+    });
+
+    $('replacementTable').innerHTML = '<p class="note">Your salary (EUR): €' + fmt(Math.round(userSalEur)) + '</p>';
+  }
+
+  function scoreDestination(code, inp, weights) {
+    const r = calcCountry(code, inp);
+    const d = DEST[code];
+    const colMid = 4000;
+    const ppp = (r.eurMo) / colMid;
+    const scores = {
+      pension: Math.min(100, r.rr * 1.1),
+      tax: code === 'SG' ? 95 : code === 'CH' ? 70 : 55,
+      col: Math.min(100, ppp * 40),
+      health: { NL: 92, CH: 95, DE: 88, LU: 90, BE: 87, AT: 89, SG: 93 }[code] || 80,
+      safety: { CH: 98, SG: 94, NL: 88, DE: 85, AT: 87, LU: 90, BE: 82 }[code] || 80,
+      climate: { SG: 60, CH: 55, NL: 50, DE: 52, AT: 58, BE: 50, LU: 52 }[code] || 55,
+    };
+    const w = weights;
+    const total = (scores.pension * w.fin + scores.tax * w.tax + scores.col * w.col + scores.health * w.health + scores.safety * w.fin + scores.climate * w.climate) /
+      (w.fin + w.tax + w.col + w.health + w.fin + w.climate);
+    return { code, r, d, scores, total, ppp };
+  }
+
+  function renderPrefs() {
+    const prefs = [
+      { id: 'prefFin', label: 'Financial security' },
+      { id: 'prefCol', label: 'Low cost of living' },
+      { id: 'prefHealth', label: 'Healthcare quality' },
+      { id: 'prefClimate', label: 'Warm climate' },
+      { id: 'prefTax', label: 'Low taxes' },
+    ];
+    $('prefSliders').innerHTML = prefs.map((p) =>
+      `<label for="${p.id}">${p.label} <span class="mono" id="${p.id}Val">3</span>★</label>
+       <input type="range" id="${p.id}" min="0" max="5" value="3" aria-label="${p.label}" />`
+    ).join('');
+    prefs.forEach((p) => {
+      $(p.id).addEventListener('input', () => {
+        $(p.id + 'Val').textContent = $(p.id).value;
+        if (state.calculated) renderDestinations(getInputs(), state.baseline);
+      });
+    });
+  }
+
+  function getWeights() {
+    return {
+      fin: +($('prefFin')?.value || 3),
+      col: +($('prefCol')?.value || 3),
+      health: +($('prefHealth')?.value || 3),
+      climate: +($('prefClimate')?.value || 3),
+      tax: +($('prefTax')?.value || 3),
+    };
+  }
+
+  function renderDestinations(inp, primary) {
+    const w = getWeights();
+    const ranked = Object.keys(DEST).map((c) => scoreDestination(c, inp, w)).sort((a, b) => b.total - a.total);
+
+    $('destCards').innerHTML = ranked.map((item) => {
+      const m = COUNTRY_META[item.code];
+      const d = item.d;
+      return `<div class="card dest-card">
+        <div style="display:flex;justify-content:space-between;"><strong>${m.flag} ${m.name}</strong><span class="score-badge mono">${item.total.toFixed(0)}</span></div>
+        <span class="tag">Recommended for: ${d.rec}</span>
+        <p style="margin-top:12px;font-size:0.85rem;"><strong>Living cost (couple):</strong> ${d.cost}/mo</p>
+        <p style="font-size:0.85rem;"><strong>Purchasing power index:</strong> <span class="mono">${item.ppp.toFixed(2)}</span></p>
+        <p style="font-size:0.85rem;"><strong>Pension tax:</strong> ${d.tax}</p>
+        <p style="font-size:0.85rem;"><strong>Healthcare:</strong> ${d.health}</p>
+        <p style="font-size:0.85rem;color:var(--green);">+ ${d.pro}</p>
+        <p style="font-size:0.85rem;color:var(--red);">− ${d.con}</p>
+        <p style="font-size:0.75rem;color:var(--ink-60);margin-top:8px;">${d.visa}</p>
+      </div>`;
+    }).join('');
+
+    const sel = inp.country;
+    const dims = ['Pension', 'Tax', 'COL', 'Healthcare', 'Safety', 'Climate'];
+    const ds = [sel, ranked[0]?.code].filter(Boolean).slice(0, 2).map((code) => {
+      const s = scoreDestination(code, inp, w).scores;
+      return {
+        label: COUNTRY_META[code].name,
+        data: [s.pension, s.tax, s.col, s.health, s.safety, s.climate],
+        borderColor: COUNTRY_META[code].color,
+        backgroundColor: COUNTRY_META[code].color + '33',
+      };
+    });
+
+    ensureChart(() => {
+    if (charts.radar) charts.radar.destroy();
+    charts.radar = new Chart($('radarChart'), {
+      type: 'radar',
+      data: { labels: dims, datasets: ds },
+      options: { responsive: true, maintainAspectRatio: false, scales: { r: { min: 0, max: 100 } } },
+    });
+    });
+  }
+
+  function renderCeilings() {
+    $('ceilingTableBody').innerHTML = CEILINGS.map((r) => `<tr><td>${r[0]}</td><td class="mono">${r[1]}</td><td>${r[2]}</td><td>${r[3]}</td></tr>`).join('');
+  }
+
+  function runScenario(type) {
+    const inp = getInputs();
+    let before, after, title, desc;
+    if (type === 'early') {
+      before = calcCountry(inp.country, inp);
+      after = calcCountry(inp.country, { ...inp, retireAge: 60 });
+      title = 'Early retirement at 60';
+      desc = 'Shorter contribution period reduces all pillars; early access penalties may apply (e.g. DE −0.3%/month before 67).';
+    } else if (type === 'swiss') {
+      $('country').value = 'CH';
+      before = calcCountry('CH', { ...inp, country: 'CH' });
+      after = calcCountry('CH', { ...inp, country: 'CH', pillar3: 7056 + 20000, chBvgExtra: true });
+      title = 'Maximise Swiss Pillar 3a + BVG buyback';
+      desc = 'CHF 7,056/yr Pillar 3a plus CHF 20,000/yr BVG einkauf (buyback) over remaining years.';
+    } else {
+      const nlPart = calcCountry('NL', { ...inp, retireAge: 50 });
+      const sgPart = calcCountry('SG', { ...inp, country: 'SG', currentAge: 50, retireAge: inp.retireAge });
+      before = calcCountry(inp.country, inp);
+      after = {
+        ...before,
+        totalMo: nlPart.p1 * 0.14 + sgPart.totalMo,
+        p1Note: '7yr NL AOW pro-rata + SG from age 50',
+        rr: before.rr * 0.85,
+      };
+      title = 'Relocate to Singapore at 50';
+      desc = '7 years NL (AOW pro-rata ~14% of full) then Singapore — CPF only if PR/citizen.';
+    }
+    const dMo = after.totalMo - before.totalMo;
+    const dRr = after.rr - before.rr;
+    $('scenarioOutput').innerHTML = `
+      <div class="card"><h3>${title}</h3><p class="sub">${desc}</p>
+      <div class="scenario-result" style="margin-top:16px;">
+        <div class="card"><h4>Before</h4><p class="mono" style="font-size:1.25rem;">${fmtCur(before.totalMo, before.meta?.currency || 'EUR')}/mo</p><p>${before.rr.toFixed(1)}% replacement</p></div>
+        <div class="card"><h4>After</h4><p class="mono" style="font-size:1.25rem;">${fmtCur(after.totalMo, after.meta?.currency || COUNTRY_META[inp.country].currency)}/mo</p>
+        <p class="${dMo >= 0 ? 'delta-pos' : 'delta-neg'}">${dMo >= 0 ? '+' : ''}${fmt(Math.round(dMo))}/mo</p>
+        <p class="${dRr >= 0 ? 'delta-pos' : 'delta-neg'}">${dRr >= 0 ? '+' : ''}${dRr.toFixed(1)}% replacement</p></div>
+      </div></div>`;
+    document.querySelector('#scenarios')?.scrollIntoView({ behavior: 'smooth' });
+  }
+
+  // Nav scroll spy
+  const sections = ['calculator', 'projection', 'compare', 'replacement', 'best-places', 'scenarios', 'methodology'];
+  const obs = new IntersectionObserver((entries) => {
+    entries.forEach((e) => {
+      if (e.isIntersecting) {
+        document.querySelectorAll('.nav-links a').forEach((a) => {
+          a.classList.toggle('active', a.getAttribute('href') === '#' + e.target.id);
+        });
+      }
+    });
+  }, { rootMargin: '-40% 0px -50% 0px' });
+  sections.forEach((id) => { const el = $(id); if (el) obs.observe(el); });
+
+  $('salaryGrowth').addEventListener('input', () => { $('salaryGrowthVal').textContent = $('salaryGrowth').value + '%'; live(); });
+  $('inflation').addEventListener('input', () => { $('inflationVal').textContent = $('inflation').value + '%'; });
+  $('invReturn').addEventListener('input', () => { $('invReturnVal').textContent = $('invReturn').value + '%'; live(); });
+
+  function live() { if (state.calculated) showResults(); }
+
+  ['currentAge', 'retireAge', 'salary', 'currency', 'country', 'empType', 'nlRuling', 'chCanton', 'chBvgExtra', 'deChurch', 'sgStatus', 'family', 'pillar3', 'includeEmployer'].forEach((id) => {
+    const el = $(id);
+    if (el) el.addEventListener(el.type === 'range' ? 'input' : 'change', live);
+  });
+
+  $('calcBtn').addEventListener('click', () => {
+    showResults();
+    $('projection').scrollIntoView({ behavior: 'smooth' });
+  });
+
+  document.querySelectorAll('[data-scenario]').forEach((btn) => {
+    btn.addEventListener('click', () => runScenario(btn.dataset.scenario));
+  });
+
+  renderPrefs();
+  renderCeilings();
+  $('invReturnVal').textContent = $('invReturn').value + '%';
+})();
+  </script>
+</body>
+</html>

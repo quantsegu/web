@@ -215,6 +215,19 @@ export default function App() {
           path="/wealth-tools/investment-policy-dashboard.html"
           element={<Navigate to="/wealth-tools/investment-policy-dashboard" replace />}
         />
+        <Route
+          path="/wealth-tools/pension-scope"
+          element={
+            <WealthToolFrame
+              src="/wealth-tools/pension-scope.html"
+              title="PensionScope — Global Retirement Intelligence"
+            />
+          }
+        />
+        <Route
+          path="/wealth-tools/pension-scope.html"
+          element={<Navigate to="/wealth-tools/pension-scope" replace />}
+        />
         <Route path="/bjp" element={<BJP />} />
         <Route path="/communities" element={<IndianCommunities />} />
         <Route path="*" element={<Navigate to="/" replace />} />
