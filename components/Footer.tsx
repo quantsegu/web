@@ -23,7 +23,7 @@ export default function Footer() {
               <li><a href="/#collaborations" className="text-gray-300 hover:text-saffron-300 transition-colors duration-200">Collaborations</a></li>
               <li><Link to="/software" className="text-gray-300 hover:text-saffron-300 transition-colors duration-200">Software</Link></li>
               <li><Link to="/wealth-tools" className="text-gray-300 hover:text-saffron-300 transition-colors duration-200">Wealth Tools</Link></li>
-              <li><a href="/resources.html" className="text-gray-300 hover:text-saffron-300 transition-colors duration-200">Resources Hub</a></li>
+              <li><a href="/resources" className="text-gray-300 hover:text-saffron-300 transition-colors duration-200">Resources Hub</a></li>
               <li><Link to="/wealth-tools/investment-universe" className="text-gray-300 hover:text-saffron-300 transition-colors duration-200">Investment Universe</Link></li>
               <li><a href="/wealth-tools/retirement-income-planner" className="text-gray-300 hover:text-saffron-300 transition-colors duration-200">Retirement Income Planner</a></li>
               <li><Link to="/communities" className="text-gray-300 hover:text-saffron-300 transition-colors duration-200">Indian Communities</Link></li>

@@ -106,6 +106,22 @@ export const wealthTools: WealthTool[] = [
     ctaLabel: 'Run scorecard',
   },
   {
+    id: 'nl-ch-vehicle-cost-comparison',
+    title: 'Europe Vehicle Cost Comparison',
+    description:
+      'Compare annual private and company LCV costs across Netherlands, Switzerland, Germany, Italy, and France — diesel, petrol, and electric with ranked EUR-equivalent totals.',
+    features: [
+      'Five-country ranking: NL, CH, DE, IT, FR with summary table',
+      'Presets: VW Caddy, ID. Buzz Cargo, Ford Transit/E-Transit, Mercedes eSprinter',
+      'Electric: BPM, bijtelling, Kfz-Steuer, TVS, and bollo estimates per country',
+      'Swiss canton and Italian region selectors',
+      'Custom catalogue values and consumption for any LCV',
+    ],
+    href: '/wealth-tools/nl-ch-vehicle-cost-comparison',
+    icon: 'car',
+    ctaLabel: 'Compare costs',
+  },
+  {
     id: 'personal-vs-company-car-planner',
     title: 'Personal vs Company Car Planner',
     description:

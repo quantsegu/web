@@ -35,7 +35,7 @@ export default function WealthTools() {
               Personal finance calculators for retirement planning, passive income targets, and portfolio assumptions — private, browser-only, no account required.
             </p>
             <a
-              href="/resources.html"
+              href="/resources"
               className="inline-block mt-6 text-sm font-medium text-saffron-300 hover:text-white transition-colors"
             >
               Browse the full resources hub →

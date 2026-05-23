@@ -76,7 +76,14 @@ export default function App() {
         <Route path="/" element={<Home {...shaderProps} />} />
         <Route path="/software" element={<Software />} />
         <Route path="/wealth-tools" element={<WealthTools />} />
-        <Route path="/resources" element={<Navigate to="/resources.html" replace />} />
+        <Route
+          path="/resources"
+          element={<WealthToolFrame src="/resources.html" title="Resources Hub" />}
+        />
+        <Route
+          path="/resources.html"
+          element={<Navigate to="/resources" replace />}
+        />
         <Route path="/wealth-tools/investment-universe" element={<InvestmentUniverse />} />
         <Route
           path="/wealth-tools/investment-universe.html"
@@ -121,6 +128,19 @@ export default function App() {
         <Route
           path="/wealth-tools/portfolio-efficiency-scorecard.html"
           element={<Navigate to="/wealth-tools/portfolio-efficiency-scorecard" replace />}
+        />
+        <Route
+          path="/wealth-tools/nl-ch-vehicle-cost-comparison"
+          element={
+            <WealthToolFrame
+              src="/wealth-tools/nl-ch-vehicle-cost-comparison.html"
+              title="Europe Vehicle Cost Comparison"
+            />
+          }
+        />
+        <Route
+          path="/wealth-tools/nl-ch-vehicle-cost-comparison.html"
+          element={<Navigate to="/wealth-tools/nl-ch-vehicle-cost-comparison" replace />}
         />
         <Route
           path="/wealth-tools/personal-vs-company-car-planner"

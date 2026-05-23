@@ -1,0 +1,764 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Compare annual private and company light commercial vehicle costs across Netherlands, Switzerland, Germany, Italy, and France — diesel, petrol, and electric." />
+<title>Europe Vehicle Cost Comparison — Shreshti Wealth</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700&family=Anybody:ital,wght@0,300;0,400;0,500;1,300;1,400&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --nl: #AE1C28; --nl-light: #f9eced;
+  --ch: #D52B1E; --ch-light: #f9ecec;
+  --de: #1a1a1a; --de-light: #ececec;
+  --it: #008C45; --it-light: #e8f5ee;
+  --fr: #0055A4; --fr-light: #e8eef8;
+  --ink: #0D0D0D; --ink-50: rgba(13,13,13,0.5); --ink-15: rgba(13,13,13,0.1);
+  --off: #F4F2ED; --white: #FFFFFF; --green: #2A6B42;
+}
+body { font-family: 'Syne', sans-serif; background: var(--off); color: var(--ink); min-height: 100vh; }
+
+nav {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 1.1rem 2.5rem; border-bottom: 1px solid var(--ink-15);
+  background: var(--white); flex-wrap: wrap; gap: 0.75rem;
+}
+.nav-brand { font-size: 13px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; }
+.nav-sub { font-size: 11px; color: var(--ink-50); letter-spacing: 0.06em; }
+.nav-links { display: flex; gap: 10px; flex-wrap: wrap; }
+.nav-links a {
+  font-size: 12px; color: var(--ink); text-decoration: none;
+  padding: 6px 12px; border: 1px solid var(--ink-15); border-radius: 4px;
+}
+.nav-links a:hover { background: var(--off); }
+.flags { font-size: 18px; letter-spacing: 2px; }
+
+.hero {
+  display: grid; grid-template-columns: 1fr auto; align-items: end;
+  padding: 2.5rem 2.5rem 1.75rem; gap: 2rem;
+  border-bottom: 1px solid var(--ink-15); background: var(--white);
+}
+.hero-left h1 {
+  font-family: 'Anybody', sans-serif;
+  font-size: clamp(1.75rem, 4vw, 2.8rem);
+  font-weight: 300; line-height: 1.1; margin-bottom: 0.75rem;
+}
+.hero-left h1 em { font-style: italic; color: var(--nl); }
+.hero-left p { font-size: 14px; color: var(--ink-50); line-height: 1.65; max-width: 560px; }
+.vehicle-badge {
+  background: var(--off); border: 1px solid var(--ink-15); border-radius: 8px;
+  padding: 1rem 1.25rem; text-align: center; min-width: 200px;
+}
+.vehicle-badge .vb-name { font-size: 14px; font-weight: 600; }
+.vehicle-badge .vb-spec { font-size: 11px; color: var(--ink-50); margin-top: 3px; max-width: 240px; margin-inline: auto; }
+.vehicle-badge .vb-price { font-family: 'Anybody', sans-serif; font-size: 1.25rem; font-weight: 500; margin-top: 6px; }
+.vehicle-badge .vb-price-label { font-size: 10px; color: var(--ink-50); text-transform: uppercase; letter-spacing: 0.06em; }
+
+.controls {
+  display: flex; align-items: center; gap: 1rem; padding: 1rem 2.5rem;
+  background: var(--off); border-bottom: 1px solid var(--ink-15); flex-wrap: wrap;
+}
+.ctrl-group { display: flex; align-items: center; gap: 8px; }
+.ctrl-label { font-size: 11px; color: var(--ink-50); text-transform: uppercase; letter-spacing: 0.07em; font-weight: 500; }
+select, input[type=number] {
+  font-family: 'Syne', sans-serif; font-size: 13px; padding: 6px 10px;
+  border: 1px solid var(--ink-15); border-radius: 4px; background: var(--white); color: var(--ink);
+}
+input[type=number] { width: 88px; }
+.ctrl-sep { height: 20px; width: 1px; background: var(--ink-15); }
+.custom-fields { display: none; width: 100%; flex-wrap: wrap; gap: 1rem; padding-top: 0.5rem; }
+.custom-fields.visible { display: flex; }
+
+.ranking-panel {
+  padding: 1.25rem 2.5rem; background: var(--white);
+  border-bottom: 1px solid var(--ink-15);
+}
+.ranking-panel h2 {
+  font-size: 10px; font-weight: 600; text-transform: uppercase;
+  letter-spacing: 0.1em; color: var(--ink-50); margin-bottom: 12px;
+}
+.ranking-list { display: flex; flex-direction: column; gap: 8px; }
+.rank-row {
+  display: grid; grid-template-columns: 28px 28px 1fr minmax(80px, 120px) minmax(70px, 90px);
+  align-items: center; gap: 10px; font-size: 13px;
+}
+.rank-pos { font-size: 11px; color: var(--ink-50); font-weight: 600; }
+.rank-flag { font-size: 1.1rem; }
+.rank-name { font-weight: 500; }
+.rank-bar-wrap {
+  height: 8px; background: var(--off); border-radius: 4px; overflow: hidden;
+  grid-column: 1 / -1; margin-top: -2px;
+}
+.rank-bar { height: 100%; border-radius: 4px; transition: width 0.3s; }
+.rank-total { font-family: 'Anybody', sans-serif; font-weight: 500; text-align: right; }
+.rank-eur { font-size: 11px; color: var(--ink-50); text-align: right; }
+
+.summary-table-wrap {
+  overflow-x: auto; padding: 0 2.5rem 1rem; background: var(--white);
+  border-bottom: 1px solid var(--ink-15);
+}
+.summary-table {
+  width: 100%; border-collapse: collapse; font-size: 12px; min-width: 640px;
+}
+.summary-table th, .summary-table td {
+  padding: 8px 10px; text-align: right; border-bottom: 1px solid var(--ink-15);
+}
+.summary-table th:first-child, .summary-table td:first-child { text-align: left; }
+.summary-table th { font-size: 10px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--ink-50); font-weight: 600; }
+.summary-table tr.cheapest td { background: var(--green); background: rgba(42, 107, 66, 0.08); }
+.summary-table .flag-cell { font-size: 1rem; }
+
+.compare-wrap {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 0;
+  background: var(--off);
+}
+.country-col {
+  padding: 1.5rem 1.5rem 2rem;
+  border-right: 1px solid var(--ink-15);
+  border-bottom: 1px solid var(--ink-15);
+  background: var(--white);
+}
+.country-header {
+  display: flex; align-items: flex-start; justify-content: space-between;
+  margin-bottom: 1.25rem; padding-bottom: 0.75rem; border-bottom: 2px solid;
+  gap: 8px;
+}
+.ch-name { display: flex; align-items: center; gap: 8px; }
+.ch-flag { font-size: 1.35rem; }
+.ch-title { font-size: 1rem; font-weight: 600; }
+.ch-sub { font-size: 10px; color: var(--ink-50); margin-top: 2px; max-width: 140px; }
+.total-badge { text-align: right; flex-shrink: 0; }
+.total-badge .tb-label { font-size: 9px; color: var(--ink-50); text-transform: uppercase; letter-spacing: 0.07em; }
+.total-badge .tb-value { font-family: 'Anybody', sans-serif; font-size: 1.35rem; font-weight: 500; }
+.total-badge .tb-eur { font-size: 10px; color: var(--ink-50); margin-top: 2px; }
+
+.cost-section { margin-bottom: 1.1rem; }
+.section-title {
+  font-size: 9px; font-weight: 600; text-transform: uppercase;
+  letter-spacing: 0.1em; color: var(--ink-50); margin-bottom: 6px;
+  padding-bottom: 4px; border-bottom: 1px solid var(--ink-15);
+}
+.cost-row {
+  display: flex; justify-content: space-between; align-items: baseline;
+  padding: 5px 0; border-bottom: 1px dotted var(--ink-15); gap: 8px;
+}
+.cost-row:last-child { border-bottom: none; }
+.cr-label { font-size: 12px; }
+.cr-sub { font-size: 10px; color: var(--ink-50); display: block; margin-top: 1px; }
+.cr-amount { font-family: 'Anybody', sans-serif; font-size: 13px; font-weight: 500; white-space: nowrap; }
+.cr-amount.positive { color: var(--green); }
+.cr-amount.negative { color: var(--nl); }
+.cr-amount.neutral { color: var(--ink-50); }
+
+.total-row {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 10px 12px; border-radius: 6px; margin-top: 0.75rem;
+}
+.total-row .tr-label { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; }
+.total-row .tr-value { font-family: 'Anybody', sans-serif; font-size: 1.25rem; font-weight: 600; }
+
+.note-box {
+  background: var(--off); border: 1px solid var(--ink-15); border-radius: 6px;
+  padding: 10px 12px; margin-top: 8px; font-size: 11px; color: var(--ink-50); line-height: 1.55;
+}
+.note-box strong { color: var(--ink); }
+
+.verdict {
+  padding: 1.5rem 2.5rem; background: var(--ink); color: var(--off);
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 1.5rem; flex-wrap: wrap; border-top: 1px solid var(--ink-15);
+}
+.verdict-text { font-size: 13px; line-height: 1.65; max-width: 720px; }
+.verdict-text strong { color: #F5C842; }
+.verdict-saving { text-align: right; }
+.verdict-saving .vs-label { font-size: 10px; opacity: 0.6; text-transform: uppercase; letter-spacing: 0.08em; }
+.verdict-saving .vs-value { font-family: 'Anybody', sans-serif; font-size: 1.75rem; font-weight: 600; color: #F5C842; }
+.verdict-saving .vs-sub { font-size: 11px; opacity: 0.6; margin-top: 2px; }
+
+.disclaimer {
+  padding: 0.75rem 2.5rem; font-size: 11px; color: var(--ink-50);
+  border-top: 1px solid var(--ink-15); background: var(--off);
+}
+
+@media (max-width: 700px) {
+  nav, .hero, .controls, .ranking-panel, .summary-table-wrap, .verdict, .disclaimer { padding-left: 1.25rem; padding-right: 1.25rem; }
+  .hero { grid-template-columns: 1fr; }
+  .rank-row { grid-template-columns: 24px 24px 1fr auto; }
+  .rank-eur { display: none; }
+}
+</style>
+</head>
+<body>
+
+<nav>
+  <div>
+    <div class="nav-brand">Europe Vehicle Cost Comparison</div>
+    <div class="nav-sub">NL · CH · DE · IT · FR · 2025 estimates</div>
+  </div>
+  <div class="nav-links">
+    <a href="/wealth-tools">← Wealth Tools</a>
+    <a href="/resources">Resources</a>
+  </div>
+  <div class="flags">🇳🇱 🇨🇭 🇩🇪 🇮🇹 🇫🇷</div>
+</nav>
+
+<div class="hero">
+  <div class="hero-left">
+    <h1>Commercial van<br><em>five-country</em><br>annual cost comparison</h1>
+    <p>Compare private and company-assigned LCV costs in the Netherlands, Switzerland, Germany, Italy, and France — road tax, insurance, energy, benefit-in-kind, and depreciation. Diesel, petrol, and electric presets included.</p>
+  </div>
+  <div class="vehicle-badge">
+    <div class="vb-name" id="badgeName">—</div>
+    <div class="vb-spec" id="badgeSpec">—</div>
+    <div class="vb-price" id="heroPrice">—</div>
+    <div class="vb-price-label">catalogue (from NL base)</div>
+  </div>
+</div>
+
+<div class="controls">
+  <div class="ctrl-group">
+    <span class="ctrl-label">Vehicle</span>
+    <select id="vehiclePreset" onchange="onPresetChange()">
+      <option value="caddy-diesel">VW Caddy Cargo — Diesel</option>
+      <option value="caddy-petrol">VW Caddy Cargo — Petrol</option>
+      <option value="caddy-electric">VW Caddy Cargo — Electric</option>
+      <option value="id-buzz-cargo">VW ID. Buzz Cargo — Electric</option>
+      <option value="transit-diesel">Ford Transit Custom — Diesel</option>
+      <option value="transit-electric">Ford E-Transit Custom — Electric</option>
+      <option value="sprinter-electric">Mercedes eSprinter — Electric</option>
+      <option value="custom">Custom vehicle…</option>
+    </select>
+  </div>
+  <div class="ctrl-sep"></div>
+  <div class="ctrl-group">
+    <span class="ctrl-label">Powertrain</span>
+    <select id="fuelType" onchange="render()">
+      <option value="diesel">Diesel</option>
+      <option value="petrol">Petrol</option>
+      <option value="electric">Electric</option>
+    </select>
+  </div>
+  <div class="ctrl-sep"></div>
+  <div class="ctrl-group">
+    <span class="ctrl-label">Ownership</span>
+    <select id="ownership" onchange="render()">
+      <option value="private">Private name</option>
+      <option value="company">Company</option>
+    </select>
+  </div>
+  <div class="ctrl-sep"></div>
+  <div class="ctrl-group">
+    <span class="ctrl-label">Annual km</span>
+    <input type="number" id="kmYear" value="20000" step="1000" min="5000" max="60000" onchange="render()">
+  </div>
+  <div class="ctrl-sep"></div>
+  <div class="ctrl-group">
+    <span class="ctrl-label">Swiss canton</span>
+    <select id="canton" onchange="render()">
+      <option value="zug">Zug</option>
+      <option value="zurich">Zurich</option>
+      <option value="bern">Bern</option>
+      <option value="geneva">Geneva</option>
+    </select>
+  </div>
+  <div class="ctrl-sep"></div>
+  <div class="ctrl-group">
+    <span class="ctrl-label">Italy region</span>
+    <select id="itRegion" onchange="render()">
+      <option value="lombardy">Lombardy</option>
+      <option value="lazio">Lazio</option>
+      <option value="veneto">Veneto</option>
+    </select>
+  </div>
+  <div class="custom-fields" id="customFields">
+    <div class="ctrl-group">
+      <span class="ctrl-label">Catalog € (EU)</span>
+      <input type="number" id="customCatalogEU" value="35000" step="500" min="15000" onchange="render()">
+    </div>
+    <div class="ctrl-group">
+      <span class="ctrl-label">Catalog CHF</span>
+      <input type="number" id="customCatalogCH" value="36000" step="500" min="15000" onchange="render()">
+    </div>
+    <div class="ctrl-group">
+      <span class="ctrl-label" id="consumptionLabel">L/100km</span>
+      <input type="number" id="customConsumption" value="6.5" step="0.1" min="1" onchange="render()">
+    </div>
+  </div>
+</div>
+
+<div class="ranking-panel">
+  <h2>Annual cost ranking (EUR equivalent, lowest first)</h2>
+  <div class="ranking-list" id="rankingList"></div>
+</div>
+
+<div class="summary-table-wrap">
+  <table class="summary-table" id="summaryTable">
+    <thead>
+      <tr>
+        <th>Country</th>
+        <th>Total / yr</th>
+        <th>EUR equiv.</th>
+        <th>Road tax</th>
+        <th>Energy</th>
+        <th>BIK / fringe</th>
+        <th>Insurance</th>
+      </tr>
+    </thead>
+    <tbody id="summaryBody"></tbody>
+  </table>
+</div>
+
+<div class="compare-wrap" id="countriesRoot"></div>
+
+<div class="verdict">
+  <div class="verdict-text" id="verdict-text">—</div>
+  <div class="verdict-saving">
+    <div class="vs-label">Cheapest vs priciest</div>
+    <div class="vs-value" id="verdict-diff">—</div>
+    <div class="vs-sub" id="verdict-diff-sub">—</div>
+  </div>
+</div>
+
+<div class="disclaimer" id="disclaimer"></div>
+
+<script>
+const FX_CHF_EUR = 0.99;
+
+const COUNTRY_ORDER = ['nl', 'de', 'it', 'fr', 'ch'];
+
+const COUNTRY_META = {
+  nl: { flag: '🇳🇱', name: 'Netherlands', color: '#AE1C28', light: '#f9eced', currency: '€', fx: 1 },
+  ch: { flag: '🇨🇭', name: 'Switzerland', color: '#D52B1E', light: '#f9ecec', currency: 'CHF', fx: FX_CHF_EUR },
+  de: { flag: '🇩🇪', name: 'Germany', color: '#1a1a1a', light: '#ececec', currency: '€', fx: 1 },
+  it: { flag: '🇮🇹', name: 'Italy', color: '#008C45', light: '#e8f5ee', currency: '€', fx: 1 },
+  fr: { flag: '🇫🇷', name: 'France', color: '#0055A4', light: '#e8eef8', currency: '€', fx: 1 },
+};
+
+const VEHICLE_PRESETS = {
+  'caddy-diesel': { name: 'VW Caddy Cargo', spec: '2.0 TDI · ~1,400 kg', fuel: 'diesel', catalogEU: 32500, catalogCH: 33500, consumption: 6.5 },
+  'caddy-petrol': { name: 'VW Caddy Cargo', spec: '1.5 TSI · ~1,400 kg', fuel: 'petrol', catalogEU: 30500, catalogCH: 31500, consumption: 7.2 },
+  'caddy-electric': { name: 'VW Caddy Cargo Electric', spec: 'e-Cargo · ~1,900 kg', fuel: 'electric', catalogEU: 45000, catalogCH: 47000, consumption: 22 },
+  'id-buzz-cargo': { name: 'VW ID. Buzz Cargo', spec: '77 kWh · ~2,200 kg', fuel: 'electric', catalogEU: 52000, catalogCH: 54000, consumption: 24 },
+  'transit-diesel': { name: 'Ford Transit Custom', spec: '2.0 EcoBlue · ~1,900 kg', fuel: 'diesel', catalogEU: 38000, catalogCH: 39500, consumption: 7.0 },
+  'transit-electric': { name: 'Ford E-Transit Custom', spec: '68 kWh · ~2,350 kg', fuel: 'electric', catalogEU: 55000, catalogCH: 57000, consumption: 26 },
+  'sprinter-electric': { name: 'Mercedes eSprinter', spec: '113 kWh · ~2,600 kg', fuel: 'electric', catalogEU: 62000, catalogCH: 65000, consumption: 28 },
+  custom: { name: 'Custom vehicle', spec: 'Your values', fuel: 'diesel', catalogEU: 35000, catalogCH: 36000, consumption: 6.5 },
+};
+
+const CATALOG_MULT = { de: 0.98, it: 1.02, fr: 1.04 };
+
+const CANTON_MFZ = {
+  zug: { annual: 420, evFactor: 0.55, label: 'Zug' },
+  zurich: { annual: 580, evFactor: 0.6, label: 'Zurich' },
+  bern: { annual: 650, evFactor: 0.62, label: 'Bern' },
+  geneva: { annual: 720, evFactor: 0.65, label: 'Geneva' },
+};
+
+const IT_BOLLO = {
+  lombardy: { ice: 480, ev: 120, label: 'Lombardy' },
+  lazio: { ice: 520, ev: 140, label: 'Lazio' },
+  veneto: { ice: 450, ev: 110, label: 'Veneto' },
+};
+
+const FUEL_PRICE = {
+  nl: { diesel: 1.82, petrol: 2.05, electric: 0.32 },
+  ch: { diesel: 1.89, petrol: 1.95, electric: 0.26 },
+  de: { diesel: 1.75, petrol: 1.88, electric: 0.30 },
+  it: { diesel: 1.78, petrol: 1.92, electric: 0.28 },
+  fr: { diesel: 1.80, petrol: 1.95, electric: 0.27 },
+};
+
+const NL_BIJ_RATE = { diesel: 0.22, petrol: 0.22, electric: 0.17 };
+const NL_BPM_RATE = { diesel: 0.06, petrol: 0.04, electric: 0 };
+const DE_BIK_MONTHLY = { diesel: 0.01, petrol: 0.01, electric: 0.0025 };
+const FR_TVS_ICE = { diesel: 1800, petrol: 1400 };
+const FR_TVS_EV = 80;
+
+function isElectric(fuel) { return fuel === 'electric'; }
+
+function fmt(n, sym = '€') {
+  return sym + Math.round(n).toLocaleString('en-CH');
+}
+
+function toEur(local, countryId) {
+  return local * COUNTRY_META[countryId].fx;
+}
+
+function getCatalog(v, countryId) {
+  if (countryId === 'ch') return v.catalogCH;
+  if (countryId === 'nl') return v.catalogEU;
+  return Math.round(v.catalogEU * (CATALOG_MULT[countryId] || 1));
+}
+
+function getActiveVehicle() {
+  const presetKey = document.getElementById('vehiclePreset').value;
+  const preset = VEHICLE_PRESETS[presetKey];
+  const fuel = document.getElementById('fuelType').value;
+
+  if (presetKey === 'custom') {
+    const catalogEU = parseInt(document.getElementById('customCatalogEU').value, 10) || 35000;
+    const catalogCH = parseInt(document.getElementById('customCatalogCH').value, 10) || 36000;
+    const consumption = parseFloat(document.getElementById('customConsumption').value) || 6.5;
+    return {
+      name: 'Custom vehicle',
+      spec: isElectric(fuel) ? `${consumption} kWh/100km` : `${consumption} L/100km · ${fuel}`,
+      fuel,
+      catalogEU,
+      catalogCH,
+      consumption,
+    };
+  }
+  return { ...preset, fuel, consumption: preset.consumption };
+}
+
+function energyCost(km, consumption, fuel, countryId) {
+  const price = FUEL_PRICE[countryId][fuel];
+  if (isElectric(fuel)) return Math.round((km / 100) * consumption * price);
+  return Math.round((km / 100) * consumption * price);
+}
+
+function energySub(km, consumption, fuel, countryId) {
+  const price = FUEL_PRICE[countryId][fuel];
+  const sym = COUNTRY_META[countryId].currency;
+  if (isElectric(fuel)) {
+    return `${km.toLocaleString()} km × ${consumption} kWh × ${sym}${price}`;
+  }
+  return `${km.toLocaleString()} km × ${consumption}L × ${sym}${price}/L`;
+}
+
+function computeCountry(countryId, v, own, km, opts) {
+  const fuel = v.fuel;
+  const electric = isElectric(fuel);
+  const meta = COUNTRY_META[countryId];
+  const sym = meta.currency;
+  const catalog = getCatalog(v, countryId);
+  const sections = [];
+  let roadTax = 0;
+  let bikTax = 0;
+  let energy = energyCost(km, v.consumption, fuel, countryId);
+  let insurance = 0;
+  let total = 0;
+
+  if (countryId === 'nl') {
+    const bpm = Math.round(catalog * NL_BPM_RATE[fuel]);
+    const priceIncl = catalog + bpm;
+    const depr = Math.round(priceIncl * 0.2);
+    if (electric) roadTax = own === 'private' ? 520 : 380;
+    else if (own === 'private') roadTax = fuel === 'diesel' ? 1500 : 1460;
+    else roadTax = 508;
+    insurance = own === 'private' ? (electric ? 1500 : 1400) : electric ? 1200 : 1100;
+    const maint = electric ? 900 : 1200;
+    const parking = own === 'private' ? 600 : 0;
+    const bij = own === 'company' ? Math.round(catalog * NL_BIJ_RATE[fuel]) : 0;
+    bikTax = own === 'company' ? Math.round(bij * 0.4) : 0;
+    const vatRec = own === 'company' ? Math.round(catalog * 0.21 * 0.7 / 5) : 0;
+    total = depr + bpm / 5 + roadTax + insurance + energy + maint + parking + bikTax - vatRec;
+    sections.push({
+      title: 'Acquisition (5 yr)',
+      rows: [
+        { label: 'Purchase incl. tax', sub: electric ? 'BTW · BPM €0' : `BTW + BPM €${bpm}`, amount: fmt(priceIncl) },
+        { label: 'Depreciation', sub: '~20%/yr', amount: fmt(depr) },
+      ],
+    });
+    sections.push({
+      title: 'Running costs',
+      rows: [
+        { label: 'MRB (road tax)', sub: own === 'private' ? 'Private LCV rate' : 'Business rate', amount: fmt(roadTax) },
+        { label: 'Insurance', sub: 'WA + Casco est.', amount: fmt(insurance) },
+        { label: electric ? 'Electricity' : 'Fuel', sub: energySub(km, v.consumption, fuel, 'nl'), amount: fmt(energy) },
+        { label: 'Maintenance', sub: 'APK, tyres', amount: fmt(maint) },
+        { label: 'Parking', sub: 'Amsterdam est.', amount: own === 'private' ? fmt(parking) : '—', cls: 'neutral' },
+      ],
+    });
+    sections.push({
+      title: 'Tax',
+      rows: [
+        { label: 'Bijtelling', sub: own === 'company' ? `${Math.round(NL_BIJ_RATE[fuel]*100)}% · tax @40%` : 'Private — N/A', amount: own === 'company' ? '+ ' + fmt(bikTax) : 'N/A', cls: own === 'company' ? 'negative' : 'neutral' },
+        { label: 'BTW reclaim', sub: own === 'company' ? '21% · 70% biz · ÷5' : '—', amount: own === 'company' ? '- ' + fmt(vatRec) : '—', cls: own === 'company' ? 'positive' : 'neutral' },
+      ],
+    });
+    return { countryId, total, roadTax, bikTax, energy, insurance, sections, note: electric ? 'NL EV: BPM €0, bijtelling 17%, lower MRB.' : 'NL ICE: high private MRB for vans; BPM applies from 2025.', subtitle: 'Noord-Holland · ' + (own === 'private' ? 'private' : 'BV') };
+  }
+
+  if (countryId === 'ch') {
+    const canton = CANTON_MFZ[opts.canton];
+    const depr = Math.round(catalog * 0.2);
+    roadTax = Math.round(canton.annual * (electric ? canton.evFactor : 1));
+    insurance = own === 'private' ? (electric ? 1700 : 1600) : electric ? 1450 : 1350;
+    const maint = electric ? 1200 : 1400;
+    const vignette = 40;
+    const pa = own === 'company' ? Math.round(catalog * 0.096) : 0;
+    bikTax = own === 'company' ? Math.round(pa * 0.2) : 0;
+    const vatRec = own === 'company' ? Math.round(catalog * 0.081 * 0.7 / 5) : 0;
+    total = depr + 60 + roadTax + insurance + energy + maint + vignette + bikTax - vatRec;
+    sections.push({ title: 'Acquisition (5 yr)', rows: [
+      { label: 'Purchase', sub: 'incl. MWST 8.1%', amount: sym + ' ' + catalog.toLocaleString() },
+      { label: 'Depreciation', sub: '~20%/yr', amount: sym + ' ' + depr.toLocaleString() },
+    ]});
+    sections.push({ title: 'Running costs', rows: [
+      { label: 'Motorfahrzeugsteuer', sub: canton.label + (electric ? ' · EV' : ''), amount: sym + ' ' + roadTax },
+      { label: 'Insurance', sub: 'Haftpflicht + Kasko', amount: sym + ' ' + insurance.toLocaleString() },
+      { label: electric ? 'Electricity' : 'Fuel', sub: energySub(km, v.consumption, fuel, 'ch'), amount: sym + ' ' + energy },
+      { label: 'Maintenance', sub: 'MFK, tyres', amount: sym + ' ' + maint },
+      { label: 'Vignette', sub: 'Annual', amount: sym + ' 40' },
+    ]});
+    sections.push({ title: 'Tax', rows: [
+      { label: 'Privatanteil', sub: own === 'company' ? '9.6% · tax ~20%' : 'Private — N/A', amount: own === 'company' ? '+ ' + sym + ' ' + bikTax : 'N/A', cls: own === 'company' ? 'negative' : 'neutral' },
+      { label: 'MWST reclaim', sub: own === 'company' ? '8.1% · 70% · ÷5' : '—', amount: own === 'company' ? '- ' + sym + ' ' + vatRec : '—', cls: own === 'company' ? 'positive' : 'neutral' },
+    ]});
+    return { countryId, total, roadTax, bikTax, energy, insurance, sections, note: 'CH: cantonal MFZ; Privatanteil on company cars; wealth tax on private vehicles.', subtitle: canton.label + ' · ' + (own === 'private' ? 'private' : 'GmbH') };
+  }
+
+  if (countryId === 'de') {
+    const depr = Math.round(catalog * 0.2);
+    if (electric) roadTax = own === 'private' ? 0 : 0;
+    else roadTax = own === 'private' ? 420 : 380;
+    insurance = own === 'private' ? (electric ? 1450 : 1350) : electric ? 1250 : 1150;
+    const maint = electric ? 950 : 1250;
+    const parking = own === 'private' ? 450 : 0;
+    const monthlyRate = DE_BIK_MONTHLY[fuel];
+    const bikBase = own === 'company' ? Math.round(catalog * monthlyRate * 12) : 0;
+    bikTax = own === 'company' ? Math.round(bikBase * 0.42) : 0;
+    const vatRec = own === 'company' ? Math.round(catalog * 0.19 * 0.7 / 5) : 0;
+    total = depr + roadTax + insurance + energy + maint + parking + bikTax - vatRec;
+    sections.push({ title: 'Acquisition (5 yr)', rows: [
+      { label: 'Purchase', sub: 'incl. MwSt 19% · no BPM', amount: fmt(catalog) },
+      { label: 'Depreciation', sub: '~20%/yr', amount: fmt(depr) },
+    ]});
+    sections.push({ title: 'Running costs', rows: [
+      { label: 'Kfz-Steuer', sub: electric ? 'EV exempt (est.)' : 'LCV weight/emission est.', amount: fmt(roadTax) },
+      { label: 'Insurance', sub: 'Vollkasko est.', amount: fmt(insurance) },
+      { label: electric ? 'Electricity' : 'Fuel', sub: energySub(km, v.consumption, fuel, 'de'), amount: fmt(energy) },
+      { label: 'Maintenance', sub: 'TÜV, tyres', amount: fmt(maint) },
+      { label: 'Parking', sub: 'Urban est.', amount: own === 'private' ? fmt(parking) : '—', cls: 'neutral' },
+    ]});
+    sections.push({ title: 'Tax', rows: [
+      { label: 'Geldwerter Vorteil', sub: own === 'company' ? `${(monthlyRate*100).toFixed(2)}%/mo list · tax ~42%` : 'Private — N/A', amount: own === 'company' ? '+ ' + fmt(bikTax) : 'N/A', cls: own === 'company' ? 'negative' : 'neutral' },
+      { label: 'MwSt reclaim', sub: own === 'company' ? '19% · 70% · ÷5' : '—', amount: own === 'company' ? '- ' + fmt(vatRec) : '—', cls: own === 'company' ? 'positive' : 'neutral' },
+    ]});
+    return { countryId, total, roadTax, bikTax, energy, insurance, sections, note: electric ? 'DE EV: 0.25%/mo company car rule under cap; Kfz-Steuer often €0.' : 'DE ICE: 1%/mo list price benefit; moderate Kfz-Steuer for LCV.', subtitle: 'Germany · ' + (own === 'private' ? 'private' : 'GmbH/UG') };
+  }
+
+  if (countryId === 'it') {
+    const reg = IT_BOLLO[opts.itRegion];
+    const depr = Math.round(catalog * 0.2);
+    roadTax = electric ? reg.ev : reg.ice;
+    insurance = own === 'private' ? (electric ? 1600 : 1500) : electric ? 1350 : 1250;
+    const maint = electric ? 1000 : 1300;
+    const fringeBase = own === 'company' ? Math.round(catalog * (electric ? 0.1 : 0.15)) : 0;
+    bikTax = own === 'company' ? Math.round(fringeBase * 0.43) : 0;
+    const vatRec = own === 'company' ? Math.round(catalog * 0.22 * 0.7 / 5) : 0;
+    total = depr + roadTax + insurance + energy + maint + bikTax - vatRec;
+    sections.push({ title: 'Acquisition (5 yr)', rows: [
+      { label: 'Purchase', sub: 'incl. IVA 22%', amount: fmt(catalog) },
+      { label: 'Depreciation', sub: '~20%/yr', amount: fmt(depr) },
+    ]});
+    sections.push({ title: 'Running costs', rows: [
+      { label: 'Bollo auto', sub: reg.label + ' (regional)', amount: fmt(roadTax) },
+      { label: 'Insurance', sub: 'RC + Kasko est.', amount: fmt(insurance) },
+      { label: electric ? 'Electricity' : 'Fuel', sub: energySub(km, v.consumption, fuel, 'it'), amount: fmt(energy) },
+      { label: 'Maintenance', sub: 'Revisione, tyres', amount: fmt(maint) },
+    ]});
+    sections.push({ title: 'Tax', rows: [
+      { label: 'Fringe benefit', sub: own === 'company' ? 'Auto aziendale est. · IRPEF ~43%' : 'Private — N/A', amount: own === 'company' ? '+ ' + fmt(bikTax) : 'N/A', cls: own === 'company' ? 'negative' : 'neutral' },
+      { label: 'IVA reclaim', sub: own === 'company' ? '22% · 70% · ÷5' : '—', amount: own === 'company' ? '- ' + fmt(vatRec) : '—', cls: own === 'company' ? 'positive' : 'neutral' },
+    ]});
+    return { countryId, total, roadTax, bikTax, energy, insurance, sections, note: 'IT: bollo varies by region; company car taxed via fringe benefit on employee.', subtitle: reg.label + ' · ' + (own === 'private' ? 'privato' : 'Srl/SpA') };
+  }
+
+  if (countryId === 'fr') {
+    const depr = Math.round(catalog * 0.2);
+    roadTax = own === 'company'
+      ? (electric ? FR_TVS_EV : FR_TVS_ICE[fuel])
+      : electric ? 0 : 180;
+    insurance = own === 'private' ? (electric ? 1550 : 1450) : electric ? 1300 : 1200;
+    const maint = electric ? 1000 : 1250;
+    const carteGrise = electric ? 50 : 350;
+    const aen = own === 'company' ? Math.round(catalog * (electric ? 0.09 : 0.12)) : 0;
+    bikTax = own === 'company' ? Math.round(aen * 0.3) : 0;
+    const vatRec = own === 'company' ? Math.round(catalog * 0.2 * 0.7 / 5) : 0;
+    total = depr + roadTax + insurance + energy + maint + carteGrise / 5 + bikTax - vatRec;
+    sections.push({ title: 'Acquisition (5 yr)', rows: [
+      { label: 'Purchase', sub: 'incl. TVA 20%', amount: fmt(catalog) },
+      { label: 'Depreciation', sub: '~20%/yr', amount: fmt(depr) },
+    ]});
+    sections.push({ title: 'Running costs', rows: [
+      { label: own === 'company' ? 'TVS (fleet tax)' : 'Taxe régionale', sub: electric ? 'Low CO₂ component' : 'CO₂-weighted est.', amount: fmt(roadTax) },
+      { label: 'Insurance', sub: 'tous risques est.', amount: fmt(insurance) },
+      { label: electric ? 'Electricity' : 'Fuel', sub: energySub(km, v.consumption, fuel, 'fr'), amount: fmt(energy) },
+      { label: 'Maintenance', sub: 'contrôle technique', amount: fmt(maint) },
+      { label: 'Carte grise', sub: 'Annualised', amount: fmt(carteGrise / 5) },
+    ]});
+    sections.push({ title: 'Tax', rows: [
+      { label: 'Avantage en nature', sub: own === 'company' ? 'URSSAF est. · ~30%' : 'Private — N/A', amount: own === 'company' ? '+ ' + fmt(bikTax) : 'N/A', cls: own === 'company' ? 'negative' : 'neutral' },
+      { label: 'TVA reclaim', sub: own === 'company' ? '20% · 70% · ÷5' : '—', amount: own === 'company' ? '- ' + fmt(vatRec) : '—', cls: own === 'company' ? 'positive' : 'neutral' },
+    ]});
+    return { countryId, total, roadTax, bikTax, energy, insurance, sections, note: electric ? 'FR EV: low TVS for fleets; bonus écologique not modelled.' : 'FR ICE: TVS can dominate fleet costs for diesel vans.', subtitle: 'France · ' + (own === 'private' ? 'particulier' : 'SAS/SARL') };
+  }
+
+  return { countryId, total: 0, roadTax: 0, bikTax: 0, energy: 0, insurance: 0, sections: [], note: '', subtitle: '' };
+}
+
+function renderCountryCard(result) {
+  const meta = COUNTRY_META[result.countryId];
+  const sym = meta.currency;
+  const totalEur = toEur(result.total, result.countryId);
+  const rows = result.sections
+    .map(
+      (sec) => `
+    <div class="cost-section">
+      <div class="section-title">${sec.title}</div>
+      ${sec.rows
+        .map(
+          (r) => `
+        <div class="cost-row">
+          <div><span class="cr-label">${r.label}</span><span class="cr-sub">${r.sub || ''}</span></div>
+          <span class="cr-amount ${r.cls || ''}">${r.amount}</span>
+        </div>`
+        )
+        .join('')}
+    </div>`
+    )
+    .join('');
+
+  return `
+  <div class="country-col" data-country="${result.countryId}">
+    <div class="country-header" style="border-color:${meta.color}">
+      <div class="ch-name">
+        <span class="ch-flag">${meta.flag}</span>
+        <div>
+          <div class="ch-title">${meta.name}</div>
+          <div class="ch-sub">${result.subtitle}</div>
+        </div>
+      </div>
+      <div class="total-badge">
+        <div class="tb-label">Total / year</div>
+        <div class="tb-value" style="color:${meta.color}">${sym === '€' ? fmt(result.total) : sym + ' ' + Math.round(result.total).toLocaleString()}</div>
+        <div class="tb-eur">≈ €${Math.round(totalEur).toLocaleString()} equiv.</div>
+      </div>
+    </div>
+    ${rows}
+    <div class="total-row" style="background:${meta.light}">
+      <span class="tr-label">Annual net cost</span>
+      <span class="tr-value" style="color:${meta.color}">${sym === '€' ? fmt(result.total) : sym + ' ' + Math.round(result.total).toLocaleString()}</span>
+    </div>
+    <div class="note-box"><strong>Note:</strong> ${result.note}</div>
+  </div>`;
+}
+
+function onPresetChange() {
+  const presetKey = document.getElementById('vehiclePreset').value;
+  const preset = VEHICLE_PRESETS[presetKey];
+  document.getElementById('customFields').classList.toggle('visible', presetKey === 'custom');
+  if (presetKey !== 'custom') document.getElementById('fuelType').value = preset.fuel;
+  document.getElementById('consumptionLabel').textContent =
+    isElectric(document.getElementById('fuelType').value) ? 'kWh/100km' : 'L/100km';
+  render();
+}
+
+document.getElementById('fuelType').addEventListener('change', () => {
+  document.getElementById('consumptionLabel').textContent =
+    isElectric(document.getElementById('fuelType').value) ? 'kWh/100km' : 'L/100km';
+  render();
+});
+
+function render() {
+  const own = document.getElementById('ownership').value;
+  const km = parseInt(document.getElementById('kmYear').value, 10) || 20000;
+  const v = getActiveVehicle();
+  const opts = {
+    canton: document.getElementById('canton').value,
+    itRegion: document.getElementById('itRegion').value,
+  };
+
+  document.getElementById('badgeName').textContent = v.name;
+  document.getElementById('badgeSpec').textContent = v.spec;
+  document.getElementById('heroPrice').textContent =
+    '€' + v.catalogEU.toLocaleString() + ' EU · CHF ' + v.catalogCH.toLocaleString();
+
+  const results = COUNTRY_ORDER.map((id) => computeCountry(id, v, own, km, opts));
+  const ranked = [...results].sort((a, b) => toEur(a.total, a.countryId) - toEur(b.total, b.countryId));
+  const cheapest = ranked[0];
+  const priciest = ranked[ranked.length - 1];
+  const maxEur = toEur(priciest.total, priciest.countryId);
+
+  document.getElementById('rankingList').innerHTML = ranked
+    .map((r, i) => {
+      const meta = COUNTRY_META[r.countryId];
+      const eur = toEur(r.total, r.countryId);
+      const pct = maxEur > 0 ? Math.round((eur / maxEur) * 100) : 0;
+      const sym = meta.currency;
+      const local =
+        sym === '€' ? fmt(r.total) : sym + ' ' + Math.round(r.total).toLocaleString();
+      return `
+      <div class="rank-row">
+        <span class="rank-pos">#${i + 1}</span>
+        <span class="rank-flag">${meta.flag}</span>
+        <span class="rank-name">${meta.name}</span>
+        <span class="rank-total" style="color:${meta.color}">${local}</span>
+        <span class="rank-eur">€${Math.round(eur).toLocaleString()}</span>
+        <div class="rank-bar-wrap">
+          <div class="rank-bar" style="width:${pct}%;background:${meta.color}"></div>
+        </div>
+      </div>`;
+    })
+    .join('');
+
+  document.getElementById('summaryBody').innerHTML = ranked
+    .map((r) => {
+      const meta = COUNTRY_META[r.countryId];
+      const eur = toEur(r.total, r.countryId);
+      const sym = meta.currency;
+      const isCheap = r.countryId === cheapest.countryId;
+      const road =
+        sym === '€' ? fmt(r.roadTax) : sym + ' ' + r.roadTax;
+      const bik =
+        r.bikTax === 0
+          ? '—'
+          : sym === '€'
+            ? fmt(r.bikTax)
+            : sym + ' ' + r.bikTax;
+      return `<tr class="${isCheap ? 'cheapest' : ''}">
+        <td><span class="flag-cell">${meta.flag}</span> ${meta.name}</td>
+        <td>${sym === '€' ? fmt(r.total) : sym + ' ' + Math.round(r.total).toLocaleString()}</td>
+        <td>€${Math.round(eur).toLocaleString()}</td>
+        <td>${road}</td>
+        <td>${sym === '€' ? fmt(r.energy) : sym + ' ' + r.energy}</td>
+        <td>${bik}</td>
+        <td>${sym === '€' ? fmt(r.insurance) : sym + ' ' + r.insurance}</td>
+      </tr>`;
+    })
+    .join('');
+
+  document.getElementById('countriesRoot').innerHTML = COUNTRY_ORDER.map((id) => {
+    const r = results.find((x) => x.countryId === id);
+    return renderCountryCard(r);
+  }).join('');
+
+  const spread = toEur(priciest.total, priciest.countryId) - toEur(cheapest.total, cheapest.countryId);
+  const powerLabel = isElectric(v.fuel) ? 'electric' : v.fuel;
+
+  document.getElementById('verdict-text').innerHTML =
+    `<strong>${COUNTRY_META[cheapest.countryId].flag} ${COUNTRY_META[cheapest.countryId].name}</strong> is cheapest for a ${own === 'private' ? 'privately owned' : 'company'} <strong>${v.name}</strong> (${powerLabel}) at ${km.toLocaleString()} km/yr — ` +
+    `<strong>€${Math.round(toEur(cheapest.total, cheapest.countryId)).toLocaleString()}/yr</strong> (EUR equiv.). ` +
+    `Most expensive: <strong>${COUNTRY_META[priciest.countryId].name}</strong> at €${Math.round(toEur(priciest.total, priciest.countryId)).toLocaleString()}. ` +
+    (isElectric(v.fuel)
+      ? 'EVs: DE/NL often lead on tax; FR TVS and IT bollo still matter for fleets.'
+      : 'ICE: FR fleet TVS and NL private MRB often push totals up; CH depends on canton.');
+
+  document.getElementById('verdict-diff').textContent = '€ ' + Math.round(spread).toLocaleString();
+  document.getElementById('verdict-diff-sub').textContent = 'spread between #1 and #5';
+
+  document.getElementById('disclaimer').textContent =
+    '⚠ 2025 estimates for NL, CH, DE, IT, FR. CH shown in CHF (×' +
+    FX_CHF_EUR +
+    ' EUR). DE: 1%/mo ICE vs 0.25%/mo EV company-car rule. FR: TVS for company vans. IT: regional bollo. Not tax advice — verify locally.';
+}
+
+onPresetChange();
+</script>
+</body>
+</html>
