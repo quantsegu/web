@@ -17,7 +17,8 @@ export const wealthTools: WealthTool[] = [
     features: [
       'Seven jurisdictions with currency conversion (EUR, CHF, SGD, AED, USD)',
       'Engagement types: permanent, contractor (BV/ZZP), payrolling / EOR',
-      'Advanced: NL 30% ruling, CH canton, DE church tax, BE expat, SG CPF',
+      'Contractor: deductible expenses, profit retention in company, salary vs dividend payout',
+      'Advanced: NL 30% ruling, multi-canton CH compare (19 cantons), DE church tax, BE expat, SG CPF',
       'Ranked bar chart, deduction stack bars, and full breakdown per country',
       'Employer cost toggle for total cost-to-company view',
     ],
