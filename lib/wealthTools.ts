@@ -10,6 +10,22 @@ export interface WealthTool {
 
 export const wealthTools: WealthTool[] = [
   {
+    id: 'country-comparison-master-dashboard',
+    title: 'CountryScope Master Dashboard',
+    description:
+      'Master comparison dashboard for country selection: benchmark tax efficiency, cost of living, healthcare, education, safety, pension systems, and quality of life with customizable preference weights.',
+    features: [
+      'Compare up to four countries side-by-side in one dashboard',
+      'Weighted scoring engine for personalized country ranking',
+      'Category matrix: tax, living cost, healthcare, education, safety, pension, quality',
+      'Auto-insights highlighting best-fit country and trade-offs',
+      'Useful as a shortlisting layer before detailed migration or wealth planning',
+    ],
+    href: '/wealth-tools/country-comparison-master-dashboard',
+    icon: 'globe',
+    ctaLabel: 'Open master dashboard',
+  },
+  {
     id: 'take-home-pay-comparison',
     title: 'Global Take-Home Pay Comparison',
     description:
@@ -57,6 +73,22 @@ export const wealthTools: WealthTool[] = [
     href: '/wealth-tools/investment-policy-dashboard',
     icon: 'policy',
     ctaLabel: 'Open dashboard',
+  },
+  {
+    id: 'edu-scope',
+    title: 'EduScope — Global Education Intelligence',
+    description:
+      'Calculate total education spend from nursery to university across NL, CH, DE, LU, BE, AT, Singapore, and UAE. Compare school quality, university rankings, family cost of living, and country scorecards.',
+    features: [
+      'Full cost calculator birth to age 22 with state, private, and international pathways',
+      'PISA scores, curriculum cards, and international school ecosystem per country',
+      'QS 2025 university rankings plus UK, US, Canada, Australia bonus destinations',
+      'Family wellbeing radar, healthcare, parental leave, and cost of living',
+      'Country scorecards and profile-based best-match ranking',
+    ],
+    href: '/wealth-tools/edu-scope',
+    icon: 'globe',
+    ctaLabel: 'Calculate education costs',
   },
   {
     id: 'pension-scope',

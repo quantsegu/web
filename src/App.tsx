@@ -130,6 +130,19 @@ export default function App() {
           element={<Navigate to="/wealth-tools/portfolio-efficiency-scorecard" replace />}
         />
         <Route
+          path="/wealth-tools/country-comparison-master-dashboard"
+          element={
+            <WealthToolFrame
+              src="/wealth-tools/country-comparison-master-dashboard.html"
+              title="CountryScope Master Dashboard"
+            />
+          }
+        />
+        <Route
+          path="/wealth-tools/country-comparison-master-dashboard.html"
+          element={<Navigate to="/wealth-tools/country-comparison-master-dashboard" replace />}
+        />
+        <Route
           path="/wealth-tools/take-home-pay-comparison"
           element={
             <WealthToolFrame
@@ -227,6 +240,19 @@ export default function App() {
         <Route
           path="/wealth-tools/pension-scope.html"
           element={<Navigate to="/wealth-tools/pension-scope" replace />}
+        />
+        <Route
+          path="/wealth-tools/edu-scope"
+          element={
+            <WealthToolFrame
+              src="/wealth-tools/edu-scope.html"
+              title="EduScope — Global Education Intelligence"
+            />
+          }
+        />
+        <Route
+          path="/wealth-tools/edu-scope.html"
+          element={<Navigate to="/wealth-tools/edu-scope" replace />}
         />
         <Route path="/bjp" element={<BJP />} />
         <Route path="/communities" element={<IndianCommunities />} />

@@ -113,6 +113,24 @@
     }
     .hero-stat strong { display: block; font-size: 1.35rem; color: #fff; }
     .hero-stat span { font-size: 0.78rem; color: var(--text-faint); }
+    .hero-cta { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 22px; align-items: center; }
+    .catalog-link-spotlight {
+      font-weight: 600; color: var(--saffron) !important;
+      border: 1px solid rgba(255, 153, 51, 0.35);
+      margin-bottom: 8px;
+    }
+    .resource-card.featured {
+      grid-column: 1 / -1;
+      border-color: rgba(255, 153, 51, 0.5);
+      background: linear-gradient(135deg, rgba(255, 153, 51, 0.14), rgba(0, 0, 0, 0.45));
+    }
+    .resource-card.featured .card-badge {
+      display: inline-block;
+      font-size: 0.62rem; font-weight: 700; letter-spacing: 0.1em;
+      text-transform: uppercase; color: #fff;
+      background: linear-gradient(90deg, var(--saffron), var(--green));
+      padding: 3px 8px; border-radius: 4px; margin-bottom: 8px;
+    }
 
     .toolbar {
       position: sticky; top: calc(var(--header-h) + 3px); z-index: 100;
@@ -285,6 +303,10 @@
     <aside class="sidebar" aria-label="Library catalog">
       <p class="sidebar-title">Browse by goal</p>
       <div class="catalog-group">
+        <h3>Start here</h3>
+        <a href="/wealth-tools/country-comparison-master-dashboard" class="catalog-link catalog-link-spotlight">★ CountryScope Master</a>
+      </div>
+      <div class="catalog-group">
         <h3>Problems</h3>
         <a href="#featured-tools" class="catalog-link" data-goal-filter="all">All resources</a>
         <a href="#featured-tools" class="catalog-link" data-goal-filter="grow">Grow returns</a>
@@ -317,9 +339,13 @@
           Educational material only. Nothing here is personal financial, tax, or legal advice.
         </p>
         <div class="hero-stats" aria-label="Library at a glance">
-          <div class="hero-stat"><strong>7</strong><span>Interactive tools</span></div>
+          <div class="hero-stat"><strong>8+</strong><span>Interactive tools</span></div>
           <div class="hero-stat"><strong>6</strong><span>Guides &amp; references</span></div>
           <div class="hero-stat"><strong>4</strong><span>Download checklists</span></div>
+        </div>
+        <div class="hero-cta">
+          <a class="btn-primary" href="/wealth-tools/country-comparison-master-dashboard">Open CountryScope Master Dashboard →</a>
+          <a class="btn-secondary" href="/wealth-tools">All wealth tools</a>
         </div>
       </header>
 
@@ -355,9 +381,17 @@
         <section class="section" id="featured-tools">
           <div class="section-head">
             <h2>Featured tools</h2>
-            <p>Browser-based calculators—private, no account. Start with the highest-impact diagnostic for your situation.</p>
+            <p>Browser-based calculators—private, no account. Start with CountryScope to shortlist countries, then drill into specialized comparisons.</p>
           </div>
           <div class="card-grid">
+            <article class="resource-card featured" data-search="countryscope master dashboard country comparison tax healthcare education pension quality of life netherlands switzerland singapore uae" data-goal="compare preserve tax retire">
+              <span class="card-badge">Featured</span>
+              <span class="card-type">Master dashboard</span>
+              <h3>CountryScope Master Dashboard</h3>
+              <p>Compare up to four countries with weighted scoring across tax efficiency, cost of living, healthcare, education, safety, pension strength, and quality of life.</p>
+              <div class="card-goals"><span class="goal-tag">Cross-border</span><span class="goal-tag">Shortlist</span><span class="goal-tag">Relocation</span></div>
+              <a class="card-cta" href="/wealth-tools/country-comparison-master-dashboard">Open master dashboard →</a>
+            </article>
             <article class="resource-card" data-search="portfolio efficiency scorecard audit fees diversification" data-goal="grow tax">
               <span class="card-type">Tool</span>
               <h3>Portfolio Efficiency Scorecard</h3>
@@ -429,9 +463,16 @@
         <section class="section" id="country-comparison">
           <div class="section-head">
             <h2>Country comparison resources</h2>
-            <p>For internationally mobile investors comparing tax drag, pensions, and property across jurisdictions.</p>
+            <p>For internationally mobile investors comparing tax drag, pensions, and property across jurisdictions. Start with the master dashboard, then open detailed tools below.</p>
           </div>
           <div class="card-grid">
+            <article class="resource-card" data-search="countryscope master dashboard weighted ranking healthcare education pension" data-goal="compare preserve">
+              <span class="card-type">Master dashboard</span>
+              <h3>CountryScope Master Dashboard</h3>
+              <p>Personalized country ranking with adjustable weights—your entry point before take-home pay, wealth preservation, or pension deep dives.</p>
+              <div class="card-goals"><span class="goal-tag">Overview</span><span class="goal-tag">Ranking</span></div>
+              <a class="card-cta" href="/wealth-tools/country-comparison-master-dashboard">Open master dashboard →</a>
+            </article>
             <article class="resource-card" data-search="take home pay salary contractor payrolling netherlands switzerland dubai singapore tax" data-goal="compare tax">
               <span class="card-type">Comparison · salary</span>
               <h3>Global Take-Home Pay Comparison</h3>

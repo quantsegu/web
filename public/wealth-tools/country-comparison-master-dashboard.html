@@ -1,0 +1,351 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CountryScope Master Dashboard</title>
+  <style>
+    :root {
+      --bg: #030712;
+      --panel: #0b1220;
+      --panel-soft: #131c2f;
+      --line: #24304a;
+      --text: #e5ecf7;
+      --muted: #9fb2d4;
+      --accent: #f59e0b;
+      --accent-2: #22c55e;
+      --accent-3: #3b82f6;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+      background: radial-gradient(circle at top right, #13213f 0%, var(--bg) 45%);
+      color: var(--text);
+      min-height: 100vh;
+    }
+    .wrap {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 24px 16px 32px;
+    }
+    .hero {
+      background: linear-gradient(140deg, #141f38, #0d1528);
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      padding: 20px;
+      margin-bottom: 16px;
+    }
+    .hero h1 {
+      margin: 0;
+      font-size: clamp(1.4rem, 2.2vw, 2rem);
+      letter-spacing: 0.2px;
+    }
+    .hero p {
+      margin: 8px 0 0;
+      color: var(--muted);
+      max-width: 860px;
+      line-height: 1.5;
+    }
+    .grid { display: grid; gap: 14px; }
+    .g-2 { grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); }
+    .g-3 { grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); }
+    .panel {
+      background: linear-gradient(180deg, var(--panel), var(--panel-soft));
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      padding: 14px;
+    }
+    .panel h2 {
+      font-size: 1rem;
+      margin: 0 0 10px;
+      color: #f8fbff;
+    }
+    label {
+      display: block;
+      color: var(--muted);
+      font-size: 0.86rem;
+      margin-bottom: 6px;
+    }
+    select, input[type="range"] {
+      width: 100%;
+      background: #0a1223;
+      color: var(--text);
+      border: 1px solid #2a3550;
+      border-radius: 8px;
+      padding: 8px;
+    }
+    input[type="range"] { padding: 0; }
+    .metric-row {
+      display: grid;
+      grid-template-columns: 1fr 80px;
+      align-items: center;
+      gap: 8px;
+      margin: 8px 0;
+    }
+    .metric-row span { font-size: 0.88rem; color: var(--muted); }
+    .score-cards {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      gap: 10px;
+    }
+    .score-card {
+      border: 1px solid #2a3550;
+      border-radius: 10px;
+      padding: 10px;
+      background: #0b1428;
+    }
+    .score-card .name { font-size: 0.9rem; color: #dbe7ff; margin-bottom: 4px; }
+    .score-card .value { font-size: 1.2rem; font-weight: 700; }
+    .bar {
+      margin-top: 6px;
+      width: 100%;
+      height: 8px;
+      border-radius: 999px;
+      background: #1b2740;
+      overflow: hidden;
+    }
+    .bar > i { display: block; height: 100%; background: linear-gradient(90deg, var(--accent), var(--accent-2)); }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.86rem;
+    }
+    th, td {
+      border-bottom: 1px solid #1f2c45;
+      padding: 8px 6px;
+      text-align: left;
+    }
+    th { color: #dbe7ff; font-weight: 600; }
+    td { color: var(--muted); }
+    .pill {
+      display: inline-block;
+      border: 1px solid #2f3f60;
+      border-radius: 999px;
+      padding: 3px 8px;
+      font-size: 0.74rem;
+      color: #d4def5;
+      margin-right: 6px;
+      margin-bottom: 6px;
+    }
+    .foot {
+      margin-top: 14px;
+      color: #89a0c8;
+      font-size: 0.77rem;
+      line-height: 1.4;
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <section class="hero">
+      <h1>CountryScope — Master Comparison Dashboard</h1>
+      <p>
+        Compare countries across taxes, cost of living, healthcare, education, safety, pension strength, and quality of life.
+        Pick up to four countries and tune your decision weights to build a personalized ranking dashboard.
+      </p>
+    </section>
+
+    <section class="grid g-2">
+      <article class="panel">
+        <h2>Country Selection</h2>
+        <div class="grid g-2">
+          <div>
+            <label for="c1">Country 1</label>
+            <select id="c1"></select>
+          </div>
+          <div>
+            <label for="c2">Country 2</label>
+            <select id="c2"></select>
+          </div>
+          <div>
+            <label for="c3">Country 3</label>
+            <select id="c3"></select>
+          </div>
+          <div>
+            <label for="c4">Country 4</label>
+            <select id="c4"></select>
+          </div>
+        </div>
+      </article>
+
+      <article class="panel">
+        <h2>Preference Weights (0-100)</h2>
+        <div id="weightControls"></div>
+      </article>
+    </section>
+
+    <section class="panel" style="margin-top:14px;">
+      <h2>Weighted Score Ranking</h2>
+      <div id="scoreCards" class="score-cards"></div>
+    </section>
+
+    <section class="grid g-2" style="margin-top:14px;">
+      <article class="panel">
+        <h2>Category Breakdown</h2>
+        <table>
+          <thead>
+            <tr>
+              <th>Country</th>
+              <th>Tax</th>
+              <th>Living Cost</th>
+              <th>Healthcare</th>
+              <th>Education</th>
+              <th>Safety</th>
+              <th>Pension</th>
+              <th>Quality</th>
+            </tr>
+          </thead>
+          <tbody id="comparisonRows"></tbody>
+        </table>
+      </article>
+
+      <article class="panel">
+        <h2>Dashboard Insights</h2>
+        <div id="insights"></div>
+      </article>
+    </section>
+
+    <p class="foot">
+      Scoring is directional and educational. Scale is 0-100 (higher is better). Tax and cost inputs are normalized so lower burden maps to a higher score.
+      Use this for initial country filtering, then validate with detailed legal and tax advice.
+    </p>
+  </div>
+
+  <script>
+    const countries = [
+      { code: "NL", name: "Netherlands", tax: 53, living: 65, healthcare: 89, education: 84, safety: 82, pension: 86, quality: 84 },
+      { code: "CH", name: "Switzerland", tax: 76, living: 38, healthcare: 95, education: 90, safety: 94, pension: 89, quality: 95 },
+      { code: "DE", name: "Germany", tax: 50, living: 62, healthcare: 88, education: 83, safety: 80, pension: 79, quality: 82 },
+      { code: "SG", name: "Singapore", tax: 91, living: 58, healthcare: 93, education: 92, safety: 98, pension: 82, quality: 91 },
+      { code: "AE", name: "United Arab Emirates", tax: 96, living: 70, healthcare: 81, education: 78, safety: 88, pension: 60, quality: 80 },
+      { code: "LU", name: "Luxembourg", tax: 63, living: 52, healthcare: 90, education: 84, safety: 90, pension: 87, quality: 88 },
+      { code: "BE", name: "Belgium", tax: 42, living: 60, healthcare: 86, education: 81, safety: 78, pension: 78, quality: 79 },
+      { code: "AT", name: "Austria", tax: 51, living: 66, healthcare: 88, education: 82, safety: 86, pension: 82, quality: 84 }
+    ];
+
+    const metrics = [
+      { key: "tax", label: "Tax efficiency", defaultWeight: 80 },
+      { key: "living", label: "Cost of living", defaultWeight: 70 },
+      { key: "healthcare", label: "Healthcare", defaultWeight: 75 },
+      { key: "education", label: "Education", defaultWeight: 65 },
+      { key: "safety", label: "Safety", defaultWeight: 70 },
+      { key: "pension", label: "Pension strength", defaultWeight: 70 },
+      { key: "quality", label: "Quality of life", defaultWeight: 85 }
+    ];
+
+    const selectors = ["c1", "c2", "c3", "c4"].map((id) => document.getElementById(id));
+    const weightControls = document.getElementById("weightControls");
+    const scoreCards = document.getElementById("scoreCards");
+    const comparisonRows = document.getElementById("comparisonRows");
+    const insights = document.getElementById("insights");
+
+    function setupSelectors() {
+      selectors.forEach((el) => {
+        el.innerHTML = countries.map((c) => `<option value="${c.code}">${c.name}</option>`).join("");
+      });
+
+      selectors[0].value = "NL";
+      selectors[1].value = "CH";
+      selectors[2].value = "SG";
+      selectors[3].value = "AE";
+
+      selectors.forEach((el) => el.addEventListener("change", render));
+    }
+
+    function setupWeights() {
+      weightControls.innerHTML = metrics.map((m) => `
+        <div class="metric-row">
+          <span>${m.label}</span>
+          <input id="w-${m.key}" type="range" min="0" max="100" step="1" value="${m.defaultWeight}" />
+        </div>
+      `).join("");
+      metrics.forEach((m) => {
+        document.getElementById(`w-${m.key}`).addEventListener("input", render);
+      });
+    }
+
+    function selectedCountries() {
+      const seen = new Set();
+      return selectors
+        .map((el) => countries.find((c) => c.code === el.value))
+        .filter((c) => c && !seen.has(c.code) && seen.add(c.code));
+    }
+
+    function metricWeight(key) {
+      return Number(document.getElementById(`w-${key}`).value || 0);
+    }
+
+    function scoreCountry(country) {
+      const totalWeight = metrics.reduce((sum, m) => sum + metricWeight(m.key), 0) || 1;
+      const weighted = metrics.reduce((sum, m) => sum + country[m.key] * metricWeight(m.key), 0);
+      return Number((weighted / totalWeight).toFixed(1));
+    }
+
+    function topMetric(country) {
+      return metrics
+        .map((m) => ({ label: m.label, value: country[m.key] }))
+        .sort((a, b) => b.value - a.value)[0];
+    }
+
+    function weakMetric(country) {
+      return metrics
+        .map((m) => ({ label: m.label, value: country[m.key] }))
+        .sort((a, b) => a.value - b.value)[0];
+    }
+
+    function render() {
+      const selected = selectedCountries();
+      const scored = selected
+        .map((country) => ({ country, score: scoreCountry(country) }))
+        .sort((a, b) => b.score - a.score);
+
+      scoreCards.innerHTML = scored.map(({ country, score }, idx) => `
+        <div class="score-card">
+          <div class="name">#${idx + 1} ${country.name}</div>
+          <div class="value">${score}</div>
+          <div class="bar"><i style="width:${score}%;"></i></div>
+        </div>
+      `).join("");
+
+      comparisonRows.innerHTML = scored.map(({ country }) => `
+        <tr>
+          <td><strong style="color:#eef4ff;">${country.name}</strong></td>
+          <td>${country.tax}</td>
+          <td>${country.living}</td>
+          <td>${country.healthcare}</td>
+          <td>${country.education}</td>
+          <td>${country.safety}</td>
+          <td>${country.pension}</td>
+          <td>${country.quality}</td>
+        </tr>
+      `).join("");
+
+      if (!scored.length) {
+        insights.innerHTML = "<p style='color:#9fb2d4;'>Select at least one country.</p>";
+        return;
+      }
+
+      const winner = scored[0].country;
+      const winnerTop = topMetric(winner);
+      const winnerWeak = weakMetric(winner);
+      const priorities = metrics
+        .map((m) => ({ label: m.label, weight: metricWeight(m.key) }))
+        .sort((a, b) => b.weight - a.weight)
+        .slice(0, 3);
+
+      insights.innerHTML = `
+        <p><strong style="color:#f9fbff;">Best match currently:</strong> ${winner.name} (${scored[0].score})</p>
+        <p style="color:#9fb2d4;">Strongest area: <span class="pill">${winnerTop.label} (${winnerTop.value})</span>
+        Watch-out: <span class="pill">${winnerWeak.label} (${winnerWeak.value})</span></p>
+        <p style="margin-bottom:6px;color:#dbe7ff;">Your top weighted priorities:</p>
+        ${priorities.map((p) => `<span class="pill">${p.label}: ${p.weight}</span>`).join("")}
+      `;
+    }
+
+    setupSelectors();
+    setupWeights();
+    render();
+  </script>
+</body>
+</html>

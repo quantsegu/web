@@ -17,7 +17,13 @@ const ICONS = {
   car: Car,
 } as const;
 
+const FEATURED_TOOL_ID = 'country-comparison-master-dashboard';
+
 export default function WealthTools() {
+  const featuredTool = wealthTools.find((tool) => tool.id === FEATURED_TOOL_ID);
+  const otherTools = wealthTools.filter((tool) => tool.id !== FEATURED_TOOL_ID);
+  const FeaturedIcon = featuredTool ? ICONS[featuredTool.icon] : Globe;
+
   return (
     <div className="min-h-screen w-full bg-[#050108]">
       <Navbar />
@@ -32,19 +38,68 @@ export default function WealthTools() {
           >
             <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold text-white mb-4">Wealth Tools</h1>
             <p className="text-saffron-100 max-w-2xl mx-auto text-lg">
-              Personal finance calculators for retirement planning, passive income targets, and portfolio assumptions — private, browser-only, no account required.
+              Personal finance calculators for retirement planning, cross-border country comparison, passive income targets, and portfolio assumptions — private, browser-only, no account required.
             </p>
-            <a
-              href="/resources"
-              className="inline-block mt-6 text-sm font-medium text-saffron-300 hover:text-white transition-colors"
-            >
-              Browse the full resources hub →
-            </a>
+            <div className="flex flex-col sm:flex-row gap-3 justify-center items-center mt-6">
+              {featuredTool && (
+                <a
+                  href={featuredTool.href}
+                  className="inline-flex items-center justify-center bg-gradient-to-r from-saffron-500 to-bjp-green text-white font-semibold py-2.5 px-6 rounded-full hover:from-saffron-600 hover:to-bjp-green-dark transition-all duration-300 text-sm"
+                >
+                  {featuredTool.ctaLabel ?? 'Open master dashboard'}
+                </a>
+              )}
+              <a
+                href="/resources"
+                className="text-sm font-medium text-saffron-300 hover:text-white transition-colors"
+              >
+                Browse the full resources hub →
+              </a>
+            </div>
             <div className="w-20 h-1 bg-gradient-to-r from-saffron-500 to-bjp-green mx-auto mt-4" />
           </motion.div>
 
+          {featuredTool && (
+            <motion.article
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.15 }}
+              className="mb-10 rounded-2xl border border-saffron-500/40 bg-gradient-to-br from-saffron-500/15 via-black/50 to-bjp-green/10 backdrop-blur-md p-6 sm:p-8 md:col-span-2"
+            >
+              <div className="flex flex-col lg:flex-row lg:items-start gap-6">
+                <div className="flex items-start gap-4 flex-1">
+                  <div className="w-14 h-14 rounded-full bg-gradient-to-br from-saffron-500 to-bjp-green flex items-center justify-center text-white shrink-0">
+                    <FeaturedIcon size={28} aria-hidden />
+                  </div>
+                  <div>
+                    <p className="text-xs font-bold uppercase tracking-widest text-saffron-400 mb-2">Featured · start here</p>
+                    <h2 className="text-2xl font-bold text-white mb-2">{featuredTool.title}</h2>
+                    <p className="text-saffron-50 mb-4 max-w-2xl">{featuredTool.description}</p>
+                    <ul className="grid sm:grid-cols-2 gap-2">
+                      {featuredTool.features.slice(0, 4).map((feature) => (
+                        <li key={feature} className="flex items-start text-gray-300 text-sm">
+                          <span className="text-saffron-400 mr-2" aria-hidden>
+                            •
+                          </span>
+                          {feature}
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                </div>
+                <a
+                  href={featuredTool.href}
+                  className="inline-flex items-center justify-center shrink-0 bg-gradient-to-r from-saffron-500 to-bjp-green text-white font-semibold py-3 px-6 rounded-lg hover:from-saffron-600 hover:to-bjp-green-dark transition-all duration-300"
+                >
+                  <span>{featuredTool.ctaLabel ?? 'Open tool'}</span>
+                  <ExternalLink size={18} className="ml-2" aria-hidden />
+                </a>
+              </div>
+            </motion.article>
+          )}
+
           <div className="grid gap-8 md:grid-cols-2">
-            {wealthTools.map((tool, index) => {
+            {otherTools.map((tool, index) => {
               const Icon = ICONS[tool.icon];
               return (
                 <motion.article

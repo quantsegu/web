@@ -54,6 +54,12 @@ export default function Hero() {
           >
             Software & POS
           </Link>
+          <Link
+            to="/wealth-tools/country-comparison-master-dashboard"
+            className="inline-flex items-center justify-center border-2 border-bjp-green/50 text-saffron-100 font-semibold py-3 px-8 rounded-md hover:bg-bjp-green/10 transition-all duration-300"
+          >
+            CountryScope Dashboard
+          </Link>
         </motion.div>
       </div>
 
