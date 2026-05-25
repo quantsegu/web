@@ -217,6 +217,9 @@
       { code: "NL", name: "Netherlands", tax: 53, living: 65, healthcare: 89, education: 84, safety: 82, pension: 86, quality: 84 },
       { code: "CH", name: "Switzerland", tax: 76, living: 38, healthcare: 95, education: 90, safety: 94, pension: 89, quality: 95 },
       { code: "DE", name: "Germany", tax: 50, living: 62, healthcare: 88, education: 83, safety: 80, pension: 79, quality: 82 },
+      { code: "UK", name: "United Kingdom", tax: 58, living: 55, healthcare: 85, education: 82, safety: 78, pension: 74, quality: 81 },
+      { code: "SCT", name: "Scotland", tax: 52, living: 58, healthcare: 86, education: 81, safety: 80, pension: 74, quality: 82 },
+      { code: "IE", name: "Ireland", tax: 62, living: 48, healthcare: 84, education: 80, safety: 83, pension: 72, quality: 83 },
       { code: "SG", name: "Singapore", tax: 91, living: 58, healthcare: 93, education: 92, safety: 98, pension: 82, quality: 91 },
       { code: "AE", name: "United Arab Emirates", tax: 96, living: 70, healthcare: 81, education: 78, safety: 88, pension: 60, quality: 80 },
       { code: "LU", name: "Luxembourg", tax: 63, living: 52, healthcare: 90, education: 84, safety: 90, pension: 87, quality: 88 },
@@ -245,10 +248,10 @@
         el.innerHTML = countries.map((c) => `<option value="${c.code}">${c.name}</option>`).join("");
       });
 
-      selectors[0].value = "NL";
-      selectors[1].value = "CH";
-      selectors[2].value = "SG";
-      selectors[3].value = "AE";
+      selectors[0].value = "UK";
+      selectors[1].value = "IE";
+      selectors[2].value = "NL";
+      selectors[3].value = "CH";
 
       selectors.forEach((el) => el.addEventListener("change", render));
     }

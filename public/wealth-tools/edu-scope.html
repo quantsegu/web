@@ -1,0 +1,885 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="EduScope — Global Education Intelligence. Calculate education costs from nursery to university across 11 countries including UK, Scotland, and Ireland." />
+  <title>EduScope — Global Education Intelligence</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Fraunces:ital,opsz,wght@1,9..144,400;1,9..144,600;1,9..144,700&display=swap" rel="stylesheet" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js" defer></script>
+  <style>
+    :root {
+      --ink: #1A1614; --ink-60: rgba(26,22,20,0.6); --ink-15: rgba(26,22,20,0.1);
+      --surface: #FAF7F2; --white: #FFFFFF; --primary: #1B4B8A; --primary-light: #EBF1FA;
+      --gold: #C49A28; --gold-light: #FDF6E3; --green: #2A6B42; --green-light: #EBF4EF;
+      --coral: #C94B2A; --coral-light: #FAEEE9; --teal: #1A7A6E; --teal-light: #E5F4F2;
+      --purple: #5B3FA6; --purple-light: #EEEAFA; --amber: #B8680A;
+      --nl: #AE1C28; --ch: #D52B1E; --de: #2B2B2B; --lu: #EF3340; --be: #8B6914;
+      --at: #ED2939; --sg: #EF3340; --ae: #00732F; --uk: #012169; --us: #B22234;
+      --ca: #FF0000; --au: #00008B; --sp: 8px; --radius: 16px;
+      --shadow: 0 2px 8px rgba(0,0,0,0.06); --max-w: 1200px;
+      --sans: "DM Sans", system-ui, sans-serif; --mono: "DM Mono", ui-monospace, monospace;
+      --display: "Fraunces", Georgia, serif;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --ink: #F0EBE6; --ink-60: rgba(240,235,230,0.65); --ink-15: rgba(240,235,230,0.12);
+        --surface: #1A1614; --white: #242018; --primary-light: rgba(27,75,138,0.25);
+        --green-light: rgba(42,107,66,0.2); --coral-light: rgba(201,75,42,0.2);
+        --teal-light: rgba(26,122,110,0.2); --purple-light: rgba(91,63,166,0.2); --gold-light: rgba(196,154,40,0.15);
+        --shadow: 0 2px 8px rgba(0,0,0,0.35);
+      }
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; font-size: 16px; }
+    body { font-family: var(--sans); color: var(--ink); background: var(--white); line-height: 1.55; }
+    .mono { font-family: var(--mono); font-variant-numeric: tabular-nums; }
+    .display { font-family: var(--display); }
+    a { color: var(--primary); }
+    :focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
+    .skip-link { position: absolute; left: -9999px; z-index: 9999; padding: 8px 16px; background: var(--primary); color: #fff; }
+    .skip-link:focus { left: 8px; top: 8px; }
+
+    .site-nav { position: sticky; top: 0; z-index: 100; background: var(--white); border-bottom: 1px solid var(--ink-15); box-shadow: var(--shadow); }
+    .nav-inner { max-width: var(--max-w); margin: 0 auto; padding: 12px 24px; display: flex; align-items: center; gap: 16px; flex-wrap: wrap; }
+    .nav-logo { font-family: var(--display); font-style: italic; font-weight: 600; font-size: 1.1rem; color: var(--ink); text-decoration: none; }
+    .nav-flags { font-size: 0.7rem; margin-left: 6px; }
+    .nav-links { display: flex; flex-wrap: wrap; gap: 4px 12px; flex: 1; justify-content: center; }
+    .nav-links a { font-size: 0.78rem; font-weight: 500; color: var(--ink-60); text-decoration: none; padding: 4px 8px; border-radius: 6px; }
+    .nav-links a:hover, .nav-links a.active { color: var(--primary); background: var(--primary-light); }
+    .nav-toggle { display: none; background: none; border: 1px solid var(--ink-15); padding: 8px 12px; border-radius: 8px; cursor: pointer; }
+    @media (max-width: 767px) {
+      .nav-toggle { display: block; margin-left: auto; }
+      .nav-links { display: none; width: 100%; flex-direction: column; padding: 12px 0; }
+      .nav-links.open { display: flex; }
+    }
+
+    .btn { display: inline-flex; align-items: center; justify-content: center; padding: 10px 20px; border-radius: 10px; font-weight: 600; font-size: 0.875rem; cursor: pointer; border: none; transition: opacity 0.15s; }
+    .btn:hover { opacity: 0.9; }
+    .btn-primary { background: var(--primary); color: #fff; width: 100%; padding: 16px; font-size: 1rem; margin-top: 24px; }
+    .btn-outline { background: transparent; border: 1px solid var(--ink-15); color: var(--ink); }
+    .btn-sm { padding: 6px 12px; font-size: 0.75rem; }
+    .btn-group { display: flex; flex-wrap: wrap; gap: 8px; margin: 12px 0; }
+    .btn-group .btn.active { background: var(--primary); color: #fff; border-color: var(--primary); }
+
+    .container { max-width: var(--max-w); margin: 0 auto; padding: calc(var(--sp) * 4) 24px; }
+    section { scroll-margin-top: 80px; }
+    .section-alt { background: var(--surface); }
+    h1 { font-family: var(--display); font-style: italic; font-size: clamp(1.75rem, 4vw, 2.75rem); font-weight: 600; line-height: 1.15; }
+    h2 { font-family: var(--display); font-size: clamp(1.35rem, 3vw, 1.85rem); font-weight: 600; margin-bottom: 8px; }
+    h3 { font-size: 1rem; font-weight: 600; margin-bottom: 8px; }
+    .sub { color: var(--ink-60); font-size: 1rem; max-width: 680px; margin-top: 8px; }
+    .card { background: var(--white); border: 1px solid rgba(26,22,20,0.08); border-radius: var(--radius); box-shadow: var(--shadow); padding: calc(var(--sp) * 2.5); }
+    .grid-2 { display: grid; gap: calc(var(--sp) * 2); grid-template-columns: 1fr; }
+    .grid-3 { display: grid; gap: calc(var(--sp) * 2); grid-template-columns: 1fr; }
+    .grid-4 { display: grid; gap: calc(var(--sp) * 2); grid-template-columns: 1fr; }
+    @media (min-width: 768px) { .grid-2 { grid-template-columns: repeat(2, 1fr); } .grid-4 { grid-template-columns: repeat(2, 1fr); } }
+    @media (min-width: 1024px) { .grid-3 { grid-template-columns: repeat(3, 1fr); } .grid-4 { grid-template-columns: repeat(4, 1fr); } }
+
+    .hero { background: var(--surface); padding: calc(var(--sp) * 6) 24px calc(var(--sp) * 4); }
+    .hero .container { padding-top: 0; padding-bottom: 0; }
+    .tagline { font-size: 0.8rem; font-weight: 600; color: var(--primary); text-transform: uppercase; letter-spacing: 0.06em; }
+    .calc-bar { display: flex; flex-wrap: wrap; gap: calc(var(--sp) * 2); margin-top: calc(var(--sp) * 4); }
+    .field { flex: 1 1 140px; min-width: 120px; }
+    .field label { display: block; font-size: 0.75rem; font-weight: 600; color: var(--ink-60); margin-bottom: 6px; }
+    .field input, .field select { width: 100%; padding: 10px 12px; border: 1px solid var(--ink-15); border-radius: 10px; background: var(--white); color: var(--ink); font-size: 0.9rem; }
+    .field input[type=number] { font-family: var(--mono); }
+    .field input[type=range] { font-family: var(--sans); padding: 0; }
+    .range-val { font-family: var(--mono); font-size: 0.8rem; color: var(--primary); }
+    details.advanced { margin-top: 16px; border: 1px solid var(--ink-15); border-radius: var(--radius); padding: calc(var(--sp) * 2); background: var(--white); }
+    details.advanced summary { cursor: pointer; font-weight: 600; color: var(--primary); }
+    .advanced-grid { display: grid; gap: calc(var(--sp) * 2); margin-top: calc(var(--sp) * 2); grid-template-columns: 1fr; }
+    @media (min-width: 768px) { .advanced-grid { grid-template-columns: repeat(2, 1fr); } }
+    .checkbox-row { display: flex; align-items: flex-start; gap: 8px; font-size: 0.85rem; }
+    .checkbox-row input { margin-top: 4px; }
+
+    .hidden-until-calc { display: none; }
+    .hidden-until-calc.visible { display: block; }
+
+    .timeline { display: flex; gap: 0; overflow-x: auto; margin: 32px 0; padding-bottom: 8px; }
+    .timeline-stage { flex: 1; min-width: 160px; padding: 16px; border-radius: 12px; color: #fff; }
+    .timeline-stage.s1 { background: var(--teal); }
+    .timeline-stage.s2 { background: var(--primary); }
+    .timeline-stage.s3 { background: var(--purple); }
+    .timeline-stage.s4 { background: var(--coral); }
+    .timeline-stage.s5 { background: var(--ink); }
+    .timeline-stage h4 { font-size: 0.85rem; margin-bottom: 8px; }
+    .timeline-stage .cost { font-family: var(--mono); font-size: 1.1rem; font-weight: 500; }
+
+    .summary-card { text-align: center; }
+    .summary-card .amount { font-family: var(--mono); font-size: clamp(1.25rem, 3vw, 1.75rem); font-weight: 600; color: var(--primary); margin: 8px 0; }
+    .summary-card .label { font-size: 0.8rem; color: var(--ink-60); }
+
+    .chart-wrap { position: relative; height: 340px; margin: 16px 0; }
+    .chart-legend { display: flex; flex-wrap: wrap; gap: 12px 20px; margin-bottom: 12px; font-size: 0.78rem; }
+    .chart-legend span { display: flex; align-items: center; gap: 6px; }
+    .chart-legend i { width: 12px; height: 12px; border-radius: 3px; display: inline-block; }
+
+    .table-wrap { overflow-x: auto; margin: 16px 0; }
+    table.data { width: 100%; border-collapse: collapse; font-size: 0.8rem; }
+    table.data th, table.data td { padding: 10px 12px; text-align: left; border-bottom: 1px solid var(--ink-15); }
+    table.data th { font-weight: 600; color: var(--ink-60); white-space: nowrap; }
+    table.data tr:hover { background: var(--surface); }
+    table.data .mono { white-space: nowrap; }
+
+    .pisa-bar { height: 8px; background: var(--ink-15); border-radius: 4px; overflow: hidden; margin-top: 4px; }
+    .pisa-bar span { display: block; height: 100%; background: var(--primary); }
+
+    .curriculum-card { border-top: 4px solid var(--primary); }
+    .curriculum-card[data-c="NL"] { border-top-color: var(--nl); }
+    .curriculum-card[data-c="CH"] { border-top-color: var(--ch); }
+    .curriculum-card[data-c="DE"] { border-top-color: var(--de); }
+    .curriculum-card[data-c="LU"] { border-top-color: var(--lu); }
+    .curriculum-card[data-c="BE"] { border-top-color: var(--be); }
+    .curriculum-card[data-c="AT"] { border-top-color: var(--at); }
+    .curriculum-card[data-c="SG"] { border-top-color: var(--sg); }
+    .curriculum-card[data-c="AE"] { border-top-color: var(--ae); }
+    .rating-bar { display: flex; gap: 4px; margin-top: 8px; }
+    .rating-bar div { flex: 1; height: 6px; border-radius: 3px; background: var(--ink-15); }
+    .rating-bar div.on { background: var(--green); }
+
+    .heatmap { display: grid; gap: 2px; font-size: 0.7rem; overflow-x: auto; }
+    .heatmap-cell { padding: 8px 6px; text-align: center; border-radius: 4px; min-width: 48px; }
+    .hm-g { background: var(--green-light); color: var(--green); font-weight: 600; }
+    .hm-b { background: var(--primary-light); color: var(--primary); }
+    .hm-a { background: var(--gold-light); color: var(--amber); }
+    .hm-x { background: var(--ink-15); color: var(--ink-60); }
+
+    .uni-card { border-left: 4px solid var(--primary); }
+    .uni-rank { font-family: var(--mono); font-size: 1.5rem; font-weight: 600; color: var(--gold); }
+
+    .scorecard-tabs { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 24px; }
+    .scorecard-tabs button { padding: 8px 14px; border: 1px solid var(--ink-15); border-radius: 20px; background: var(--white); cursor: pointer; font-size: 0.8rem; }
+    .scorecard-tabs button.active { background: var(--primary); color: #fff; border-color: var(--primary); }
+    .score-breakdown { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 12px; margin: 16px 0; }
+    .score-item { text-align: center; padding: 12px; background: var(--surface); border-radius: 10px; }
+    .score-item .val { font-family: var(--mono); font-size: 1.25rem; font-weight: 600; color: var(--primary); }
+    .pill { display: inline-block; padding: 4px 10px; border-radius: 20px; font-size: 0.7rem; background: var(--primary-light); color: var(--primary); margin: 2px; }
+    .rank-badge { width: 32px; height: 32px; border-radius: 50%; display: grid; place-items: center; font-weight: 700; font-size: 0.85rem; }
+    .rank-1 { background: var(--gold-light); color: var(--gold); }
+    .rank-2 { background: #E8E8E8; color: #666; }
+    .rank-3 { background: #F5E6D3; color: #8B6914; }
+
+    .insight { padding: 16px; border-radius: var(--radius); margin: 12px 0; font-size: 0.9rem; }
+    .insight.blue { background: var(--primary-light); border-left: 4px solid var(--primary); }
+    .insight.green { background: var(--green-light); border-left: 4px solid var(--green); }
+    .insight.amber { background: var(--gold-light); border-left: 4px solid var(--gold); }
+
+    .radar-toggles { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 12px; }
+    .radar-toggles label { font-size: 0.78rem; display: flex; align-items: center; gap: 4px; }
+
+  footer.footer { background: var(--ink); color: rgba(255,255,255,0.88); padding: 48px 24px; font-size: 0.82rem; }
+  footer.footer a { color: #fff; }
+  footer.footer details { margin-top: 12px; }
+  footer.footer summary { cursor: pointer; font-weight: 600; margin-bottom: 8px; }
+  .disclaimer { font-size: 0.75rem; color: var(--ink-60); margin-top: 12px; }
+
+    @media print {
+      .site-nav, .hero form, .btn-group, .nav-toggle, .no-print, details.advanced { display: none !important; }
+      section { page-break-before: always; }
+      body { background: #fff; color: #000; }
+      .print-cover::before { content: "EduScope Family Education Report"; display: block; font-size: 1.5rem; font-weight: 700; margin-bottom: 24px; }
+    }
+  </style>
+</head>
+<body>
+  <a href="#main" class="skip-link">Skip to main content</a>
+
+  <nav class="site-nav no-print" aria-label="Main navigation">
+    <div class="nav-inner">
+      <a href="/wealth-tools" class="nav-logo">EduScope<span class="nav-flags"> 🇳🇱🇨🇭🇩🇪🇱🇺🇧🇪🇦🇹🇬🇧🏴🇮🇪🇸🇬🇦🇪</span></a>
+      <button type="button" class="nav-toggle" id="navToggle" aria-label="Toggle menu">☰ Menu</button>
+      <div class="nav-links" id="navLinks">
+        <a href="#calculator">Costs</a>
+        <a href="#costs">Calculator</a>
+        <a href="#schools">Schools</a>
+        <a href="#universities">Universities</a>
+        <a href="#family">Family Life</a>
+        <a href="#scorecards">Scorecards</a>
+        <a href="#best-match">Best Match</a>
+        <a href="#glossary">Glossary</a>
+      </div>
+      <button type="button" class="btn btn-outline btn-sm no-print" onclick="window.print()">Download PDF</button>
+    </div>
+  </nav>
+
+  <main id="main">
+    <section id="calculator" class="hero">
+      <div class="container">
+        <p class="tagline">EduScope — Global Education Intelligence</p>
+        <h1>What will your child's education really cost?</h1>
+        <p class="sub">Calculate total education spend from nursery to university across 11 countries — including UK, Scotland, and Ireland — and find where quality meets affordability.</p>
+        <p class="sub" style="font-size:0.9rem;font-style:italic;">From nursery to masters — know the real cost and quality before you move.</p>
+
+        <form id="profileForm" class="card calc-bar" aria-label="Family profile">
+          <div class="field"><label for="numChildren">Number of children</label><input type="number" id="numChildren" min="1" max="4" value="1" inputmode="numeric" /></div>
+          <div class="field" id="age1Wrap"><label for="childAge1">Child 1 age</label><input type="number" id="childAge1" min="0" max="17" value="0" inputmode="numeric" /></div>
+          <div id="extraAges" style="display:contents;"></div>
+          <div class="field" style="flex:1 1 200px;"><label for="schoolPref">School preference</label>
+            <select id="schoolPref">
+              <option value="state">Public / state school only</option>
+              <option value="tutoring">Public with private tutoring</option>
+              <option value="international">International school</option>
+              <option value="private">Private / independent school</option>
+              <option value="mixed">Mixed (public primary, private secondary)</option>
+            </select>
+          </div>
+          <div class="field"><label for="uniAmbition">University ambition</label>
+            <select id="uniAmbition">
+              <option value="top50">Top 50 global ranking</option>
+              <option value="top200">Top 200 global ranking</option>
+              <option value="local">Local public university</option>
+              <option value="vocational">Vocational / applied sciences</option>
+              <option value="undecided">Undecided</option>
+            </select>
+          </div>
+          <div class="field"><label for="langPref">Language preference</label>
+            <select id="langPref">
+              <option value="english">English-medium only</option>
+              <option value="bilingual">Bilingual acceptable</option>
+              <option value="local">Local language acceptable</option>
+            </select>
+          </div>
+          <div class="field"><label for="currentCountry">Current country</label>
+            <select id="currentCountry">
+              <option value="NL">Netherlands</option>
+              <option value="CH">Switzerland</option>
+              <option value="DE">Germany</option>
+              <option value="LU">Luxembourg</option>
+              <option value="BE">Belgium</option>
+              <option value="AT">Austria</option>
+              <option value="SG">Singapore</option>
+              <option value="AE">UAE (Dubai)</option>
+            </select>
+          </div>
+          <div class="field"><label for="budgetSens">Budget sensitivity</label>
+            <select id="budgetSens">
+              <option value="cost">Cost is the primary factor</option>
+              <option value="balance">Balance cost and quality</option>
+              <option value="quality">Quality is the primary factor</option>
+            </select>
+          </div>
+        </form>
+
+        <details class="advanced card">
+          <summary>Advanced options</summary>
+          <div class="advanced-grid">
+            <div class="checkbox-row"><input type="checkbox" id="inclTutoring" checked /><label for="inclTutoring">Include private tutoring / enrichment estimate</label></div>
+            <div class="checkbox-row"><input type="checkbox" id="inclLiving" checked /><label for="inclLiving">Include university living costs</label></div>
+            <div class="checkbox-row"><input type="checkbox" id="inclAbroad" /><label for="inclAbroad">Include study abroad year</label></div>
+            <div class="field"><label for="inflation">Annual cost inflation <span class="range-val" id="inflationVal">3%</span></label><input type="range" id="inflation" min="2" max="6" step="0.5" value="3" /></div>
+            <div class="field"><label for="uniDest">University destination country</label>
+              <select id="uniDest">
+                <option value="same">Same as current country</option>
+                <option value="UK">United Kingdom</option>
+                <option value="US">United States</option>
+                <option value="CA">Canada</option>
+                <option value="AU">Australia</option>
+                <option value="DE">Germany</option>
+                <option value="CH">Switzerland</option>
+              </select>
+            </div>
+            <div class="field"><label for="scholarship">Scholarship / grant assumption</label>
+              <select id="scholarship">
+                <option value="none">No scholarships assumed</option>
+                <option value="merit">Merit scholarship 25% tuition discount</option>
+                <option value="need">Need-based grant 50% tuition discount</option>
+              </select>
+            </div>
+          </div>
+        </details>
+        <button type="button" class="btn btn-primary" id="calcBtn">Calculate education costs →</button>
+      </div>
+    </section>
+
+    <section id="costs" class="hidden-until-calc">
+      <div class="container print-cover">
+        <h2>Total education investment: birth to age 22</h2>
+        <p class="sub" id="costSub"></p>
+        <div id="timeline" class="timeline"></div>
+        <div class="btn-group no-print" id="pathwayToggle">
+          <button type="button" class="btn btn-outline btn-sm active" data-path="state">State pathway</button>
+          <button type="button" class="btn btn-outline btn-sm" data-path="private">Private pathway</button>
+          <button type="button" class="btn btn-outline btn-sm" data-path="international">International pathway</button>
+        </div>
+        <div class="btn-group no-print" id="currencyToggle">
+          <button type="button" class="btn btn-outline btn-sm active" data-cur="EUR">EUR</button>
+          <button type="button" class="btn btn-outline btn-sm" data-cur="CHF">CHF</button>
+          <button type="button" class="btn btn-outline btn-sm" data-cur="SGD">SGD</button>
+          <button type="button" class="btn btn-outline btn-sm" data-cur="USD">USD</button>
+        </div>
+        <div class="chart-legend" id="stackLegend"></div>
+        <div class="chart-wrap" aria-label="Annual education cost by age"><canvas id="stackChart"></canvas></div>
+        <div class="chart-wrap" aria-label="Cumulative education cost"><canvas id="cumulChart"></canvas></div>
+        <details class="chart-fallback"><summary>Cost data table</summary><div id="costTable"></div></details>
+        <div class="grid-4" id="summaryCards" style="margin-top:32px;"></div>
+        <h3 style="margin-top:40px;">State vs private vs international</h3>
+        <div class="table-wrap"><table class="data" id="pathCompareTable"><thead><tr><th>Item</th><th>State / public</th><th>Private</th><th>International</th></tr></thead><tbody id="pathCompareBody"></tbody></table></div>
+      </div>
+    </section>
+
+    <section id="schools" class="section-alt hidden-until-calc">
+      <div class="container">
+        <h2>School systems compared — quality, language, and curriculum</h2>
+        <h3>PISA 2022 scores</h3>
+        <div class="table-wrap"><table class="data" id="pisaTable"><thead><tr><th>Country</th><th>Reading</th><th>Maths</th><th>Science</th><th>Rank</th><th>Trend</th></tr></thead><tbody id="pisaBody"></tbody></table></div>
+        <div class="chart-wrap" style="height:380px;" aria-label="PISA scores chart"><canvas id="pisaChart"></canvas></div>
+        <h3 style="margin-top:32px;">Curriculum overview</h3>
+        <div class="grid-2" id="curriculumCards"></div>
+        <h3 style="margin-top:32px;">International school ecosystem</h3>
+        <div class="table-wrap"><table class="data" id="intlSchoolTable"><thead><tr><th>Country</th><th># Schools</th><th>Curriculum</th><th>Price range</th><th>Waitlist</th><th>Notable schools</th></tr></thead><tbody id="intlSchoolBody"></tbody></table></div>
+        <h3 style="margin-top:32px;">Language of instruction</h3>
+        <div class="table-wrap"><div id="langMatrix"></div>
+      </div>
+    </section>
+
+    <section id="universities" class="hidden-until-calc">
+      <div class="container">
+        <h2>University quality and cost — from €0 to €80,000/year</h2>
+        <div id="uniCards" class="grid-2" style="margin-top:24px;"></div>
+        <h3 style="margin-top:32px;">Global top destinations</h3>
+        <div class="grid-2" id="globalUniCards"></div>
+        <h3 style="margin-top:32px;">Bachelor's vs master's cost</h3>
+        <div class="btn-group no-print" id="studentTypeToggle">
+          <button type="button" class="btn btn-outline btn-sm active" data-stu="eu">EU student rates</button>
+          <button type="button" class="btn btn-outline btn-sm" data-stu="intl">International student rates</button>
+        </div>
+        <div class="table-wrap"><table class="data" id="degreeTable"><thead><tr><th>Country</th><th>Bachelor total</th><th>Master total</th><th>MBA range</th><th>PhD funding</th></tr></thead><tbody id="degreeBody"></tbody></table></div>
+        <h3 style="margin-top:32px;">Field of study quality heatmap</h3>
+        <div id="heatmap" class="heatmap"></div>
+        <h3 style="margin-top:32px;">Return on investment calculator</h3>
+        <div class="card grid-2" style="gap:16px;">
+          <div class="field"><label for="roiDegree">Degree type</label><select id="roiDegree"><option value="bachelor">Bachelor's</option><option value="master">Master's</option><option value="mba">MBA</option></select></div>
+          <div class="field"><label for="roiField">Field of study</label><select id="roiField"><option value="eng">Engineering</option><option value="biz">Business / Finance</option><option value="med">Medicine</option><option value="cs">Computer Science</option></select></div>
+          <div class="field"><label for="roiCountry">Country of study</label><select id="roiCountry"></select></div>
+        </div>
+        <div class="card" id="roiOutput" style="margin-top:16px;"></div>
+        <div class="chart-wrap" style="height:360px;margin-top:24px;" aria-label="University cost vs graduate salary"><canvas id="roiChart"></canvas></div>
+      </div>
+    </section>
+
+    <section id="family" class="section-alt hidden-until-calc">
+      <div class="container">
+        <h2>Where do children and families thrive?</h2>
+        <div class="radar-toggles no-print" id="radarToggles"></div>
+        <div class="chart-wrap" style="height:400px;" aria-label="Family wellbeing radar"><canvas id="wellbeingChart"></canvas></div>
+        <h3 style="margin-top:32px;">Healthcare for children</h3>
+        <div class="table-wrap"><table class="data"><thead><tr><th>Country</th><th>System</th><th>Paeds wait</th><th>Vaccination</th><th>Expat access</th><th>Annual family health</th></tr></thead><tbody id="healthBody"></tbody></table></div>
+        <h3 style="margin-top:32px;">Childcare &amp; parental leave</h3>
+        <div class="table-wrap"><table class="data"><thead><tr><th>Country</th><th>Maternity</th><th>Paternity</th><th>Shared leave</th><th>Subsidised childcare</th></tr></thead><tbody id="leaveBody"></tbody></table></div>
+        <h3 style="margin-top:32px;">Monthly family cost of living (family of 4)</h3>
+        <div class="grid-2" id="colCards"></div>
+        <div class="chart-wrap" style="height:400px;margin-top:24px;" aria-label="Family cost of living"><canvas id="colChart"></canvas></div>
+      </div>
+    </section>
+
+    <section id="scorecards" class="hidden-until-calc">
+      <div class="container">
+        <h2>Country scorecards</h2>
+        <div class="scorecard-tabs no-print" id="scorecardTabs"></div>
+        <div id="scorecardPanel"></div>
+      </div>
+    </section>
+
+    <section id="best-match" class="section-alt hidden-until-calc">
+      <div class="container">
+        <h2>Which country fits your family?</h2>
+        <div id="profileInsights"></div>
+        <div id="rankedCountries" style="margin-top:24px;"></div>
+      </div>
+    </section>
+  </main>
+
+  <footer id="glossary" class="footer">
+    <div class="container" style="max-width:var(--max-w);margin:0 auto;">
+      <h2 style="color:#fff;margin-bottom:16px;">Glossary &amp; disclaimer</h2>
+      <p>All costs are estimates based on publicly available data and market research as of 2025. School fees change annually — verify directly with institutions. PISA data: OECD PISA 2022. University rankings: QS World University Rankings 2025. Cost of living: Numbeo 2025, Mercer Cost of Living 2025. This tool is for indicative planning purposes only and does not constitute financial or educational advice. Exchange rates are approximate (EUR reference rates).</p>
+      <details><summary>Country-specific notes</summary>
+        <ul style="margin:12px 0 0 20px;line-height:1.8;">
+          <li><strong>NL:</strong> Kinderopvangtoeslag can offset 70–96% of eligible childcare for working parents.</li>
+          <li><strong>CH:</strong> ETH #7 globally at CHF 730/yr tuition. Pre-school childcare is the largest family cost.</li>
+          <li><strong>DE:</strong> Public universities charge zero tuition to all students including international.</li>
+          <li><strong>SG:</strong> Foreign children need MOE ballot for public school — international school near-mandatory for expats.</li>
+          <li><strong>UAE:</strong> No free public education for expatriates. Check KHDA ratings before enrolling.</li>
+          <li><strong>LU:</strong> Among highest child benefits in Europe — offsets school costs for residents.</li>
+        </ul>
+      </details>
+      <p style="margin-top:24px;"><a href="/wealth-tools">← Back to Wealth Tools</a></p>
+    </div>
+  </footer>
+
+  <script>(function () {
+  'use strict';
+  const FX = { EUR: 1, CHF: 1.05, SGD: 1.47, AED: 4.0, USD: 1.09 };
+  const TO_EUR = { EUR: 1, CHF: 1/1.05, SGD: 0.68, AED: 0.25, USD: 0.92, GBP: 0.85 };
+  const COUNTRIES = ['NL','CH','DE','LU','BE','AT','UK','SCT','IE','SG','AE'];
+  const META = {
+    NL:{name:'Netherlands',flag:'🇳🇱',color:'#AE1C28',cur:'EUR',score:82,scores:{school:16,uni:15,afford:14,qol:18,intl:19}},
+    CH:{name:'Switzerland',flag:'🇨🇭',color:'#D52B1E',cur:'CHF',score:83,scores:{school:18,uni:19,afford:10,qol:19,intl:17}},
+    DE:{name:'Germany',flag:'🇩🇪',color:'#2B2B2B',cur:'EUR',score:82,scores:{school:15,uni:18,afford:19,qol:16,intl:14}},
+    LU:{name:'Luxembourg',flag:'🇱🇺',color:'#EF3340',cur:'EUR',score:75,scores:{school:14,uni:10,afford:15,qol:17,intl:19}},
+    BE:{name:'Belgium',flag:'🇧🇪',color:'#8B6914',cur:'EUR',score:78,scores:{school:15,uni:16,afford:16,qol:15,intl:16}},
+    AT:{name:'Austria',flag:'🇦🇹',color:'#ED2939',cur:'EUR',score:78,scores:{school:15,uni:14,afford:18,qol:18,intl:13}},
+    SG:{name:'Singapore',flag:'🇸🇬',color:'#EF3340',cur:'SGD',score:86,scores:{school:20,uni:19,afford:12,qol:17,intl:18}},
+    AE:{name:'UAE (Dubai)',flag:'🇦🇪',color:'#00732F',cur:'AED',score:62,scores:{school:13,uni:8,afford:9,qol:14,intl:18}},
+    UK:{name:'United Kingdom',flag:'🇬🇧',color:'#012169',cur:'GBP',score:81,scores:{school:16,uni:17,afford:14,qol:16,intl:18}},
+    SCT:{name:'Scotland',flag:'🏴',color:'#005EB8',cur:'GBP',score:79,scores:{school:15,uni:16,afford:16,qol:17,intl:15}},
+    IE:{name:'Ireland',flag:'🇮🇪',color:'#169B62',cur:'EUR',score:80,scores:{school:15,uni:15,afford:13,qol:17,intl:17}},
+  };
+  const COSTS = {
+    NL:{cc:1500,pS:400,pP:12000,pI:18000,sS:650,sP:14000,sI:23000,uS:800,uP:16000,uI:28000,uni:2314,live:1200,tut:2250,ben:0},
+    CH:{cc:2750,pS:750,pP:30000,pI:45000,sS:1150,sP:38000,sI:45000,uS:1500,uP:45000,uI:55000,uni:730,live:2600,tut:3000,ben:0},
+    DE:{cc:350,pS:300,pP:12000,pI:17000,sS:750,sP:15000,sI:20000,uS:1000,uP:18000,uI:22000,uni:600,live:1100,tut:2000,ben:0},
+    LU:{cc:1150,pS:650,pP:12000,pI:19000,sS:800,sP:14000,sI:22000,uS:1000,uP:16000,uI:22000,uni:400,live:1400,tut:2500,ben:530},
+    BE:{cc:450,pS:450,pP:14000,pI:18000,sS:900,sP:16000,sI:20000,uS:1200,uP:18000,uI:22000,uni:1000,live:1100,tut:2000,ben:0},
+    AT:{cc:400,pS:300,pP:10000,pI:22000,sS:600,sP:12000,sI:25000,uS:800,uP:15000,uI:28000,uni:726,live:1100,tut:1800,ben:0},
+    SG:{cc:1100,pS:6936,pP:35000,pI:35000,sS:13920,sP:38000,sI:45000,uS:15000,uP:42000,uI:50000,uni:22000,live:1850,tut:4000,ben:0},
+    AE:{cc:3333,pS:35000,pP:37500,pI:65000,sS:45000,sP:55000,sI:90000,uS:55000,uP:70000,uI:110000,uni:60000,live:2000,tut:5000,ben:0},
+    UK:{cc:0,pS:0,pP:0,pI:0,sS:0,sP:14000,sI:22000,uS:9250,uP:28000,uI:38000,uni:9535,live:1400,tut:0,ben:0},
+    SCT:{cc:0,pS:0,pP:0,pI:0,sS:0,sP:12000,sI:18000,uS:0,uP:1820,uI:9000,uni:1820,live:1200,tut:0,ben:0},
+    IE:{cc:0,pS:0,pP:0,pI:0,sS:0,sP:8000,sI:14000,uS:3000,uP:7000,uI:12000,uni:3000,live:1300,tut:3000,ben:0},
+  };
+  const PISA = [
+    {c:'SG',r:549,m:575,s:561,rank:1,trend:'↑ Stable #1'},{c:'CH',r:483,m:508,s:503,rank:10,trend:'→ Stable'},
+    {c:'NL',r:459,m:493,s:488,rank:15,trend:'↓ Declined since 2018'},{c:'AT',r:480,m:487,s:491,rank:19,trend:'→ Stable'},
+    {c:'DE',r:480,m:475,s:492,rank:22,trend:'↓ Significant decline'},{c:'BE',r:479,m:489,s:488,rank:24,trend:'→ Stable'},
+    {c:'LU',r:460,m:483,s:474,rank:27,trend:'→ Stable'},    {c:'AE',r:430,m:437,s:434,rank:43,trend:'↑ Improving rapidly'},
+    {c:'UK',r:470,m:489,s:485,rank:20,trend:'→ Stable'},
+    {c:'IE',r:488,m:492,s:487,rank:12,trend:'→ Strong'},
+    {c:'SCT',r:472,m:490,s:486,rank:18,trend:'→ In line with UK'},
+  ];
+  const WELLBEING = {NL:[8.5,8,7.5,9,9,9],CH:[9.5,9.5,8.5,9.5,8.5,8],DE:[8,8.5,7.5,8.5,7.5,7.5],LU:[8.5,8,8,8,9.5,8.5],BE:[7.5,7.5,6.5,8,8.5,8],AT:[9,9,8.5,9,7,8.5],SG:[9.5,7,7.5,9.5,9.5,7],AE:[9,4,5,9,9.5,6.5],UK:[8,8,7.5,9,8.5,8],SCT:[8.5,8.5,8,9,8,8.5],IE:[8.5,8,7.5,8.5,8.5,8]};
+  const GRAD = {eng:{CH:95000,DE:52000,NL:48000,SG:65000,BE:45000,AT:44000,LU:58000,AE:120000},biz:{CH:85000,DE:48000,NL:44000,SG:60000,BE:42000,AT:40000,LU:65000,AE:140000},med:{CH:120000,DE:65000,NL:65000,SG:70000,BE:80000,AT:70000,LU:90000,AE:180000},cs:{CH:105000,DE:58000,NL:52000,SG:75000,BE:48000,AT:50000,LU:62000,AE:130000}};
+  const UNIS = {
+    CH:[{rank:7,name:'ETH Zurich',subj:'Engineering, CS, Natural Sciences',tu:'CHF 730/yr',live:'CHF 2,200–2,800/mo'},{rank:36,name:'EPFL Lausanne',subj:'Engineering, Architecture',tu:'CHF 730/yr',live:'CHF 2,000/mo'},{rank:111,name:'University of Zurich',subj:'Medicine, Law',tu:'CHF 730/yr',live:'CHF 2,200/mo'}],
+    SG:[{rank:8,name:'NUS',subj:'Multidisciplinary, CS, Business',tu:'SGD 17,550–29,350/yr intl',live:'SGD 1,500–2,000/mo'},{rank:15,name:'NTU',subj:'Engineering, Materials',tu:'SGD 17,550–29,350/yr',live:'SGD 1,500/mo'},{rank:57,name:'SMU',subj:'Business, Law',tu:'SGD 12,000–18,000/yr',live:'SGD 1,600/mo'}],
+    NL:[{rank:52,name:'TU Delft',subj:'Engineering, Aerospace',tu:'€2,314/yr EU',live:'€1,000–1,400/mo'},{rank:67,name:'UvA',subj:'Social Sciences, Law',tu:'€2,314/yr EU',live:'€1,200/mo'},{rank:94,name:'Leiden',subj:'Law, IR, Medicine',tu:'€2,314/yr EU',live:'€1,100/mo'}],
+    DE:[{rank:87,name:'TUM',subj:'Engineering, CS',tu:'€0 + Semesterbeitrag',live:'€1,000–1,400/mo'},{rank:101,name:'LMU Munich',subj:'Medicine, Humanities',tu:'€0 + ~€150/sem',live:'€1,100/mo'},{rank:130,name:'KIT Karlsruhe',subj:'Engineering, CS',tu:'€0 + Semesterbeitrag',live:'€900/mo'}],
+    BE:[{rank:74,name:'KU Leuven',subj:'Engineering, Medicine',tu:'~€1,000/yr EU',live:'€800–1,100/mo'},{rank:220,name:'Ghent University',subj:'Life Sciences',tu:'~€1,000/yr',live:'€850/mo'},{rank:231,name:'ULB',subj:'Social Sciences, Law',tu:'~€4,000/yr non-EU',live:'€1,000/mo'}],
+    AT:[{rank:187,name:'University of Vienna',subj:'Humanities, Social Sciences',tu:'€363/sem EU',live:'€900–1,300/mo'},{rank:280,name:'TU Wien',subj:'Engineering, CS',tu:'€726/sem non-EU',live:'€950/mo'},{rank:0,name:'WU Vienna',subj:'Business, Economics',tu:'€363/sem',live:'€1,000/mo'}],
+    LU:[{rank:620,name:'University of Luxembourg',subj:'Law, Finance, Multilingual',tu:'€400/yr',live:'€1,200–1,600/mo'}],
+    AE:[{rank:0,name:'American University of Sharjah',subj:'Business, Engineering',tu:'AED 50,000–70,000/yr',live:'AED 3,000/mo'},{rank:0,name:'University of Birmingham Dubai',subj:'Business, Engineering',tu:'AED 55,000–75,000/yr',live:'AED 3,500/mo'}],
+  };
+  const GLOBAL = [
+    {flag:'🇺🇸',name:'MIT (US)',rank:1,tu:'$59,750/yr',live:'$2,000–2,500/mo'},
+    {flag:'🇬🇧',name:'Imperial College London',rank:2,tu:'£37,900/yr intl',live:'£1,800–2,200/mo'},
+    {flag:'🇬🇧',name:'University of Oxford',rank:3,tu:'£39,010/yr intl',live:'£1,400–1,700/mo'},
+    {flag:'🇦🇺',name:'University of Melbourne',rank:11,tu:'AUD 42,000–52,000/yr',live:'AUD 2,000–2,500/mo'},
+    {flag:'🇨🇦',name:'University of Toronto',rank:21,tu:'CAD 45,000–55,000/yr',live:'CAD 1,500–2,000/mo'},
+  ];
+  const CURRICULUM = {
+    NL:{sys:'Dutch system (Basis → VMBO/HAVO/VWO)',start:4,comp:'4–16',qual:'VWO diploma / HAVO',class:'22–28',ratio:'1:12',day:'8:30–15:00',hol:40,feat:'VWO for university track; strong bilingual options in Randstad',expat:'Newcomer classes (OKAN) in many cities',ratings:[4,4,3,4]},
+    CH:{sys:'Cantonal system (Primarschule → Gymnasium)',start:4,comp:'4–15',qual:'Maturität / Berufslehre',class:'18–22',ratio:'1:10',day:'8:00–16:00',hol:35,feat:'Gymnasium selection age 11–12; dual vocational track',expat:'Integration classes; German/French required for state',ratings:[5,4,2,4]},
+    DE:{sys:'Grundschule → Gymnasium/Realschule',start:6,comp:'6–18',qual:'Abitur / Realschulabschluss',class:'25–30',ratio:'1:14',day:'8:00–13:30',hol:40,feat:'Gymnasium selection age 10; tuition-free universities',expat:'Willkommensklassen in major cities',ratings:[4,3,3,4]},
+    LU:{sys:'Luxembourgish + European curriculum',start:4,comp:'4–16',qual:'Diplôme de fin d\'études',class:'20–24',ratio:'1:11',day:'8:00–16:00',hol:38,feat:'Multilingual from age 3; European School option',expat:'Excellent for EU institution families',ratings:[3,4,4,5]},
+    BE:{sys:'Flemish/Walloon systems (ASO/TSO/BSO)',start:6,comp:'6–18',qual:'Diploma secundair',class:'22–26',ratio:'1:13',day:'8:30–16:00',hol:38,feat:'European School Brussels; strong trilingual region',expat:'International schools in Brussels hub',ratings:[4,3,3,4]},
+    AT:{sys:'Volksschule → AHS/Gymnasium',start:6,comp:'6–15',qual:'Matura',class:'20–25',ratio:'1:12',day:'8:00–14:00',hol:40,feat:'Kindergartenpflicht age 5; Vienna top student city',expat:'Vienna International School; German for state',ratings:[4,4,2,3]},
+    SG:{sys:'MOE national + international parallel',start:6,comp:'6–16',qual:'O-level / A-level / IB',class:'30–40 (MOE)',ratio:'1:18',day:'7:30–13:30',hol:40,feat:'World #1 PISA; MOE vs international split',expat:'International school near-mandatory for foreigners',ratings:[5,3,5,5]},
+    AE:{sys:'KHDA-regulated private (no public for expats)',start:4,comp:'4–18',qual:'A-level / IB / American diploma',class:'20–25',ratio:'1:12',day:'7:45–15:00',hol:35,feat:'All fee-paying; KHDA quality ratings essential',expat:'100% expat-oriented; English-medium standard',ratings:[3,3,5,4]},
+    UK:{sys:'National Curriculum / GCSE / A-level',start:4,comp:'4–18',qual:'A-levels / T-levels',class:'25–30',ratio:'1:17',day:'8:45–15:15',hol:39,feat:'State free; strong private/grammar track',expat:'International schools in major cities',ratings:[4,4,3,4]},
+    SCT:{sys:'Curriculum for Excellence',start:4,comp:'4–18',qual:'Highers / Advanced Highers',class:'22–26',ratio:'1:14',day:'9:00–15:30',hol:40,feat:'Free state schools; distinct Scottish qualifications',expat:'International options in Edinburgh/Glasgow',ratings:[4,4,3,4]},
+    IE:{sys:'Irish primary + secondary',start:4,comp:'4–18',qual:'Leaving Certificate',class:'24–28',ratio:'1:15',day:'9:00–15:30',hol:35,feat:'Free state education; strong English-medium',expat:'Dublin international school hub',ratings:[4,3,3,4]},
+  };
+  const INTL = {
+    NL:{n:45,cur:'IB / British / American',range:'€8,000–28,000/yr',wait:'3–6 months',schools:'British School NL (€18k), Amsterdam Int\'l (€22k), NAISR (€16k)'},
+    CH:{n:60,cur:'IB / British / German / French',range:'CHF 20,000–55,000/yr',wait:'6–12 months',schools:'ZIS (CHF 35k), Institut Le Rosey (CHF 130k boarding), La Côte Int\'l'},
+    DE:{n:80,cur:'IB / British / American',range:'€6,000–22,000/yr',wait:'3–9 months',schools:'Berlin Int\'l, Munich Int\'l, Frankfurt Int\'l'},
+    LU:{n:8,cur:'IB / European / British',range:'€3,000–22,000/yr',wait:'6–12 months',schools:'IS Luxembourg (€20k), European School I/II (€3–6k EU staff)'},
+    BE:{n:35,cur:'IB / British / European',range:'€4,000–20,000/yr',wait:'6–12 months',schools:'International School of Brussels, British School of Brussels'},
+    AT:{n:15,cur:'IB / British / American',range:'€5,000–28,000/yr',wait:'3–6 months',schools:'Vienna Int\'l School (€22k), American Int\'l School Vienna'},
+    SG:{n:50,cur:'IB / British / American',range:'SGD 20,000–55,000/yr',wait:'12–18 months top schools',schools:'UWCSEA (SGD 45k), Tanglin Trust (SGD 38k), SAS (SGD 42k)'},
+    AE:{n:200,cur:'British / IB / American / Indian',range:'AED 15,000–130,000/yr',wait:'Immediate–6 months',schools:'Dubai College (AED 95k), JESS (AED 80k), Repton (AED 90k)'},
+    UK:{n:120,cur:'British / IB',range:'£12,000–35,000/yr',wait:'6–12 months London',schools:'Southbank, ACS, Dulwich College London'},
+    SCT:{n:25,cur:'Scottish / IB',range:'£0 state / £10,000–18,000 private',wait:'3–9 months',schools:'George Watson\'s, Fettes, St Leonards'},
+    IE:{n:40,cur:'Irish / IB',range:'€4,000–18,000/yr',wait:'3–6 months',schools:'St Andrew\'s Dublin, Blackrock College, Sandford Park'},
+  };
+  const HEALTH = {
+    NL:['ZVW mandatory','2–6 weeks','95%+','GP referral system','~€1,740/adult/yr'],
+    CH:['KVG mandatory','Immediate','98%+','World-class access','CHF 5,400–7,200/family/yr'],
+    DE:['GKV family cover','2–8 weeks','95%+','Children free on policy','~€400/mo family top-up'],
+    LU:['CNS + top-up','1–4 weeks','97%+','Cross-border care','~€2,400/family/yr'],
+    BE:['Mutualité/INAMI','2–4 weeks','96%+','Low out-of-pocket','~€1,800/family/yr'],
+    AT:['ÖGK public','1–3 weeks','95%+','Wahlarzt option','~€1,500/family/yr'],
+    SG:['Medisave/MediShield','1–2 weeks private','98%+','Private insurance typical','SGD 3,000–6,000/family/yr'],
+    AE:['Employer insurance','Varies','90%+','Mandatory employer cover','AED 8,000–15,000/family/yr'],
+  };
+  const LEAVE = {
+    NL:['16wk 100%','9wk 70%','9mo parental 70%','Kinderopvangtoeslag subsidy'],
+    CH:['14wk 80% max CHF 220/day','2wk 80%','None statutory','Limited; expensive'],
+    DE:['14wk 100%','Elterngeld 12–14mo','Up to 3yr parental leave','Kita subsidised'],
+    LU:['20wk 100%','2wk','6mo per parent','Chèques-service + child benefit'],
+    BE:['15wk 82%→75%','10 days 82%','4mo flat ~€900/mo','Kind en Gezin subsidised'],
+    AT:['16wk 100%','4wk','Kinderbetreuungsgeld €33/day','Kindergartenpflicht age 5'],
+    SG:['16wk govt-paid citizens','2wk citizens','Employer discretion','Baby Bonus SGD 6–18k'],
+    AE:['60 days 100%','5 days','None statutory','Employer-dependent'],
+  };
+  const COL = {
+    NL:{city:'Amsterdam area',housing:'€2,800–3,800',total:7500,cur:'EUR'},
+    CH:{city:'Zurich/Zug',housing:'CHF 3,500–5,000',total:12000,cur:'CHF'},
+    DE:{city:'Munich',housing:'€2,200–3,200',total:4850,cur:'EUR'},
+    LU:{city:'Luxembourg City',housing:'€2,500–3,500',total:5900,cur:'EUR',offset:'−€530–645/mo child benefit'},
+    BE:{city:'Brussels/Ghent',housing:'€1,600–2,500',total:4250,cur:'EUR'},
+    AT:{city:'Vienna',housing:'€1,500–2,500',total:3950,cur:'EUR'},
+    SG:{city:'Singapore',housing:'SGD 4,500–7,000',total:11500,cur:'SGD'},
+    AE:{city:'Dubai',housing:'AED 12,000–20,000',total:37500,cur:'AED'},
+    UK:{city:'London',housing:'£2,200–3,500',total:6500,cur:'GBP'},
+    SCT:{city:'Edinburgh',housing:'£1,400–2,200',total:4200,cur:'GBP'},
+    IE:{city:'Dublin',housing:'€2,000–3,200',total:5200,cur:'EUR'},
+  };
+  const HEATMAP = {eng:{CH:'g',DE:'b',NL:'b',SG:'g',BE:'b',AT:'b',LU:'a',AE:'a'},med:{CH:'g',DE:'b',NL:'b',BE:'g',AT:'b',LU:'a',SG:'b',AE:'a'},law:{CH:'b',DE:'b',NL:'b',BE:'b',AT:'b',LU:'b',SG:'b',AE:'a'},biz:{CH:'g',DE:'b',NL:'b',SG:'g',BE:'b',AT:'b',LU:'g',AE:'b'},cs:{CH:'g',DE:'b',NL:'b',SG:'g',BE:'b',AT:'b',LU:'a',AE:'a'},arts:{CH:'b',DE:'b',NL:'b',BE:'b',AT:'g',LU:'a',SG:'a',AE:'x'},sci:{CH:'g',DE:'b',NL:'b',SG:'g',BE:'b',AT:'b',LU:'a',AE:'a'},soc:{CH:'b',DE:'b',NL:'b',BE:'b',AT:'b',LU:'b',SG:'b',AE:'a'}};
+  const HM_LABELS = {g:'World-class',b:'Strong',a:'Adequate',x:'Limited'};
+  const HM_CLASS = {g:'hm-g',b:'hm-b',a:'hm-a',x:'hm-x'};
+  const FIELDS = ['eng','med','law','biz','cs','arts','sci','soc'];
+  const FIELD_NAMES = ['Engineering','Medicine','Law','Business','CS/Tech','Arts','Natural Sci','Social Sci'];
+
+  let state = {calculated:false,pathway:'state',displayCur:'EUR',studentType:'eu',radarVisible:['NL','CH','SG','DE']};
+  let charts = {};
+  const $ = (id) => document.getElementById(id);
+  const fmt = (n) => new Intl.NumberFormat('en-US',{maximumFractionDigits:0}).format(Math.round(n));
+  const fmtE = (eur, cur) => {
+    const mult = {EUR:1,CHF:1.05,SGD:1.47,USD:1.09}[cur]||1;
+    const sym = {EUR:'€',CHF:'CHF ',SGD:'SGD ',USD:'$'}[cur]||'€';
+    return sym + fmt(eur * mult);
+  };
+  const toEur = (amt, cur) => amt * (TO_EUR[cur]||1);
+
+  function getProfile() {
+    const n = Math.min(4, Math.max(1, +$('numChildren').value));
+    const ages = [];
+    for (let i = 1; i <= n; i++) ages.push(+($('childAge'+i)?.value || 0));
+    return {numChildren:n, ages, schoolPref:$('schoolPref').value, uniAmbition:$('uniAmbition').value,
+      langPref:$('langPref').value, country:$('currentCountry').value, budgetSens:$('budgetSens').value,
+      inclTutoring:$('inclTutoring').checked, inclLiving:$('inclLiving').checked, inclAbroad:$('inclAbroad').checked,
+      inflation:+$('inflation').value/100, uniDest:$('uniDest').value, scholarship:$('scholarship').value};
+  }
+
+  function pk(pref, path) {
+    if (path==='international'||pref==='international') return 'I';
+    if (path==='private'||pref==='private') return 'P';
+    if (pref==='mixed') return path==='state'?'S':'P';
+    if (pref==='tutoring') return 'S';
+    return 'S';
+  }
+
+  function costAtAge(country, age, pathKey, prof) {
+    const c = COSTS[country], m = META[country];
+    let tuition=0, cc=0, extras=0, uniT=0, uniL=0;
+    const k = pathKey;
+    if (age<=5) { cc = c.cc*12; if (country==='NL') cc*=0.35; if (country==='LU') cc = Math.max(0, cc - c.ben*12); }
+    else if (age<=11) tuition = c['p'+k]||c.pS;
+    else if (age<=15) tuition = c['s'+k]||c.sS;
+    else if (age<=18) tuition = c['u'+k]||c.uS;
+    else if (age<=22) { uniT = c.uni; if (prof.scholarship==='merit') uniT*=0.75; if (prof.scholarship==='need') uniT*=0.5; if (prof.inclLiving) uniL = c.live*12; }
+    if (prof.inclTutoring && age>=6 && age<=18) extras += c.tut;
+    extras += tuition*0.08;
+    if (country==='SG' && k==='I' && age===6) extras += 8000;
+    const total = cc+tuition+extras+uniT+uniL;
+    return {tuition,childcare:cc,extras,uniTuition:uniT,uniLiving:uniL,totalEur:toEur(total,m.cur)};
+  }
+
+  function calcTotals(country, prof, path) {
+    const pathKey = pk(prof.schoolPref, path);
+    const childAge = prof.ages[0]||0;
+    let to18=0, to22=0, to24=0;
+    const byAge = [];
+    for (let age=0; age<=24; age++) {
+      const inf = Math.pow(1+prof.inflation, Math.max(0, age-childAge));
+      const yr = costAtAge(country, age, pathKey, prof);
+      const cost = yr.totalEur * inf * prof.numChildren;
+      byAge.push({age,...yr,cost});
+      if (age>=childAge) { if (age<=18) to18+=cost; if (age<=22) to22+=cost; to24+=cost; }
+    }
+    const monthsLeft = Math.max(1,(22-childAge)*12);
+    const monthlySave = to22 / monthsLeft / Math.pow(1.04, (22-childAge)/2);
+    return {to18,to22,to24,monthlySave,byAge,pathKey};
+  }
+
+  function ensureChart(cb) { if (typeof Chart!=='undefined') return cb(); window.addEventListener('load', cb, {once:true}); }
+
+  function renderExtraAges(n) {
+    $('extraAges').innerHTML = '';
+    for (let i=2;i<=n;i++) {
+      const d = document.createElement('div');
+      d.className='field';
+      d.innerHTML=`<label for="childAge${i}">Child ${i} age</label><input type="number" id="childAge${i}" min="0" max="17" value="3" inputmode="numeric"/>`;
+      $('extraAges').appendChild(d);
+      $('childAge'+i).addEventListener('change', debouncedCalc);
+    }
+  }
+
+  function showResults() {
+    const prof = getProfile();
+    state.calculated = true;
+    document.querySelectorAll('.hidden-until-calc').forEach(el => el.classList.add('visible'));
+    const country = prof.country;
+    const totals = calcTotals(country, prof, state.pathway);
+    const stateT = calcTotals(country, prof, 'state');
+    const privT = calcTotals(country, prof, 'private');
+    const intlT = calcTotals(country, prof, 'international');
+
+    const prefLabels = {state:'public/state',tutoring:'public with tutoring',international:'international',private:'private',mixed:'mixed pathway'};
+    $('costSub').textContent = `For ${prof.numChildren} child(ren), ${prefLabels[prof.schoolPref]||prof.schoolPref}, ${$('uniAmbition').selectedOptions[0].text} — in ${META[country].name}.`;
+
+    const stages = [
+      {id:'s1',title:'Early childhood (0–5)',ages:[0,5]},
+      {id:'s2',title:'Primary (6–11)',ages:[6,11]},
+      {id:'s3',title:'Secondary (12–15)',ages:[12,15]},
+      {id:'s4',title:'Upper secondary (16–18)',ages:[16,18]},
+      {id:'s5',title:'University (19–22)',ages:[19,22]},
+    ];
+    $('timeline').innerHTML = stages.map(st => {
+      const sum = totals.byAge.filter(a=>a.age>=st.ages[0]&&a.age<=st.ages[1]).reduce((s,a)=>s+a.cost,0);
+      return `<div class="timeline-stage ${st.id}"><h4>${st.title}</h4><div class="cost">${fmtE(sum, state.displayCur)}</div><p style="font-size:0.75rem;margin-top:8px;opacity:0.9;">${fmt(Math.round(sum))} EUR total</p></div>`;
+    }).join('');
+
+    $('summaryCards').innerHTML = [
+      ['Total birth–18 (school)', totals.to18],
+      ['Total birth–22 (incl. bachelor\'s)', totals.to22],
+      ['Total birth–24 (incl. master\'s)', totals.to24*1.15],
+      ['Monthly savings needed now', totals.monthlySave],
+    ].map(([label, val]) => `<div class="card summary-card"><p class="label">${label}</p><p class="amount">${fmtE(val, state.displayCur)}</p><p class="label mono">€${fmt(val)} EUR</p></div>`).join('');
+
+    renderCostCharts(totals, stateT, privT, intlT, prof);
+    renderPathTable(country);
+    renderPisa();
+    renderCurriculum();
+    renderIntlSchools();
+    renderLangMatrix();
+    renderUnis();
+    renderDegreeTable();
+    renderHeatmap();
+    renderROI(prof);
+    renderFamily();
+    renderScorecards(prof);
+    renderBestMatch(prof);
+  }
+
+  function renderCostCharts(totals, stateT, privT, intlT, prof) {
+    ensureChart(() => {
+      const childAge = prof.ages[0]||0;
+      const ages = totals.byAge.filter(a=>a.age<=22).map(a=>a.age);
+      const ds = (data, key) => ages.map(a => { const row = data.byAge.find(r=>r.age===a); return row ? Math.round(row[key]||0) : 0; });
+      $('stackLegend').innerHTML = '<span><i style="background:#1B4B8A"></i> Tuition</span><span><i style="background:#1A7A6E"></i> Childcare</span><span><i style="background:#C49A28"></i> Extras</span><span><i style="background:#5B3FA6"></i> Uni living</span><span><i style="background:#0D1117"></i> Uni tuition</span>';
+      if (charts.stack) charts.stack.destroy();
+      charts.stack = new Chart($('stackChart'), {type:'bar',data:{labels:ages,datasets:[
+        {label:'Tuition',data:ds(totals,'tuition'),backgroundColor:'#1B4B8A',stack:'s'},
+        {label:'Childcare',data:ds(totals,'childcare'),backgroundColor:'#1A7A6E',stack:'s'},
+        {label:'Extras',data:ds(totals,'extras'),backgroundColor:'#C49A28',stack:'s'},
+        {label:'Uni living',data:ds(totals,'uniLiving'),backgroundColor:'#5B3FA6',stack:'s'},
+        {label:'Uni tuition',data:ds(totals,'uniTuition'),backgroundColor:'#1A1614',stack:'s'},
+      ]},options:{responsive:true,maintainAspectRatio:false,scales:{x:{stacked:true},y:{stacked:true,ticks:{font:{family:'DM Mono'}}}}}});
+      if (charts.cumul) charts.cumul.destroy();
+      let cs=0, cp=0, ci=0;
+      charts.cumul = new Chart($('cumulChart'), {type:'line',data:{labels:ages,datasets:[
+        {label:'State',data:ages.map(a=>{const r=stateT.byAge.find(x=>x.age===a); cs+=r?r.cost:0; return Math.round(cs);}),borderColor:'#2A6B42',tension:0.2},
+        {label:'Private',data:ages.map(a=>{const r=privT.byAge.find(x=>x.age===a); cp+=r?r.cost:0; return Math.round(cp);}),borderColor:'#C49A28',tension:0.2},
+        {label:'International',data:ages.map(a=>{const r=intlT.byAge.find(x=>x.age===a); ci+=r?r.cost:0; return Math.round(ci);}),borderColor:'#1B4B8A',tension:0.2},
+      ]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:true}},scales:{y:{ticks:{font:{family:'DM Mono'}}}}}});
+    });
+  }
+
+  function renderPathTable(country) {
+    const c = COSTS[country], m = META[country];
+    const rows = [
+      ['Annual primary','pS','pP','pI'],['Annual secondary','sS','sP','sI'],['Annual upper sec.','uS','uP','uI'],
+      ['Typical class size','22–28','18–22','18–20'],['Teaching language',country==='SG'?'English/Mandarin':'Local + EN options','English/local','English'],
+      ['Curriculum','National','National/IB','IB / Cambridge / American'],
+    ];
+    $('pathCompareBody').innerHTML = rows.map(r => `<tr><td>${r[0]}</td><td class="mono">${typeof c[r[1]]==='number'?fmtCur(toEur(c[r[1]],m.cur),state.displayCur):c[r[1]]||r[1]}</td><td class="mono">${typeof c[r[2]]==='number'?fmtCur(toEur(c[r[2]],m.cur),state.displayCur):r[2]}</td><td class="mono">${typeof c[r[3]]==='number'?fmtCur(toEur(c[r[3]],m.cur),state.displayCur):r[3]}</td></tr>`).join('');
+  }
+  function fmtCur(eur, cur) { return fmtE(eur, cur); }
+
+  function renderPisa() {
+    $('pisaBody').innerHTML = PISA.map(p => `<tr><td>${META[p.c].flag} ${META[p.c].name}</td><td class="mono">${p.r}</td><td class="mono">${p.m}</td><td class="mono">${p.s}</td><td>#${p.rank}</td><td>${p.trend}</td></tr>`).join('');
+    ensureChart(() => {
+      if (charts.pisa) charts.pisa.destroy();
+      charts.pisa = new Chart($('pisaChart'), {type:'bar',data:{labels:PISA.map(p=>META[p.c].name),datasets:[
+        {label:'Reading',data:PISA.map(p=>p.r),backgroundColor:'#1B4B8A'},
+        {label:'Maths',data:PISA.map(p=>p.m),backgroundColor:'#1A7A6E'},
+        {label:'Science',data:PISA.map(p=>p.s),backgroundColor:'#C49A28'},
+      ]},options:{indexAxis:'y',responsive:true,maintainAspectRatio:false}});
+    });
+  }
+
+  function renderCurriculum() {
+    $('curriculumCards').innerHTML = COUNTRIES.map(code => {
+      const cu = CURRICULUM[code], m = META[code];
+      const ratLabels = ['Academic rigour','Wellbeing','Language access','Intl mobility'];
+      const bars = cu.ratings.map((v,i)=>`<div><span style="font-size:0.7rem">${ratLabels[i]}</span><div class="rating-bar">${[1,2,3,4,5].map(n=>`<div class="${n<=v?'on':''}"></div>`).join('')}</div></div>`).join('');
+      return `<div class="card curriculum-card" data-c="${code}"><h3>${m.flag} ${m.name}</h3><p><strong>${cu.sys}</strong></p><p style="font-size:0.85rem;margin-top:8px;">Start age ${cu.start} · Compulsory ${cu.comp} · Qual: ${cu.qual}</p><p style="font-size:0.8rem;color:var(--ink-60);">Class ${cu.class} · Ratio ${cu.ratio} · ${cu.day} · ${cu.hol} holiday weeks</p><p style="font-size:0.8rem;margin-top:8px;">${cu.feat}</p><p style="font-size:0.8rem;color:var(--primary);">${cu.expat}</p>${bars}</div>`;
+    }).join('');
+  }
+
+  function renderIntlSchools() {
+    $('intlSchoolBody').innerHTML = COUNTRIES.map(c => { const i=INTL[c],m=META[c]; return `<tr><td>${m.flag} ${m.name}</td><td>${i.n}</td><td>${i.cur}</td><td>${i.range}</td><td>${i.wait}</td><td style="font-size:0.75rem">${i.schools}</td></tr>`; }).join('');
+  }
+
+  function renderLangMatrix() {
+    const types = ['State/public','Private','International'];
+    $('langMatrix').innerHTML = '<table class="data"><thead><tr><th>Country</th>'+types.map(t=>`<th>${t}</th>`).join('')+'</tr></thead><tbody>'+
+      COUNTRIES.map(c => `<tr><td>${META[c].name}</td><td>${c==='AE'?'N/A (expats)':c==='SG'?'Mandarin/English':'Local primary'}</td><td>English/local mix</td><td>English-medium (+20–40% premium)</td></tr>`).join('')+'</tbody></table>';
+  }
+
+  function renderUnis() {
+    $('uniCards').innerHTML = COUNTRIES.flatMap(c => (UNIS[c]||[]).map(u => `<div class="card uni-card"><div class="uni-rank">#${u.rank||'—'}</div><h3>${META[c].flag} ${u.name}</h3><p style="font-size:0.85rem">${u.subj}</p><p class="mono" style="margin-top:8px">${u.tu}</p><p style="font-size:0.8rem;color:var(--ink-60)">Living: ${u.live}</p></div>`)).join('');
+    $('globalUniCards').innerHTML = GLOBAL.map(g => `<div class="card uni-card"><div class="uni-rank">#${g.rank}</div><h3>${g.flag} ${g.name}</h3><p class="mono">${g.tu}</p><p style="font-size:0.8rem">Living: ${g.live}</p></div>`).join('');
+    $('roiCountry').innerHTML = COUNTRIES.map(c=>`<option value="${c}">${META[c].name}</option>`).join('');
+  }
+
+  function renderDegreeTable() {
+    const intl = state.studentType==='intl';
+    $('degreeBody').innerHTML = COUNTRIES.map(c => {
+      const co = COSTS[c], live = co.live*12*4, mastLive = co.live*12*2;
+      const bach = toEur(co.uni*4 + live, META[c].cur) * (intl && c!=='DE'?1.8:1);
+      const mast = toEur(co.uni*2 + mastLive, META[c].cur) * (intl?1.5:1);
+      return `<tr><td>${META[c].flag} ${META[c].name}</td><td class="mono">€${fmt(bach)}</td><td class="mono">€${fmt(mast)}</td><td>${c==='CH'?'CHF 80–150k (IMD)':c==='SG'?'SGD 60–80k':'€15–60k'}</td><td>${c==='CH'||c==='DE'?'Stipend common':'Competitive/self-funded'}</td></tr>`;
+    }).join('');
+  }
+
+  function renderHeatmap() {
+    let html = '<div class="heatmap-cell" style="font-weight:600">Country</div>'+FIELD_NAMES.map(f=>`<div class="heatmap-cell" style="font-weight:600">${f}</div>`).join('');
+    COUNTRIES.forEach(c => {
+      html += `<div class="heatmap-cell">${META[c].flag}</div>`;
+      FIELDS.forEach(f => { const v = HEATMAP[f][c]||'x'; html += `<div class="heatmap-cell ${HM_CLASS[v]}" title="${HM_LABELS[v]}">${HM_LABELS[v].charAt(0)}</div>`; });
+    });
+    $('heatmap').innerHTML = html;
+    $('heatmap').style.gridTemplateColumns = `80px repeat(${FIELDS.length}, 1fr)`;
+  }
+
+  function renderROI(prof) {
+    const c = $('roiCountry').value, field = $('roiField').value, deg = $('roiDegree').value;
+    const co = COSTS[c], years = deg==='bachelor'?4:deg==='master'?2:2;
+    const totalCost = toEur(co.uni*years + co.live*12*years, META[c].cur);
+    const salary = GRAD[field][c]||50000;
+    const baseline = 28000;
+    const premium = salary - baseline;
+    const breakeven = premium > 0 ? totalCost / premium : 99;
+    const tenYr = premium * 10 - totalCost;
+    $('roiOutput').innerHTML = `<h3>ROI estimate — ${META[c].name}, ${$('roiField').selectedOptions[0].text}</h3>
+      <div class="grid-4" style="margin-top:12px"><div><p class="label">Total degree cost</p><p class="mono amount">€${fmt(totalCost)}</p></div>
+      <div><p class="label">Median starting salary</p><p class="mono amount">${fmt(salary)} ${META[c].cur}</p></div>
+      <div><p class="label">Break-even</p><p class="mono amount">${breakeven.toFixed(1)} years</p></div>
+      <div><p class="label">10yr salary premium</p><p class="mono amount">€${fmt(tenYr)}</p></div></div>`;
+    ensureChart(() => {
+      if (charts.roi) charts.roi.destroy();
+      charts.roi = new Chart($('roiChart'), {type:'bar',data:{labels:COUNTRIES.map(c=>META[c].name),datasets:[
+        {label:'Degree cost EUR',data:COUNTRIES.map(c=>{const co=COSTS[c];return Math.round(toEur(co.uni*4+co.live*48,META[c].cur));}),backgroundColor:'#1B4B8A'},
+        {label:'Year-1 salary EUR',data:COUNTRIES.map(c=>Math.round((GRAD.eng[c]||50000)*TO_EUR[META[c].cur])),backgroundColor:'#2A6B42'},
+      ]},options:{responsive:true,maintainAspectRatio:false}});
+    });
+  }
+
+  function renderFamily() {
+    $('healthBody').innerHTML = COUNTRIES.map(c => `<tr><td>${META[c].flag} ${META[c].name}</td>${HEALTH[c].map(h=>`<td>${h}</td>`).join('')}</tr>`).join('');
+    $('leaveBody').innerHTML = COUNTRIES.map(c => `<tr><td>${META[c].name}</td>${LEAVE[c].map(l=>`<td style="font-size:0.78rem">${l}</td>`).join('')}</tr>`).join('');
+    $('colCards').innerHTML = COUNTRIES.map(c => { const col=COL[c]; return `<div class="card"><h3>${META[c].flag} ${col.city}</h3><p class="mono" style="font-size:1.1rem;margin:8px 0">${col.housing}/mo housing</p><p>Total family spend (ex. school): <strong class="mono">${col.total.toLocaleString()} ${col.cur}/mo</strong></p>${col.offset?`<p style="color:var(--green);font-size:0.85rem">${col.offset}</p>`:''}</div>`; }).join('');
+    $('radarToggles').innerHTML = COUNTRIES.map(c => `<label><input type="checkbox" data-radar="${c}" ${state.radarVisible.includes(c)?'checked':''}/> ${META[c].flag} ${META[c].name}</label>`).join('');
+    $('radarToggles').querySelectorAll('input').forEach(inp => inp.addEventListener('change', () => {
+      state.radarVisible = [...$('radarToggles').querySelectorAll('input:checked')].map(i=>i.dataset.radar).slice(0,4);
+      renderRadar();
+    }));
+    renderRadar();
+    ensureChart(() => renderColChart());
+  }
+
+  function renderRadar() {
+    ensureChart(() => {
+      const dims = ['Safety','Green space','Air quality','Activities','Expat community','Work-life balance'];
+      const ds = state.radarVisible.map(c => ({label:META[c].name,data:WELLBEING[c],borderColor:META[c].color,backgroundColor:META[c].color+'33'}));
+      if (charts.wellbeing) charts.wellbeing.destroy();
+      charts.wellbeing = new Chart($('wellbeingChart'), {type:'radar',data:{labels:dims,datasets:ds},options:{responsive:true,maintainAspectRatio:false,scales:{r:{min:0,max:10}}}});
+    });
+  }
+
+  function renderColChart() {
+    if (charts.col) charts.col.destroy();
+    const sorted = [...COUNTRIES].sort((a,b)=>COL[a].total-COL[b].total);
+    charts.col = new Chart($('colChart'), {type:'bar',data:{labels:sorted.map(c=>META[c].name),datasets:[
+      {label:'Monthly COL (local units)',data:sorted.map(c=>COL[c].total),backgroundColor:sorted.map(c=>META[c].color)},
+    ]},options:{indexAxis:'y',responsive:true,maintainAspectRatio:false}});
+  }
+
+  function renderScorecards(prof) {
+    $('scorecardTabs').innerHTML = COUNTRIES.map(c => `<button type="button" data-sc="${c}" class="${c===prof.country?'active':''}">${META[c].flag} ${META[c].name}</button>`).join('');
+    $('scorecardTabs').querySelectorAll('button').forEach(btn => btn.addEventListener('click', () => {
+      $('scorecardTabs').querySelectorAll('button').forEach(b=>b.classList.remove('active'));
+      btn.classList.add('active');
+      showScorecard(btn.dataset.sc, prof);
+    }));
+    showScorecard(prof.country, prof);
+  }
+
+  function showScorecard(c, prof) {
+    const m = META[c], sc = m.scores;
+    const st = calcTotals(c, prof, 'state'), pr = calcTotals(c, prof, 'private');
+    const pros = {NL:['World-best pension-adjacent education ecosystem','Excellent English in Randstad','Strong childcare subsidy'],CH:['ETH #7 at CHF 730/yr','Safest environment globally','Outstanding outdoor education'],DE:['Tuition-free university for all','Lowest public school costs','Rich cultural/education heritage'],LU:['Highest child benefits in EU','Multilingual from age 3','EU institution hub'],BE:['KU Leuven top 50 globally','Central EU location','Affordable public pathway'],AT:['Vienna top 5 student city','Near-free university','Excellent public schools'],SG:['PISA #1 globally','NUS/NTU top 15','English-medium hub'],AE:['Zero income tax offset','200+ school choices','Premium facilities']};
+    const cons = {NL:['Childcare expensive pre-subsidy','Dutch required for state track','Housing costly in Randstad'],CH:['Pre-school childcare very expensive','Boarding schools CHF 80k+','Language barrier in German cantons'],DE:['PISA scores declining','Bureaucracy for enrollment','Regional Kita variation'],LU:['Limited local university options','Expensive housing','Small school pool'],BE:['Language complexity (3 official)','Bureaucratic enrollment','Regional quality variation'],AT:['German required for state schools','Limited international outside Vienna','PAYG-style system risks'],SG:['International school mandatory for most expats','12–18mo waitlists','High pressure environment'],AE:['All education fee-paying','No local top-200 university','Extreme summer heat']};
+    const tags = {NL:['Expat families','Balanced cost-quality'],CH:['STEM families','Top university access'],DE:['Budget-conscious','University-focused'],LU:['EU cross-border','Multilingual families'],BE:['EU hub families'],AT:['Student city lovers','Budget quality'],SG:['Academic excellence','International career'],AE:['Tax-free earners','Premium education']};
+    $('scorecardPanel').innerHTML = `<div class="card"><div style="display:flex;justify-content:space-between;align-items:center"><h2>${m.flag} ${m.name}</h2><span class="score-badge mono" style="font-size:2rem;color:var(--gold)">${m.score}/100</span></div>
+      <div class="score-breakdown">${Object.entries(sc).map(([k,v])=>`<div class="score-item"><p style="font-size:0.75rem;text-transform:capitalize">${k.replace('qol','QoL').replace('intl','International')}</p><p class="val">${v}/20</p></div>`).join('')}</div>
+      <p style="margin:16px 0"><strong>State pathway birth–22:</strong> <span class="mono">€${fmt(st.to22)}</span> · <strong>Private:</strong> <span class="mono">€${fmt(pr.to22)}</span> · <strong>Monthly savings:</strong> <span class="mono">€${fmt(st.monthlySave)}/mo</span></p>
+      <div class="grid-2"><div><h4>Pros</h4><ul>${pros[c].map(p=>`<li>${p}</li>`).join('')}</ul></div><div><h4>Cons</h4><ul>${cons[c].map(p=>`<li>${p}</li>`).join('')}</ul></div></div>
+      <p style="margin-top:12px">${tags[c].map(t=>`<span class="pill">${t}</span>`).join('')}</p></div>`;
+  }
+
+  function profileScore(c, prof) {
+    const m = META[c], t = calcTotals(c, prof, pk(prof.schoolPref, state.pathway));
+    let s = m.score;
+    if (prof.budgetSens==='cost') s += (20 - m.scores.afford);
+    if (prof.budgetSens==='quality') s += m.scores.school + m.scores.uni - 20;
+    if (prof.langPref==='english' && (c==='SG'||c==='AE'||c==='LU')) s += 5;
+    if (prof.uniAmbition==='top50' && (c==='CH'||c==='SG'||c==='DE')) s += 8;
+    if (prof.schoolPref==='international' && c==='SG') s += 5;
+    if (prof.schoolPref==='state' && (c==='DE'||c==='AT')) s += 5;
+    return {code:c, score:s, total:t.to22, m};
+  }
+
+  function renderBestMatch(prof) {
+    const ranked = COUNTRIES.map(c => profileScore(c, prof)).sort((a,b)=>b.score-a.score);
+    const cheapest = Math.min(...ranked.map(r=>r.total));
+    const insights = [];
+    if (prof.schoolPref==='international') insights.push('<div class="insight blue"><strong>International school note:</strong> Singapore has 12–18 month waitlists at top schools. Apply before arrival.</div>');
+    if (prof.country==='CH') insights.push('<div class="insight amber"><strong>Switzerland:</strong> State schools are strong and free — but childcare before age 4 costs CHF 2,000–3,500/mo in Zurich/Zug.</div>');
+    if (prof.uniAmbition==='top50') insights.push('<div class="insight green"><strong>Top 50 universities:</strong> ETH Zurich (#7) and NUS (#8) offer top-10 education at a fraction of US/UK costs. Germany\'s TUM is tuition-free.</div>');
+    if (prof.budgetSens==='cost') insights.push('<div class="insight green"><strong>Budget priority:</strong> Germany and Austria offer near-free university to all students. Vienna is the top-ranked student city at lowest cost.</div>');
+    $('profileInsights').innerHTML = insights.join('');
+    $('rankedCountries').innerHTML = ranked.map((r,i) => {
+      const diff = r.total - cheapest;
+      const rankCls = i===0?'rank-1':i===1?'rank-2':i===2?'rank-3':'';
+      return `<div class="card" style="display:flex;gap:16px;align-items:flex-start;margin-bottom:12px">
+        <span class="rank-badge ${rankCls}">${i+1}</span>
+        <div style="flex:1"><h3>${r.m.flag} ${r.m.name} <span class="mono" style="color:var(--gold)">${Math.round(r.score)}/100</span></h3>
+        <p style="font-size:0.9rem;margin:8px 0">22-year cost estimate: <strong class="mono">€${fmt(r.total)}</strong>${diff>0?` · <span style="color:var(--coral)">+€${fmt(diff)} vs cheapest</span>`:''}</p>
+        <p style="font-size:0.85rem;color:var(--ink-60)">${i===0?`Best match for ${prof.numChildren} child(ren) with ${$('schoolPref').selectedOptions[0].text.toLowerCase()} preference.`:`Strong option — ${r.m.scores.afford>=15?'affordable':'premium'} pathway with ${r.m.scores.school>=17?'excellent':'good'} schools.`}</p>
+        <button type="button" class="btn btn-outline btn-sm" onclick="document.querySelector('[data-sc=\\'${r.code}\\']')?.click();document.getElementById('scorecards').scrollIntoView({behavior:'smooth'})">See full scorecard</button></div></div>`;
+    }).join('');
+  }
+
+  function debouncedCalc() { clearTimeout(debounceTimer); debounceTimer = setTimeout(() => { if (state.calculated) showResults(); }, 300); }
+
+  $('numChildren').addEventListener('change', () => { renderExtraAges(+ $('numChildren').value); debouncedCalc(); });
+  $('calcBtn').addEventListener('click', () => { showResults(); $('costs').scrollIntoView({behavior:'smooth'}); });
+  $('inflation').addEventListener('input', () => { $('inflationVal').textContent = $('inflation').value+'%'; debouncedCalc(); });
+  ['profileForm','advanced'].forEach(id => { const el = $(id)||document.querySelector('.'+id); el?.addEventListener('change', debouncedCalc); });
+  document.querySelectorAll('#pathwayToggle button').forEach(btn => btn.addEventListener('click', () => {
+    document.querySelectorAll('#pathwayToggle button').forEach(b=>b.classList.remove('active')); btn.classList.add('active');
+    state.pathway = btn.dataset.path; debouncedCalc();
+  }));
+  document.querySelectorAll('#currencyToggle button').forEach(btn => btn.addEventListener('click', () => {
+    document.querySelectorAll('#currencyToggle button').forEach(b=>b.classList.remove('active')); btn.classList.add('active');
+    state.displayCur = btn.dataset.cur; debouncedCalc();
+  }));
+  document.querySelectorAll('#studentTypeToggle button').forEach(btn => btn.addEventListener('click', () => {
+    document.querySelectorAll('#studentTypeToggle button').forEach(b=>b.classList.remove('active')); btn.classList.add('active');
+    state.studentType = btn.dataset.stu; if (state.calculated) renderDegreeTable();
+  }));
+  ['roiDegree','roiField','roiCountry'].forEach(id => $(id)?.addEventListener('change', () => { if (state.calculated) renderROI(getProfile()); }));
+  $('navToggle')?.addEventListener('click', () => $('navLinks').classList.toggle('open'));
+  const sects = ['calculator','costs','schools','universities','family','scorecards','best-match','glossary'];
+  new IntersectionObserver(entries => entries.forEach(e => { if (e.isIntersecting) document.querySelectorAll('.nav-links a').forEach(a => a.classList.toggle('active', a.getAttribute('href')==='#'+e.target.id)); }), {rootMargin:'-40% 0 -50% 0'}).observe && sects.forEach(id => { const el=$(id); if(el) new IntersectionObserver(entries => entries.forEach(e => { if(e.isIntersecting) document.querySelectorAll('.nav-links a').forEach(a => a.classList.toggle('active', a.getAttribute('href')==='#'+e.target.id)); }), {rootMargin:'-40% 0 -50% 0'}).observe(el); });
+  renderExtraAges(1);
+})();</script>
+</body>
+</html>

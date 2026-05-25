@@ -196,7 +196,7 @@ input[type=number] { width: 88px; }
 <nav>
   <div>
     <div class="nav-brand">Europe Vehicle Cost Comparison</div>
-    <div class="nav-sub">NL · CH · DE · IT · FR · 2025 estimates</div>
+    <div class="nav-sub">NL · CH · DE · IT · FR · UK · IE · 2025 estimates</div>
   </div>
   <div class="nav-links">
     <a href="/wealth-tools">← Wealth Tools</a>
@@ -327,7 +327,9 @@ input[type=number] { width: 88px; }
 <script>
 const FX_CHF_EUR = 0.99;
 
-const COUNTRY_ORDER = ['nl', 'de', 'it', 'fr', 'ch'];
+const FX_GBP_EUR = 1.17;
+
+const COUNTRY_ORDER = ['nl', 'de', 'it', 'fr', 'uk', 'ie', 'ch'];
 
 const COUNTRY_META = {
   nl: { flag: '🇳🇱', name: 'Netherlands', color: '#AE1C28', light: '#f9eced', currency: '€', fx: 1 },
@@ -335,6 +337,8 @@ const COUNTRY_META = {
   de: { flag: '🇩🇪', name: 'Germany', color: '#1a1a1a', light: '#ececec', currency: '€', fx: 1 },
   it: { flag: '🇮🇹', name: 'Italy', color: '#008C45', light: '#e8f5ee', currency: '€', fx: 1 },
   fr: { flag: '🇫🇷', name: 'France', color: '#0055A4', light: '#e8eef8', currency: '€', fx: 1 },
+  uk: { flag: '🇬🇧', name: 'United Kingdom', color: '#012169', light: '#e8ecf5', currency: '£', fx: FX_GBP_EUR },
+  ie: { flag: '🇮🇪', name: 'Ireland', color: '#169B62', light: '#e8f5ee', currency: '€', fx: 1 },
 };
 
 const VEHICLE_PRESETS = {
@@ -348,7 +352,7 @@ const VEHICLE_PRESETS = {
   custom: { name: 'Custom vehicle', spec: 'Your values', fuel: 'diesel', catalogEU: 35000, catalogCH: 36000, consumption: 6.5 },
 };
 
-const CATALOG_MULT = { de: 0.98, it: 1.02, fr: 1.04 };
+const CATALOG_MULT = { de: 0.98, it: 1.02, fr: 1.04, uk: 1.05, ie: 1.03 };
 
 const CANTON_MFZ = {
   zug: { annual: 420, evFactor: 0.55, label: 'Zug' },
@@ -369,6 +373,8 @@ const FUEL_PRICE = {
   de: { diesel: 1.75, petrol: 1.88, electric: 0.30 },
   it: { diesel: 1.78, petrol: 1.92, electric: 0.28 },
   fr: { diesel: 1.80, petrol: 1.95, electric: 0.27 },
+  uk: { diesel: 1.55, petrol: 1.48, electric: 0.28 },
+  ie: { diesel: 1.72, petrol: 1.78, electric: 0.30 },
 };
 
 const NL_BIJ_RATE = { diesel: 0.22, petrol: 0.22, electric: 0.17 };
@@ -597,6 +603,60 @@ function computeCountry(countryId, v, own, km, opts) {
       { label: 'TVA reclaim', sub: own === 'company' ? '20% · 70% · ÷5' : '—', amount: own === 'company' ? '- ' + fmt(vatRec) : '—', cls: own === 'company' ? 'positive' : 'neutral' },
     ]});
     return { countryId, total, roadTax, bikTax, energy, insurance, sections, note: electric ? 'FR EV: low TVS for fleets; bonus écologique not modelled.' : 'FR ICE: TVS can dominate fleet costs for diesel vans.', subtitle: 'France · ' + (own === 'private' ? 'particulier' : 'SAS/SARL') };
+  }
+
+  if (countryId === 'uk') {
+    const depr = Math.round(catalog * 0.2);
+    roadTax = electric ? (own === 'private' ? 0 : 290) : (own === 'private' ? 335 : 290);
+    insurance = own === 'private' ? (electric ? 1500 : 1400) : electric ? 1250 : 1150;
+    const maint = electric ? 950 : 1200;
+    const ved = roadTax;
+    const bikPct = own === 'company' ? (electric ? 0.02 : 0.03) : 0;
+    const bik = own === 'company' ? Math.round(catalog * bikPct) : 0;
+    bikTax = own === 'company' ? Math.round(bik * 0.4) : 0;
+    const vatRec = own === 'company' ? Math.round(catalog * 0.2 * 0.7 / 5) : 0;
+    total = depr + ved + insurance + energy + maint + bikTax - vatRec;
+    sections.push({ title: 'Acquisition (5 yr)', rows: [
+      { label: 'Purchase', sub: 'incl. VAT 20%', amount: fmt(catalog, sym) },
+      { label: 'Depreciation', sub: '~20%/yr', amount: fmt(depr, sym) },
+    ]});
+    sections.push({ title: 'Running costs', rows: [
+      { label: 'VED / road tax', sub: electric ? 'EV £0–290' : 'LCV rate est.', amount: fmt(ved, sym) },
+      { label: 'Insurance', sub: 'Comprehensive est.', amount: fmt(insurance, sym) },
+      { label: electric ? 'Electricity' : 'Fuel', sub: energySub(km, v.consumption, fuel, 'uk'), amount: fmt(energy, sym) },
+      { label: 'Maintenance', sub: 'MOT, tyres', amount: fmt(maint, sym) },
+    ]});
+    sections.push({ title: 'Tax', rows: [
+      { label: 'BIK', sub: own === 'company' ? `${(bikPct*100)}% list · tax ~40%` : 'Private — N/A', amount: own === 'company' ? '+ ' + fmt(bikTax, sym) : 'N/A', cls: own === 'company' ? 'negative' : 'neutral' },
+      { label: 'VAT reclaim', sub: own === 'company' ? '20% · 70% · ÷5' : '—', amount: own === 'company' ? '- ' + fmt(vatRec, sym) : '—', cls: own === 'company' ? 'positive' : 'neutral' },
+    ]});
+    return { countryId, total, roadTax, bikTax, energy, insurance, sections, note: 'UK: Scotland uses same VED/NI; company van BIK 2–3% of list.', subtitle: 'England/Wales/NI · ' + (own === 'private' ? 'private' : 'Ltd') };
+  }
+
+  if (countryId === 'ie') {
+    const depr = Math.round(catalog * 0.2);
+    roadTax = electric ? 120 : (own === 'private' ? 680 : 520);
+    insurance = own === 'private' ? (electric ? 1550 : 1450) : electric ? 1300 : 1200;
+    const maint = electric ? 900 : 1150;
+    const bik = own === 'company' ? Math.round(catalog * (electric ? 0.08 : 0.12)) : 0;
+    bikTax = own === 'company' ? Math.round(bik * 0.52) : 0;
+    const vatRec = own === 'company' ? Math.round(catalog * 0.23 * 0.7 / 5) : 0;
+    total = depr + roadTax + insurance + energy + maint + bikTax - vatRec;
+    sections.push({ title: 'Acquisition (5 yr)', rows: [
+      { label: 'Purchase', sub: 'incl. VAT 23%', amount: fmt(catalog) },
+      { label: 'Depreciation', sub: '~20%/yr', amount: fmt(depr) },
+    ]});
+    sections.push({ title: 'Running costs', rows: [
+      { label: 'Motor tax', sub: 'CO₂-based est.', amount: fmt(roadTax) },
+      { label: 'Insurance', sub: 'Comprehensive est.', amount: fmt(insurance) },
+      { label: electric ? 'Electricity' : 'Fuel', sub: energySub(km, v.consumption, fuel, 'ie'), amount: fmt(energy) },
+      { label: 'Maintenance', sub: 'NCT, tyres', amount: fmt(maint) },
+    ]});
+    sections.push({ title: 'Tax', rows: [
+      { label: 'BIK', sub: own === 'company' ? 'Notional pay · tax ~52%' : 'Private — N/A', amount: own === 'company' ? '+ ' + fmt(bikTax) : 'N/A', cls: own === 'company' ? 'negative' : 'neutral' },
+      { label: 'VAT reclaim', sub: own === 'company' ? '23% · 70% · ÷5' : '—', amount: own === 'company' ? '- ' + fmt(vatRec) : '—', cls: own === 'company' ? 'positive' : 'neutral' },
+    ]});
+    return { countryId, total, roadTax, bikTax, energy, insurance, sections, note: 'IE: motor tax by emissions; commercial vehicles may qualify for lower rates.', subtitle: 'Ireland · ' + (own === 'private' ? 'private' : 'Ltd') };
   }
 
   return { countryId, total: 0, roadTax: 0, bikTax: 0, energy: 0, insurance: 0, sections: [], note: '', subtitle: '' };

@@ -15,7 +15,7 @@ export const wealthTools: WealthTool[] = [
     description:
       'Master comparison dashboard for country selection: benchmark tax efficiency, cost of living, healthcare, education, safety, pension systems, and quality of life with customizable preference weights.',
     features: [
-      'Compare up to four countries side-by-side in one dashboard',
+      'Compare up to four countries side-by-side (11 jurisdictions including UK, Scotland, Ireland)',
       'Weighted scoring engine for personalized country ranking',
       'Category matrix: tax, living cost, healthcare, education, safety, pension, quality',
       'Auto-insights highlighting best-fit country and trade-offs',
@@ -29,9 +29,9 @@ export const wealthTools: WealthTool[] = [
     id: 'take-home-pay-comparison',
     title: 'Global Take-Home Pay Comparison',
     description:
-      'Compare net pay across permanent employment, contracting, and payrolling in NL, CH, LU, DE, BE, UAE, and Singapore — with 30% ruling, cantonal tax, CPF, and expat regime options.',
+      'Compare net pay across permanent employment, contracting, and payrolling in NL, CH, LU, DE, BE, UK, Scotland, Ireland, UAE, and Singapore — with 30% ruling, cantonal tax, CPF, and expat regime options.',
     features: [
-      'Seven jurisdictions with currency conversion (EUR, CHF, SGD, AED, USD)',
+      'Ten jurisdictions with currency conversion (EUR, GBP, CHF, SGD, AED, USD)',
       'Engagement types: permanent, contractor (BV/ZZP), payrolling / EOR',
       'Contractor: deductible expenses, profit retention in company, salary vs dividend payout',
       'Advanced: NL 30% ruling, multi-canton CH compare (20 cantons incl. Schaffhausen), DE church tax, BE expat, SG CPF',
@@ -78,7 +78,7 @@ export const wealthTools: WealthTool[] = [
     id: 'edu-scope',
     title: 'EduScope — Global Education Intelligence',
     description:
-      'Calculate total education spend from nursery to university across NL, CH, DE, LU, BE, AT, Singapore, and UAE. Compare school quality, university rankings, family cost of living, and country scorecards.',
+      'Calculate total education spend from nursery to university across NL, CH, DE, LU, BE, AT, UK, Scotland, Ireland, Singapore, and UAE. Compare school quality, university rankings, family cost of living, and country scorecards.',
     features: [
       'Full cost calculator birth to age 22 with state, private, and international pathways',
       'PISA scores, curriculum cards, and international school ecosystem per country',
@@ -94,11 +94,11 @@ export const wealthTools: WealthTool[] = [
     id: 'pension-scope',
     title: 'PensionScope — Global Retirement Intelligence',
     description:
-      'Calculate projected pension income across Netherlands, Switzerland, Germany, Luxembourg, Belgium, Austria, and Singapore. Three-pillar breakdown, country comparison, replacement rate explorer, and retirement destination scoring.',
+      'Calculate projected pension income across Netherlands, Switzerland, Germany, Luxembourg, Belgium, Austria, UK, Scotland, Ireland, UAE, and Singapore. Three-pillar breakdown, country comparison, replacement rate explorer, and retirement destination scoring.',
     features: [
       'Hero calculator with NL 30% ruling, CH canton/BVG, DE church tax, SG CPF status',
       'State, occupational, and private pillar cards with capital accumulation chart',
-      'Eight-country comparison dashboard with Mercer grades and ranking charts',
+      'Eleven-country comparison dashboard with Mercer grades and ranking charts',
       'Replacement rate explorer by salary with ceiling table',
       'Best places to retire with preference sliders and radar chart',
       'Scenario planner: early retirement, Swiss max 3a, SG relocation at 50',
@@ -175,9 +175,9 @@ export const wealthTools: WealthTool[] = [
     id: 'nl-ch-vehicle-cost-comparison',
     title: 'Europe Vehicle Cost Comparison',
     description:
-      'Compare annual private and company LCV costs across Netherlands, Switzerland, Germany, Italy, and France — diesel, petrol, and electric with ranked EUR-equivalent totals.',
+      'Compare annual private and company LCV costs across Netherlands, Switzerland, Germany, Italy, France, UK, and Ireland — diesel, petrol, and electric with ranked EUR-equivalent totals.',
     features: [
-      'Five-country ranking: NL, CH, DE, IT, FR with summary table',
+      'Seven-country ranking: NL, CH, DE, IT, FR, UK, IE with summary table',
       'Presets: VW Caddy, ID. Buzz Cargo, Ford Transit/E-Transit, Mercedes eSprinter',
       'Electric: BPM, bijtelling, Kfz-Steuer, TVS, and bollo estimates per country',
       'Swiss canton and Italian region selectors',
@@ -239,7 +239,7 @@ export const wealthTools: WealthTool[] = [
     id: 'global-wealth-preservation-comparison',
     title: 'Global Wealth Preservation Comparison',
     description:
-      'Premium seven-jurisdiction dashboard for internationally mobile investors. Compare tax drag, pensions, real estate, and projected net worth across Switzerland, Netherlands, Germany, Belgium, UAE, Singapore, and Luxembourg.',
+      'Premium ten-jurisdiction dashboard for internationally mobile investors. Compare tax drag, pensions, real estate, and projected net worth across Switzerland, Netherlands, Germany, Belgium, UK, Scotland, Ireland, UAE, Singapore, and Luxembourg.',
     features: [
       'Jurisdiction profile cards and detailed comparison matrix',
       'Interactive assumptions: salary, portfolio, property, pensions, relocation',

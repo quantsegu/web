@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="description" content="Compare take-home pay across permanent employment, contracting, and payrolling in NL, CH, LU, DE, BE, UAE, and Singapore." />
+<meta name="description" content="Compare take-home pay across permanent employment, contracting, and payrolling in NL, CH, LU, DE, BE, UK, Scotland, Ireland, UAE, and Singapore." />
 <title>Global Take-Home Pay Comparison — Shreshti Wealth</title>
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=DM+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
 <style>
@@ -159,7 +159,7 @@ a:hover { text-decoration: underline; }
   display: flex; height: 10px; border-radius: 5px; overflow: hidden; margin: 8px 0 4px;
   background: var(--surface-2);
 }
-.stack-bar span { display: block; height: 100%; transition: width 0.3s; }
+.stack-bar span { display: block; height: 100%; transition: width 0.35s ease; }
 .stack-legend { display: flex; flex-wrap: wrap; gap: 10px; font-size: 0.65rem; color: var(--text-muted); }
 .stack-legend i { display: inline-block; width: 8px; height: 8px; border-radius: 2px; margin-right: 4px; vertical-align: middle; }
 
@@ -212,6 +212,23 @@ tr.cheapest td { background: var(--green-bg); }
   border-radius: 8px; background: var(--surface);
 }
 
+.engagement-notes {
+  margin-bottom: 24px; display: grid; gap: 12px;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+}
+.engagement-notes article {
+  background: var(--surface); border: 1px solid var(--border); border-radius: 10px;
+  padding: 14px 16px; box-shadow: var(--shadow);
+}
+.engagement-notes h3 { font-size: 0.85rem; margin-bottom: 6px; }
+.engagement-notes p { font-size: 0.78rem; color: var(--text-muted); margin: 0; line-height: 1.45; }
+.engagement-notes .eng-perm { border-left: 3px solid var(--perm); }
+.engagement-notes .eng-contract { border-left: 3px solid var(--contract); }
+.engagement-notes .eng-payroll { border-left: 3px solid var(--payroll); }
+
+.card { transition: border-color 0.25s, box-shadow 0.25s; }
+.stack-bar .take-home { background: var(--green); }
+
 @media print {
   .topbar, .advanced-toggle, .toggle-breakdown, .btn-icon { display: none !important; }
   .advanced { display: grid !important; }
@@ -230,7 +247,7 @@ tr.cheapest td { background: var(--green-bg); }
 <header class="topbar">
   <div>
     <h1>Global Take-Home Pay Comparison</h1>
-    <p>Permanent · Contractor · Payrolling — NL · CH (20 cantons) · LU · DE · BE · UAE · SG</p>
+    <p>Permanent · Contractor · Payrolling — NL · CH · LU · DE · BE · UK · Scotland · Ireland · UAE · SG</p>
   </div>
   <div class="topbar-actions">
     <a href="/wealth-tools" class="btn">← Wealth Tools</a>
@@ -318,6 +335,17 @@ tr.cheapest td { background: var(--green-bg); }
           <option value="local">Local hire (not eligible)</option>
         </select>
       </div>
+      <div class="field" id="chCantonDropdownWrap">
+        <label for="chCantonQuick">CH canton (cantonal + communal tax)</label>
+        <select id="chCantonQuick">
+          <option value="zug">Zug (~14–18% effective)</option>
+          <option value="zurich">Zurich (~23–28%)</option>
+          <option value="geneva">Geneva (~32–36%)</option>
+          <option value="basel">Basel-Stadt (~26–30%)</option>
+          <option value="bern">Bern (~27–31%)</option>
+        </select>
+        <p class="field-hint">Sets the primary canton. Use the Swiss panel below to compare multiple cantons side by side.</p>
+      </div>
       <div class="field">
         <label class="chk"><input type="checkbox" id="deChurch"> DE church tax (+8–9% of income tax)</label>
       </div>
@@ -362,6 +390,21 @@ tr.cheapest td { background: var(--green-bg); }
     <div id="chartRoot"></div>
   </section>
 
+  <section class="engagement-notes" aria-label="Engagement type guide">
+    <article class="eng-perm">
+      <h3>Permanent employment</h3>
+      <p>Traditional employment contract. Employer withholds tax and social security. Benefits (health, pension) included — higher security, less flexibility.</p>
+    </article>
+    <article class="eng-contract">
+      <h3>Contractor (BV / GmbH / ZZP)</h3>
+      <p>Gross equals revenue. You manage VAT, corporate tax, and personal withdrawals. Higher gross-to-net potential with more admin; NL supports BV (dividend) vs ZZP paths.</p>
+    </article>
+    <article class="eng-payroll">
+      <h3>Payrolling / EOR</h3>
+      <p>A payroll company or employer-of-record employs you while you work at the client — common in NL and BE. Between permanent and contracting; typical agency markup ~3–5%.</p>
+    </article>
+  </section>
+
   <section class="table-wrap">
     <table>
       <thead id="tableHead">
@@ -381,8 +424,8 @@ tr.cheapest td { background: var(--green-bg); }
 (function () {
   'use strict';
 
-  const FX_TO_EUR = { EUR: 1, CHF: 0.99, SGD: 0.68, AED: 0.25, USD: 0.92 };
-  const CURRENCIES = ['EUR', 'CHF', 'SGD', 'AED', 'USD'];
+  const FX_TO_EUR = { EUR: 1, CHF: 0.99, SGD: 0.68, AED: 0.25, USD: 0.92, GBP: 1.17 };
+  const CURRENCIES = ['EUR', 'GBP', 'CHF', 'SGD', 'AED', 'USD'];
 
   const COUNTRIES = {
     nl: { flag: '🇳🇱', name: 'Netherlands', currency: 'EUR', sym: '€' },
@@ -392,6 +435,9 @@ tr.cheapest td { background: var(--green-bg); }
     be: { flag: '🇧🇪', name: 'Belgium', currency: 'EUR', sym: '€' },
     ae: { flag: '🇦🇪', name: 'Dubai (UAE)', currency: 'AED', sym: 'AED' },
     sg: { flag: '🇸🇬', name: 'Singapore', currency: 'SGD', sym: 'S$' },
+    uk: { flag: '🇬🇧', name: 'United Kingdom', currency: 'GBP', sym: '£' },
+    sct: { flag: '🏴', name: 'Scotland', currency: 'GBP', sym: '£' },
+    ie: { flag: '🇮🇪', name: 'Ireland', currency: 'EUR', sym: '€' },
   };
 
   const ENG_LABELS = { permanent: 'Permanent', contractor: 'Contractor', payrolling: 'Payrolling' };
@@ -483,9 +529,12 @@ tr.cheapest td { background: var(--green-bg); }
       return aed > 375000 ? (aed - 375000) * 0.09 * FX_TO_EUR.AED : 0;
     },
     sg: (p) => p * 0.17,
+    uk: (p) => bracketTax(p, [{ to: 50000, rate: 0.19 }, { to: Infinity, rate: 0.25 }]),
+    sct: (p) => bracketTax(p, [{ to: 50000, rate: 0.19 }, { to: Infinity, rate: 0.25 }]),
+    ie: (p) => p * 0.125,
   };
 
-  const DIV_EFFECTIVE = { nl: 0.24, ch: 0.22, de: 0.264, lu: 0.18, be: 0.3, ae: 0, sg: 0 };
+  const DIV_EFFECTIVE = { nl: 0.24, ch: 0.22, de: 0.264, lu: 0.18, be: 0.3, ae: 0, sg: 0, uk: 0.3375, sct: 0.3375, ie: 0.25 };
 
   function toEur(amount, cur) { return amount * (FX_TO_EUR[cur] || 1); }
   function fromEur(eur, cur) { return eur / (FX_TO_EUR[cur] || 1); }
@@ -575,6 +624,43 @@ tr.cheapest td { background: var(--green-bg); }
     return Math.max(0, bracketTax(taxable, b) - allowance);
   }
 
+  function ukIncomeTaxRUK(gbp) {
+    return bracketTax(gbp, [
+      { to: 12570, rate: 0 }, { to: 50270, rate: 0.20 },
+      { to: 125140, rate: 0.40 }, { to: Infinity, rate: 0.45 },
+    ]);
+  }
+
+  function ukIncomeTaxScotland(gbp) {
+    return bracketTax(gbp, [
+      { to: 12570, rate: 0 }, { to: 31092, rate: 0.19 }, { to: 43662, rate: 0.20 },
+      { to: 75000, rate: 0.21 }, { to: 125140, rate: 0.42 }, { to: Infinity, rate: 0.45 },
+    ]);
+  }
+
+  function ukNIEmployee(gbp) {
+    if (gbp <= 12570) return 0;
+    const main = Math.max(0, Math.min(gbp, 50270) - 12570) * 0.08;
+    const upper = Math.max(0, gbp - 50270) * 0.02;
+    return main + upper;
+  }
+
+  function ukNIEmployer(gbp) {
+    return Math.max(0, gbp - 9100) * 0.138;
+  }
+
+  function iePAYE(eur) {
+    const tax = bracketTax(eur, [{ to: 42000, rate: 0.20 }, { to: Infinity, rate: 0.40 }]);
+    return Math.max(0, tax - 1875);
+  }
+
+  function ieUSC(eur) {
+    return bracketTax(eur, [
+      { to: 12012, rate: 0.005 }, { to: 23736, rate: 0.02 },
+      { to: 70044, rate: 0.03 }, { to: Infinity, rate: 0.08 },
+    ]);
+  }
+
   function chFederalTax(chfIncome) {
     const b = [
       { to: 14800, rate: 0 }, { to: 25600, rate: 0.0077 }, { to: 32800, rate: 0.0088 },
@@ -631,6 +717,9 @@ tr.cheapest td { background: var(--green-bg); }
       return beIncomeTax(taxable, allowance);
     }
     if (countryId === 'sg') return sgIncomeTax(fromEur(taxable, 'SGD')) * FX_TO_EUR.SGD;
+    if (countryId === 'uk') return ukIncomeTaxRUK(fromEur(taxable, 'GBP')) * FX_TO_EUR.GBP;
+    if (countryId === 'sct') return ukIncomeTaxScotland(fromEur(taxable, 'GBP')) * FX_TO_EUR.GBP;
+    if (countryId === 'ie') return iePAYE(taxable);
     return 0;
   }
 
@@ -648,6 +737,10 @@ tr.cheapest td { background: var(--green-bg); }
     }
     if (countryId === 'lu') return Math.min(salaryEur, 130000) * 0.1245;
     if (countryId === 'be') return salaryEur * 0.1307;
+    if (countryId === 'uk' || countryId === 'sct') {
+      return ukNIEmployee(fromEur(salaryEur, 'GBP')) * FX_TO_EUR.GBP;
+    }
+    if (countryId === 'ie') return salaryEur * 0.04 + ieUSC(salaryEur);
     return 0;
   }
 
@@ -721,7 +814,10 @@ tr.cheapest td { background: var(--green-bg); }
       `${Math.round(retainPct * 100)}% of post-tax profit retained in company`,
       'Cash take-home = salary net + dividend net only (excludes retained)',
     ];
-    if (countryId === 'nl') notes.push('NL BV: DGA salary often required for mixed routes');
+    if (countryId === 'nl') {
+      notes.push('NL BV: DGA salary often required for mixed routes');
+      if (opts.nlContractorMode === 'zzp') notes.push('KOR (small business VAT exemption) may apply below turnover threshold');
+    }
     if (countryId === 'ch') notes.push('CH GmbH: Verrechnungssteuer on dividends may be refundable');
 
     return buildResult(countryId, grossEur, {
@@ -762,6 +858,7 @@ tr.cheapest td { background: var(--green-bg); }
       ssPct: pct(x.ssEmp, grossEur),
       otherPct: pct(x.other, grossEur),
       takePct: pct(netEur, grossEur),
+      takeHomeRate: pct(netEur, grossEur),
       employerCostEur: grossEur,
       lines: x.lines || [],
       brackets: [],
@@ -871,6 +968,7 @@ tr.cheapest td { background: var(--green-bg); }
       ssEr = ssEmp;
       if (engagement === 'payrolling') ssEr = grossEur * 0.21;
       brackets.push({ to: 11604, rate: 0 }, { to: 277826, rate: 0.42 }, { to: Infinity, rate: 0.45 });
+      if (married) notes.push('Ehegattensplitting (tax class III/V) approximated via income splitting');
     }
 
     if (countryId === 'be') {
@@ -889,6 +987,7 @@ tr.cheapest td { background: var(--green-bg); }
       ssEmp = grossEur * 0.1307;
       ssEr = grossEur * 0.25;
       if (engagement === 'payrolling') notes.push('Payroll markup ~3–5% typical');
+      notes.push('Commuting: €0.15/km × 2 × ~230 days may be deductible (not modeled)');
     }
 
     if (countryId === 'ae') {
@@ -916,14 +1015,58 @@ tr.cheapest td { background: var(--green-bg); }
       brackets.push({ to: 320000, rate: 0.22 });
     }
 
+    if (countryId === 'uk') {
+      const gbp = grossLocal;
+      incomeTax = ukIncomeTaxRUK(gbp) * FX_TO_EUR.GBP;
+      ssEmp = ukNIEmployee(gbp) * FX_TO_EUR.GBP;
+      ssEr = ukNIEmployer(gbp) * FX_TO_EUR.GBP;
+      brackets.push({ to: 12570, rate: 0 }, { to: 50270, rate: 0.20 }, { to: 125140, rate: 0.40 });
+      notes.push('England, Wales & NI income tax bands; UK-wide NI');
+      if (engagement === 'payrolling') {
+        other = grossEur * 0.04;
+        notes.push('Umbrella / PAYE payroll margin ~4%');
+      }
+    }
+
+    if (countryId === 'sct') {
+      const gbp = grossLocal;
+      incomeTax = ukIncomeTaxScotland(gbp) * FX_TO_EUR.GBP;
+      ssEmp = ukNIEmployee(gbp) * FX_TO_EUR.GBP;
+      ssEr = ukNIEmployer(gbp) * FX_TO_EUR.GBP;
+      brackets.push({ to: 12570, rate: 0 }, { to: 75000, rate: 0.21 }, { to: 125140, rate: 0.42 });
+      notes.push('Scottish income tax rates; National Insurance same as UK');
+      if (engagement === 'payrolling') {
+        other = grossEur * 0.04;
+        notes.push('Umbrella / agency PAYE ~4%');
+      }
+    }
+
+    if (countryId === 'ie') {
+      incomeTax = iePAYE(grossEur);
+      const usc = ieUSC(grossEur);
+      ssEmp = grossEur * 0.04 + usc;
+      other = usc * 0; // USC counted in ssEmp for stack
+      ssEr = grossEur * 0.1105;
+      brackets.push({ to: 42000, rate: 0.20 }, { to: Infinity, rate: 0.40 });
+      notes.push('PAYE + PRSI 4% + USC; €1,875 single person credit applied');
+      if (engagement === 'payrolling') {
+        other += grossEur * 0.035;
+        notes.push('Payroll / EOR fee ~3.5%');
+      }
+      lines.push({ label: 'USC (Universal Social Charge)', amount: usc, tip: 'Irish USC on gross income' });
+    }
+
     const totalDeductions = incomeTax + ssEmp + other;
     const netEur = Math.max(0, grossEur - totalDeductions);
     const netLocal = fromEur(netEur, c.currency);
     const employerCostEur = grossEur + ssEr + (engagement === 'payrolling' ? grossEur * 0.04 : 0);
 
+    const takeHomeRate = pct(netEur, grossEur);
+
     return {
       countryId, grossLocal, grossEur, netEur, netLocal, incomeTax, ssEmp, ssEr, other,
       effectiveRate: pct(totalDeductions - special, grossEur),
+      takeHomeRate,
       taxPct: pct(incomeTax, grossEur), ssPct: pct(ssEmp, grossEur), otherPct: pct(other, grossEur),
       takePct: pct(netEur, grossEur),
       employerCostEur, lines, brackets, bracketText: bracketText(grossEur, brackets.length ? brackets : [{ to: grossEur, rate: 0.2 }], sym),
@@ -984,11 +1127,13 @@ tr.cheapest td { background: var(--green-bg); }
             <span style="width:${r.taxPct}%;background:var(--tax-bar)"></span>
             <span style="width:${r.ssPct}%;background:var(--ss-bar)"></span>
             <span style="width:${r.otherPct}%;background:var(--other-bar)"></span>
+            <span class="take-home" style="width:${r.takePct}%;"></span>
           </div>
           <div class="stack-legend">
             <span><i style="background:var(--tax-bar)"></i>Tax ${r.taxPct}%</span>
             <span><i style="background:var(--ss-bar)"></i>SS ${r.ssPct}%</span>
             <span><i style="background:var(--other-bar)"></i>Other ${r.otherPct}%</span>
+            <span><i style="background:var(--green)"></i>Take-home ${r.takePct}%</span>
           </div>
         </div>
         ${
@@ -1009,9 +1154,18 @@ tr.cheapest td { background: var(--green-bg); }
           <div class="metric-sub">≈ ${eurDisp} EUR${r.isContractor && r.retainedEur > 0 ? ' · + ' + fmt(fromEur(r.retainedEur, r.currency), r.sym) + ' in company' : ''}</div>
         </div>
         <div class="metric">
-          <div class="metric-label">Effective tax + SS rate</div>
-          <div class="effective mono">${r.effectiveRate}%</div>
+          <div class="metric-label">Take-home rate · deductions</div>
+          <div class="effective mono">${r.takeHomeRate != null ? r.takeHomeRate : r.takePct}% net · ${r.effectiveRate}% deducted</div>
         </div>
+        ${
+          opts.employerCosts && !r.isContractor
+            ? `<div class="metric">
+          <div class="metric-label">Employer total cost</div>
+          <div class="metric-value mono">${fmt(fromEur(r.employerCostEur, r.currency), r.sym)}</div>
+          <div class="metric-sub">Gross salary + employer social &amp; payroll load</div>
+        </div>`
+            : ''
+        }
         <button type="button" class="toggle-breakdown">See breakdown</button>
         <div class="breakdown">
           <p class="bracket-note">${r.bracketText}</p>
@@ -1042,7 +1196,7 @@ tr.cheapest td { background: var(--green-bg); }
     const opts = getOpts();
 
     document.getElementById('fxNote').textContent =
-      `Entered in ${state.currency}. ≈ €${Math.round(grossEur).toLocaleString()} at indicative rates (EUR 1 · CHF ${(1 / FX_TO_EUR.CHF).toFixed(2)} · SGD ${(1 / FX_TO_EUR.SGD).toFixed(2)} · AED ${(1 / FX_TO_EUR.AED).toFixed(0)} · USD ${(1 / FX_TO_EUR.USD).toFixed(2)}).`;
+      `Entered in ${state.currency}. ≈ €${Math.round(grossEur).toLocaleString()} at indicative rates (EUR 1 · GBP ${(1 / FX_TO_EUR.GBP).toFixed(2)} · CHF ${(1 / FX_TO_EUR.CHF).toFixed(2)} · SGD ${(1 / FX_TO_EUR.SGD).toFixed(2)} · AED ${(1 / FX_TO_EUR.AED).toFixed(0)} · USD ${(1 / FX_TO_EUR.USD).toFixed(2)}).`;
 
     const results = buildComputeTargets()
       .map((t) => compute(t.countryId, grossEur, engagement, { ...opts, chCanton: t.chCanton, resultId: t.resultId }))
@@ -1078,6 +1232,12 @@ tr.cheapest td { background: var(--green-bg); }
 
     const isContractor = engagement === 'contractor';
     document.getElementById('swissPanel').classList.toggle('visible', state.selected.has('ch'));
+    document.getElementById('chCantonDropdownWrap').style.display = state.selected.has('ch') ? 'block' : 'none';
+    const quickCanton = document.getElementById('chCantonQuick');
+    if (quickCanton && state.selectedChCantons.size === 1) {
+      const only = [...state.selectedChCantons][0];
+      if (quickCanton.querySelector(`option[value="${only}"]`)) quickCanton.value = only;
+    }
     document.getElementById('contractorPanel').classList.toggle('visible', isContractor);
     document.getElementById('nlContractorModeWrap').style.display =
       isContractor && state.selected.has('nl') ? 'block' : 'none';
@@ -1175,6 +1335,20 @@ tr.cheapest td { background: var(--green-bg); }
     });
   }
 
+  function syncChCantonSelect() {
+    const sel = document.getElementById('chCantonQuick');
+    if (!sel) return;
+    const first = state.selectedChCantons.values().next().value;
+    if (first && sel.querySelector(`option[value="${first}"]`)) sel.value = first;
+  }
+
+  function setChCantonFromDropdown(cantonId) {
+    state.selectedChCantons = new Set([cantonId]);
+    if (!state.selected.has('ch')) state.selected.add('ch');
+    syncChCantonPills();
+    syncCountryPills();
+  }
+
   function syncChCantonPills() {
     document.querySelectorAll('#chCantonPills .pill').forEach((pill) => {
       const id = pill.dataset.canton;
@@ -1182,6 +1356,7 @@ tr.cheapest td { background: var(--green-bg); }
       pill.classList.toggle('selected', state.selectedChCantons.has(id));
       pill.classList.toggle('tier-low', c && c.tier === 'low');
     });
+    syncChCantonSelect();
   }
 
   function initChCantonPills() {
@@ -1216,6 +1391,13 @@ tr.cheapest td { background: var(--green-bg); }
         render();
       };
     });
+    const chSel = document.getElementById('chCantonQuick');
+    if (chSel) {
+      chSel.addEventListener('change', () => {
+        setChCantonFromDropdown(chSel.value);
+        render();
+      });
+    }
   }
 
   function syncCountryPills() {
@@ -1280,7 +1462,7 @@ tr.cheapest td { background: var(--green-bg); }
     html.dataset.theme = html.dataset.theme === 'dark' ? 'light' : 'dark';
   };
 
-  ['grossInput', 'nlRuling30', 'nlExpat', 'deChurch', 'beExpat', 'sgNor', 'familyStatus', 'employerCosts', 'nlContractorMode', 'sgCpf', 'contractorExpenses'].forEach((id) => {
+  ['grossInput', 'nlRuling30', 'nlExpat', 'chCantonQuick', 'deChurch', 'beExpat', 'sgNor', 'familyStatus', 'employerCosts', 'nlContractorMode', 'sgCpf', 'contractorExpenses'].forEach((id) => {
     const el = document.getElementById(id);
     if (el) el.addEventListener('change', render);
     if (el && el.type === 'number') el.addEventListener('input', render);

@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="description" content="Global wealth preservation comparison — seven jurisdictions, tax drag, pensions, and long-term net worth for internationally mobile investors." />
+  <meta name="description" content="Global wealth preservation comparison — ten jurisdictions including UK, Scotland, and Ireland; tax drag, pensions, and long-term net worth for internationally mobile investors." />
   <title>Global Wealth Preservation Comparison</title>
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js" defer></script>
   <style>
@@ -343,7 +343,7 @@
       </svg>
       <div>
         <div class="logo-title">Global Wealth Preservation</div>
-        <div class="logo-sub">7 jurisdictions · planning dashboard</div>
+        <div class="logo-sub">10 jurisdictions · planning dashboard</div>
       </div>
     </a>
     <div class="header-actions">
@@ -473,6 +473,9 @@
             <option value="AE">Dubai / UAE</option>
             <option value="SG">Singapore</option>
             <option value="LU">Luxembourg</option>
+            <option value="UK">United Kingdom</option>
+            <option value="SCT">Scotland</option>
+            <option value="IE">Ireland</option>
           </select>
         </div>
         <div class="toggle-row">
@@ -495,6 +498,9 @@
                 <option value="DE">Germany</option>
                 <option value="BE">Belgium</option>
                 <option value="LU">Luxembourg</option>
+                <option value="UK">United Kingdom</option>
+                <option value="SCT">Scotland</option>
+                <option value="IE">Ireland</option>
               </select>
             </div>
           </div>
@@ -541,7 +547,7 @@
             An analytical comparison for internationally mobile investors and high-income professionals. Model how salary, investment taxation, pensions, and real-estate economics compound — or erode — total net worth across Switzerland, the Netherlands, Germany, Belgium, Dubai/UAE, Singapore, and Luxembourg over 10, 20, and 25-year horizons.
           </p>
           <div class="hero-points">
-            <span>Seven jurisdictions side by side</span>
+            <span>Ten jurisdictions side by side</span>
             <span>Annual tax drag &amp; compounding</span>
             <span>Pension &amp; property layers</span>
             <span>Planning logic — not legal advice</span>
@@ -734,11 +740,47 @@
       scores: { salary: 62, compound: 74, pension: 80, re: 72, mobility: 86, currency: 74 },
       risks: 'Substantial participation rules; payroll complexity',
       investor: 'Finance-sector mobile professionals in Benelux'
+    },
+    UK: {
+      id: 'UK', name: 'United Kingdom', code: 'UK',
+      incomeTax: 40, dividendTax: 8.75, cgTax: 20, cgRealization: 0.25, wealthTax: 0,
+      box3Deemed: 0, box3Rate: 0, pensionContrib: 0.08, reFriction: 1.5,
+      profiles: {
+        wealth: 'Global hub', investment: 'CGT + dividend tax', pension: 'State + workplace',
+        re: 'SDLT; BTL rules', fit: 'English-speaking mobile professionals'
+      },
+      scores: { salary: 55, compound: 72, pension: 70, re: 62, mobility: 82, currency: 78 },
+      risks: 'Higher-rate creep; NI; non-dom abolished 2025',
+      investor: 'UK residents and inbound executives'
+    },
+    SCT: {
+      id: 'SCT', name: 'Scotland', code: 'SCT',
+      incomeTax: 42, dividendTax: 8.75, cgTax: 20, cgRealization: 0.25, wealthTax: 0,
+      box3Deemed: 0, box3Rate: 0, pensionContrib: 0.08, reFriction: 1.45,
+      profiles: {
+        wealth: 'UK subset', investment: 'Scottish income tax higher', pension: 'Same UK system',
+        re: 'LBTT; similar to UK', fit: 'UK mobile preferring Scotland lifestyle'
+      },
+      scores: { salary: 52, compound: 70, pension: 70, re: 64, mobility: 80, currency: 78 },
+      risks: 'Scottish tax bands vs rUK; same NI rules',
+      investor: 'Scotland-based HNW and executives'
+    },
+    IE: {
+      id: 'IE', name: 'Ireland', code: 'IE',
+      incomeTax: 40, dividendTax: 25, cgTax: 33, cgRealization: 0.3, wealthTax: 0,
+      box3Deemed: 0, box3Rate: 0, pensionContrib: 0.04, reFriction: 1.35,
+      profiles: {
+        wealth: 'EU tech/pharma hub', investment: 'CGT 33%; exit tax rules', pension: 'PRSI + occupational',
+        re: 'Stamp duty; rent controls in cities', fit: 'EU HQs and mobile tech workers'
+      },
+      scores: { salary: 60, compound: 76, pension: 72, re: 66, mobility: 88, currency: 72 },
+      risks: 'USC/PRSI; domicile rules; property supply',
+      investor: 'Ireland-based and inbound EU professionals'
     }
   };
 
-  const ORDER = ['CH', 'NL', 'DE', 'BE', 'AE', 'SG', 'LU'];
-  const CHART_COLORS = ['#0d6e6e', '#2a5f8f', '#6a5f3a', '#8a5a2a', '#1a6b3c', '#5c4d8a', '#7a4d5a'];
+  const ORDER = ['CH', 'NL', 'UK', 'IE', 'DE', 'SCT', 'BE', 'AE', 'SG', 'LU'];
+  const CHART_COLORS = ['#0d6e6e', '#2a5f8f', '#012169', '#169B62', '#6a5f3a', '#005EB8', '#8a5a2a', '#1a6b3c', '#5c4d8a', '#7a4d5a'];
 
   const $ = (id) => document.getElementById(id);
   const state = {

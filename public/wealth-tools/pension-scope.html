@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="description" content="PensionScope — Global Retirement Intelligence. Calculate projected pension income across 8 countries and compare where you'll thrive." />
+  <meta name="description" content="PensionScope — Global Retirement Intelligence. Calculate projected pension income across 11 countries and compare where you'll thrive." />
   <title>PensionScope — Global Retirement Intelligence</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -166,6 +166,34 @@
     .delta-pos { color: var(--green); }
     .delta-neg { color: var(--red); }
 
+    .opp-card { border-top: 4px solid var(--accent); }
+    .opp-card[data-c="NL"] { border-top-color: var(--nl); }
+    .opp-card[data-c="CH"] { border-top-color: var(--ch); }
+    .opp-card[data-c="DE"] { border-top-color: var(--de); }
+    .opp-card[data-c="LU"] { border-top-color: var(--lu); }
+    .opp-card[data-c="BE"] { border-top-color: var(--be); }
+    .opp-card[data-c="AT"] { border-top-color: var(--at); }
+    .opp-card[data-c="SG"] { border-top-color: var(--sg); }
+    .opp-card[data-c="AE"] { border-top-color: #00732F; }
+    .opp-score { font-family: var(--mono); font-size: 1.5rem; font-weight: 700; color: var(--gold); }
+    .gap-alert { padding: calc(var(--sp) * 2.5); border-radius: var(--radius); margin: calc(var(--sp) * 3) 0; border: 1px solid; }
+    .gap-alert.red { background: var(--red-bg); border-color: var(--red); }
+    .gap-alert.amber { background: var(--amber-bg); border-color: var(--amber); }
+    .gap-alert.green { background: var(--green-bg); border-color: var(--green); }
+    .gap-stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: calc(var(--sp) * 2); margin: calc(var(--sp) * 2) 0; }
+    .gap-stat { padding: calc(var(--sp) * 2); background: var(--surface); border-radius: var(--radius); }
+    .gap-stat .val { font-family: var(--mono); font-size: 1.25rem; font-weight: 600; color: var(--accent); }
+    .opp-levers { display: grid; gap: calc(var(--sp) * 2); margin: calc(var(--sp) * 3) 0; }
+    .opp-lever { padding: calc(var(--sp) * 2); border: 1px solid var(--ink-15); border-radius: var(--radius); background: var(--white); }
+    .opp-lever-result { font-size: 0.85rem; color: var(--ink-60); margin-top: 8px; }
+    .pill-row { display: flex; flex-wrap: wrap; gap: 4px; margin: 8px 0; }
+    .pill-green { background: var(--green-bg); color: var(--green); }
+    .pill-amber { background: var(--amber-bg); color: var(--amber); }
+    table.compare td.sweet { background: var(--green-bg); font-weight: 600; }
+    table.compare td.moderate { background: var(--amber-bg); }
+    .rec-card { border-left: 4px solid var(--gold); margin-bottom: calc(var(--sp) * 2); }
+    .rec-rank { font-family: var(--mono); font-weight: 700; color: var(--gold); }
+
     .honourable { background: var(--surface); border-radius: var(--radius); padding: calc(var(--sp) * 2); margin-top: calc(var(--sp) * 2); }
     footer.methodology { background: var(--ink); color: rgba(255,255,255,0.85); padding: calc(var(--sp) * 5) calc(var(--sp) * 2); font-size: 0.8rem; }
     footer.methodology a { color: #fff; }
@@ -187,13 +215,14 @@
   <nav class="site-nav no-print" aria-label="Main navigation">
     <div class="nav-inner">
       <a href="/wealth-tools" class="nav-logo">
-        PensionScope <span class="nav-flags" aria-hidden="true">🇳🇱🇨🇭🇩🇪🇱🇺🇧🇪🇦🇹🇸🇬</span>
+        PensionScope <span class="nav-flags" aria-hidden="true">🇳🇱🇨🇭🇩🇪🇱🇺🇧🇪🇦🇹🇬🇧🏴🇮🇪🇸🇬🇦🇪</span>
       </a>
       <div class="nav-links" id="navLinks">
         <a href="#calculator">Calculator</a>
         <a href="#projection">Projection</a>
         <a href="#compare">Compare</a>
         <a href="#replacement">Replacement</a>
+        <a href="#opportunity">Opportunities</a>
         <a href="#best-places">Best Places</a>
         <a href="#scenarios">Scenarios</a>
         <a href="#methodology">Methodology</a>
@@ -208,7 +237,7 @@
       <div class="container">
         <p style="font-size:0.8rem;font-weight:600;color:var(--accent);text-transform:uppercase;letter-spacing:0.08em;">PensionScope — Global Retirement Intelligence</p>
         <h1>What will your pension actually be?</h1>
-        <p class="sub">Enter your details. We calculate your projected income across 8 countries — and show where you'll retire best.</p>
+        <p class="sub">Enter your details. We calculate your projected income across 11 countries — and show where you'll retire best.</p>
         <p class="sub" style="font-size:0.85rem;font-style:italic;">Calculate what you'll receive. Compare where you'll thrive.</p>
 
         <form id="calcForm" class="card calc-bar" style="margin-top:32px;" aria-label="Pension calculator inputs">
@@ -247,6 +276,9 @@
               <option value="LU">Luxembourg</option>
               <option value="BE">Belgium</option>
               <option value="AT">Austria</option>
+              <option value="UK">United Kingdom</option>
+              <option value="SCT">Scotland</option>
+              <option value="IE">Ireland</option>
               <option value="SG">Singapore</option>
             </select>
           </div>
@@ -415,6 +447,58 @@
       </div>
     </section>
 
+    <!-- SECTION D2: POST-RETIREMENT OPPORTUNITY INDEX -->
+    <section id="opportunity" class="section-alt hidden-until-calc">
+      <div class="container">
+        <h2>Bridging the income gap — post-retirement opportunities by country</h2>
+        <p class="sub">When replacement rates fall below 50%, continued income becomes essential. Here is where you can earn it most efficiently.</p>
+
+        <div id="oppGapSummary"></div>
+        <div class="opp-levers no-print" id="oppLevers"></div>
+
+        <h3 style="margin-top:40px;">Opportunity score dashboard</h3>
+        <p class="disclaimer">Senior employment: OECD Employment Outlook 2025. Scores are composite indices for illustrative comparison.</p>
+        <div class="grid-4" id="oppCards" style="margin-top:24px;"></div>
+
+        <h3 style="margin-top:40px;">Income strategy matrix</h3>
+        <div class="compare-table-wrap">
+          <table class="compare" id="strategyTable" aria-label="Post-retirement income strategies by country">
+            <thead><tr><th>Strategy</th><th>NL</th><th>CH</th><th>DE</th><th>UK</th><th>SCT</th><th>IE</th><th>LU</th><th>BE</th><th>AT</th><th>SG</th><th>UAE</th></tr></thead>
+            <tbody id="strategyBody"></tbody>
+          </table>
+        </div>
+
+        <h3 style="margin-top:40px;">Future retirement age trajectory (2025–2060)</h3>
+        <div class="chart-wrap" style="height:360px;" aria-label="Retirement age trajectory chart">
+          <canvas id="retireAgeChart"></canvas>
+        </div>
+        <div id="retireAgeCallout" class="insight-box amber" style="margin-top:16px;"></div>
+
+        <h3 style="margin-top:40px;">Personalised recommendation</h3>
+        <div class="card grid-2 no-print" style="gap:16px;margin-bottom:16px;">
+          <div class="field"><label for="oppSkills">Skills profile</label>
+            <select id="oppSkills">
+              <option value="finance">Finance &amp; Data</option>
+              <option value="tech">Tech &amp; Engineering</option>
+              <option value="consulting">Consulting &amp; Strategy</option>
+              <option value="health">Healthcare</option>
+              <option value="other">Other</option>
+            </select>
+          </div>
+          <div class="field"><label for="oppIntensity">Preferred work intensity post-retirement</label>
+            <select id="oppIntensity">
+              <option value="full">Full consulting (5 days/wk)</option>
+              <option value="part">Part-time (2–3 days)</option>
+              <option value="advisory">Advisory only (occasional)</option>
+              <option value="none">Prefer full retirement</option>
+            </select>
+          </div>
+        </div>
+        <div id="oppRecommendations"></div>
+        <p class="disclaimer" style="margin-top:24px;">Post-retirement income estimates are illustrative. Day rates vary by sector, seniority and market conditions. Tax calculations are approximate — consult a local tax advisor. Re-employment rights and freelance regulations are subject to legislative change. Future retirement ages are OECD projections.</p>
+      </div>
+    </section>
+
     <!-- SECTION E: BEST PLACES -->
     <section id="best-places" class="section-alt hidden-until-calc">
       <div class="container">
@@ -471,6 +555,7 @@
         <li><strong>LU:</strong> CNAP contributions required; cross-border workers differ.</li>
         <li><strong>SG:</strong> CPF LIFE zero for non-citizens/non-PR; EP holders must self-fund.</li>
         <li><strong>AT:</strong> Reform ongoing; early retirement penalties before statutory age.</li>
+        <li><strong>Post-retirement income:</strong> Day rates and tax estimates are illustrative; verify ZZP, flexi-job, and re-employment rules locally.</li>
       </ul>
       <p><a href="/wealth-tools">← Back to Wealth Tools</a></p>
     </div>
@@ -488,7 +573,11 @@
     LU: { name: 'Luxembourg', flag: '🇱🇺', color: '#EF3340', currency: 'EUR', mercer: 80.5, grade: 'A', pensionAge: 65, system: 'Mixed', strength: 'Highest EU replacement potential', weakness: 'Requires LU career for full entitlement', tag: 'Best for high earners' },
     BE: { name: 'Belgium', flag: '🇧🇪', color: '#8B6914', currency: 'EUR', mercer: 77.8, grade: 'B+', pensionAge: 65, system: 'PAYG', strength: 'Central EU location', weakness: 'High overall taxation', tag: '' },
     AT: { name: 'Austria', flag: '🇦🇹', color: '#ED2939', currency: 'EUR', mercer: 79.5, grade: 'B+', pensionAge: 65, system: 'PAYG', strength: '80% replacement at full career', weakness: 'Pure PAYG sustainability risk', tag: 'Best for average earners' },
+    AE: { name: 'UAE (Dubai)', flag: '🇦🇪', color: '#00732F', currency: 'AED', mercer: 70, grade: 'B', pensionAge: 60, system: 'None', strength: '0% income tax', weakness: 'No state pension for expats', tag: 'Post-retirement consulting' },
     SG: { name: 'Singapore', flag: '🇸🇬', color: '#EF3340', currency: 'SGD', mercer: 76.2, grade: 'B+', pensionAge: 65, system: 'Funded', strength: '0% tax on CPF LIFE', weakness: 'EP holders get zero CPF', tag: '' },
+    UK: { name: 'United Kingdom', flag: '🇬🇧', color: '#012169', currency: 'GBP', mercer: 75.5, grade: 'B+', pensionAge: 66, system: 'Mixed', strength: 'Auto-enrolment workplace pensions', weakness: 'State pension among lowest in OECD', tag: '' },
+    SCT: { name: 'Scotland', flag: '🏴', color: '#005EB8', currency: 'GBP', mercer: 75.2, grade: 'B+', pensionAge: 66, system: 'Mixed', strength: 'Same UK state pension + Scottish tax context', weakness: 'Higher income tax bands than rUK', tag: '' },
+    IE: { name: 'Ireland', flag: '🇮🇪', color: '#169B62', currency: 'EUR', mercer: 74.8, grade: 'B+', pensionAge: 66, system: 'PAYG', strength: 'Strong PRSI social insurance', weakness: 'PRSI ceiling limits high earners', tag: '' },
   };
 
   const DEST = {
@@ -499,6 +588,9 @@
     BE: { cost: '€2,900–3,800', tax: 'Reduced vs employment; 10% lump sums', health: 'INAMI excellent', pro: 'Central EU; good services', con: 'High tax; language complexity', visa: 'EU FOM; expat regime', rec: 'EU retirees' },
     AT: { cost: '€2,800–3,500', tax: 'Pensionistenabsetzbetrag ~€900/yr', health: 'ÖGK excellent', pro: 'High replacement; Vienna livability', con: 'PAYG sustainability risk', visa: 'EU FOM', rec: 'Active retirement' },
     SG: { cost: 'SGD 5,000–7,000', tax: '0% on CPF LIFE', health: 'Medisave + MediShield', pro: '0% pension tax; safe; English', con: 'EP gets no CPF; heat; expensive', visa: 'LTVP limited; PR track', rec: 'Citizens/PR only for CPF' },
+    UK: { cost: '£3,200–4,500', tax: 'Pension income taxable', health: 'NHS free at point of use', pro: 'English; global finance hub', con: 'Low state pension; housing costly', visa: 'Skilled Worker / ILR paths', rec: 'Career professionals in UK' },
+    SCT: { cost: '£2,900–4,000', tax: 'Scottish rates on pension drawdown', health: 'NHS Scotland', pro: 'Lower living cost than London', con: 'Scottish tax higher than rUK', visa: 'Same as UK', rec: 'UK retirees preferring Scotland' },
+    IE: { cost: '€3,000–4,200', tax: 'PAYE on occupational + state', health: 'Public + private', pro: 'English; EU access; tech hub', con: 'High living cost in Dublin', visa: 'EU FOM; Critical Skills', rec: 'EU mobile professionals' },
   };
 
   const CEILINGS = [
@@ -509,7 +601,244 @@
     ['Belgium', 'Reference wage avg', 'Cap ~€3,200/mo gross', 'IPT, group insurance'],
     ['Austria', 'Assessment base avg', 'Max ~€6,800/mo', 'Voluntary pension funds'],
     ['Singapore', 'SGD 6,000/mo OW', 'CPF on ceiling only', 'SRS SGD 35,700 for foreigners'],
+    ['United Kingdom', '£50,270 higher-rate band', 'Auto-enrolment on qualifying earnings', 'SIPP / personal pension'],
+    ['Scotland', 'Scottish tax bands', 'Same UK pension caps', 'SIPP + Scottish tax planning'],
+    ['Ireland', '€42,000 standard rate band', 'PRSI on reckonable pay', 'PRSA / AVC voluntary'],
   ];
+
+
+  const OPP_COUNTRIES = ['SG','CH','NL','UK','IE','AE','DE','LU','BE','AT','SCT'];
+  const OPP_META = {
+    NL:{name:'Netherlands',flag:'🇳🇱',color:'#AE1C28',cur:'EUR',total:82,srEmp:74,gig:9,tax:7,demand:8,ease:9,avgRR:72,hiRR:45,sectors:['Data architecture','Risk & compliance','ESG','Financial services'],insight:'Highest senior employment in OECD — ZZP/BV with no AOW clawback makes NL ideal for part-time consulting.',strengths:['No pension clawback','Strong ZZP framework','74% senior employment'],weaknesses:['High Box 1 rates','Complex ZZP rules']},
+    CH:{name:'Switzerland',flag:'🇨🇭',color:'#D52B1E',cur:'CHF',total:88,srEmp:72,gig:8,tax:9,demand:8,ease:8,avgRR:58,hiRR:28,sectors:['Financial services','Pharma compliance','Data governance','AI/regulatory'],insight:'Zug GmbH + BVG Einkauf tax deduction — senior consulting at CHF 1,200–1,600/day covers high-earner gaps.',strengths:['Low cantonal tax','BVG buyback deductible','Culture accepts work past 65'],weaknesses:['Complex admin','Health insurance separate']},
+    DE:{name:'Germany',flag:'🇩🇪',color:'#2B2B2B',cur:'EUR',total:76,srEmp:72,gig:7,tax:6,demand:8,ease:8,avgRR:48,hiRR:38,sectors:['SAP/ERP','Automotive tech','Engineering','Compliance'],insight:'Fachkräftemangel drives demand; working past 67 adds +0.5%/month to GRV pension.',strengths:['Skilled worker shortage','Pension + work allowed','Freiberufler framework'],weaknesses:['Rising pension taxation','Bureaucratic setup']},
+    LU:{name:'Luxembourg',flag:'🇱🇺',color:'#EF3340',cur:'EUR',total:71,srEmp:52,gig:7,tax:8,demand:8,ease:7,avgRR:78,hiRR:55,sectors:['CSSF compliance','Risk','Data','Fund admin'],insight:'High day rates (€900–1,400) in financial sector compensate for smaller market and lower senior employment.',strengths:['SARL efficient','Financial hub demand','High replacement rate'],weaknesses:['Small market','Lower 55–64 employment']},
+    BE:{name:'Belgium',flag:'🇧🇪',color:'#8B6914',cur:'EUR',total:64,srEmp:58,gig:6,tax:5,demand:7,ease:6,avgRR:65,hiRR:42,sectors:['EU institutions','Compliance','Advisory'],insight:'Flexi-job post-65: up to €12,000/yr tax-free; BVBA preferred over payroll due to high employer SS.',strengths:['Flexi-job regime','Pensioenbonus deferral'],weaknesses:['High tax on consulting','Employer SS ~25%']},
+    AT:{name:'Austria',flag:'🇦🇹',color:'#ED2939',cur:'EUR',total:62,srEmp:55,gig:6,tax:6,demand:6,ease:6,avgRR:80,hiRR:53,sectors:['Tourism mgmt','Life sciences','Public consulting'],insight:'High replacement for full careers — gap smaller. Deferring pension earns +4.2%/yr Pensionsbonus.',strengths:['High pension replacement','Vienna livability'],weaknesses:['Lower senior employment','Early retirement culture']},
+    SG:{name:'Singapore',flag:'🇸🇬',color:'#EF3340',cur:'SGD',total:91,srEmp:68,gig:8,tax:10,demand:9,ease:9,avgRR:35,hiRR:0,sectors:['FinTech','MAS compliance','Data governance','Private banking'],insight:'Re-employment Act + 0% CPF tax + SRS deductions — essential path for EP holders with zero CPF.',strengths:['Mandatory re-employment','0% CPF tax','SRS for foreigners'],weaknesses:['Zero CPF for EP','High living costs']},
+    AE:{name:'UAE (Dubai)',flag:'🇦🇪',color:'#00732F',cur:'AED',total:85,srEmp:65,gig:9,tax:10,demand:8,ease:7,avgRR:0,hiRR:0,sectors:['Consulting','Finance','Tech','Advisory boards'],insight:'0% personal income tax — AED 600k consulting = AED 600k net. No state pension; visa tied to assets/income.',strengths:['Zero income tax','DIFC framework','High net retention'],weaknesses:['No safety net','Visa requirements','No state pension']},
+    UK:{name:'United Kingdom',flag:'🇬🇧',color:'#012169',cur:'GBP',total:80,srEmp:68,gig:8,tax:6,demand:9,ease:8,avgRR:42,hiRR:28,sectors:['Finance','Tech','Compliance','Advisory'],insight:'IR35-aware contracting; Ltd + dividend route for senior consultants. State pension requires 35yr NI.',strengths:['English market','Flexible Ltd structure','Strong consulting demand'],weaknesses:['Low state pension','IR35 complexity']},
+    SCT:{name:'Scotland',flag:'🏴',color:'#005EB8',cur:'GBP',total:74,srEmp:62,gig:7,tax:5,demand:7,ease:7,avgRR:42,hiRR:28,sectors:['Energy','Finance','Public sector advisory'],insight:'Same UK pension rules with higher Scottish income tax — plan drawdown and consulting via UK Ltd.',strengths:['NHS Scotland','Lower housing vs London'],weaknesses:['Higher tax bands','Smaller market']},
+    IE:{name:'Ireland',flag:'🇮🇪',color:'#169B62',cur:'EUR',total:78,srEmp:60,gig:8,tax:7,demand:8,ease:8,avgRR:48,hiRR:35,sectors:['Tech','Pharma','Funds','Compliance'],insight:'PRSI + USC on consulting; Ltd 12.5% corp tax for trading income. Dublin day rates €700–1,100.',strengths:['EU hub','12.5% corp rate','English'],weaknesses:['PRSI ceiling','Dublin cost']},
+  };
+
+  const OPP_PROFILES = {
+    NL:`Legal: ZZP or BV — no age limit; AOW continues with no clawback. Tax: Box 1 with zelfstandigenaftrek €2,470 + MKB 12.7%; pensioners pay 17.9% on first bracket. Day rate €650–900 × 150 days → net ~€58,000–75,000 covers typical gap for €200k earner.`,
+    CH:`Legal: GmbH or Einzelunternehmen; voluntary AHV past 65; BVG deferral possible. Zug ~15–18% effective; BVG Einkauf saves ~CHF 1,500–1,800 tax per CHF 10k. Pillar 3a CHF 7,056/yr deductible. CHF 1,200–1,600/day × 100 days → net CHF 95,000–130,000.`,
+    DE:`Legal: Freiberufler or UG/GmbH; pension continues past 67 with +0.5%/month bonus. IT consultant €800–1,200/day × 100 days → net €48,000–68,000 combined with GRV.`,
+    LU:`Legal: SARL highly efficient; CSSF firms need senior compliance. €900–1,400/day × 100 days → net €54,000–78,000.`,
+    BE:`Flexi-job post-65: flat 25% withholding; up to €12,000/yr tax-free. BVBA structure preferred. €700–1,000/day — supplement rather than primary gap filler.`,
+    AT:`Frühpensionierung culture; Fachkräftemangel growing. Pensionsbonus +4.2%/yr for deferral. Gap smaller due to high replacement for full careers.`,
+    SG:`Re-employment Act: employers must offer re-employment 63–68. CPF LIFE 0% tax; SRS SGD 35,700/yr deductible for foreigners. ~18% effective on SGD 200k consulting.`,
+    AE:`0% tax on all earned income. Corporate 9% above AED 375k. Retirement Visa: AED 1M property/savings or AED 20k/mo income. AED 600k consulting = AED 600k net.`,
+    UK:`Ltd company: corp tax 19–25%; salary + dividends. IR35 if deemed employee. State pension ~£11.5k/yr with 35yr NI. SIPP tax relief up to 100% earnings (capped).`,
+    SCT:`Same UK pension and Ltd rules; Scottish income tax on salary/dividends higher than rUK for same gross.`,
+    IE:`Ltd/contractor: 12.5% corp on trading profits; PRSI 4% + USC on personal income. PRSA/AVC for top-ups. State pension max ~€14.4k/yr at full contributions.`,
+  };
+
+  const RETIRE_AGE = {
+    NL:{2025:67,2035:68,2045:69,2060:70}, CH:{2025:65,2035:65,2045:66,2060:66},
+    DE:{2025:67,2035:67,2045:67,2060:67}, LU:{2025:65,2035:65,2045:65,2060:65},
+    BE:{2025:65,2035:66,2045:67,2060:67}, AT:{2025:65,2035:65,2045:65,2060:65},
+    SG:{2025:63,2035:64,2045:65,2060:65}, AE:{2025:60,2035:60,2045:60,2060:60},
+    UK:{2025:66,2035:67,2045:68,2060:68}, SCT:{2025:66,2035:67,2045:68,2060:68},
+    IE:{2025:66,2035:66,2045:67,2060:67},
+  };
+
+  const STRATEGIES = [
+    {name:'Part-time employment (60% FTE)', cells:{NL:['~','€40–80k','25–37%','Moderate','Employment contract'],CH:['~','CHF 60–120k','15–22%','Moderate','AHV continues'],DE:['~','€45–90k','30–42%','Moderate','GRV continues'],LU:['~','€50–100k','25–35%','Moderate','CNAP continues'],BE:['~','€35–70k','40–50%','Difficult','High employer SS'],AT:['~','€40–75k','30–40%','Moderate','ÖGK continues'],SG:['✓','SGD 80–150k','15–22%','Easy','Re-employment Act'],AE:['✗','N/A','0%','Difficult','No payroll for expats']}},
+    {name:'Independent consulting (GmbH/BV/SARL)', cells:{NL:['✓','€80–135k','35–45% net eff.','Easy','ZZP/BV no clawback'],CH:['✓','CHF 120–160k','15–20%','Easy','GmbH + BVG Einkauf'],DE:['✓','€80–120k','38–48%','Easy','Freiberufler'],LU:['✓','€90–140k','35–42%','Easy','SARL efficient'],BE:['~','€56–80k','45–55%','Moderate','BVBA preferred'],AT:['~','€60–90k','35–45%','Moderate','Einzelunternehmen'],SG:['✓','SGD 150–250k','15–19%','Easy','SRS deductible'],AE:['✓','AED 400–800k','0%','Easy','Zero tax']}},
+    {name:'Board / advisory positions', cells:{NL:['✓','€20–60k','37–49%','Easy','Director fees Box 1'],CH:['✓','CHF 30–80k','15–25%','Easy','Common for seniors'],DE:['✓','€25–70k','40–48%','Easy','Aufsichtsrat fees'],LU:['✓','€30–80k','30–40%','Easy','Board culture strong'],BE:['~','€20–50k','45–55%','Moderate','Tax heavy'],AT:['~','€20–45k','35–45%','Moderate','Limited market'],SG:['✓','SGD 40–120k','15–20%','Easy','Listed co boards'],AE:['✓','AED 100–300k','0%','Easy','DIFC boards']}},
+    {name:'Online / remote freelancing', cells:{NL:['✓','€60–100k','30–40%','Easy','EU platform rules'],CH:['✓','CHF 80–130k','15–22%','Easy','Remote-friendly'],DE:['✓','€60–100k','35–45%','Easy','Strong demand'],LU:['~','€50–90k','30–40%','Moderate','Smaller market'],BE:['~','€40–70k','40–50%','Moderate','EU remote OK'],AT:['~','€45–75k','35–42%','Moderate','Growing'],SG:['✓','SGD 100–180k','15–18%','Easy','Global hub'],AE:['✓','AED 200–500k','0%','Easy','Remote + 0% tax']}},
+    {name:'Rental income (property)', cells:{NL:['~','€15–40k','37–49% Box 3','Moderate','Box 3 wealth tax'],CH:['~','CHF 20–50k','15–25%','Moderate','Imputed rental value'],DE:['~','€12–35k','25–45%','Moderate','Depreciation rules'],LU:['~','€20–45k','25–35%','Moderate','Property expensive'],BE:['~','€10–30k','40–50%','Moderate','High property tax'],AT:['~','€12–30k','30–40%','Moderate','Regulated rents'],SG:['~','SGD 24–60k','0–15%','Difficult','ABSD for foreigners'],AE:['✓','AED 80–200k','0%','Easy','No tax on rental']}},
+    {name:'Passive investment drawdown', cells:{NL:['✓','Variable','Box 3 ~36% eff.','Easy','Wealth tax on assets'],CH:['✓','Variable','15–25%','Easy','Dividend + wealth'],DE:['✓','Variable','26% Abgeltung','Easy','Standard portfolio'],LU:['✓','Variable','20–30%','Easy','Investment friendly'],BE:['~','Variable','30–40%','Moderate','Precompte mobilier'],AT:['✓','Variable','27.5% KESt','Easy','Standard'],SG:['✓','Variable','0% dividends','Easy','No CGT'],AE:['✓','Variable','0%','Easy','No CGT or income tax']}},
+  ];
+
+  let oppState = { extraYears: 0, consulting: 5000, pillar3Boost: 7056 };
+
+  function extraPensionPerYear(country, inp, r) {
+    const notes = {
+      NL: `+2% AOW pro-rata (~€${fmt(17358*0.02/12)}/mo) + ~1.875% occupational on pensionable salary`,
+      CH: `+1 AHV year (~CHF 668/yr) + BVG at 18% on coordinated salary`,
+      DE: `+1 Entgeltpunkt (~€451/yr pension = €${fmt(451/12)}/mo)`,
+      LU: `+1.85% accrual on average salary`,
+      BE: `+career fraction increase + pensioenbonus deferral`,
+      AT: `+1.78% accrual or +4.2%/yr if deferring`,
+      SG: `CPF contributions if re-employed to 68`,
+      AE: `No state pension — focus on DEWS/SRS accumulation`,
+      UK: `+1 NI year improves new State Pension pro-rata (~£230/yr)`,
+      SCT: `Same as UK — additional qualifying years increase State Pension`,
+      IE: `+1 year PRSI improves contributory pension pro-rata`,
+    };
+    return notes[country] || 'Additional accrual year';
+  }
+
+  function consultingNet(country, grossMonthly) {
+    const rates = { NL:0.42, CH:0.22, DE:0.45, LU:0.40, BE:0.52, AT:0.42, SG:0.18, AE:0, UK:0.38, SCT:0.40, IE:0.42 };
+    const annual = grossMonthly * 12;
+    const net = annual * (1 - (rates[country]||0.35));
+    return { gross: annual, net, rate: rates[country]||0.35 };
+  }
+
+  function pillar3TaxSaving(country, amount) {
+    const rates = { NL:0.375, CH:0.25, DE:0.42, LU:0.35, BE:0.45, AT:0.40, SG:0.18, AE:0, UK:0.40, SCT:0.40, IE:0.40 };
+    return Math.round(amount * (rates[country]||0.3));
+  }
+
+  function renderOpportunity(inp, r) {
+    const gapPct = Math.max(0, 100 - r.rr);
+    const gapMo = Math.max(0, r.finalSal / 12 - r.totalMo);
+    const gapYr = gapMo * 12;
+    const alertCls = gapPct > 50 ? 'red' : gapPct > 30 ? 'amber' : 'green';
+    const alertMsg = gapPct > 50 ? 'Critical gap: you need active income or assets to maintain your lifestyle'
+      : gapPct > 30 ? 'Significant gap: supplementary income strongly recommended'
+      : 'Manageable gap: part-time work or investment income can cover it comfortably';
+
+    $('oppGapSummary').innerHTML = `
+      <div class="gap-stats">
+        <div class="gap-stat"><p style="font-size:0.75rem;color:var(--ink-60)">Final salary at retirement</p><p class="val">${fmtCur(r.finalSal, r.meta.currency)}/yr</p></div>
+        <div class="gap-stat"><p style="font-size:0.75rem;color:var(--ink-60)">Projected pension income</p><p class="val">${fmtCur(r.totalMo * 12, r.meta.currency)}/yr</p></div>
+        <div class="gap-stat"><p style="font-size:0.75rem;color:var(--ink-60)">Monthly income gap</p><p class="val">${fmtCur(gapMo, r.meta.currency)}/mo</p></div>
+        <div class="gap-stat"><p style="font-size:0.75rem;color:var(--ink-60)">Gap as % of salary</p><p class="val">${gapPct.toFixed(1)}%</p></div>
+      </div>
+      <div class="gap-alert ${alertCls}"><strong>${alertMsg}</strong><p style="margin-top:8px;font-size:0.9rem">Replacement rate ${r.rr.toFixed(1)}% — you would need approximately ${fmtCur(gapYr, r.meta.currency)}/yr additional income to match pre-retirement salary.</p></div>`;
+
+    renderOppLevers(inp, r, gapMo, gapYr);
+    renderOppCards(r);
+    renderStrategyMatrix();
+    renderRetireAgeChart(inp);
+    renderOppRecommendations(inp, r, gapMo, gapYr);
+  }
+
+  function renderOppLevers(inp, r, gapMo, gapYr) {
+    const c = inp.country;
+    const cur = r.meta.currency;
+    $('oppLevers').innerHTML = `
+      <div class="opp-lever"><label for="oppExtraYears">Lever 1: Work <span class="mono" id="oppExtraYearsVal">${oppState.extraYears}</span> more years beyond retirement age</label>
+        <input type="range" id="oppExtraYears" min="0" max="10" value="${oppState.extraYears}" />
+        <p class="opp-lever-result" id="oppLever1Result">${extraPensionPerYear(c, inp, r)}</p></div>
+      <div class="opp-lever"><label for="oppConsulting">Lever 2: Earn <span class="mono" id="oppConsultingVal">${fmtCur(oppState.consulting, cur)}</span>/mo from consulting</label>
+        <input type="number" id="oppConsulting" min="0" step="500" value="${oppState.consulting}" inputmode="numeric" style="width:100%;padding:8px;font-family:var(--mono)" />
+        <p class="opp-lever-result" id="oppLever2Result"></p></div>
+      <div class="opp-lever"><label for="oppPillar3">Lever 3: Increase Pillar 3a by <span class="mono" id="oppPillar3Val">${fmt(oppState.pillar3Boost)}</span>/yr starting now</label>
+        <input type="range" id="oppPillar3" min="0" max="35000" step="500" value="${oppState.pillar3Boost}" />
+        <p class="opp-lever-result" id="oppLever3Result"></p></div>`;
+    updateOppLeverResults(inp, r, gapMo, gapYr);
+    ['oppExtraYears','oppConsulting','oppPillar3'].forEach(id => {
+      $(id)?.addEventListener('input', () => {
+        oppState.extraYears = +($('oppExtraYears')?.value || 0);
+        oppState.consulting = +($('oppConsulting')?.value || 0);
+        oppState.pillar3Boost = +($('oppPillar3')?.value || 0);
+        $('oppExtraYearsVal').textContent = oppState.extraYears;
+        $('oppConsultingVal').textContent = fmtCur(oppState.consulting, cur);
+        $('oppPillar3Val').textContent = fmt(oppState.pillar3Boost);
+        updateOppLeverResults(inp, r, gapMo, gapYr);
+      });
+    });
+  }
+
+  function updateOppLeverResults(inp, r, gapMo, gapYr) {
+    const c = inp.country, cur = r.meta.currency;
+    const extraPension = oppState.extraYears * (c === 'DE' ? 451/12 : c === 'CH' ? 668/12 : c === 'NL' ? 17358*0.02/12 + r.finalSal*0.01875/12 : r.finalSal * 0.015 / 12);
+    $('oppLever1Result').textContent = `${oppState.extraYears} extra year(s): ~+${fmtCur(extraPension, cur)}/mo pension. ${extraPensionPerYear(c, inp, r)}`;
+    const cons = consultingNet(c, oppState.consulting);
+    const monthsCover = gapMo > 0 ? (cons.net / 12 / gapMo).toFixed(1) : '∞';
+    const p3Future = oppState.pillar3Boost * Math.pow(1.04, yearsToRetire(inp));
+    $('oppLever2Result').textContent = `Gross ${fmtCur(cons.gross, cur)}/yr → net ~${fmtCur(cons.net, cur)}/yr (${((1-cons.rate)*100).toFixed(0)}% retained). Covers ${monthsCover}× monthly gap. Invested at 4%: +${fmtCur(p3Future * 0.04 / 12, cur)}/mo drawdown potential.`;
+    const taxSave = pillar3TaxSaving(c, oppState.pillar3Boost);
+    const capAtRet = oppState.pillar3Boost * ((Math.pow(1.04, yearsToRetire(inp)) - 1) / 0.04 + yearsToRetire(inp));
+    $('oppLever3Result').textContent = `Tax saving this year: ~${fmtCur(taxSave, cur)}. Capital at retirement: ~${fmtCur(capAtRet, cur)} → +${fmtCur(capAtRet / 20 / 12, cur)}/mo over 20yr drawdown.`;
+  }
+
+  function renderOppCards(r) {
+    const sorted = [...OPP_COUNTRIES].sort((a,b) => OPP_META[b].total - OPP_META[a].total);
+    $('oppCards').innerHTML = sorted.map(code => {
+      const o = OPP_META[code];
+      const bar = (v, max, red) => `<div class="progress-bar"><span style="width:${Math.min(100,v/max*100)}%;background:${red && v<40?'var(--red)':'var(--green)'}"></span></div><span class="mono" style="font-size:0.75rem">${v}${typeof v==='number'&&v<=100?'%':''}</span>`;
+      return `<div class="card opp-card" data-c="${code}"><div style="display:flex;justify-content:space-between;align-items:flex-start"><strong>${o.flag} ${o.name}</strong><span class="opp-score">${o.total}</span></div>
+        <p style="font-size:0.75rem;color:var(--ink-60);margin:8px 0">Opportunity Score /100</p>
+        <p style="font-size:0.8rem">Senior employment 55–64</p>${bar(o.srEmp, 100, false)}
+        <p style="font-size:0.8rem">Avg earner replacement</p>${bar(o.avgRR, 100, false)}
+        <p style="font-size:0.8rem">High earner replacement</p>${bar(o.hiRR, 100, true)}
+        <p style="font-size:0.8rem;margin-top:8px">Gig/freelance: <span class="mono">${o.gig}/10</span> · Tax efficiency: <span class="mono">${o.tax}/10</span></p>
+        <div class="pill-row">${o.sectors.map(s=>`<span class="tag">${s}</span>`).join('')}</div>
+        <div class="pill-row">${o.strengths.map(s=>`<span class="tag pill-green">${s}</span>`).join('')}</div>
+        <details style="margin-top:12px"><summary style="cursor:pointer;font-weight:600;color:var(--accent);font-size:0.85rem">See full opportunity profile</summary><p style="font-size:0.8rem;margin-top:8px">${OPP_PROFILES[code]}</p></details>
+        <p style="font-size:0.8rem;margin-top:12px;font-style:italic;color:var(--ink-60)">${o.insight}</p></div>`;
+    }).join('');
+  }
+
+  function renderStrategyMatrix() {
+    const codes = ['NL','CH','DE','UK','SCT','IE','LU','BE','AT','SG','AE'];
+    $('strategyBody').innerHTML = STRATEGIES.map(s => {
+      return `<tr><td><strong>${s.name}</strong></td>${codes.map(c => {
+        const cell = s.cells[c] || ['~', 'Varies', '—', 'Moderate', 'See UK/IE profile'];
+        const cls = cell[0]==='✓' && (cell[3]==='Easy' || cell[2].includes('0%')) ? 'sweet' : cell[0]==='~' ? 'moderate' : '';
+        return `<td class="${cls}" style="font-size:0.75rem"><strong>${cell[0]}</strong> ${cell[1]}<br/>Tax: ${cell[2]} · ${cell[3]}<br/><em>${cell[4]}</em></td>`;
+      }).join('')}</tr>`;
+    }).join('');
+  }
+
+  function renderRetireAgeChart(inp) {
+    ensureChart(() => {
+      const years = [2025, 2030, 2035, 2040, 2045, 2050, 2055, 2060];
+      const countries = ['NL','CH','DE','BE','SG'];
+      const datasets = countries.map(c => ({
+        label: OPP_META[c]?.name || COUNTRY_META[c]?.name,
+        data: years.map(y => {
+          const d = RETIRE_AGE[c];
+          if (y <= 2025) return d[2025];
+          if (y <= 2035) return d[2035] || d[2025];
+          if (y <= 2045) return d[2045] || d[2035];
+          return d[2060] || d[2045];
+        }),
+        borderColor: (OPP_META[c]||COUNTRY_META[c])?.color || '#666',
+        tension: 0.2,
+      }));
+      if (charts.retireAge) charts.retireAge.destroy();
+      charts.retireAge = new Chart($('retireAgeChart'), {
+        type: 'line', data: { labels: years, datasets },
+        options: { responsive: true, maintainAspectRatio: false, scales: { y: { min: 60, max: 72, title: { display: true, text: 'Statutory retirement age' } } } },
+      });
+    });
+    const userRetire = inp.retireAge;
+    const nlFuture = inp.currentAge <= 43 ? 69 : 67;
+    $('retireAgeCallout').innerHTML = `<strong>Your timeline:</strong> Retiring at ${userRetire} under current rules. ${inp.country==='NL' && inp.currentAge <= 43 ? 'The Netherlands is discussing raising retirement age to 70–72. If you are '+inp.currentAge+' today, you may retire at '+nlFuture+'–70 under future Dutch rules.' : 'Monitor OECD projections — Belgium reaches 67 by 2030; Germany stable at 67.'}`;
+  }
+
+  function renderOppRecommendations(inp, r, gapMo, gapYr) {
+    const skills = $('oppSkills')?.value || 'finance';
+    const intensity = $('oppIntensity')?.value || 'part';
+    const gapEur = gapYr * (FX[r.meta.currency] || 1);
+    const ranked = OPP_COUNTRIES.map(c => {
+      let score = OPP_META[c].total;
+      if (skills === 'finance' && (c === 'CH' || c === 'LU' || c === 'SG')) score += 8;
+      if (skills === 'tech' && (c === 'DE' || c === 'SG')) score += 6;
+      if (intensity === 'part' && (c === 'CH' || c === 'NL')) score += 5;
+      if (intensity === 'advisory' && c === 'AE') score += 4;
+      if (inp.country === c) score += 3;
+      return { c, score, o: OPP_META[c] };
+    }).sort((a, b) => b.score - a.score);
+
+    const dayRates = { CH: 1400, NL: 775, SG: 1200, DE: 1000, LU: 1150, AE: 2500, BE: 850, AT: 900 };
+    const daysMap = { full: 200, part: 100, advisory: 40, none: 0 };
+    const days = daysMap[intensity] || 100;
+
+    const recs = ranked.slice(0, 3).map((item, i) => {
+      const dr = dayRates[item.c];
+      const gross = dr * days;
+      const net = gross * (1 - (consultingNet(item.c, 1000).rate));
+      const covers = net >= gapYr * (item.o.cur === 'EUR' ? 1 : item.o.cur === 'CHF' ? 1/1.05 : 0.68);
+      const labels = ['RECOMMENDED', 'ALTERNATIVE', 'CONTINGENCY'];
+      return `<div class="card rec-card"><p class="rec-rank">#${i+1} ${labels[i]}: ${item.o.flag} ${item.o.name}</p>
+        <p style="font-size:0.9rem;margin:8px 0">${intensity === 'none' ? 'Focus on Pillar 3 maximisation and passive drawdown.' : `${days} day-rate days at ${item.o.cur === 'CHF' ? 'CHF' : item.o.cur === 'SGD' ? 'SGD' : item.o.cur === 'AED' ? 'AED' : '€'}${fmt(dr)}/day = ${fmtCur(gross, item.o.cur)} gross → ~${fmtCur(net, item.o.cur)} net.`}</p>
+        <p style="font-size:0.85rem;color:${covers?'var(--green)':'var(--amber)'}">${covers ? 'Covers your estimated gap of '+fmtCur(gapYr, r.meta.currency)+'/yr with buffer.' : 'Partial gap coverage — combine with Pillar 3 or extra work years.'}</p>
+        <p style="font-size:0.8rem;color:var(--ink-60);margin-top:8px">${item.o.insight}</p></div>`;
+    }).join('');
+
+    $('oppRecommendations').innerHTML = `<p class="sub" style="margin-bottom:16px">Based on your profile: <strong>${COUNTRY_META[inp.country].name}</strong>, gap <strong>${fmtCur(gapMo, r.meta.currency)}/mo</strong>, <strong>${$('oppSkills').selectedOptions[0].text}</strong>, <strong>${$('oppIntensity').selectedOptions[0].text.toLowerCase()}</strong>.</p>${recs}
+      <div class="insight-box blue" style="margin-top:16px"><strong>OECD context:</strong> Tertiary-educated workers have 76.7% employment at 55–64 vs 50.4% OECD average — a 26pp gap. Data/AI/governance skills are in the top 5 remote freelance categories in 2025.</div>`;
+  }
 
   let state = { calculated: false, baseline: null };
   let charts = {};
@@ -690,6 +1019,31 @@
         p3Note = 'Voluntary savings shown in occupational column for EP holders';
         p2Note = `Private/SRS projection from CHF/€ ${fmt(o.pillar3)}/yr contributions`;
       }
+    } else if (countryCode === 'UK' || countryCode === 'SCT') {
+      const niYears = Math.min(1, careerYrs / 35);
+      p1 = (11502 * niYears) / 12;
+      p1Note = `New State Pension ~£11,502/yr at 35yr NI; ${(niYears * 100).toFixed(0)}% pro-rata`;
+      const qualifying = Math.max(0, finalSal - 6240);
+      const totalContrib = qualifying * 0.08 * (o.includeEmployer ? 1 : 0.5);
+      const ukCap = projectCapital(totalContrib, yrsLeft, ret, o.currentAge, o.currentAge);
+      p2 = (ukCap / 20) / 12;
+      p2Note = `Auto-enrolment ~8% on qualifying earnings; annuity from pot`;
+      if (countryCode === 'SCT') p1Note += ' — Scottish tax on drawdown';
+    } else if (countryCode === 'IE') {
+      const fraction = Math.min(1, careerYrs / 40);
+      p1 = Math.min((finalSal * 0.015 * careerYrs) / 12, 1200);
+      p1Note = `Contributory State Pension max ~€1,200/mo at 40yr; ${(fraction * 100).toFixed(0)}% pro-rata`;
+      const prsiBase = Math.min(finalSal, 70044);
+      const empContrib = prsiBase * 0.04 * (o.includeEmployer ? 1 : 0);
+      const ieCap = projectCapital(empContrib + finalSal * 0.06 * (o.includeEmployer ? 1 : 0), yrsLeft, ret, o.currentAge, o.currentAge);
+      p2 = (ieCap / 20) / 12;
+      p2Note = `Occupational + AVC; PRSI fund growth`;
+    } else if (countryCode === 'AE') {
+      p1 = 0;
+      p1Note = 'No state pension for expats — employer DEWS/voluntary only';
+      const aeCap = projectCapital(finalSal * 0.05, yrsLeft, ret, o.currentAge, o.currentAge);
+      p2 = (aeCap / 20) / 12;
+      p2Note = 'Voluntary employer savings ~5% of gross (illustrative)';
     }
 
     const totalMo = p1 + p2 + p3;
@@ -732,6 +1086,7 @@
     renderAccumChart(inp, primary);
     renderCompare(inp);
     renderReplacementChart(inp);
+    renderOpportunity(inp, primary);
     renderDestinations(inp, primary);
     renderCeilings();
     renderPrefs();
@@ -1083,7 +1438,7 @@
   }
 
   // Nav scroll spy
-  const sections = ['calculator', 'projection', 'compare', 'replacement', 'best-places', 'scenarios', 'methodology'];
+  const sections = ['calculator', 'projection', 'compare', 'replacement', 'opportunity', 'best-places', 'scenarios', 'methodology'];
   const obs = new IntersectionObserver((entries) => {
     entries.forEach((e) => {
       if (e.isIntersecting) {
@@ -1115,6 +1470,7 @@
     btn.addEventListener('click', () => runScenario(btn.dataset.scenario));
   });
 
+  ['oppSkills','oppIntensity'].forEach(id => $(id)?.addEventListener('change', () => { if (state.calculated && state.baseline) renderOpportunity(getInputs(), state.baseline); }));
   renderPrefs();
   renderCeilings();
   $('invReturnVal').textContent = $('invReturn').value + '%';
