@@ -134,6 +134,71 @@
       font-size: 0.77rem;
       line-height: 1.4;
     }
+    .method-panel { margin-top: 14px; }
+    .method-panel summary {
+      cursor: pointer;
+      font-weight: 600;
+      color: #dbe7ff;
+      font-size: 0.95rem;
+      list-style: none;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .method-panel summary::-webkit-details-marker { display: none; }
+    .method-panel summary::before {
+      content: "▸";
+      color: var(--accent);
+      font-size: 0.85rem;
+      transition: transform 0.2s;
+    }
+    .method-panel[open] summary::before { transform: rotate(90deg); }
+    .method-body { margin-top: 14px; font-size: 0.84rem; color: var(--muted); line-height: 1.55; }
+    .method-body h3 {
+      font-size: 0.88rem;
+      color: #eef4ff;
+      margin: 16px 0 8px;
+    }
+    .method-body h3:first-child { margin-top: 0; }
+    .formula {
+      background: #0a1223;
+      border: 1px solid #2a3550;
+      border-radius: 8px;
+      padding: 12px 14px;
+      margin: 10px 0 14px;
+      font-family: ui-monospace, "IBM Plex Mono", monospace;
+      font-size: 0.8rem;
+      color: #c7d6f0;
+      line-height: 1.5;
+    }
+    .method-list { margin: 0; padding-left: 1.2rem; }
+    .method-list li { margin-bottom: 8px; }
+    .method-list strong { color: #dbe7ff; font-weight: 600; }
+    .method-grid {
+      display: grid;
+      gap: 10px;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      margin-top: 10px;
+    }
+    .method-card {
+      background: #0a1223;
+      border: 1px solid #2a3550;
+      border-radius: 8px;
+      padding: 10px 12px;
+    }
+    .method-card .title { color: #eef4ff; font-size: 0.82rem; font-weight: 600; margin-bottom: 4px; }
+    .method-card p { margin: 0; font-size: 0.78rem; line-height: 1.45; }
+    #methodBreakdown { margin-top: 12px; }
+    .breakdown-row {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 8px;
+      padding: 6px 0;
+      border-bottom: 1px dotted #1f2c45;
+      font-size: 0.78rem;
+    }
+    .breakdown-row:last-child { border-bottom: none; font-weight: 600; color: #eef4ff; }
+    .mono { font-family: ui-monospace, "IBM Plex Mono", monospace; font-variant-numeric: tabular-nums; }
   </style>
 </head>
 <body>
@@ -206,8 +271,36 @@
       </article>
     </section>
 
+    <details class="panel method-panel">
+      <summary>How ratings are calculated</summary>
+      <div class="method-body">
+        <p>
+          Every category uses a <strong style="color:#eef4ff;">0–100 score where higher is better</strong>.
+          Scores are fixed reference values for 2024/2025 conditions (not live data). They are meant for
+          side-by-side shortlisting, not as precise forecasts.
+        </p>
+
+        <div class="formula">
+          Weighted country score = (w<sub>tax</sub>×Tax + w<sub>living</sub>×Living + … + w<sub>quality</sub>×Quality)
+          ÷ (w<sub>tax</sub> + w<sub>living</sub> + … + w<sub>quality</sub>)
+        </div>
+        <p>
+          Slider weights (0–100) are relative importance only. A weight of 80 vs 40 means that category
+          counts twice as much in the average, not that it is measured on a different scale.
+        </p>
+
+        <h3>Category score definitions</h3>
+        <div class="method-grid" id="methodMetricCards"></div>
+
+        <h3>Your current ranking breakdown</h3>
+        <p id="methodBreakdownIntro" style="margin:0 0 8px;">Adjust countries or weights above to see how the leader is built.</p>
+        <div id="methodBreakdown"></div>
+      </div>
+    </details>
+
     <p class="foot">
-      Scoring is directional and educational. Scale is 0-100 (higher is better). Tax and cost inputs are normalized so lower burden maps to a higher score.
+      Scoring is directional and educational. Category scores are expert-normalized benchmarks; the weighted total
+      reflects your slider priorities. Tax and cost-of-living scores treat lower burden as higher points.
       Use this for initial country filtering, then validate with detailed legal and tax advice.
     </p>
   </div>
@@ -228,13 +321,48 @@
     ];
 
     const metrics = [
-      { key: "tax", label: "Tax efficiency", defaultWeight: 80 },
-      { key: "living", label: "Cost of living", defaultWeight: 70 },
-      { key: "healthcare", label: "Healthcare", defaultWeight: 75 },
-      { key: "education", label: "Education", defaultWeight: 65 },
-      { key: "safety", label: "Safety", defaultWeight: 70 },
-      { key: "pension", label: "Pension strength", defaultWeight: 70 },
-      { key: "quality", label: "Quality of life", defaultWeight: 85 }
+      {
+        key: "tax",
+        label: "Tax efficiency",
+        defaultWeight: 80,
+        calc: "Higher = lower effective tax on employment, investment, and wealth for a typical mobile professional (income tax, social charges, and common wealth taxes combined). 100 ≈ very low burden (e.g. UAE); 40 ≈ high burden (e.g. Belgium).",
+      },
+      {
+        key: "living",
+        label: "Cost of living",
+        defaultWeight: 70,
+        calc: "Higher = more affordable day-to-day life (housing, groceries, transport, childcare) relative to peers at a similar income band. Inverted scale: expensive cities score lower.",
+      },
+      {
+        key: "healthcare",
+        label: "Healthcare",
+        defaultWeight: 75,
+        calc: "Higher = quality, access, and outcomes of the health system (public + private mix), including wait times and coverage for residents.",
+      },
+      {
+        key: "education",
+        label: "Education",
+        defaultWeight: 65,
+        calc: "Higher = strength of schools and universities (PISA-style outcomes, international school availability, and tertiary reputation) for families planning nursery through university.",
+      },
+      {
+        key: "safety",
+        label: "Safety",
+        defaultWeight: 70,
+        calc: "Higher = personal safety, rule of law, political stability, and low violent crime — composite of common expat/security indices.",
+      },
+      {
+        key: "pension",
+        label: "Pension strength",
+        defaultWeight: 70,
+        calc: "Higher = expected retirement income from state + occupational pillars, system sustainability, and flexibility for late-career savers (Mercer/ OECD-style replacement thinking).",
+      },
+      {
+        key: "quality",
+        label: "Quality of life",
+        defaultWeight: 85,
+        calc: "Higher = overall livability: infrastructure, culture, English use, climate preference, work-life balance, and general satisfaction for internationally mobile households.",
+      },
     ];
 
     const selectors = ["c1", "c2", "c3", "c4"].map((id) => document.getElementById(id));
@@ -242,6 +370,55 @@
     const scoreCards = document.getElementById("scoreCards");
     const comparisonRows = document.getElementById("comparisonRows");
     const insights = document.getElementById("insights");
+    const methodMetricCards = document.getElementById("methodMetricCards");
+    const methodBreakdown = document.getElementById("methodBreakdown");
+    const methodBreakdownIntro = document.getElementById("methodBreakdownIntro");
+
+    function setupMethodologyCards() {
+      methodMetricCards.innerHTML = metrics
+        .map(
+          (m) => `
+        <div class="method-card">
+          <div class="title">${m.label} (0–100)</div>
+          <p>${m.calc}</p>
+        </div>`
+        )
+        .join("");
+    }
+
+    function scoreBreakdown(country) {
+      const parts = metrics.map((m) => ({
+        label: m.label,
+        weight: metricWeight(m.key),
+        raw: country[m.key],
+        contribution: country[m.key] * metricWeight(m.key),
+      }));
+      const totalWeight = parts.reduce((s, p) => s + p.weight, 0) || 1;
+      const total = parts.reduce((s, p) => s + p.contribution, 0) / totalWeight;
+      return { parts, total: Number(total.toFixed(1)), totalWeight };
+    }
+
+    function renderMethodBreakdown(scored) {
+      if (!scored.length) {
+        methodBreakdown.innerHTML = "";
+        methodBreakdownIntro.textContent = "Select at least one country to see the calculation.";
+        return;
+      }
+      const leader = scored[0];
+      const { parts, total, totalWeight } = scoreBreakdown(leader.country);
+      methodBreakdownIntro.textContent = `Leading country: ${leader.country.name} — weighted score ${total} (sum of weighted categories ÷ ${totalWeight} total weight).`;
+      methodBreakdown.innerHTML =
+        parts
+          .map(
+            (p) => `
+        <div class="breakdown-row">
+          <span>${p.label}: ${p.raw} × weight ${p.weight}</span>
+          <span class="mono">${(p.contribution / totalWeight).toFixed(1)} pts</span>
+        </div>`
+          )
+          .join("") +
+        `<div class="breakdown-row"><span>Total weighted score</span><span>${total}</span></div>`;
+    }
 
     function setupSelectors() {
       selectors.forEach((el) => {
@@ -344,10 +521,13 @@
         <p style="margin-bottom:6px;color:#dbe7ff;">Your top weighted priorities:</p>
         ${priorities.map((p) => `<span class="pill">${p.label}: ${p.weight}</span>`).join("")}
       `;
+
+      renderMethodBreakdown(scored);
     }
 
     setupSelectors();
     setupWeights();
+    setupMethodologyCards();
     render();
   </script>
 </body>
