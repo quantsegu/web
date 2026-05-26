@@ -258,13 +258,21 @@ export default function App() {
           path="/wealth-tools/swiss-tax-locator"
           element={
             <WealthToolFrame
-              src="/wealth-tools/swiss-tax-locator/index.html"
+              src="/wealth-tools/swiss-tax-locator.html"
               title="SwissTax Locator — Gemeinde Income Tax"
             />
           }
         />
         <Route
+          path="/wealth-tools/swiss-tax-locator.html"
+          element={<Navigate to="/wealth-tools/swiss-tax-locator" replace />}
+        />
+        <Route
           path="/wealth-tools/swiss-tax-locator/"
+          element={<Navigate to="/wealth-tools/swiss-tax-locator" replace />}
+        />
+        <Route
+          path="/wealth-tools/swiss-tax-locator/index.html"
           element={<Navigate to="/wealth-tools/swiss-tax-locator" replace />}
         />
         <Route path="/bjp" element={<BJP />} />

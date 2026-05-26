@@ -16,7 +16,7 @@ const CANTON_FROM_STATE = {
 function normalizeName(s) {
   if (!s) return '';
   let t = String(s).toLowerCase().trim();
-  t = t.normalize('NFD').replace(/\p{M}/gu, '');
+  t = t.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
   t = t.replace(/\bst\.\b/g, 'sankt').replace(/\bkt\.\b/g, 'kanton');
   t = t.replace(/\(zh\)/g, '').replace(/\(be\)/g, '').replace(/\(bl\)/g, '');
   t = t.replace(/[^a-z0-9\s-]/g, ' ').replace(/\s+/g, ' ').trim();

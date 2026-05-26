@@ -3,7 +3,10 @@
 (function init() {
   const { buildTaxIndex, matchGemeinde, findBySfoId, computeStats, rankInCanton, rankNational, parseCantonFromState } = SwissTaxMatcher;
   const { resolveAddress, autocompleteAddress, parseNominatimResult } = SwissTaxGeocode;
-  const { loadRegistry, addEntry, removeEntry, groupByGemeinde, downloadCsv } = SwissTaxRegistry;
+  const {
+    loadRegistry, addEntry, removeEntry, groupByGemeinde, filterEntries,
+    getCapacity, downloadCsv, downloadJson, importFromFile, MAX_LOCATIONS,
+  } = SwissTaxRegistry;
   const { renderCompareTable, highlightCells } = SwissTaxCompare;
   const { showToast, animateCount, formatChf, setSearchStatus } = SwissTaxUI;
 
@@ -17,8 +20,24 @@
   let mapModal = null;
   let suggestIdx = -1;
   let debounceTimer = null;
+  let registryFilterQuery = '';
 
   const $ = (id) => document.getElementById(id);
+
+  function updateRegistryMeta() {
+    const cap = getCapacity(registry);
+    const countEl = $('registry-count');
+    const fillEl = $('registry-capacity-fill');
+    if (countEl) {
+      countEl.textContent = `${cap.count} / ${cap.max}`;
+      countEl.classList.toggle('near-limit', cap.count >= cap.max * 0.9);
+    }
+    if (fillEl) {
+      const pct = cap.max ? (cap.count / cap.max) * 100 : 0;
+      fillEl.style.width = `${pct}%`;
+      fillEl.classList.toggle('near-limit', cap.atLimit);
+    }
+  }
 
   function renderStatsBar() {
     $('stat-cheapest').textContent = `${stats.minRow.commune} (${stats.minRow.canton}) · ${stats.minRow.total_pct.toFixed(2)}%`;
@@ -179,8 +198,13 @@
       if (result.ok) {
         registry = loadRegistry();
         renderRegistry(true);
+        updateRegistryMeta();
       } else if (result.reason === 'duplicate') {
         showToast('Already in registry');
+      } else if (result.reason === 'limit') {
+        showToast(`Location limit reached (${MAX_LOCATIONS}). Export backup, then remove or import with merge.`);
+      } else if (result.reason === 'quota') {
+        showToast('Storage full — export a backup, then remove some locations.');
       }
     }
   }
@@ -208,23 +232,31 @@
 
   function renderRegistry(flashNew = false) {
     const el = $('registry-list');
-    const groups = groupByGemeinde(registry.entries);
+    updateRegistryMeta();
+    const filtered = filterEntries(registry.entries, registryFilterQuery);
+    const groups = groupByGemeinde(filtered);
+    const autoCollapse = registry.entries.length > 15;
+
+    if (!registry.entries.length) {
+      el.innerHTML = '<p class="registry-empty">Resolved addresses appear here, grouped by Gemeinde. Up to 200 locations — export or import backups anytime.</p>';
+      return;
+    }
     if (!groups.length) {
-      el.innerHTML = '<p class="registry-empty">Resolved addresses appear here, grouped by Gemeinde.</p>';
+      el.innerHTML = '<p class="registry-filter-empty">No locations match your filter.</p>';
       return;
     }
 
     el.innerHTML = groups.map((g) => {
       const key = `${g.sfo_id}`;
       const checked = compareSelected.has(key) ? 'checked' : '';
-      const collapsed = g._collapsed ? 'collapsed' : '';
+      const collapsed = autoCollapse ? 'collapsed' : (g._collapsed ? 'collapsed' : '');
       return `
         <div class="gemeinde-group ${flashNew ? 'flash' : ''}" data-key="${key}">
           <div class="group-head" data-action="toggle">
             <input type="checkbox" data-compare="${key}" ${checked} aria-label="Compare ${g.gemeinde}" />
-            <span class="group-title">📍 ${g.gemeinde} (${g.canton})</span>
+            <span class="group-title">📍 ${g.gemeinde} (${g.canton}) <span class="group-count">${g.entries.length}</span></span>
             <span class="group-meta">${g.total_pct.toFixed(1)}% · ${formatChf(g.total_chf)}</span>
-            <button type="button" class="group-toggle" data-action="collapse">▼</button>
+            <button type="button" class="group-toggle" data-action="collapse">${autoCollapse ? '▶' : '▼'}</button>
           </div>
           <div class="group-addresses ${collapsed}">
             ${g.entries.map((e) => `
@@ -270,6 +302,7 @@
         removeEntry(registry, btn.dataset.delete);
         registry = loadRegistry();
         renderRegistry();
+        updateRegistryMeta();
       });
     });
 
@@ -286,9 +319,38 @@
   function localSuggestions(q) {
     const lq = q.toLowerCase();
     return registry.entries
-      .filter((e) => e.address.toLowerCase().includes(lq))
-      .slice(0, 5)
+      .filter((e) => {
+        const hay = `${e.address} ${e.gemeinde} ${e.canton}`.toLowerCase();
+        return hay.includes(lq);
+      })
+      .slice(0, 12)
       .map((e) => ({ label: e.address, type: 'registry', entry: e }));
+  }
+
+  function handleImportFile(file) {
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = () => {
+      const replace = registry.entries.length > 0
+        && window.confirm(
+          `Import ${file.name}?\n\nOK = Replace all ${registry.entries.length} saved locations with file contents.\nCancel = Merge (keep existing, add new, skip duplicates).`,
+        );
+      const mode = replace ? 'replace' : 'merge';
+      const result = importFromFile(registry, String(reader.result || ''), file.name, mode);
+      registry = loadRegistry();
+      renderRegistry();
+      updateRegistryMeta();
+      if (!result.ok) {
+        showToast(result.errors?.[0] || result.parseErrors?.[0] || 'Import failed');
+        return;
+      }
+      const parts = [`${result.added} added`];
+      if (result.duplicates) parts.push(`${result.duplicates} duplicates skipped`);
+      if (result.skippedLimit) parts.push(`${result.skippedLimit} over ${MAX_LOCATIONS} limit`);
+      showToast(`Import complete: ${parts.join(', ')}`);
+    };
+    reader.onerror = () => showToast('Could not read file');
+    reader.readAsText(file);
   }
 
   function showSuggestions(items) {
@@ -385,8 +447,16 @@
     renderStatsBar();
     renderRegistry();
 
-    mapMain = new SwissTaxMap('map-container', taxIndex, onMapSelect);
-    await mapMain.init();
+    try {
+      mapMain = new SwissTaxMap('map-container', taxIndex, onMapSelect);
+      await mapMain.init();
+    } catch (err) {
+      console.error('Map failed to load:', err);
+      const mapEl = $('map-container');
+      if (mapEl) {
+        mapEl.innerHTML = '<p style="padding:24px;color:#5c5a56;font-size:0.85rem;">Map unavailable — search and tax lookup still work.</p>';
+      }
+    }
 
     $('address-search').addEventListener('keydown', (ev) => {
       const ul = $('suggestions');
@@ -414,7 +484,32 @@
     });
 
     $('btn-search').addEventListener('click', onSearchSubmit);
-    $('btn-export').addEventListener('click', () => downloadCsv(registry.entries));
+    $('btn-export-csv')?.addEventListener('click', () => {
+      if (!registry.entries.length) {
+        showToast('No locations to export');
+        return;
+      }
+      downloadCsv(registry.entries);
+      showToast(`Exported ${registry.entries.length} locations (CSV)`);
+    });
+    $('btn-export-json')?.addEventListener('click', () => {
+      if (!registry.entries.length) {
+        showToast('No locations to export');
+        return;
+      }
+      downloadJson(registry);
+      showToast(`Backup saved (${registry.entries.length} locations)`);
+    });
+    $('btn-import')?.addEventListener('click', () => $('import-file')?.click());
+    $('import-file')?.addEventListener('change', (ev) => {
+      const file = ev.target.files?.[0];
+      handleImportFile(file);
+      ev.target.value = '';
+    });
+    $('registry-filter')?.addEventListener('input', (ev) => {
+      registryFilterQuery = ev.target.value;
+      renderRegistry();
+    });
     $('btn-compare').addEventListener('click', openCompare);
     $('btn-close-compare').addEventListener('click', () => $('compare-overlay').classList.remove('open'));
     $('compare-overlay').addEventListener('click', (ev) => {
