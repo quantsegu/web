@@ -26,6 +26,22 @@ export const wealthTools: WealthTool[] = [
     ctaLabel: 'Open master dashboard',
   },
   {
+    id: 'swiss-tax-locator',
+    title: 'SwissTax Locator — Gemeinde Income Tax',
+    description:
+      'Resolve Swiss property addresses to Gemeinde via geocoding, look up ESTV 2025 municipal income tax (CHF 200k scenario), explore an interactive choropleth map, and keep a persistent grouped address registry.',
+    features: [
+      'Nominatim address search with manual Gemeinde fallback and fuzzy matching',
+      '2,100+ municipalities — total burden %, CHF breakdown, canton & national rank',
+      'D3 choropleth map coloured by tax burden with click-to-select',
+      'localStorage registry grouped by Gemeinde, CSV export, 2–4 way comparison',
+      'National stats bar and sortable canton averages',
+    ],
+    href: '/wealth-tools/swiss-tax-locator',
+    icon: 'tax',
+    ctaLabel: 'Open locator',
+  },
+  {
     id: 'take-home-pay-comparison',
     title: 'Global Take-Home Pay Comparison',
     description:

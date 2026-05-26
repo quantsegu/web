@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="SwissTax Locator — resolve Swiss property addresses to Gemeinde, compare municipal income tax burden (ESTV 2025, CHF 200k), and keep a persistent address registry." />
+  <title>SwissTax Locator — Gemeinde Income Tax Map</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=DM+Mono:wght@400;500&family=DM+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/style.css" />
+  <script src="https://cdn.jsdelivr.net/npm/d3@7/dist/d3.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/topojson-client@3/dist/topojson-client.min.js"></script>
+</head>
+<body>
+  <a class="skip-link" href="#address-search">Skip to search</a>
+
+  <header class="site-nav">
+    <div class="nav-inner">
+      <a class="nav-logo" href="/wealth-tools">Wealth Tools</a>
+      <span class="nav-logo">SwissTax <span>Locator</span></span>
+      <a class="nav-back" href="/wealth-tools">← All tools</a>
+    </div>
+  </header>
+
+  <div class="stats-bar" role="region" aria-label="National overview">
+    <span class="stat">Cheapest: <span class="stat-val" id="stat-cheapest">—</span></span>
+    <span class="stat">Highest: <span class="stat-val" id="stat-expensive">—</span></span>
+    <span class="stat">National avg: <span class="stat-val" id="stat-avg">—</span></span>
+    <span class="stat">Gemeinden: <span class="stat-val" id="stat-count">—</span></span>
+  </div>
+
+  <main class="app-shell">
+    <aside class="panel panel-left">
+      <div class="panel-head">
+        <h2>Address & registry</h2>
+      </div>
+      <div class="panel-body">
+        <div class="search-wrap">
+          <input
+            type="search"
+            id="address-search"
+            class="search-input"
+            placeholder="Swiss address — e.g. Baarerstrasse 12, 6300 Zug"
+            autocomplete="off"
+            aria-autocomplete="list"
+            aria-controls="suggestions"
+          />
+          <span class="search-status" id="search-status" aria-hidden="true"></span>
+          <ul class="suggestions" id="suggestions" role="listbox"></ul>
+        </div>
+        <button type="button" class="btn btn-primary" id="btn-search" style="width:100%;margin-top:10px;">Look up tax burden</button>
+
+        <div class="manual-fallback" id="manual-fallback">
+          <label for="manual-gemeinde">Select Gemeinde manually</label>
+          <select id="manual-gemeinde" aria-label="Manual Gemeinde selection"></select>
+        </div>
+
+        <div class="registry-actions">
+          <button type="button" class="btn" id="btn-export">Export CSV</button>
+          <button type="button" class="btn btn-accent" id="btn-compare" disabled>Compare (2–4)</button>
+        </div>
+
+        <div class="registry" id="registry-list">
+          <p class="registry-empty">Resolved addresses appear here, grouped by Gemeinde.</p>
+        </div>
+      </div>
+    </aside>
+
+    <section class="map-panel" aria-label="Switzerland tax map">
+      <div class="map-toolbar">
+        <span>Municipal income tax · ESTV 2025 · CHF 200,000</span>
+        <button type="button" class="btn btn-sm btn-map-expand" id="btn-map-expand">Full screen map</button>
+      </div>
+      <p class="map-thumb-hint">Tap full screen for the interactive choropleth</p>
+      <div id="map-container"></div>
+      <div class="canton-table-wrap">
+        <table class="canton-table" id="canton-table">
+          <thead>
+            <tr>
+              <th data-sort="canton">Canton</th>
+              <th data-sort="avg">Avg tax %</th>
+              <th data-sort="count">Gemeinden</th>
+            </tr>
+          </thead>
+          <tbody id="canton-table-body"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <aside class="panel panel-right">
+      <div class="panel-head">
+        <h2>Tax result</h2>
+      </div>
+      <div class="panel-body">
+        <div id="confidence-banner" class="confidence-banner"></div>
+
+        <div id="tax-card-empty" class="tax-card-empty">
+          <p>Enter a Swiss address or click a municipality on the map to see income tax burden for married dual income (70/30), one child, no church tax — CHF 200,000, 2025.</p>
+        </div>
+
+        <article id="tax-card" class="tax-card" aria-live="polite">
+          <div class="tax-card-header">
+            <div>
+              <h3 id="tc-name">—</h3>
+              <p class="hero-label">Gemeinde · ESTV scenario</p>
+            </div>
+            <span class="canton-badge" id="tc-canton">—</span>
+          </div>
+          <div class="hero-pct mono" id="tc-pct">0.00%</div>
+          <div class="hero-chf" id="tc-chf">CHF 0</div>
+          <p class="hero-label">Total tax burden on CHF 200,000 income</p>
+
+          <div class="benchmarks" id="tc-benchmarks"></div>
+
+          <div class="spectrum-bar" aria-hidden="true">
+            <span class="spectrum-marker" id="tc-marker"></span>
+          </div>
+          <div class="spectrum-labels">
+            <span id="tc-spectrum-min">Low</span>
+            <span>National range</span>
+            <span id="tc-spectrum-max">High</span>
+          </div>
+
+          <details class="breakdown" open>
+            <summary>Tax breakdown</summary>
+            <div class="breakdown-grid">
+              <div class="breakdown-row"><span>Federal tax</span><span id="bd-federal">—</span></div>
+              <div class="breakdown-row"><span>Cantonal tax</span><span id="bd-cantonal">—</span></div>
+              <div class="breakdown-row"><span>Communal tax</span><span id="bd-communal">—</span></div>
+              <div class="breakdown-row"><span>Church tax</span><span id="bd-church">—</span></div>
+              <div class="breakdown-row"><span>Personal tax</span><span id="bd-personal">—</span></div>
+            </div>
+          </details>
+        </article>
+      </div>
+    </aside>
+  </main>
+
+  <p class="disclaimer">
+    Educational tool only — not tax advice. Data: Swiss Federal Tax Administration (ESTV), income CHF 200,000, married dual income (70/30), 1 child, no religion, 2025.
+    Geocoding via OpenStreetMap Nominatim. Municipality boundaries © swiss-maps / FSO.
+  </p>
+
+  <div class="compare-overlay" id="compare-overlay" role="dialog" aria-modal="true" aria-labelledby="compare-title">
+    <div class="compare-panel">
+      <h3 id="compare-title">Gemeinde comparison</h3>
+      <div id="compare-table-host"></div>
+      <button type="button" class="btn" id="btn-close-compare" style="margin-top:16px;">Close</button>
+    </div>
+  </div>
+
+  <div class="map-modal" id="map-modal">
+    <div class="map-modal-head">
+      <strong>Switzerland — municipal tax map</strong>
+      <button type="button" class="btn" id="btn-map-close">Close</button>
+    </div>
+    <div id="map-modal-container"></div>
+  </div>
+
+  <script src="js/data.js"></script>
+  <script src="js/matcher.js"></script>
+  <script src="js/geocode.js"></script>
+  <script src="js/registry.js"></script>
+  <script src="js/compare.js"></script>
+  <script src="js/ui.js"></script>
+  <script src="js/map.js"></script>
+  <script src="js/app.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      if (typeof TAX_DATA === 'undefined') return;
+      var min = Math.min.apply(null, TAX_DATA.map(function (r) { return r.total_pct; }));
+      var max = Math.max.apply(null, TAX_DATA.map(function (r) { return r.total_pct; }));
+      var elMin = document.getElementById('tc-spectrum-min');
+      var elMax = document.getElementById('tc-spectrum-max');
+      if (elMin) elMin.textContent = min.toFixed(1) + '%';
+      if (elMax) elMax.textContent = max.toFixed(1) + '%';
+    });
+  </script>
+</body>
+</html>
