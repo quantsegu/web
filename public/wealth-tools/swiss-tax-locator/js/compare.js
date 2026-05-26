@@ -1,8 +1,10 @@
 /* Gemeinde comparison modal */
 
 const NUMERIC_ROWS = [
-  { key: 'total_pct', label: 'Total tax %', fmt: (v) => `${v.toFixed(2)}%`, lowerBetter: true },
-  { key: 'total_chf', label: 'Total tax CHF', fmt: (v) => v.toLocaleString('de-CH'), lowerBetter: true },
+  { key: 'total_pct', label: 'Income tax %', fmt: (v) => `${v.toFixed(2)}%`, lowerBetter: true },
+  { key: 'total_chf', label: 'Income tax CHF', fmt: (v) => v.toLocaleString('de-CH'), lowerBetter: true },
+  { key: 'wealth_chf', label: 'Wealth tax CHF', fmt: (v) => v == null ? '—' : v.toLocaleString('de-CH'), lowerBetter: true },
+  { key: 'corp_pct', label: 'Corporate tax %', fmt: (v) => v == null ? '—' : `~${Number(v).toFixed(1)}%`, lowerBetter: true },
   { key: 'federal', label: 'Federal', fmt: (v) => v.toLocaleString('de-CH'), lowerBetter: true },
   { key: 'cantonal', label: 'Cantonal', fmt: (v) => v.toLocaleString('de-CH'), lowerBetter: true },
   { key: 'communal', label: 'Communal', fmt: (v) => v.toLocaleString('de-CH'), lowerBetter: true },
@@ -19,7 +21,10 @@ function renderCompareTable(groups, taxData, rankNational) {
     { label: 'Canton', values: cols.map((g) => g.canton) },
     ...NUMERIC_ROWS.map((def) => ({
       label: def.label,
-      values: cols.map((g) => g.entries[0][def.key] ?? g[def.key]),
+      values: cols.map((g) => {
+        const e = g.entries[0];
+        return e[def.key] ?? g[def.key] ?? null;
+      }),
       def,
     })),
     {
@@ -39,7 +44,8 @@ function highlightCells(tableEl, rows) {
   const trs = tableEl.querySelectorAll('tbody tr');
   rows.forEach((row, ri) => {
     if (!row.def) return;
-    const vals = row.values.map(Number);
+    const vals = row.values.map(Number).filter((v) => Number.isFinite(v));
+    if (!vals.length) return;
     const min = Math.min(...vals);
     const max = Math.max(...vals);
     const tr = trs[ri];

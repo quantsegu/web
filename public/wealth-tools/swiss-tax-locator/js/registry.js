@@ -79,6 +79,10 @@ function normalizeEntry(raw) {
     communal: Number(raw.communal) || 0,
     church: Number(raw.church) || 0,
     personal: Number(raw.personal) || 0,
+    wealth_chf: raw.wealth_chf != null && raw.wealth_chf !== '' ? Number(raw.wealth_chf) : null,
+    wealth_pct: raw.wealth_pct != null && raw.wealth_pct !== '' ? Number(raw.wealth_pct) : null,
+    corp_pct: raw.corp_pct != null && raw.corp_pct !== '' ? Number(raw.corp_pct) : null,
+    fortune_base: raw.fortune_base != null && raw.fortune_base !== '' ? Number(raw.fortune_base) : null,
     lat: raw.lat != null && raw.lat !== '' ? Number(raw.lat) : null,
     lon: raw.lon != null && raw.lon !== '' ? Number(raw.lon) : null,
     added_at: raw.added_at || new Date().toISOString(),
@@ -163,13 +167,16 @@ function filterEntries(entries, query) {
 }
 
 function exportCsv(entries) {
-  const header = 'Address,Gemeinde,Canton,Tax %,Tax CHF,Federal,Cantonal,Communal,Church,Personal,Lat,Lon,Note,Added';
+  const header = 'Address,Gemeinde,Canton,Tax %,Tax CHF,Wealth Tax CHF,Corp Tax %,Fortune Base,Federal,Cantonal,Communal,Church,Personal,Lat,Lon,Note,Added';
   const rows = entries.map((e) => [
     `"${String(e.address).replace(/"/g, '""')}"`,
     `"${String(e.gemeinde).replace(/"/g, '""')}"`,
     e.canton,
     e.total_pct,
     e.total_chf,
+    e.wealth_chf ?? '',
+    e.corp_pct ?? '',
+    e.fortune_base ?? '',
     e.federal,
     e.cantonal,
     e.communal,
@@ -253,6 +260,9 @@ function importFromCsv(text) {
   const iCan = col(['canton']);
   const iPct = col(['tax %', 'total tax %', 'total_tax_pct', 'total tax burden in %']);
   const iChf = col(['tax chf', 'total tax chf', 'total_chf', 'total tax burden in chf']);
+  const iWealth = col(['wealth tax chf', 'wealth_chf']);
+  const iCorp = col(['corp tax %', 'corporate tax %', 'corp_pct']);
+  const iFortune = col(['fortune base', 'fortune_base']);
   const iSfo = col(['sfo_id', 'sfo commune id', 'sfo_commune_id']);
   const iFed = col(['federal', 'federal tax in chf']);
   const iCant = col(['cantonal', 'cantonal tax in chf']);
@@ -280,6 +290,9 @@ function importFromCsv(text) {
       sfo_id: iSfo >= 0 ? Number(cells[iSfo]) : 0,
       total_pct: cellNum(cells, iPct),
       total_chf: cellNum(cells, iChf),
+      wealth_chf: iWealth >= 0 && cells[iWealth] !== '' ? Number(cells[iWealth]) : null,
+      corp_pct: iCorp >= 0 && cells[iCorp] !== '' ? Number(cells[iCorp]) : null,
+      fortune_base: iFortune >= 0 && cells[iFortune] !== '' ? Number(cells[iFortune]) : null,
       federal: cellNum(cells, iFed),
       cantonal: cellNum(cells, iCant),
       communal: cellNum(cells, iCom),

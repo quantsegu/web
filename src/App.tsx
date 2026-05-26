@@ -8,6 +8,14 @@ import WealthTools from '../pages/WealthTools';
 import InvestmentUniverse from '../pages/InvestmentUniverse';
 import WealthToolFrame from '../components/WealthToolFrame';
 
+/** Full-page navigation to static HTML tools (avoids blank React iframe shell). */
+function WealthToolStaticRedirect({ to }: { to: string }) {
+  useEffect(() => {
+    window.location.replace(to);
+  }, [to]);
+  return <p style={{ padding: 24, textAlign: 'center' }}>Loading tool…</p>;
+}
+
 function LegacyHashRedirect() {
   const location = useLocation();
   const navigate = useNavigate();
@@ -255,17 +263,30 @@ export default function App() {
           element={<Navigate to="/wealth-tools/edu-scope" replace />}
         />
         <Route
-          path="/wealth-tools/swiss-tax-locator"
+          path="/wealth-tools/grocery-business-analysis"
           element={
             <WealthToolFrame
-              src="/wealth-tools/swiss-tax-locator.html"
-              title="SwissTax Locator — Gemeinde Income Tax"
+              src="/wealth-tools/grocery-business-analysis/index.html"
+              title="Grocery Business Analysis — CEE Fulfillment"
             />
           }
         />
         <Route
-          path="/wealth-tools/swiss-tax-locator.html"
-          element={<Navigate to="/wealth-tools/swiss-tax-locator" replace />}
+          path="/wealth-tools/grocery-business-analysis/*"
+          element={
+            <WealthToolFrame
+              src="/wealth-tools/grocery-business-analysis/index.html"
+              title="Grocery Business Analysis — CEE Fulfillment"
+            />
+          }
+        />
+        <Route
+          path="/wealth-tools/grocery-business-analysis.html"
+          element={<Navigate to="/wealth-tools/grocery-business-analysis" replace />}
+        />
+        <Route
+          path="/wealth-tools/swiss-tax-locator"
+          element={<WealthToolStaticRedirect to="/wealth-tools/swiss-tax-locator.html" />}
         />
         <Route
           path="/wealth-tools/swiss-tax-locator/"

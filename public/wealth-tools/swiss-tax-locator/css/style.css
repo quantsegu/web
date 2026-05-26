@@ -348,6 +348,32 @@ a:hover { text-decoration: underline; }
 .hero-chf { font-family: var(--mono); font-size: 1.1rem; color: var(--muted); margin-top: 4px; }
 .hero-label { font-size: 0.75rem; color: var(--muted); margin-top: 8px; }
 
+.fortune-field { margin-top: 12px; }
+.fortune-field label {
+  display: block; font-size: 0.72rem; font-weight: 600;
+  color: var(--muted); margin-bottom: 6px;
+}
+
+.tax-panels {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 10px;
+  margin: 16px 0 12px;
+}
+.tax-panel {
+  padding: 12px; border-radius: 10px;
+  border: 1px solid var(--border); background: var(--bg);
+}
+.tax-panel h4 {
+  font-size: 0.72rem; font-weight: 600; text-transform: uppercase;
+  letter-spacing: 0.04em; color: var(--muted); margin-bottom: 6px;
+}
+.tax-panel-hero { font-size: 1.15rem; font-weight: 600; color: var(--primary); }
+.tax-panel-sub { font-size: 0.68rem; color: var(--muted); margin-top: 4px; line-height: 1.35; }
+.wealth-panel { border-left: 3px solid var(--success); }
+.corp-panel { border-left: 3px solid var(--accent); }
+
+.btn-save-location { width: 100%; margin-bottom: 8px; }
+.btn-save-location.saved { background: var(--success); border-color: var(--success); }
+
 .benchmarks { margin: 16px 0; font-size: 0.82rem; }
 .benchmarks p { margin-bottom: 6px; }
 .benchmarks .pos { color: var(--success); }

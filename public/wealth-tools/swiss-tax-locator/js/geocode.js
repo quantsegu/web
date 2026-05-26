@@ -34,7 +34,11 @@ async function pumpQueue() {
 async function nominatimSearch(query, limit = 5) {
   const url = `${NOMINATIM_BASE}?format=json&countrycodes=ch&addressdetails=1&limit=${limit}&q=${encodeURIComponent(query)}`;
   const res = await fetch(url, {
-    headers: { 'Accept-Language': 'en', 'Accept': 'application/json' },
+    headers: {
+      'Accept-Language': 'en',
+      'Accept': 'application/json',
+      'User-Agent': 'SwissTaxLocator/1.0 (wealth-tools; contact via site owner)',
+    },
   });
   if (!res.ok) throw new Error(`Geocoding failed (${res.status})`);
   return res.json();

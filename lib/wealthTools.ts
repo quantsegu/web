@@ -10,6 +10,22 @@ export interface WealthTool {
 
 export const wealthTools: WealthTool[] = [
   {
+    id: 'grocery-business-analysis',
+    title: 'Grocery Business Analysis — EU Fulfillment',
+    description:
+      'Financial modeling for Indian grocery and pooja e-commerce across seven fulfillment hubs: Poland, Romania, Czech Republic, Hungary, Germany, Italy, and Switzerland. Rank the best hub for EU-wide export.',
+    features: [
+      'Seven hubs — CEE plus Germany, Italy, Switzerland with 7×7 delivery matrices',
+      'EU Export Optimizer ranks best fulfillment location for pan-EU shipping',
+      'Western trio comparison, CEE head-to-head, Swiss customs modeling',
+      'Cost breakdown, ROI calculator, and market analysis',
+      'Exportable settings and shareable scenario URLs',
+    ],
+    href: '/wealth-tools/grocery-business-analysis',
+    icon: 'globe',
+    ctaLabel: 'Open analysis',
+  },
+  {
     id: 'country-comparison-master-dashboard',
     title: 'CountryScope Master Dashboard',
     description:
@@ -34,7 +50,9 @@ export const wealthTools: WealthTool[] = [
       'Nominatim address search with manual Gemeinde fallback and fuzzy matching',
       '2,100+ municipalities — total burden %, CHF breakdown, canton & national rank',
       'D3 choropleth map coloured by tax burden with click-to-select',
-      'localStorage registry grouped by Gemeinde, CSV export, 2–4 way comparison',
+      'Save up to 200 locations with JSON/CSV import & export',
+      'Wealth tax (on CHF 500k+ fortune) and corporate profit-tax estimates per Gemeinde',
+      'localStorage registry grouped by Gemeinde, 2–4 way comparison',
       'National stats bar and sortable canton averages',
     ],
     href: '/wealth-tools/swiss-tax-locator',

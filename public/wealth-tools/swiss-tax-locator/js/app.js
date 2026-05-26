@@ -7,6 +7,7 @@
     loadRegistry, addEntry, removeEntry, groupByGemeinde, filterEntries,
     getCapacity, downloadCsv, downloadJson, importFromFile, MAX_LOCATIONS,
   } = SwissTaxRegistry;
+  const { getFortuneBase, getTaxProfile } = SwissTaxProfile;
   const { renderCompareTable, highlightCells } = SwissTaxCompare;
   const { showToast, animateCount, formatChf, setSearchStatus } = SwissTaxUI;
 
@@ -15,6 +16,8 @@
   let registry = loadRegistry();
   let selectedRow = null;
   let pendingMatch = null;
+  let pendingAddressLabel = null;
+  let lastParsedGeo = null;
   let compareSelected = new Set();
   let mapMain = null;
   let mapModal = null;
@@ -118,6 +121,31 @@
     $('bd-church').textContent = formatChf(row.church);
     $('bd-personal').textContent = formatChf(row.personal);
 
+    const fortuneBase = getFortuneBase();
+    const profile = getTaxProfile(row, fortuneBase);
+    const wealthEl = $('tc-wealth-chf');
+    const wealthPctEl = $('tc-wealth-pct');
+    const corpEl = $('tc-corp-pct');
+    if (profile.wealth_chf != null) {
+      wealthEl.textContent = formatChf(profile.wealth_chf);
+      wealthPctEl.textContent = `${profile.wealth_pct.toFixed(3)}% on CHF ${fortuneBase.toLocaleString('de-CH')} taxable wealth`;
+    } else {
+      wealthEl.textContent = '—';
+      wealthPctEl.textContent = 'Estimate unavailable for this Gemeinde';
+    }
+    if (profile.corp_pct != null) {
+      corpEl.textContent = `~${profile.corp_pct.toFixed(1)}%`;
+    } else {
+      corpEl.textContent = '—';
+    }
+
+    const saveBtn = $('btn-save-location');
+    if (saveBtn) {
+      saveBtn.classList.remove('saved');
+      saveBtn.textContent = 'Save to registry';
+      saveBtn.disabled = false;
+    }
+
     mapMain?.highlightSfo(row.sfo_id);
     mapModal?.highlightSfo(row.sfo_id);
 
@@ -126,20 +154,74 @@
     }
   }
 
+  function buildRegistryPayload(row, address, parsed) {
+    const fortuneBase = getFortuneBase();
+    const profile = getTaxProfile(row, fortuneBase);
+    return {
+      address: address || `${row.commune}, ${row.canton}`,
+      gemeinde: row.commune,
+      canton: row.canton,
+      canton_id: row.canton_id,
+      sfo_id: row.sfo_id,
+      total_pct: row.total_pct,
+      total_chf: row.total_chf,
+      federal: row.federal,
+      cantonal: row.cantonal,
+      communal: row.communal,
+      church: row.church,
+      personal: row.personal,
+      wealth_chf: profile.wealth_chf,
+      wealth_pct: profile.wealth_pct,
+      corp_pct: profile.corp_pct,
+      fortune_base: fortuneBase,
+      lat: parsed?.lat ?? null,
+      lon: parsed?.lon ?? null,
+    };
+  }
+
+  function saveToRegistry(row, address, parsed, opts = {}) {
+    const result = addEntry(registry, buildRegistryPayload(row, address, parsed));
+    if (result.ok) {
+      registry = loadRegistry();
+      renderRegistry(true);
+      updateRegistryMeta();
+      if (!opts.silent) {
+        showToast('Location saved');
+        const btn = $('btn-save-location');
+        if (btn) {
+          btn.classList.add('saved');
+          btn.textContent = 'Saved ✓';
+        }
+      }
+      return true;
+    }
+    if (!opts.silent) {
+      if (result.reason === 'duplicate') showToast('Already in registry');
+      else if (result.reason === 'limit') showToast(`Location limit reached (${MAX_LOCATIONS})`);
+      else if (result.reason === 'quota') showToast('Storage full — export a backup first');
+      else showToast('Could not save location');
+    }
+    return false;
+  }
+
   function showConfidence(match, gemeindeName) {
     pendingMatch = match;
     const banner = $('confidence-banner');
     banner.classList.add('open');
     banner.innerHTML = `
-      Matched to <strong>${match.row.commune}</strong> (${match.row.canton}) — confidence ${(match.confidence * 100).toFixed(0)}%. Are you sure?
+      Matched to <strong>${match.row.commune}</strong> (${match.row.canton}) — confidence ${(match.confidence * 100).toFixed(0)}%. Confirm match?
       <div class="actions">
-        <button type="button" class="btn btn-primary" id="btn-confirm-match">✓ Yes</button>
+        <button type="button" class="btn btn-primary" id="btn-confirm-match">✓ Confirm & show taxes</button>
         <button type="button" class="btn" id="btn-manual-match">Search manually</button>
       </div>
     `;
     $('btn-confirm-match').onclick = () => {
       showTaxCard(match.row);
       banner.classList.remove('open');
+      if (pendingAddressLabel) {
+        saveToRegistry(match.row, pendingAddressLabel, lastParsedGeo);
+        pendingAddressLabel = null;
+      }
     };
     $('btn-manual-match').onclick = () => openManualSelect(gemeindeName);
   }
@@ -158,7 +240,7 @@
     ).join('');
   }
 
-  function resolveAndShow(parsed, addressLabel) {
+  function resolveAndShow(parsed, addressLabel, opts = {}) {
     const cantonHint = parseCantonFromState(parsed.canton);
     const match = matchGemeinde(parsed.gemeinde, cantonHint, taxIndex);
 
@@ -178,34 +260,8 @@
     setSearchStatus('ok');
     showTaxCard(match.row);
 
-    if (addressLabel) {
-      const result = addEntry(registry, {
-        address: addressLabel,
-        gemeinde: match.row.commune,
-        canton: match.row.canton,
-        canton_id: match.row.canton_id,
-        sfo_id: match.row.sfo_id,
-        total_pct: match.row.total_pct,
-        total_chf: match.row.total_chf,
-        federal: match.row.federal,
-        cantonal: match.row.cantonal,
-        communal: match.row.communal,
-        church: match.row.church,
-        personal: match.row.personal,
-        lat: parsed.lat,
-        lon: parsed.lon,
-      });
-      if (result.ok) {
-        registry = loadRegistry();
-        renderRegistry(true);
-        updateRegistryMeta();
-      } else if (result.reason === 'duplicate') {
-        showToast('Already in registry');
-      } else if (result.reason === 'limit') {
-        showToast(`Location limit reached (${MAX_LOCATIONS}). Export backup, then remove or import with merge.`);
-      } else if (result.reason === 'quota') {
-        showToast('Storage full — export a backup, then remove some locations.');
-      }
+    if (addressLabel && opts.autoSave !== false) {
+      saveToRegistry(match.row, addressLabel, parsed);
     }
   }
 
@@ -216,9 +272,11 @@
     setSearchStatus('loading');
     $('manual-fallback').classList.remove('open');
 
+    pendingAddressLabel = q;
     try {
       const parsed = await resolveAddress(q);
-      resolveAndShow(parsed, parsed.displayName || q);
+      lastParsedGeo = parsed;
+      resolveAndShow(parsed, parsed.displayName || q, { autoSave: false });
     } catch (e) {
       setSearchStatus('err');
       if (e.code === 'NOT_FOUND') {
@@ -255,7 +313,7 @@
           <div class="group-head" data-action="toggle">
             <input type="checkbox" data-compare="${key}" ${checked} aria-label="Compare ${g.gemeinde}" />
             <span class="group-title">📍 ${g.gemeinde} (${g.canton}) <span class="group-count">${g.entries.length}</span></span>
-            <span class="group-meta">${g.total_pct.toFixed(1)}% · ${formatChf(g.total_chf)}</span>
+            <span class="group-meta">${g.total_pct.toFixed(1)}% · ${g.entries[0].wealth_chf != null ? formatChf(g.entries[0].wealth_chf) + ' wealth' : formatChf(g.total_chf)}</span>
             <button type="button" class="group-toggle" data-action="collapse">${autoCollapse ? '▶' : '▼'}</button>
           </div>
           <div class="group-addresses ${collapsed}">
@@ -441,6 +499,22 @@
 
   function onMapSelect(row) {
     showTaxCard(row, { fillSearch: true });
+    lastParsedGeo = null;
+    pendingAddressLabel = $('address-search').value.trim() || `${row.commune}, ${row.canton}`;
+  }
+
+  function saveGemeindeFromManual() {
+    const sfo = Number($('manual-gemeinde')?.value);
+    if (!sfo) {
+      openManualSelect();
+      showToast('Select a Gemeinde first');
+      return;
+    }
+    const row = findBySfoId(sfo, taxIndex);
+    if (!row) return;
+    const addr = $('address-search').value.trim() || `${row.commune}, ${row.canton}`;
+    showTaxCard(row);
+    saveToRegistry(row, addr, lastParsedGeo);
   }
 
   async function boot() {
@@ -484,6 +558,21 @@
     });
 
     $('btn-search').addEventListener('click', onSearchSubmit);
+    $('btn-save-location')?.addEventListener('click', () => {
+      if (!selectedRow) {
+        showToast('Look up or select a Gemeinde first');
+        return;
+      }
+      const addr = $('address-search').value.trim() || pendingAddressLabel || `${selectedRow.commune}, ${selectedRow.canton}`;
+      saveToRegistry(selectedRow, addr, lastParsedGeo);
+    });
+    $('btn-save-gemeinde')?.addEventListener('click', saveGemeindeFromManual);
+    $('fortune-amount')?.addEventListener('change', () => {
+      if (selectedRow) showTaxCard(selectedRow, { fillSearch: false });
+    });
+    $('fortune-amount')?.addEventListener('input', () => {
+      if (selectedRow) showTaxCard(selectedRow, { fillSearch: false });
+    });
     $('btn-export-csv')?.addEventListener('click', () => {
       if (!registry.entries.length) {
         showToast('No locations to export');
@@ -521,6 +610,7 @@
       if (row) {
         setSearchStatus('ok');
         showTaxCard(row);
+        pendingAddressLabel = $('address-search').value.trim() || `${row.commune}, ${row.canton}`;
       }
     });
 

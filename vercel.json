@@ -1,6 +1,8 @@
 {
   "routes": [
     { "handle": "filesystem" },
+    { "src": "/wealth-tools/swiss-tax-locator", "dest": "/wealth-tools/swiss-tax-locator.html" },
+    { "src": "/wealth-tools/swiss-tax-locator/", "dest": "/wealth-tools/swiss-tax-locator.html" },
     { "src": "/(.*)", "dest": "/index.html" }
   ]
 }

@@ -50,6 +50,12 @@
           <ul class="suggestions" id="suggestions" role="listbox"></ul>
         </div>
         <button type="button" class="btn btn-primary" id="btn-search" style="width:100%;margin-top:10px;">Look up tax burden</button>
+        <button type="button" class="btn" id="btn-save-gemeinde" style="width:100%;margin-top:8px;">Save Gemeinde (no address lookup)</button>
+
+        <div class="fortune-field">
+          <label for="fortune-amount">Taxable wealth (CHF) for wealth-tax estimate</label>
+          <input type="number" id="fortune-amount" class="search-input" value="500000" min="0" step="50000" />
+        </div>
 
         <div class="manual-fallback" id="manual-fallback">
           <label for="manual-gemeinde">Select Gemeinde manually</label>
@@ -133,7 +139,22 @@
           </div>
           <div class="hero-pct mono" id="tc-pct">0.00%</div>
           <div class="hero-chf" id="tc-chf">CHF 0</div>
-          <p class="hero-label">Total tax burden on CHF 200,000 income</p>
+          <p class="hero-label">Total income tax on CHF 200,000 (ESTV scenario)</p>
+
+          <div class="tax-panels">
+            <div class="tax-panel wealth-panel">
+              <h4>Wealth tax</h4>
+              <p class="tax-panel-hero mono" id="tc-wealth-chf">—</p>
+              <p class="tax-panel-sub" id="tc-wealth-pct">On taxable wealth —</p>
+            </div>
+            <div class="tax-panel corp-panel">
+              <h4>Corporate profit tax</h4>
+              <p class="tax-panel-hero mono" id="tc-corp-pct">—</p>
+              <p class="tax-panel-sub">Indicative combined rate (federal + canton + commune)</p>
+            </div>
+          </div>
+
+          <button type="button" class="btn btn-primary btn-save-location" id="btn-save-location">Save to registry</button>
 
           <div class="benchmarks" id="tc-benchmarks"></div>
 
@@ -162,7 +183,8 @@
   </main>
 
   <p class="disclaimer">
-    Educational tool only — not tax advice. Data: Swiss Federal Tax Administration (ESTV), income CHF 200,000, married dual income (70/30), 1 child, no religion, 2025.
+    Educational tool only — not tax advice. Income tax: ESTV 2025, CHF 200,000, married dual income (70/30), 1 child, no religion.
+    Wealth tax estimates use your taxable wealth input (default CHF 500,000). Corporate rates are indicative combined profit-tax estimates by canton/Gemeinde — not a ruling.
     Geocoding via OpenStreetMap Nominatim. Municipality boundaries © swiss-maps / FSO.
   </p>
 
@@ -183,6 +205,8 @@
   </div>
 
   <script src="/wealth-tools/swiss-tax-locator/js/data.js"></script>
+  <script src="/wealth-tools/swiss-tax-locator/js/aux_tax_data.js"></script>
+  <script src="/wealth-tools/swiss-tax-locator/js/tax_profile.js"></script>
   <script src="/wealth-tools/swiss-tax-locator/js/matcher.js"></script>
   <script src="/wealth-tools/swiss-tax-locator/js/geocode.js"></script>
   <script src="/wealth-tools/swiss-tax-locator/js/registry.js"></script>
