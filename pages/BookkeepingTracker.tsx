@@ -4,33 +4,25 @@ import RoleDescription from '../components/bookkeeping/RoleDescription';
 import ChecklistPanel from '../components/bookkeeping/ChecklistPanel';
 import InfoRequestsTable from '../components/bookkeeping/InfoRequestsTable';
 import {
-  DAILY_ITEMS,
-  WEEKLY_ITEMS,
-  MONTHLY_ITEMS,
-  ENTITIES,
+  WEEKLY_DAILY_SUMMARY_ITEMS,
+  WEEKLY_REVIEW_ITEMS,
   type TrackerState,
   type WeeklyStatusUpdate,
-  type MonthlySummary,
   loadState,
   saveState,
   defaultState,
   formatDateKey,
   getIsoWeekKey,
-  getMonthKey,
-  monthlyCheckKey,
-  getMonthlySummary,
   exportStateAsJson,
 } from '../lib/bookkeepingTracker';
 
-function DateNav({
-  label,
+function WeekNav({
   value,
   onChange,
   onPrev,
   onNext,
   onToday,
 }: {
-  label: string;
   value: string;
   onChange: (v: string) => void;
   onPrev: () => void;
@@ -39,19 +31,19 @@ function DateNav({
 }) {
   return (
     <div className="flex flex-wrap items-center gap-2">
-      <span className="text-sm font-medium text-slate-700">{label}</span>
+      <span className="text-sm font-medium text-slate-700">Week</span>
       <button type="button" onClick={onPrev} className="px-2 py-1 rounded border border-slate-300 text-sm hover:bg-slate-50">
         ←
       </button>
       <input
-        type={label.includes('Week') ? 'week' : label.includes('Month') ? 'month' : 'date'}
+        type="week"
         value={value}
         onChange={(e) => {
           const v = e.target.value;
-          if (label.includes('Week') && v) {
+          if (v) {
             const [y, w] = v.split('-W');
             onChange(`${y}-W${w}`);
-          } else if (v) onChange(v);
+          }
         }}
         className="rounded border border-slate-300 px-3 py-1.5 text-sm"
       />
@@ -63,7 +55,7 @@ function DateNav({
         onClick={onToday}
         className="px-3 py-1.5 text-sm font-medium rounded-lg bg-slate-800 text-white hover:bg-slate-900"
       >
-        Today
+        This week
       </button>
     </div>
   );
@@ -97,10 +89,7 @@ function SummaryField({
 export default function BookkeepingTracker() {
   const [activeTab, setActiveTab] = useState<TrackerTab>('weekly');
   const [state, setState] = useState<TrackerState>(defaultState);
-  const [selectedDate, setSelectedDate] = useState(() => formatDateKey(new Date()));
   const [selectedWeek, setSelectedWeek] = useState(() => getIsoWeekKey(new Date()));
-  const [selectedMonth, setSelectedMonth] = useState(() => getMonthKey(new Date()));
-  const [selectedCompany, setSelectedCompany] = useState<string>(ENTITIES[0]);
 
   const [weeklyDraft, setWeeklyDraft] = useState({
     workDone: '',
@@ -121,17 +110,7 @@ export default function BookkeepingTracker() {
     setState((prev) => ({ ...prev, ...partial }));
   }, []);
 
-  const dailyChecks = state.dailyChecks[selectedDate];
   const weeklyChecks = state.weeklyChecks[selectedWeek];
-  const monthlyKey = monthlyCheckKey(selectedMonth, selectedCompany);
-  const monthlyChecks = state.monthlyChecks[monthlyKey];
-  const monthlySummary = getMonthlySummary(state.monthlySummaries, selectedMonth, selectedCompany);
-
-  const shiftDate = (days: number) => {
-    const d = new Date(selectedDate);
-    d.setDate(d.getDate() + days);
-    setSelectedDate(formatDateKey(d));
-  };
 
   const shiftWeek = (weeks: number) => {
     const match = selectedWeek.match(/^(\d{4})-W(\d{2})$/);
@@ -139,12 +118,6 @@ export default function BookkeepingTracker() {
     const d = new Date(Number(match[1]), 0, 1 + (Number(match[2]) - 1) * 7);
     d.setDate(d.getDate() + weeks * 7);
     setSelectedWeek(getIsoWeekKey(d));
-  };
-
-  const shiftMonth = (months: number) => {
-    const [y, m] = selectedMonth.split('-').map(Number);
-    const d = new Date(y, m - 1 + months, 1);
-    setSelectedMonth(getMonthKey(d));
   };
 
   const existingWeeklyUpdate = useMemo(
@@ -164,6 +137,22 @@ export default function BookkeepingTracker() {
       setWeeklyDraft({ workDone: '', reconciliation: '', overdueItems: '', openQuestions: '' });
     }
   }, [selectedWeek, existingWeeklyUpdate]);
+
+  const toggleCheck = (id: string, checked: boolean) => {
+    patch({
+      weeklyChecks: {
+        ...state.weeklyChecks,
+        [selectedWeek]: { ...weeklyChecks, [id]: checked },
+      },
+    });
+  };
+
+  const resetWeek = () => {
+    patch({
+      weeklyChecks: { ...state.weeklyChecks, [selectedWeek]: {} },
+      weeklyNotes: { ...state.weeklyNotes, [selectedWeek]: '' },
+    });
+  };
 
   const saveWeeklyUpdate = () => {
     const entry: WeeklyStatusUpdate = {
@@ -207,21 +196,32 @@ export default function BookkeepingTracker() {
 
   const handleImport = (json: string) => {
     try {
-      const parsed = JSON.parse(json) as TrackerState;
-      setState({ ...defaultState(), ...parsed });
+      const parsed = JSON.parse(json) as Partial<TrackerState>;
+      setState({
+        ...defaultState(),
+        weeklyChecks: parsed.weeklyChecks ?? {},
+        weeklyNotes: parsed.weeklyNotes ?? {},
+        infoRequests: parsed.infoRequests ?? [],
+        weeklyUpdates: parsed.weeklyUpdates ?? [],
+        sopSections:
+          parsed.sopSections && parsed.sopSections.length > 0
+            ? parsed.sopSections
+            : defaultState().sopSections,
+      });
     } catch {
       alert('Invalid backup file.');
     }
   };
 
-  const updateMonthlySummary = (field: keyof MonthlySummary, value: string) => {
-    patch({
-      monthlySummaries: {
-        ...state.monthlySummaries,
-        [monthlyKey]: { ...monthlySummary, [field]: value },
-      },
-    });
-  };
+  const weekNav = (
+    <WeekNav
+      value={selectedWeek}
+      onChange={setSelectedWeek}
+      onPrev={() => shiftWeek(-1)}
+      onNext={() => shiftWeek(1)}
+      onToday={() => setSelectedWeek(getIsoWeekKey(new Date()))}
+    />
+  );
 
   return (
     <TrackerShell
@@ -232,84 +232,44 @@ export default function BookkeepingTracker() {
     >
       {activeTab === 'role' && <RoleDescription />}
 
-      {activeTab === 'daily' && (
-        <div className="space-y-4">
+      {activeTab === 'weekly' && (
+        <div className="space-y-6">
+          <div className="rounded-xl border border-emerald-200 bg-emerald-50 px-5 py-4">
+            <p className="text-sm text-emerald-900">
+              Complete once per week on a fixed day. Confirm all daily work for the week in the first checklist,
+              then finish the weekly review and status update below.
+            </p>
+          </div>
+
           <ChecklistPanel
-            title="Daily checklist"
-            subtitle="Tick each working day. Data is saved per date."
-            items={DAILY_ITEMS}
-            checks={dailyChecks}
-            onToggle={(id, checked) =>
-              patch({
-                dailyChecks: {
-                  ...state.dailyChecks,
-                  [selectedDate]: { ...dailyChecks, [id]: checked },
-                },
-              })
-            }
-            onReset={() =>
-              patch({
-                dailyChecks: { ...state.dailyChecks, [selectedDate]: {} },
-                dailyNotes: { ...state.dailyNotes, [selectedDate]: '' },
-              })
-            }
-            headerExtra={
-              <DateNav
-                label="Date"
-                value={selectedDate}
-                onChange={setSelectedDate}
-                onPrev={() => shiftDate(-1)}
-                onNext={() => shiftDate(1)}
-                onToday={() => setSelectedDate(formatDateKey(new Date()))}
-              />
-            }
+            title="Daily work — week summary"
+            subtitle="Confirm these were done across all working days this week (no per-day tracking)."
+            items={WEEKLY_DAILY_SUMMARY_ITEMS}
+            checks={weeklyChecks}
+            onToggle={toggleCheck}
+            headerExtra={weekNav}
+          />
+
+          <ChecklistPanel
+            title="Weekly review"
+            subtitle="Per company where relevant. Ideally completed on the same fixed day each week."
+            items={WEEKLY_REVIEW_ITEMS}
+            checks={weeklyChecks}
+            onToggle={toggleCheck}
+            onReset={resetWeek}
             footerExtra={
               <label className="block">
-                <span className="text-sm font-medium text-slate-700">Notes for this day</span>
+                <span className="text-sm font-medium text-slate-700">Notes for this week</span>
                 <textarea
-                  value={state.dailyNotes[selectedDate] ?? ''}
+                  value={state.weeklyNotes[selectedWeek] ?? ''}
                   onChange={(e) =>
-                    patch({ dailyNotes: { ...state.dailyNotes, [selectedDate]: e.target.value } })
+                    patch({ weeklyNotes: { ...state.weeklyNotes, [selectedWeek]: e.target.value } })
                   }
                   rows={3}
-                  placeholder="Questions or issues to include in the weekly summary…"
+                  placeholder="Questions, issues, or reminders to include in the status update…"
                   className="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2 text-sm"
                 />
               </label>
-            }
-          />
-        </div>
-      )}
-
-      {activeTab === 'weekly' && (
-        <div className="space-y-6">
-          <ChecklistPanel
-            title="Weekly checklist"
-            subtitle="Complete once per week, ideally on a fixed day. Per company where relevant."
-            items={WEEKLY_ITEMS}
-            checks={weeklyChecks}
-            onToggle={(id, checked) =>
-              patch({
-                weeklyChecks: {
-                  ...state.weeklyChecks,
-                  [selectedWeek]: { ...weeklyChecks, [id]: checked },
-                },
-              })
-            }
-            onReset={() =>
-              patch({
-                weeklyChecks: { ...state.weeklyChecks, [selectedWeek]: {} },
-              })
-            }
-            headerExtra={
-              <DateNav
-                label="Week"
-                value={selectedWeek}
-                onChange={setSelectedWeek}
-                onPrev={() => shiftWeek(-1)}
-                onNext={() => shiftWeek(1)}
-                onToday={() => setSelectedWeek(getIsoWeekKey(new Date()))}
-              />
             }
           />
 
@@ -362,99 +322,13 @@ export default function BookkeepingTracker() {
                 label="Overdue invoices / bills needing attention"
                 value={weeklyDraft.overdueItems}
                 onChange={(v) => setWeeklyDraft((d) => ({ ...d, overdueItems: v }))}
-                placeholder="• Customer X — invoice #123, 45 days&#10;• Supplier Y — due next week"
+                placeholder={'• Customer X — invoice #123, 45 days\n• Supplier Y — due next week'}
               />
               <SummaryField
                 label="Key open questions / challenges"
                 value={weeklyDraft.openQuestions}
                 onChange={(v) => setWeeklyDraft((d) => ({ ...d, openQuestions: v }))}
-                placeholder="• Missing receipt for CH transfer on 12.05&#10;• VAT code for new supplier?"
-              />
-            </div>
-          </section>
-        </div>
-      )}
-
-      {activeTab === 'monthly' && (
-        <div className="space-y-6">
-          <div className="flex flex-wrap items-center gap-3">
-            <DateNav
-              label="Month"
-              value={selectedMonth}
-              onChange={setSelectedMonth}
-              onPrev={() => shiftMonth(-1)}
-              onNext={() => shiftMonth(1)}
-              onToday={() => setSelectedMonth(getMonthKey(new Date()))}
-            />
-            <label className="flex items-center gap-2 text-sm">
-              <span className="font-medium text-slate-700">Company</span>
-              <select
-                value={selectedCompany}
-                onChange={(e) => setSelectedCompany(e.target.value)}
-                className="rounded-lg border border-slate-300 px-3 py-1.5"
-              >
-                {ENTITIES.map((e) => (
-                  <option key={e} value={e}>
-                    {e}
-                  </option>
-                ))}
-              </select>
-            </label>
-          </div>
-
-          <ChecklistPanel
-            title="Monthly checklist — month-end close lite"
-            subtitle={`${selectedMonth} · ${selectedCompany}`}
-            items={MONTHLY_ITEMS}
-            checks={monthlyChecks}
-            onToggle={(id, checked) =>
-              patch({
-                monthlyChecks: {
-                  ...state.monthlyChecks,
-                  [monthlyKey]: { ...monthlyChecks, [id]: checked },
-                },
-              })
-            }
-            onReset={() =>
-              patch({
-                monthlyChecks: { ...state.monthlyChecks, [monthlyKey]: {} },
-              })
-            }
-          />
-
-          <section className="rounded-xl border border-slate-200 bg-white shadow-sm p-5 space-y-4">
-            <h2 className="text-lg font-semibold text-slate-900">Monthly summary (1 page per company)</h2>
-            <p className="text-sm text-slate-600">Prepare for manager review after completing the checklist above.</p>
-            <div className="grid gap-4 sm:grid-cols-2">
-              <SummaryField
-                label="Bank balances & reconciliation status"
-                value={monthlySummary.bankBalances}
-                onChange={(v) => updateMonthlySummary('bankBalances', v)}
-                placeholder="Balances per account and recon status…"
-              />
-              <SummaryField
-                label="Total A/R and A/P, key overdue items"
-                value={monthlySummary.arAp}
-                onChange={(v) => updateMonthlySummary('arAp', v)}
-                placeholder="Totals and items needing attention…"
-              />
-              <SummaryField
-                label="VAT position & upcoming deadlines"
-                value={monthlySummary.vatPosition}
-                onChange={(v) => updateMonthlySummary('vatPosition', v)}
-                placeholder="Payable/receivable, return dates…"
-              />
-              <SummaryField
-                label="Unusual or one-off transactions"
-                value={monthlySummary.unusualTransactions}
-                onChange={(v) => updateMonthlySummary('unusualTransactions', v)}
-                placeholder="Large transfers, new accounts, spikes…"
-              />
-              <SummaryField
-                label="Open issues & suggested next steps"
-                value={monthlySummary.openIssues}
-                onChange={(v) => updateMonthlySummary('openIssues', v)}
-                placeholder="What needs decision or follow-up…"
+                placeholder={'• Missing receipt for CH transfer on 12.05\n• VAT code for new supplier?'}
               />
             </div>
           </section>

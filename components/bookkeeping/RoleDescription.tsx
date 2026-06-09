@@ -5,8 +5,8 @@ export default function RoleDescription() {
     <div className="space-y-4">
       <div className="rounded-xl border border-emerald-200 bg-emerald-50 px-5 py-4">
         <p className="text-sm text-emerald-900">
-          Copy-friendly one-page role description. Use the checklists in the other tabs for daily, weekly, and monthly
-          work — and log status updates in the Weekly and Status log tabs.
+          Copy-friendly one-page role description. Use the Weekly tab to confirm daily work for the week, complete
+          weekly reviews, and save status updates in the Status log.
         </p>
       </div>
 

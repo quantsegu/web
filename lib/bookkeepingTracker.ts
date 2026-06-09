@@ -35,63 +35,36 @@ export interface SopSection {
 }
 
 export interface TrackerState {
-  dailyChecks: Record<string, Record<string, boolean>>;
-  dailyNotes: Record<string, string>;
   weeklyChecks: Record<string, Record<string, boolean>>;
-  monthlyChecks: Record<string, Record<string, boolean>>;
-  monthlySummaries: Record<string, MonthlySummary>;
+  weeklyNotes: Record<string, string>;
   infoRequests: InfoRequest[];
   weeklyUpdates: WeeklyStatusUpdate[];
   sopSections: SopSection[];
 }
 
-export interface MonthlySummary {
-  bankBalances: string;
-  arAp: string;
-  vatPosition: string;
-  unusualTransactions: string;
-  openIssues: string;
-}
-
-export const DAILY_ITEMS = [
-  { id: 'sales-invoices', label: 'Enter all new sales invoices provided (or confirm there were none)' },
-  { id: 'purchase-invoices', label: 'Enter all new purchase invoices and expenses from documents received' },
-  { id: 'bank-card', label: 'Import/record bank and card transactions from feeds or statements' },
-  { id: 'categorise', label: 'Categorise new transactions to correct accounts and VAT codes; avoid uncategorised items' },
-  { id: 'attach-docs', label: 'Attach or file supporting documents (PDFs, receipt photos) to relevant entries' },
-  { id: 'info-list', label: 'Update the information request list with missing invoices, receipts, or explanations' },
-  { id: 'urgent', label: 'Check urgent items: rejected payments, urgent supplier payments, critical overdue invoices' },
-  { id: 'weekly-notes', label: 'Note questions or issues for the next weekly summary' },
+/** Daily work items, confirmed once per week (summarised across all working days). */
+export const WEEKLY_DAILY_SUMMARY_ITEMS = [
+  { id: 'sales-invoices', label: 'All new sales invoices for the week entered (or confirmed there were none)' },
+  { id: 'purchase-invoices', label: 'All new purchase invoices and expenses for the week entered' },
+  { id: 'bank-card', label: 'All bank and card transactions for the week imported or recorded' },
+  { id: 'categorise', label: 'All new transactions categorised with correct accounts and VAT codes' },
+  { id: 'attach-docs', label: 'Supporting documents attached or filed for the week\'s entries' },
+  { id: 'info-list', label: 'Information request list updated with missing invoices, receipts, or explanations' },
+  { id: 'urgent', label: 'Urgent items checked: rejected payments, urgent supplier payments, critical overdue invoices' },
 ] as const;
 
-export const WEEKLY_ITEMS = [
+export const WEEKLY_REVIEW_ITEMS = [
   { id: 'bank-recon', label: 'Complete bank and card reconciliations for all active accounts (per company)' },
   { id: 'ar-review', label: 'Review A/R: run aging report, identify past-due invoices and reminder needs' },
   { id: 'ap-review', label: 'Review A/P: run open bills list, flag due/overdue and cash-flow issues' },
   { id: 'recurring', label: 'Confirm recurring transactions (rent, subscriptions, salaries) captured for the week' },
   { id: 'suspense', label: 'Clean up small suspense items that can be resolved quickly' },
-  { id: 'info-list-update', label: 'Update information request list: close received items, add new ones' },
+  { id: 'info-list-update', label: 'Close resolved items on information request list; add new ones from the week' },
   { id: 'consolidated-request', label: 'Prepare a single consolidated message with open document requests' },
   { id: 'status-update', label: 'Send weekly status update (work done, reconciliation, overdue, open questions)' },
 ] as const;
 
-export const MONTHLY_ITEMS = [
-  { id: 'sales-entered', label: 'Confirm all sales invoices for the month are entered' },
-  { id: 'purchases-entered', label: 'Confirm all purchase invoices for the month are entered' },
-  { id: 'bank-recorded', label: 'Confirm all bank and card transactions recorded through month-end' },
-  { id: 'reconcile-all', label: 'Reconcile all bank, card, and loan accounts; explain differences' },
-  { id: 'ar-aging', label: 'Review A/R aging; highlight invoices >30/60 days overdue' },
-  { id: 'ap-outstanding', label: 'Review A/P: list bills due and long-outstanding items' },
-  { id: 'vat-check', label: 'Check VAT accounts (CH and NL): balances plausible vs activity and return timing' },
-  { id: 'shareholder-ic', label: 'Review shareholder, director, and intercompany accounts for unusual movements' },
-  { id: 'suspense-review', label: 'Review suspense / to clarify accounts; keep only small, documented list' },
-  { id: 'financials', label: 'Run and save P&L, Balance Sheet, and Cash-flow for the month' },
-  { id: 'variance-scan', label: 'Scan for unusual variances vs prior months; add brief notes' },
-  { id: 'documentation', label: 'Ensure all invoices, receipts, and key contracts filed and linked' },
-  { id: 'retention', label: 'Check Swiss (10y) and Dutch (7–10y) retention practices respected' },
-  { id: 'backup', label: 'Backup or export key data/reports for off-system retention' },
-  { id: 'monthly-summary', label: 'Prepare 1-page monthly summary per company for manager review' },
-] as const;
+export const WEEKLY_ITEMS = [...WEEKLY_DAILY_SUMMARY_ITEMS, ...WEEKLY_REVIEW_ITEMS] as const;
 
 export const DEFAULT_SOP_SECTIONS: Omit<SopSection, 'updatedAt'>[] = [
   {
@@ -214,24 +187,11 @@ export const ROLE_SECTIONS = [
   },
 ] as const;
 
-function emptyMonthlySummary(): MonthlySummary {
-  return {
-    bankBalances: '',
-    arAp: '',
-    vatPosition: '',
-    unusualTransactions: '',
-    openIssues: '',
-  };
-}
-
 export function defaultState(): TrackerState {
   const now = new Date().toISOString();
   return {
-    dailyChecks: {},
-    dailyNotes: {},
     weeklyChecks: {},
-    monthlyChecks: {},
-    monthlySummaries: {},
+    weeklyNotes: {},
     infoRequests: [],
     weeklyUpdates: [],
     sopSections: DEFAULT_SOP_SECTIONS.map((s) => ({ ...s, updatedAt: now })),
@@ -242,10 +202,16 @@ export function loadState(): TrackerState {
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
     if (!raw) return defaultState();
-    const parsed = JSON.parse(raw) as Partial<TrackerState>;
+    const parsed = JSON.parse(raw) as Partial<TrackerState> & {
+      dailyChecks?: Record<string, Record<string, boolean>>;
+      dailyNotes?: Record<string, string>;
+    };
     return {
       ...defaultState(),
-      ...parsed,
+      weeklyChecks: parsed.weeklyChecks ?? {},
+      weeklyNotes: parsed.weeklyNotes ?? {},
+      infoRequests: parsed.infoRequests ?? [],
+      weeklyUpdates: parsed.weeklyUpdates ?? [],
       sopSections:
         parsed.sopSections && parsed.sopSections.length > 0
           ? parsed.sopSections
@@ -271,14 +237,6 @@ export function getIsoWeekKey(date: Date): string {
   const yearStart = new Date(Date.UTC(d.getUTCFullYear(), 0, 1));
   const week = Math.ceil(((d.getTime() - yearStart.getTime()) / 86400000 + 1) / 7);
   return `${d.getUTCFullYear()}-W${String(week).padStart(2, '0')}`;
-}
-
-export function getMonthKey(date: Date): string {
-  return date.toISOString().slice(0, 7);
-}
-
-export function monthlyCheckKey(monthKey: string, company: string): string {
-  return `${monthKey}::${company}`;
 }
 
 export function createInfoRequest(partial?: Partial<InfoRequest>): InfoRequest {
@@ -311,11 +269,3 @@ export function progressForItems(
   return { done, total, percent: total ? Math.round((done / total) * 100) : 0 };
 }
 
-export function getMonthlySummary(
-  summaries: Record<string, MonthlySummary>,
-  monthKey: string,
-  company: string,
-): MonthlySummary {
-  const key = monthlyCheckKey(monthKey, company);
-  return summaries[key] ?? emptyMonthlySummary();
-}

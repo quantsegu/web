@@ -2,9 +2,7 @@ import type { ReactNode } from 'react';
 
 const TABS = [
   { id: 'role', label: 'Role' },
-  { id: 'daily', label: 'Daily' },
   { id: 'weekly', label: 'Weekly' },
-  { id: 'monthly', label: 'Monthly' },
   { id: 'requests', label: 'Info requests' },
   { id: 'updates', label: 'Status log' },
   { id: 'sop', label: 'Manual' },
