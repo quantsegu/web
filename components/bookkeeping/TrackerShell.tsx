@@ -3,6 +3,7 @@ import type { ReactNode } from 'react';
 const TABS = [
   { id: 'role', label: 'Role' },
   { id: 'weekly', label: 'Weekly' },
+  { id: 'compliance', label: 'Compliance' },
   { id: 'requests', label: 'Info requests' },
   { id: 'updates', label: 'Status log' },
   { id: 'sop', label: 'Manual' },
@@ -48,7 +49,7 @@ export default function TrackerShell({
           <div>
             <p className="text-xs font-semibold uppercase tracking-wider text-emerald-700">Internal ops</p>
             <h1 className="text-xl sm:text-2xl font-bold text-slate-900">Bookkeeping tracker</h1>
-            <p className="text-sm text-slate-600">SnelStart (NL) · ERPNext (CH) — checklists & weekly status</p>
+            <p className="text-sm text-slate-600">SnelStart (NL) · ERPNext (CH) — checklists, compliance & weekly status</p>
           </div>
           <div className="flex flex-wrap gap-2">
             <button

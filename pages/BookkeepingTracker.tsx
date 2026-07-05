@@ -3,9 +3,22 @@ import TrackerShell, { type TrackerTab } from '../components/bookkeeping/Tracker
 import RoleDescription from '../components/bookkeeping/RoleDescription';
 import ChecklistPanel from '../components/bookkeeping/ChecklistPanel';
 import InfoRequestsTable from '../components/bookkeeping/InfoRequestsTable';
+import ComplianceSchedulePanel from '../components/bookkeeping/ComplianceSchedulePanel';
+import ComplianceDeadlineBanner from '../components/bookkeeping/ComplianceDeadlineBanner';
 import {
   WEEKLY_DAILY_SUMMARY_ITEMS,
   WEEKLY_REVIEW_ITEMS,
+  MONTHLY_PREP_ITEMS,
+  MONTHLY_CLOSE_ITEMS,
+  NL_MONTHLY_ITEMS,
+  NL_QUARTERLY_ITEMS,
+  NL_ANNUAL_ITEMS,
+  CH_MONTHLY_ITEMS,
+  CH_QUARTERLY_ITEMS,
+  CH_ANNUAL_ITEMS,
+  QUARTERLY_PREP_ITEMS,
+  ANNUAL_PREP_ITEMS,
+  COMPLIANCE_REFERENCE,
   type TrackerState,
   type WeeklyStatusUpdate,
   loadState,
@@ -13,8 +26,82 @@ import {
   defaultState,
   formatDateKey,
   getIsoWeekKey,
+  getMonthKey,
+  getQuarterKey,
+  getYearKey,
+  shiftMonthKey,
+  shiftQuarterKey,
   exportStateAsJson,
 } from '../lib/bookkeepingTracker';
+import {
+  ensureActiveCompliancePeriods,
+  listActiveFilingSchedules,
+  getMonthlySchedule,
+  getQuarterlySchedules,
+  getAnnualSchedules,
+  isPeriodChecklistOpen,
+  formatDisplayDate,
+  PREP_LEAD_DAYS,
+  type FilingSchedule,
+} from '../lib/complianceDeadlines';
+
+function PeriodNav({
+  label,
+  value,
+  onChange,
+  onPrev,
+  onNext,
+  onToday,
+  inputType,
+}: {
+  label: string;
+  value: string;
+  onChange: (v: string) => void;
+  onPrev: () => void;
+  onNext: () => void;
+  onToday: () => void;
+  inputType: 'month' | 'number' | 'quarter';
+}) {
+  return (
+    <div className="flex flex-wrap items-center gap-2">
+      <span className="text-sm font-medium text-slate-700">{label}</span>
+      <button type="button" onClick={onPrev} className="px-2 py-1 rounded border border-slate-300 text-sm hover:bg-slate-50">
+        ←
+      </button>
+      {inputType === 'month' ? (
+        <input
+          type="month"
+          value={value}
+          onChange={(e) => e.target.value && onChange(e.target.value)}
+          className="rounded border border-slate-300 px-3 py-1.5 text-sm"
+        />
+      ) : inputType === 'quarter' ? (
+        <span className="rounded border border-slate-300 bg-white px-3 py-1.5 text-sm font-medium text-slate-800">
+          {value}
+        </span>
+      ) : (
+        <input
+          type="number"
+          value={value}
+          min={2020}
+          max={2099}
+          onChange={(e) => e.target.value && onChange(e.target.value)}
+          className="w-20 rounded border border-slate-300 px-3 py-1.5 text-sm"
+        />
+      )}
+      <button type="button" onClick={onNext} className="px-2 py-1 rounded border border-slate-300 text-sm hover:bg-slate-50">
+        →
+      </button>
+      <button
+        type="button"
+        onClick={onToday}
+        className="px-3 py-1.5 text-sm font-medium rounded-lg bg-slate-800 text-white hover:bg-slate-900"
+      >
+        Current
+      </button>
+    </div>
+  );
+}
 
 function WeekNav({
   value,
@@ -90,6 +177,9 @@ export default function BookkeepingTracker() {
   const [activeTab, setActiveTab] = useState<TrackerTab>('weekly');
   const [state, setState] = useState<TrackerState>(defaultState);
   const [selectedWeek, setSelectedWeek] = useState(() => getIsoWeekKey(new Date()));
+  const [selectedMonth, setSelectedMonth] = useState(() => getMonthKey(new Date()));
+  const [selectedQuarter, setSelectedQuarter] = useState(() => getQuarterKey(new Date()));
+  const [selectedYear, setSelectedYear] = useState(() => getYearKey(new Date()));
 
   const [weeklyDraft, setWeeklyDraft] = useState({
     workDone: '',
@@ -99,18 +189,47 @@ export default function BookkeepingTracker() {
   });
 
   useEffect(() => {
-    setState(loadState());
+    setState(ensureActiveCompliancePeriods(loadState()));
   }, []);
 
   useEffect(() => {
     saveState(state);
   }, [state]);
 
+  const activeSchedules = useMemo(() => listActiveFilingSchedules(state), [state]);
+
+  const monthlySchedule = useMemo(
+    () => getMonthlySchedule(selectedMonth, state),
+    [selectedMonth, state],
+  );
+  const quarterlySchedules = useMemo(
+    () => getQuarterlySchedules(selectedQuarter, state),
+    [selectedQuarter, state],
+  );
+  const annualSchedules = useMemo(
+    () => getAnnualSchedules(selectedYear, state),
+    [selectedYear, state],
+  );
+
+  const monthlyOpen = isPeriodChecklistOpen(monthlySchedule);
+  const quarterlyOpen = quarterlySchedules.some((s) => isPeriodChecklistOpen(s));
+  const annualOpen = annualSchedules.some((s) => isPeriodChecklistOpen(s));
+
+  const selectFilingSchedule = (schedule: FilingSchedule) => {
+    if (schedule.cadence === 'monthly') setSelectedMonth(schedule.periodKey);
+    if (schedule.cadence === 'quarterly') setSelectedQuarter(schedule.periodKey);
+    if (schedule.cadence === 'annual') setSelectedYear(schedule.periodKey);
+  };
+
   const patch = useCallback((partial: Partial<TrackerState>) => {
     setState((prev) => ({ ...prev, ...partial }));
   }, []);
 
   const weeklyChecks = state.weeklyChecks[selectedWeek];
+  const monthlyChecks = state.monthlyChecks[selectedMonth];
+  const quarterlyChecks = state.quarterlyChecks[selectedQuarter];
+  const annualChecks = state.annualChecks[selectedYear];
+  const complianceNoteKey = `${selectedMonth}|${selectedQuarter}|${selectedYear}`;
 
   const shiftWeek = (weeks: number) => {
     const match = selectedWeek.match(/^(\d{4})-W(\d{2})$/);
@@ -144,6 +263,42 @@ export default function BookkeepingTracker() {
         ...state.weeklyChecks,
         [selectedWeek]: { ...weeklyChecks, [id]: checked },
       },
+    });
+  };
+
+  const toggleMonthlyCheck = (id: string, checked: boolean) => {
+    patch({
+      monthlyChecks: {
+        ...state.monthlyChecks,
+        [selectedMonth]: { ...monthlyChecks, [id]: checked },
+      },
+    });
+  };
+
+  const toggleQuarterlyCheck = (id: string, checked: boolean) => {
+    patch({
+      quarterlyChecks: {
+        ...state.quarterlyChecks,
+        [selectedQuarter]: { ...quarterlyChecks, [id]: checked },
+      },
+    });
+  };
+
+  const toggleAnnualCheck = (id: string, checked: boolean) => {
+    patch({
+      annualChecks: {
+        ...state.annualChecks,
+        [selectedYear]: { ...annualChecks, [id]: checked },
+      },
+    });
+  };
+
+  const resetCompliancePeriod = () => {
+    patch({
+      monthlyChecks: { ...state.monthlyChecks, [selectedMonth]: {} },
+      quarterlyChecks: { ...state.quarterlyChecks, [selectedQuarter]: {} },
+      annualChecks: { ...state.annualChecks, [selectedYear]: {} },
+      complianceNotes: { ...state.complianceNotes, [complianceNoteKey]: '' },
     });
   };
 
@@ -201,6 +356,10 @@ export default function BookkeepingTracker() {
         ...defaultState(),
         weeklyChecks: parsed.weeklyChecks ?? {},
         weeklyNotes: parsed.weeklyNotes ?? {},
+        monthlyChecks: parsed.monthlyChecks ?? {},
+        quarterlyChecks: parsed.quarterlyChecks ?? {},
+        annualChecks: parsed.annualChecks ?? {},
+        complianceNotes: parsed.complianceNotes ?? {},
         infoRequests: parsed.infoRequests ?? [],
         weeklyUpdates: parsed.weeklyUpdates ?? [],
         sopSections:
@@ -248,6 +407,7 @@ export default function BookkeepingTracker() {
             checks={weeklyChecks}
             onToggle={toggleCheck}
             headerExtra={weekNav}
+            showTags
           />
 
           <ChecklistPanel
@@ -257,6 +417,7 @@ export default function BookkeepingTracker() {
             checks={weeklyChecks}
             onToggle={toggleCheck}
             onReset={resetWeek}
+            showTags
             footerExtra={
               <label className="block">
                 <span className="text-sm font-medium text-slate-700">Notes for this week</span>
@@ -330,6 +491,214 @@ export default function BookkeepingTracker() {
                 onChange={(v) => setWeeklyDraft((d) => ({ ...d, openQuestions: v }))}
                 placeholder={'• Missing receipt for CH transfer on 12.05\n• VAT code for new supplier?'}
               />
+            </div>
+          </section>
+        </div>
+      )}
+
+      {activeTab === 'compliance' && (
+        <div className="space-y-6">
+          <div className="rounded-xl border border-emerald-200 bg-emerald-50 px-5 py-4">
+            <p className="text-sm text-emerald-900">
+              Monthly, quarterly, and annual checklists are <strong>auto-created {PREP_LEAD_DAYS} days before</strong>{' '}
+              each filing deadline. Complete preparation items first, then filings. Confirm deadlines with your tax
+              advisor.
+            </p>
+          </div>
+
+          <ComplianceSchedulePanel schedules={activeSchedules} onSelect={selectFilingSchedule} />
+
+          <div className="grid gap-4 sm:grid-cols-3">
+            <PeriodNav
+              label="Month"
+              value={selectedMonth}
+              onChange={setSelectedMonth}
+              onPrev={() => setSelectedMonth(shiftMonthKey(selectedMonth, -1))}
+              onNext={() => setSelectedMonth(shiftMonthKey(selectedMonth, 1))}
+              onToday={() => setSelectedMonth(getMonthKey(new Date()))}
+              inputType="month"
+            />
+            <PeriodNav
+              label="Quarter"
+              value={selectedQuarter}
+              onChange={setSelectedQuarter}
+              onPrev={() => setSelectedQuarter(shiftQuarterKey(selectedQuarter, -1))}
+              onNext={() => setSelectedQuarter(shiftQuarterKey(selectedQuarter, 1))}
+              onToday={() => setSelectedQuarter(getQuarterKey(new Date()))}
+              inputType="quarter"
+            />
+            <PeriodNav
+              label="Year"
+              value={selectedYear}
+              onChange={setSelectedYear}
+              onPrev={() => setSelectedYear(String(Number(selectedYear) - 1))}
+              onNext={() => setSelectedYear(String(Number(selectedYear) + 1))}
+              onToday={() => setSelectedYear(getYearKey(new Date()))}
+              inputType="number"
+            />
+          </div>
+
+          <ChecklistPanel
+            title="Monthly preparation (≥3 weeks before deadline)"
+            subtitle={`${selectedMonth} — start by ${formatDisplayDate(monthlySchedule.prepStart)}`}
+            items={MONTHLY_PREP_ITEMS}
+            checks={monthlyChecks}
+            onToggle={toggleMonthlyCheck}
+            showTags
+            disabled={!monthlyOpen}
+            disabledMessage={
+              !monthlyOpen
+                ? `Opens on ${formatDisplayDate(monthlySchedule.prepStart)} (${PREP_LEAD_DAYS} days before filing due ${formatDisplayDate(monthlySchedule.filingDeadline)}).`
+                : undefined
+            }
+            bannerExtra={<ComplianceDeadlineBanner schedule={monthlySchedule} />}
+          />
+
+          <ChecklistPanel
+            title="Month-end close — all entities"
+            subtitle={`Close for ${selectedMonth}. Complete before tax filings.`}
+            items={MONTHLY_CLOSE_ITEMS}
+            checks={monthlyChecks}
+            onToggle={toggleMonthlyCheck}
+            showTags
+            disabled={!monthlyOpen}
+          />
+
+          <ChecklistPanel
+            title="Netherlands (SnelStart) — monthly controls & ICP"
+            subtitle="BTW ledger hygiene, ICP-aangifte (Opgaaf ICP), and NL-specific booking rules."
+            items={NL_MONTHLY_ITEMS}
+            checks={monthlyChecks}
+            onToggle={toggleMonthlyCheck}
+            showTags
+            disabled={!monthlyOpen}
+          />
+
+          <ChecklistPanel
+            title="Switzerland (ERPNext) — monthly controls"
+            subtitle="MWST ledger hygiene and CH-specific booking rules."
+            items={CH_MONTHLY_ITEMS}
+            checks={monthlyChecks}
+            onToggle={toggleMonthlyCheck}
+            showTags
+            disabled={!monthlyOpen}
+          />
+
+          <ChecklistPanel
+            title="Quarterly preparation (≥3 weeks before deadline)"
+            subtitle={`${selectedQuarter} — NL due ${formatDisplayDate(quarterlySchedules[0].filingDeadline)}, CH due ${formatDisplayDate(quarterlySchedules[1].filingDeadline)}`}
+            items={QUARTERLY_PREP_ITEMS}
+            checks={quarterlyChecks}
+            onToggle={toggleQuarterlyCheck}
+            showTags
+            disabled={!quarterlyOpen}
+            disabledMessage={
+              !quarterlyOpen
+                ? `Opens on ${formatDisplayDate(quarterlySchedules[0].prepStart)} (NL) / ${formatDisplayDate(quarterlySchedules[1].prepStart)} (CH).`
+                : undefined
+            }
+            bannerExtra={
+              <div className="space-y-2">
+                {quarterlySchedules.map((schedule) => (
+                  <ComplianceDeadlineBanner key={schedule.filingLabel} schedule={schedule} />
+                ))}
+              </div>
+            }
+          />
+
+          <ChecklistPanel
+            title="Netherlands — BTW & periodic filings"
+            subtitle={`Quarter ${selectedQuarter}. For quarterly BTW filers only — monthly filers complete BTW and ICP in the monthly checklist.`}
+            items={NL_QUARTERLY_ITEMS}
+            checks={quarterlyChecks}
+            onToggle={toggleQuarterlyCheck}
+            showTags
+            disabled={!quarterlyOpen}
+          />
+
+          <ChecklistPanel
+            title="Switzerland — MWST periodic return"
+            subtitle={`Quarter ${selectedQuarter}. Filing frequency may be quarterly or semi-annual per ESTV agreement.`}
+            items={CH_QUARTERLY_ITEMS}
+            checks={quarterlyChecks}
+            onToggle={toggleQuarterlyCheck}
+            showTags
+            disabled={!quarterlyOpen}
+          />
+
+          <ChecklistPanel
+            title="Annual preparation (≥3 weeks before deadline)"
+            subtitle={`FY ${selectedYear} — NL due ${formatDisplayDate(annualSchedules[0].filingDeadline)}, CH due ${formatDisplayDate(annualSchedules[1].filingDeadline)}`}
+            items={ANNUAL_PREP_ITEMS}
+            checks={annualChecks}
+            onToggle={toggleAnnualCheck}
+            showTags
+            disabled={!annualOpen}
+            disabledMessage={
+              !annualOpen
+                ? `Opens on ${formatDisplayDate(annualSchedules[0].prepStart)} (NL) / ${formatDisplayDate(annualSchedules[1].prepStart)} (CH).`
+                : undefined
+            }
+            bannerExtra={
+              <div className="space-y-2">
+                {annualSchedules.map((schedule) => (
+                  <ComplianceDeadlineBanner key={schedule.filingLabel} schedule={schedule} />
+                ))}
+              </div>
+            }
+          />
+
+          <ChecklistPanel
+            title="Netherlands — annual obligations"
+            subtitle={`Fiscal year ${selectedYear}.`}
+            items={NL_ANNUAL_ITEMS}
+            checks={annualChecks}
+            onToggle={toggleAnnualCheck}
+            showTags
+            disabled={!annualOpen}
+          />
+
+          <ChecklistPanel
+            title="Switzerland — annual obligations"
+            subtitle={`Fiscal year ${selectedYear}.`}
+            items={CH_ANNUAL_ITEMS}
+            checks={annualChecks}
+            onToggle={toggleAnnualCheck}
+            onReset={resetCompliancePeriod}
+            showTags
+            disabled={!annualOpen}
+            footerExtra={
+              <label className="block">
+                <span className="text-sm font-medium text-slate-700">Compliance notes for this period</span>
+                <textarea
+                  value={state.complianceNotes[complianceNoteKey] ?? ''}
+                  onChange={(e) =>
+                    patch({ complianceNotes: { ...state.complianceNotes, [complianceNoteKey]: e.target.value } })
+                  }
+                  rows={3}
+                  placeholder="Filing references, advisor confirmations, deadline extensions, nil-return notes…"
+                  className="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2 text-sm"
+                />
+              </label>
+            }
+          />
+
+          <section className="rounded-xl border border-slate-200 bg-white shadow-sm p-5 space-y-4">
+            <h2 className="text-lg font-semibold text-slate-900">Filing deadlines reference</h2>
+            <p className="text-sm text-slate-600">
+              Static reference — always confirm current deadlines with Belastingdienst (NL) and ESTV / canton (CH).
+            </p>
+            <div className="grid gap-4 lg:grid-cols-3">
+              {COMPLIANCE_REFERENCE.map((section) => (
+                <div key={section.id} className="rounded-lg border border-slate-100 bg-slate-50 p-4">
+                  <h3 className="text-sm font-semibold text-slate-900 mb-2">{section.title}</h3>
+                  <ul className="list-disc pl-4 space-y-1.5 text-xs text-slate-700">
+                    {section.bullets.map((bullet) => (
+                      <li key={bullet}>{bullet}</li>
+                    ))}
+                  </ul>
+                </div>
+              ))}
             </div>
           </section>
         </div>

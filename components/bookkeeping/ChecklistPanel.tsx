@@ -1,21 +1,20 @@
 import type { ReactNode } from 'react';
 import ProgressBar from './ProgressBar';
-import { progressForItems } from '../../lib/bookkeepingTracker';
-
-interface ChecklistItem {
-  id: string;
-  label: string;
-}
+import { progressForItems, ENTITY_TAG_STYLES, type ChecklistItemDef } from '../../lib/bookkeepingTracker';
 
 interface ChecklistPanelProps {
   title: string;
   subtitle?: string;
-  items: readonly ChecklistItem[];
+  items: readonly ChecklistItemDef[];
   checks: Record<string, boolean> | undefined;
   onToggle: (id: string, checked: boolean) => void;
   onReset?: () => void;
   headerExtra?: ReactNode;
   footerExtra?: ReactNode;
+  showTags?: boolean;
+  disabled?: boolean;
+  disabledMessage?: string;
+  bannerExtra?: ReactNode;
 }
 
 export default function ChecklistPanel({
@@ -27,6 +26,10 @@ export default function ChecklistPanel({
   onReset,
   headerExtra,
   footerExtra,
+  showTags = false,
+  disabled = false,
+  disabledMessage,
+  bannerExtra,
 }: ChecklistPanelProps) {
   const progress = progressForItems(checks, items);
 
@@ -54,9 +57,13 @@ export default function ChecklistPanel({
         <div className="mt-3">
           <ProgressBar {...progress} />
         </div>
+        {bannerExtra && <div className="mt-3">{bannerExtra}</div>}
+        {disabled && disabledMessage && (
+          <p className="mt-3 text-sm text-slate-500 italic">{disabledMessage}</p>
+        )}
       </div>
 
-      <ul className="divide-y divide-slate-100">
+      <ul className={`divide-y divide-slate-100 ${disabled ? 'opacity-50 pointer-events-none' : ''}`}>
         {items.map((item) => {
           const checked = Boolean(checks?.[item.id]);
           return (
@@ -68,9 +75,16 @@ export default function ChecklistPanel({
                   onChange={(e) => onToggle(item.id, e.target.checked)}
                   className="mt-1 h-4 w-4 rounded border-slate-300 text-emerald-600 focus:ring-emerald-500"
                 />
-                <span className={`text-sm leading-relaxed ${checked ? 'text-slate-500 line-through' : 'text-slate-800'}`}>
+                <span className={`text-sm leading-relaxed flex-1 ${checked ? 'text-slate-500 line-through' : 'text-slate-800'}`}>
                   {item.label}
                 </span>
+                {showTags && item.tag && (
+                  <span
+                    className={`shrink-0 mt-0.5 px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wide rounded border ${ENTITY_TAG_STYLES[item.tag]}`}
+                  >
+                    {item.tag}
+                  </span>
+                )}
               </label>
             </li>
           );
