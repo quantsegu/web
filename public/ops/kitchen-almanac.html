@@ -156,6 +156,9 @@
   .ex-table th{font-family:'IBM Plex Mono', monospace; font-size:10px; letter-spacing:0.06em; text-transform:uppercase; color:#7a8a7f; text-align:left; padding:8px 10px 8px 0; border-bottom:1px dashed rgba(19,36,32,0.15);}
   .ex-table td{padding:9px 10px 9px 0; border-bottom:1px solid rgba(19,36,32,0.07); vertical-align:top; line-height:1.45; color:#2b3a33;}
   .ex-table td.eq{font-family:'IBM Plex Mono', monospace; font-size:11px; color:#6b7a71; white-space:nowrap;}
+  .ex-table td.vid{white-space:nowrap; width:72px;}
+  .ex-vid{display:inline-flex; align-items:center; gap:3px; font-family:'IBM Plex Mono', monospace; font-size:10px; letter-spacing:0.04em; text-transform:uppercase; color:var(--rust); text-decoration:none; border-bottom:1px solid rgba(140,63,50,0.35); padding-bottom:1px; transition:color 0.2s, border-color 0.2s;}
+  .ex-vid:hover{color:var(--turmeric); border-bottom-color:var(--turmeric);}
   .ex-table tr:last-child td{border-bottom:none;}
   .ex-note{font-size:12.5px; color:var(--cream-dim); line-height:1.55; margin:0 0 16px;}
   .equip-chips{display:flex; flex-wrap:wrap; gap:8px; margin-bottom:30px;}
@@ -1561,7 +1564,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       <span class="equip-chip">Band · medium/heavy</span>
       <span class="equip-chip">Door anchor</span>
     </div>
-    <p class="ex-note">DB-1 through DB-4 are your four dumbbells ranked lightest to heaviest — adjust to what you actually own. Rest <b>90 sec</b> after compound lifts, <b>60 sec</b> after isolation work.</p>
+    <p class="ex-note">DB-1 through DB-4 are your four dumbbells ranked lightest to heaviest — adjust to what you actually own. Rest <b>90 sec</b> after compound lifts, <b>60 sec</b> after isolation work. Tap <b>▶ Watch</b> in the Form column for a YouTube form demo before trying a movement for the first time.</p>
 
     <div class="section-label">Weekly split</div>
     <div class="train-grid">
@@ -1589,15 +1592,15 @@ document.addEventListener('DOMContentLoaded', async () => {
       <div class="ex-block">
         <h4>Main lifts</h4>
         <table class="ex-table">
-          <tr><th>Exercise</th><th>Sets × reps</th><th>Equipment</th></tr>
-          <tr><td><b>Goblet squat</b> — elbows inside knees, 3 sec down</td><td>4 × 8–10</td><td class="eq">DB-4</td></tr>
-          <tr><td><b>Romanian deadlift</b> — soft knees, hinge hips, feel hamstrings</td><td>4 × 10</td><td class="eq">DB-3 or DB-4 (pair)</td></tr>
-          <tr><td><b>Reverse lunge</b> — back knee floats, torso tall</td><td>3 × 10 each leg</td><td class="eq">DB-3 (each hand)</td></tr>
-          <tr><td><b>Step-up</b> — drive through whole foot, no push-off back leg</td><td>3 × 10 each leg</td><td class="eq">DB-2 (goblet)</td></tr>
-          <tr><td><b>Band glute bridge</b> — band above knees, push knees out</td><td>3 × 15</td><td class="eq">Light band</td></tr>
-          <tr><td><b>Farmer carry</b> — shoulders down, walk tall, crush grip</td><td>3 × 40 m</td><td class="eq">DB-4 (each hand)</td></tr>
-          <tr><td><b>Pallof press</b> — resist rotation, hold 2 sec out</td><td>3 × 12 each side</td><td class="eq">Medium band</td></tr>
-          <tr><td><b>Dead bug</b> — low back pressed to floor</td><td>3 × 10 each side</td><td class="eq">Bodyweight</td></tr>
+          <tr><th>Exercise</th><th>Sets × reps</th><th>Equipment</th><th>Form</th></tr>
+          <tr><td><b>Goblet squat</b> — elbows inside knees, 3 sec down</td><td>4 × 8–10</td><td class="eq">DB-4</td><td class="vid"><a class="ex-vid" href="https://www.youtube.com/watch?v=MeIiIdhvXT4" target="_blank" rel="noopener">▶ Watch</a></td></tr>
+          <tr><td><b>Romanian deadlift</b> — soft knees, hinge hips, feel hamstrings</td><td>4 × 10</td><td class="eq">DB-3 or DB-4 (pair)</td><td class="vid"><a class="ex-vid" href="https://www.youtube.com/watch?v=hQgFixeXdZo" target="_blank" rel="noopener">▶ Watch</a></td></tr>
+          <tr><td><b>Reverse lunge</b> — back knee floats, torso tall</td><td>3 × 10 each leg</td><td class="eq">DB-3 (each hand)</td><td class="vid"><a class="ex-vid" href="https://www.youtube.com/watch?v=sjlsISvHyZs" target="_blank" rel="noopener">▶ Watch</a></td></tr>
+          <tr><td><b>Step-up</b> — drive through whole foot, no push-off back leg</td><td>3 × 10 each leg</td><td class="eq">DB-2 (goblet)</td><td class="vid"><a class="ex-vid" href="https://www.youtube.com/watch?v=hgkk12L_Umk" target="_blank" rel="noopener">▶ Watch</a></td></tr>
+          <tr><td><b>Band glute bridge</b> — band above knees, push knees out</td><td>3 × 15</td><td class="eq">Light band</td><td class="vid"><a class="ex-vid" href="https://www.youtube.com/watch?v=ktdIgom5B18" target="_blank" rel="noopener">▶ Watch</a></td></tr>
+          <tr><td><b>Farmer carry</b> — shoulders down, walk tall, crush grip</td><td>3 × 40 m</td><td class="eq">DB-4 (each hand)</td><td class="vid"><a class="ex-vid" href="https://www.youtube.com/watch?v=p5MNNosenJc" target="_blank" rel="noopener">▶ Watch</a></td></tr>
+          <tr><td><b>Pallof press</b> — resist rotation, hold 2 sec out</td><td>3 × 12 each side</td><td class="eq">Medium band</td><td class="vid"><a class="ex-vid" href="https://www.youtube.com/watch?v=HXrLaqNIkTs" target="_blank" rel="noopener">▶ Watch</a></td></tr>
+          <tr><td><b>Dead bug</b> — low back pressed to floor</td><td>3 × 10 each side</td><td class="eq">Bodyweight</td><td class="vid"><a class="ex-vid" href="https://www.youtube.com/watch?v=g_BYB0R-4Ws" target="_blank" rel="noopener">▶ Watch</a></td></tr>
         </table>
       </div>
     </div>
@@ -1608,15 +1611,15 @@ document.addEventListener('DOMContentLoaded', async () => {
       <div class="ex-block">
         <h4>Main lifts</h4>
         <table class="ex-table">
-          <tr><th>Exercise</th><th>Sets × reps</th><th>Equipment</th></tr>
-          <tr><td><b>Floor press</b> — pause 1 sec at bottom, don't bounce elbows</td><td>4 × 8–10</td><td class="eq">DB-4 (each hand)</td></tr>
-          <tr><td><b>Overhead press</b> — ribs down, press straight up, no lean-back</td><td>4 × 8–10</td><td class="eq">DB-3 (each hand)</td></tr>
-          <tr><td><b>Incline DB press</b> — bench or floor wedge ~30° if you have it</td><td>3 × 10</td><td class="eq">DB-3</td></tr>
-          <tr><td><b>Band chest fly</b> — slight bend elbows, squeeze at midline</td><td>3 × 12–15</td><td class="eq">Light band</td></tr>
-          <tr><td><b>Lateral raise</b> — lead with elbows, stop at shoulder height</td><td>3 × 15</td><td class="eq">DB-1 or DB-2</td></tr>
-          <tr><td><b>Overhead tricep extension</b> — one or two dumbbells</td><td>3 × 12</td><td class="eq">DB-2</td></tr>
-          <tr><td><b>Band tricep pushdown</b> — elbows pinned to ribs</td><td>3 × 15</td><td class="eq">Medium band</td></tr>
-          <tr><td><b>Push-up finisher</b> — knees or toes, stop 2 reps before failure</td><td>2 × max clean reps</td><td class="eq">Bodyweight</td></tr>
+          <tr><th>Exercise</th><th>Sets × reps</th><th>Equipment</th><th>Form</th></tr>
+          <tr><td><b>Floor press</b> — pause 1 sec at bottom, don't bounce elbows</td><td>4 × 8–10</td><td class="eq">DB-4 (each hand)</td><td class="vid"><a class="ex-vid" href="https://www.youtube.com/watch?v=uUGDRwge4F8" target="_blank" rel="noopener">▶ Watch</a></td></tr>
+          <tr><td><b>Overhead press</b> — ribs down, press straight up, no lean-back</td><td>4 × 8–10</td><td class="eq">DB-3 (each hand)</td><td class="vid"><a class="ex-vid" href="https://www.youtube.com/watch?v=qEwKCR5JCog" target="_blank" rel="noopener">▶ Watch</a></td></tr>
+          <tr><td><b>Incline DB press</b> — bench or floor wedge ~30° if you have it</td><td>3 × 10</td><td class="eq">DB-3</td><td class="vid"><a class="ex-vid" href="https://www.youtube.com/watch?v=8iPEnn-ltC8" target="_blank" rel="noopener">▶ Watch</a></td></tr>
+          <tr><td><b>Band chest fly</b> — slight bend elbows, squeeze at midline</td><td>3 × 12–15</td><td class="eq">Light band</td><td class="vid"><a class="ex-vid" href="https://www.youtube.com/watch?v=yVcEkvgymt8" target="_blank" rel="noopener">▶ Watch</a></td></tr>
+          <tr><td><b>Lateral raise</b> — lead with elbows, stop at shoulder height</td><td>3 × 15</td><td class="eq">DB-1 or DB-2</td><td class="vid"><a class="ex-vid" href="https://www.youtube.com/watch?v=3VcKaXpzqRo" target="_blank" rel="noopener">▶ Watch</a></td></tr>
+          <tr><td><b>Overhead tricep extension</b> — one or two dumbbells</td><td>3 × 12</td><td class="eq">DB-2</td><td class="vid"><a class="ex-vid" href="https://www.youtube.com/watch?v=-Vyt2QdsR7E" target="_blank" rel="noopener">▶ Watch</a></td></tr>
+          <tr><td><b>Band tricep pushdown</b> — elbows pinned to ribs</td><td>3 × 15</td><td class="eq">Medium band</td><td class="vid"><a class="ex-vid" href="https://www.youtube.com/watch?v=qjPN6ElNqpc" target="_blank" rel="noopener">▶ Watch</a></td></tr>
+          <tr><td><b>Push-up finisher</b> — knees or toes, stop 2 reps before failure</td><td>2 × max clean reps</td><td class="eq">Bodyweight</td><td class="vid"><a class="ex-vid" href="https://www.youtube.com/watch?v=IODxDxX7oi4" target="_blank" rel="noopener">▶ Watch</a></td></tr>
         </table>
       </div>
     </div>
@@ -1627,15 +1630,15 @@ document.addEventListener('DOMContentLoaded', async () => {
       <div class="ex-block">
         <h4>Main lifts</h4>
         <table class="ex-table">
-          <tr><th>Exercise</th><th>Sets × reps</th><th>Equipment</th></tr>
-          <tr><td><b>Band row</b> — seated or standing, squeeze shoulder blades 2 sec</td><td>4 × 12</td><td class="eq">Medium/heavy band</td></tr>
-          <tr><td><b>Single-arm DB row</b> — flat back, pull to hip pocket</td><td>4 × 10 each arm</td><td class="eq">DB-4</td></tr>
-          <tr><td><b>Band face pull</b> — pull to forehead, external rotation at end</td><td>3 × 15</td><td class="eq">Light band</td></tr>
-          <tr><td><b>Reverse fly</b> — hinge slightly, lead with pinkies</td><td>3 × 12</td><td class="eq">DB-1 (pair)</td></tr>
-          <tr><td><b>Band pull-apart</b> — arms straight, pull to chest</td><td>3 × 20</td><td class="eq">Light band</td></tr>
-          <tr><td><b>Hammer curl</b> — neutral grip, no swinging</td><td>3 × 12</td><td class="eq">DB-3</td></tr>
-          <tr><td><b>DB bicep curl</b> — supinate at top</td><td>3 × 12</td><td class="eq">DB-2</td></tr>
-          <tr><td><b>Bird dog</b> — reach long, don't arch lower back</td><td>3 × 10 each side</td><td class="eq">Bodyweight</td></tr>
+          <tr><th>Exercise</th><th>Sets × reps</th><th>Equipment</th><th>Form</th></tr>
+          <tr><td><b>Band row</b> — seated or standing, squeeze shoulder blades 2 sec</td><td>4 × 12</td><td class="eq">Medium/heavy band</td><td class="vid"><a class="ex-vid" href="https://www.youtube.com/watch?v=cYF1mlR7yR8" target="_blank" rel="noopener">▶ Watch</a></td></tr>
+          <tr><td><b>Single-arm DB row</b> — flat back, pull to hip pocket</td><td>4 × 10 each arm</td><td class="eq">DB-4</td><td class="vid"><a class="ex-vid" href="https://www.youtube.com/watch?v=tLnlWj7LQ34" target="_blank" rel="noopener">▶ Watch</a></td></tr>
+          <tr><td><b>Band face pull</b> — pull to forehead, external rotation at end</td><td>3 × 15</td><td class="eq">Light band</td><td class="vid"><a class="ex-vid" href="https://www.youtube.com/watch?v=eFxMixk_qPQ" target="_blank" rel="noopener">▶ Watch</a></td></tr>
+          <tr><td><b>Reverse fly</b> — hinge slightly, lead with pinkies</td><td>3 × 12</td><td class="eq">DB-1 (pair)</td><td class="vid"><a class="ex-vid" href="https://www.youtube.com/watch?v=JoCRRZ3zRtI" target="_blank" rel="noopener">▶ Watch</a></td></tr>
+          <tr><td><b>Band pull-apart</b> — arms straight, pull to chest</td><td>3 × 20</td><td class="eq">Light band</td><td class="vid"><a class="ex-vid" href="https://www.youtube.com/watch?v=Nwm80m3TjbE" target="_blank" rel="noopener">▶ Watch</a></td></tr>
+          <tr><td><b>Hammer curl</b> — neutral grip, no swinging</td><td>3 × 12</td><td class="eq">DB-3</td><td class="vid"><a class="ex-vid" href="https://www.youtube.com/watch?v=zC3nLlEvin4" target="_blank" rel="noopener">▶ Watch</a></td></tr>
+          <tr><td><b>DB bicep curl</b> — supinate at top</td><td>3 × 12</td><td class="eq">DB-2</td><td class="vid"><a class="ex-vid" href="https://www.youtube.com/watch?v=sAq_ocpRh_I" target="_blank" rel="noopener">▶ Watch</a></td></tr>
+          <tr><td><b>Bird dog</b> — reach long, don't arch lower back</td><td>3 × 10 each side</td><td class="eq">Bodyweight</td><td class="vid"><a class="ex-vid" href="https://www.youtube.com/watch?v=ZdAHe9_HeEw" target="_blank" rel="noopener">▶ Watch</a></td></tr>
         </table>
       </div>
     </div>
@@ -1647,20 +1650,20 @@ document.addEventListener('DOMContentLoaded', async () => {
         <p class="ex-note" style="color:#4b5c53;margin-top:14px;">Run as a <b>circuit</b>: do exercises 1–6 back-to-back, rest 2 min, repeat 3 rounds. Moderate pace — breathing hard but every rep controlled. This is fat-burning density work, not HIIT.</p>
         <h4>Circuit — 3 rounds</h4>
         <table class="ex-table">
-          <tr><th>Exercise</th><th>Reps</th><th>Equipment</th></tr>
-          <tr><td><b>DB thruster</b> — squat, then press overhead in one motion</td><td>12</td><td class="eq">DB-3 (each hand)</td></tr>
-          <tr><td><b>Bent-over row</b> — both arms, flat back</td><td>12</td><td class="eq">DB-4 (pair)</td></tr>
-          <tr><td><b>Band lat pulldown</b> — kneel or stand, pull to upper chest</td><td>15</td><td class="eq">Medium band · door</td></tr>
-          <tr><td><b>Split squat</b> — static stance, drop straight down</td><td>10 each leg</td><td class="eq">DB-2 (goblet)</td></tr>
-          <tr><td><b>Band wood chop</b> — rotate through core, not arms</td><td>12 each side</td><td class="eq">Medium band</td></tr>
-          <tr><td><b>Suitcase carry</b> — one DB, walk without leaning</td><td>30 m each hand</td><td class="eq">DB-4</td></tr>
+          <tr><th>Exercise</th><th>Reps</th><th>Equipment</th><th>Form</th></tr>
+          <tr><td><b>DB thruster</b> — squat, then press overhead in one motion</td><td>12</td><td class="eq">DB-3 (each hand)</td><td class="vid"><a class="ex-vid" href="https://www.youtube.com/watch?v=M5gEwLTtWbg" target="_blank" rel="noopener">▶ Watch</a></td></tr>
+          <tr><td><b>Bent-over row</b> — both arms, flat back</td><td>12</td><td class="eq">DB-4 (pair)</td><td class="vid"><a class="ex-vid" href="https://www.youtube.com/watch?v=pYcpY20QaE8" target="_blank" rel="noopener">▶ Watch</a></td></tr>
+          <tr><td><b>Band lat pulldown</b> — kneel or stand, pull to upper chest</td><td>15</td><td class="eq">Medium band · door</td><td class="vid"><a class="ex-vid" href="https://www.youtube.com/watch?v=yldAhz-yO0o" target="_blank" rel="noopener">▶ Watch</a></td></tr>
+          <tr><td><b>Split squat</b> — static stance, drop straight down</td><td>10 each leg</td><td class="eq">DB-2 (goblet)</td><td class="vid"><a class="ex-vid" href="https://www.youtube.com/watch?v=2C-uNgKwPLE" target="_blank" rel="noopener">▶ Watch</a></td></tr>
+          <tr><td><b>Band wood chop</b> — rotate through core, not arms</td><td>12 each side</td><td class="eq">Medium band</td><td class="vid"><a class="ex-vid" href="https://www.youtube.com/watch?v=Yp2DmHk3KnY" target="_blank" rel="noopener">▶ Watch</a></td></tr>
+          <tr><td><b>Suitcase carry</b> — one DB, walk without leaning</td><td>30 m each hand</td><td class="eq">DB-4</td><td class="vid"><a class="ex-vid" href="https://www.youtube.com/watch?v=p5MNNosenJc" target="_blank" rel="noopener">▶ Watch</a></td></tr>
         </table>
         <h4>Finisher</h4>
         <table class="ex-table">
-          <tr><th>Exercise</th><th>Sets × reps</th><th>Equipment</th></tr>
-          <tr><td><b>Band good morning</b> — band on upper back, hinge hips</td><td>3 × 12</td><td class="eq">Medium band</td></tr>
-          <tr><td><b>Plank</b> — squeeze glutes, don't sag hips</td><td>3 × 45 sec</td><td class="eq">Bodyweight</td></tr>
-          <tr><td><b>Brisk walk</b> — outdoor if possible, nasal breathing</td><td>12 min</td><td class="eq">—</td></tr>
+          <tr><th>Exercise</th><th>Sets × reps</th><th>Equipment</th><th>Form</th></tr>
+          <tr><td><b>Band good morning</b> — band on upper back, hinge hips</td><td>3 × 12</td><td class="eq">Medium band</td><td class="vid"><a class="ex-vid" href="https://www.youtube.com/watch?v=CTRaCzE8pWU" target="_blank" rel="noopener">▶ Watch</a></td></tr>
+          <tr><td><b>Plank</b> — squeeze glutes, don't sag hips</td><td>3 × 45 sec</td><td class="eq">Bodyweight</td><td class="vid"><a class="ex-vid" href="https://www.youtube.com/watch?v=ASdvN_XEl_c" target="_blank" rel="noopener">▶ Watch</a></td></tr>
+          <tr><td><b>Brisk walk</b> — outdoor if possible, nasal breathing</td><td>12 min</td><td class="eq">—</td><td class="vid"><a class="ex-vid" href="https://www.youtube.com/watch?v=irjamWE5sdY" target="_blank" rel="noopener">▶ Watch</a></td></tr>
         </table>
       </div>
     </div>
