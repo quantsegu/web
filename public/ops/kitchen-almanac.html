@@ -142,6 +142,30 @@
   .fix-list li b{color:var(--cream);}
   .fix-list li .add{font-family:'IBM Plex Mono', monospace; font-size:12px; color:var(--turmeric-2); display:block; margin-top:5px;}
 
+  /* TRAINING TAB */
+  .train-grid{display:grid; grid-template-columns:repeat(4,1fr); gap:14px; margin-bottom:40px;}
+  @media (max-width:900px){ .train-grid{grid-template-columns:repeat(2,1fr);} }
+  @media (max-width:500px){ .train-grid{grid-template-columns:1fr;} }
+  .train-day{background:var(--cream); color:var(--ink); border-radius:6px; overflow:hidden; margin-bottom:20px;}
+  .train-day .day-head{background:rgba(124,154,133,0.15);}
+  .train-day .day-head .dprotein{color:#4f6b45;}
+  .ex-block{padding:0 24px 20px;}
+  .ex-block h4{font-family:'Fraunces', serif; font-size:16px; color:var(--rust); margin:18px 0 10px; font-weight:600;}
+  .ex-block h4:first-child{margin-top:16px;}
+  .ex-table{width:100%; border-collapse:collapse; font-size:13px;}
+  .ex-table th{font-family:'IBM Plex Mono', monospace; font-size:10px; letter-spacing:0.06em; text-transform:uppercase; color:#7a8a7f; text-align:left; padding:8px 10px 8px 0; border-bottom:1px dashed rgba(19,36,32,0.15);}
+  .ex-table td{padding:9px 10px 9px 0; border-bottom:1px solid rgba(19,36,32,0.07); vertical-align:top; line-height:1.45; color:#2b3a33;}
+  .ex-table td.eq{font-family:'IBM Plex Mono', monospace; font-size:11px; color:#6b7a71; white-space:nowrap;}
+  .ex-table tr:last-child td{border-bottom:none;}
+  .ex-note{font-size:12.5px; color:var(--cream-dim); line-height:1.55; margin:0 0 16px;}
+  .equip-chips{display:flex; flex-wrap:wrap; gap:8px; margin-bottom:30px;}
+  .equip-chip{font-family:'IBM Plex Mono', monospace; font-size:11px; letter-spacing:0.04em; text-transform:uppercase; padding:6px 12px; border-radius:20px; background:var(--ink-2); border:1px solid var(--line); color:var(--sage);}
+  .rest-row{display:grid; grid-template-columns:repeat(3,1fr); gap:14px; margin-bottom:40px;}
+  @media (max-width:700px){ .rest-row{grid-template-columns:1fr;} }
+  .rest-card{background:var(--ink-2); border:1px solid var(--line); border-radius:6px; padding:18px 20px;}
+  .rest-card h4{font-family:'Fraunces', serif; font-size:16px; color:var(--turmeric-2); margin:0 0 8px;}
+  .rest-card p{font-size:13px; color:var(--cream-dim); line-height:1.55; margin:0;}
+
   footer{text-align:center; font-family:'IBM Plex Mono', monospace; font-size:11px; color:var(--sage); letter-spacing:0.05em; padding-top:60px;}
 </style>
 </head>
@@ -149,9 +173,9 @@
 <div class="wrap">
 
   <div class="hero">
-    <div class="eyebrow">Drinks · Week Plan · Groceries · Recipes — all in one place</div>
+    <div class="eyebrow">Drinks · Week Plan · Groceries · Recipes · Training — all in one place</div>
     <h1>The Kitchen <em>Almanac</em></h1>
-    <p class="lede">Everything merged into one page: the five drinks, the full week of meals built around them, the shopping list, and the actual recipes for every dish on the plan.</p>
+    <p class="lede">Everything merged into one page: the five drinks, the full week of meals built around them, the shopping list, the recipes, and a four-day strength plan built for fat loss, muscle, and longevity.</p>
   </div>
 
   <nav class="tabs" id="tabNav">
@@ -161,7 +185,8 @@
     <button class="tab-btn" onclick="showTab('recipes')">04 · Recipes</button>
     <button class="tab-btn" onclick="showTab('nutrition')">05 · Nutrition Targets</button>
     <button class="tab-btn" onclick="showTab('fittrack')">06 · FitTrack</button>
-    <button class="tab-btn" onclick="showTab('colourguide')">07 · Colour Guide</button>
+    <button class="tab-btn" onclick="showTab('training')">07 · Training</button>
+    <button class="tab-btn" onclick="showTab('colourguide')">08 · Colour Guide</button>
   </nav>
 
   <!-- TAB 1: DRINKS -->
@@ -1502,7 +1527,183 @@ document.addEventListener('DOMContentLoaded', async () => {
     <iframe id="fittrackFrame" style="width:100%;height:1600px;border:none;border-radius:8px;"></iframe>
   </div>
 
-  <!-- TAB 7: COLOUR GUIDE -->
+  <!-- TAB 7: TRAINING -->
+  <div id="training" class="tabpanel">
+    <div class="note-panel">
+      <div class="label">Coach's<br>Notes</div>
+      <div>
+        <h3>Strength for longevity — not just aesthetics</h3>
+        <ul>
+          <li><b>Four days · ~60 minutes each.</b> Three lifting days plus one full-body conditioning day. Rest or walk on the other three — that walking is part of the fat-loss plan, not optional filler.</li>
+          <li><b>Equipment only:</b> your four dumbbells (light → heavy) and resistance bands. No barbell, no machines. Anchor bands to a sturdy door or post for rows and pulldowns.</li>
+          <li><b>Longevity priorities:</b> hinge and squat patterns (legs + back health), carries (grip + spine stability), rows and face pulls (posture), single-leg work (balance as you age), and controlled tempo — no bouncing reps.</li>
+          <li><b>Recomposition at 43:</b> train hard enough to keep muscle while the ~2,200 kcal plan handles fat loss. If gym performance drops for two weeks straight, add 100–150 kcal on training days — don't grind through exhaustion.</li>
+          <li><b>Thyroid note:</b> moderate training is fine. Avoid stacking three all-out HIIT sessions on top of four lifting days — the full-body day uses brisk circuits, not gasping sprints.</li>
+          <li><b>Progression:</b> when you hit the top of the rep range with good form on all sets, move up one dumbbell weight next session. Bands: use a thicker band or choke up to shorten the loop.</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="stat-grid">
+      <div class="stat"><div class="slabel">Frequency</div><div class="sval">4×</div><div class="ssub">days per week</div></div>
+      <div class="stat"><div class="slabel">Session length</div><div class="sval">~60</div><div class="ssub">minutes each</div></div>
+      <div class="stat"><div class="slabel">Equipment</div><div class="sval">DB + Band</div><div class="ssub">dumbbells & bands only</div></div>
+      <div class="stat"><div class="slabel">Focus</div><div class="sval">Full body</div><div class="ssub">strength · posture · fat loss</div></div>
+    </div>
+
+    <div class="section-label">Equipment map</div>
+    <div class="equip-chips">
+      <span class="equip-chip">DB-1 · lightest</span>
+      <span class="equip-chip">DB-2 · light-medium</span>
+      <span class="equip-chip">DB-3 · medium-heavy</span>
+      <span class="equip-chip">DB-4 · heaviest</span>
+      <span class="equip-chip">Band · light loop</span>
+      <span class="equip-chip">Band · medium/heavy</span>
+      <span class="equip-chip">Door anchor</span>
+    </div>
+    <p class="ex-note">DB-1 through DB-4 are your four dumbbells ranked lightest to heaviest — adjust to what you actually own. Rest <b>90 sec</b> after compound lifts, <b>60 sec</b> after isolation work.</p>
+
+    <div class="section-label">Weekly split</div>
+    <div class="train-grid">
+      <div class="rest-card" style="border-left:3px solid var(--sage);">
+        <h4>Mon · Day A</h4>
+        <p>Lower body + core · hinges, squats, carries</p>
+      </div>
+      <div class="rest-card" style="border-left:3px solid var(--turmeric);">
+        <h4>Wed · Day B</h4>
+        <p>Push · chest, shoulders, triceps</p>
+      </div>
+      <div class="rest-card" style="border-left:3px solid var(--rust);">
+        <h4>Fri · Day C</h4>
+        <p>Pull · back, biceps, posture</p>
+      </div>
+      <div class="rest-card" style="border-left:3px solid #4f6b45;">
+        <h4>Sat · Day D</h4>
+        <p>Full body + conditioning · strength density</p>
+      </div>
+    </div>
+
+    <div class="section-label">Day A — Lower body & core · Monday · ~60 min</div>
+    <div class="train-day">
+      <div class="day-head"><span class="dname">Day A</span><span class="dprotein">8 min warm-up · 47 min work · 5 min mobility</span></div>
+      <div class="ex-block">
+        <h4>Main lifts</h4>
+        <table class="ex-table">
+          <tr><th>Exercise</th><th>Sets × reps</th><th>Equipment</th></tr>
+          <tr><td><b>Goblet squat</b> — elbows inside knees, 3 sec down</td><td>4 × 8–10</td><td class="eq">DB-4</td></tr>
+          <tr><td><b>Romanian deadlift</b> — soft knees, hinge hips, feel hamstrings</td><td>4 × 10</td><td class="eq">DB-3 or DB-4 (pair)</td></tr>
+          <tr><td><b>Reverse lunge</b> — back knee floats, torso tall</td><td>3 × 10 each leg</td><td class="eq">DB-3 (each hand)</td></tr>
+          <tr><td><b>Step-up</b> — drive through whole foot, no push-off back leg</td><td>3 × 10 each leg</td><td class="eq">DB-2 (goblet)</td></tr>
+          <tr><td><b>Band glute bridge</b> — band above knees, push knees out</td><td>3 × 15</td><td class="eq">Light band</td></tr>
+          <tr><td><b>Farmer carry</b> — shoulders down, walk tall, crush grip</td><td>3 × 40 m</td><td class="eq">DB-4 (each hand)</td></tr>
+          <tr><td><b>Pallof press</b> — resist rotation, hold 2 sec out</td><td>3 × 12 each side</td><td class="eq">Medium band</td></tr>
+          <tr><td><b>Dead bug</b> — low back pressed to floor</td><td>3 × 10 each side</td><td class="eq">Bodyweight</td></tr>
+        </table>
+      </div>
+    </div>
+
+    <div class="section-label">Day B — Push · Wednesday · ~60 min</div>
+    <div class="train-day">
+      <div class="day-head"><span class="dname">Day B</span><span class="dprotein">8 min warm-up · 47 min work · 5 min stretch</span></div>
+      <div class="ex-block">
+        <h4>Main lifts</h4>
+        <table class="ex-table">
+          <tr><th>Exercise</th><th>Sets × reps</th><th>Equipment</th></tr>
+          <tr><td><b>Floor press</b> — pause 1 sec at bottom, don't bounce elbows</td><td>4 × 8–10</td><td class="eq">DB-4 (each hand)</td></tr>
+          <tr><td><b>Overhead press</b> — ribs down, press straight up, no lean-back</td><td>4 × 8–10</td><td class="eq">DB-3 (each hand)</td></tr>
+          <tr><td><b>Incline DB press</b> — bench or floor wedge ~30° if you have it</td><td>3 × 10</td><td class="eq">DB-3</td></tr>
+          <tr><td><b>Band chest fly</b> — slight bend elbows, squeeze at midline</td><td>3 × 12–15</td><td class="eq">Light band</td></tr>
+          <tr><td><b>Lateral raise</b> — lead with elbows, stop at shoulder height</td><td>3 × 15</td><td class="eq">DB-1 or DB-2</td></tr>
+          <tr><td><b>Overhead tricep extension</b> — one or two dumbbells</td><td>3 × 12</td><td class="eq">DB-2</td></tr>
+          <tr><td><b>Band tricep pushdown</b> — elbows pinned to ribs</td><td>3 × 15</td><td class="eq">Medium band</td></tr>
+          <tr><td><b>Push-up finisher</b> — knees or toes, stop 2 reps before failure</td><td>2 × max clean reps</td><td class="eq">Bodyweight</td></tr>
+        </table>
+      </div>
+    </div>
+
+    <div class="section-label">Day C — Pull & posture · Friday · ~60 min</div>
+    <div class="train-day">
+      <div class="day-head"><span class="dname">Day C</span><span class="dprotein">8 min warm-up · 47 min work · 5 min mobility</span></div>
+      <div class="ex-block">
+        <h4>Main lifts</h4>
+        <table class="ex-table">
+          <tr><th>Exercise</th><th>Sets × reps</th><th>Equipment</th></tr>
+          <tr><td><b>Band row</b> — seated or standing, squeeze shoulder blades 2 sec</td><td>4 × 12</td><td class="eq">Medium/heavy band</td></tr>
+          <tr><td><b>Single-arm DB row</b> — flat back, pull to hip pocket</td><td>4 × 10 each arm</td><td class="eq">DB-4</td></tr>
+          <tr><td><b>Band face pull</b> — pull to forehead, external rotation at end</td><td>3 × 15</td><td class="eq">Light band</td></tr>
+          <tr><td><b>Reverse fly</b> — hinge slightly, lead with pinkies</td><td>3 × 12</td><td class="eq">DB-1 (pair)</td></tr>
+          <tr><td><b>Band pull-apart</b> — arms straight, pull to chest</td><td>3 × 20</td><td class="eq">Light band</td></tr>
+          <tr><td><b>Hammer curl</b> — neutral grip, no swinging</td><td>3 × 12</td><td class="eq">DB-3</td></tr>
+          <tr><td><b>DB bicep curl</b> — supinate at top</td><td>3 × 12</td><td class="eq">DB-2</td></tr>
+          <tr><td><b>Bird dog</b> — reach long, don't arch lower back</td><td>3 × 10 each side</td><td class="eq">Bodyweight</td></tr>
+        </table>
+      </div>
+    </div>
+
+    <div class="section-label">Day D — Full body & conditioning · Saturday · ~60 min</div>
+    <div class="train-day">
+      <div class="day-head"><span class="dname">Day D</span><span class="dprotein">8 min warm-up · 40 min circuit · 12 min walk cool-down</span></div>
+      <div class="ex-block">
+        <p class="ex-note" style="color:#4b5c53;margin-top:14px;">Run as a <b>circuit</b>: do exercises 1–6 back-to-back, rest 2 min, repeat 3 rounds. Moderate pace — breathing hard but every rep controlled. This is fat-burning density work, not HIIT.</p>
+        <h4>Circuit — 3 rounds</h4>
+        <table class="ex-table">
+          <tr><th>Exercise</th><th>Reps</th><th>Equipment</th></tr>
+          <tr><td><b>DB thruster</b> — squat, then press overhead in one motion</td><td>12</td><td class="eq">DB-3 (each hand)</td></tr>
+          <tr><td><b>Bent-over row</b> — both arms, flat back</td><td>12</td><td class="eq">DB-4 (pair)</td></tr>
+          <tr><td><b>Band lat pulldown</b> — kneel or stand, pull to upper chest</td><td>15</td><td class="eq">Medium band · door</td></tr>
+          <tr><td><b>Split squat</b> — static stance, drop straight down</td><td>10 each leg</td><td class="eq">DB-2 (goblet)</td></tr>
+          <tr><td><b>Band wood chop</b> — rotate through core, not arms</td><td>12 each side</td><td class="eq">Medium band</td></tr>
+          <tr><td><b>Suitcase carry</b> — one DB, walk without leaning</td><td>30 m each hand</td><td class="eq">DB-4</td></tr>
+        </table>
+        <h4>Finisher</h4>
+        <table class="ex-table">
+          <tr><th>Exercise</th><th>Sets × reps</th><th>Equipment</th></tr>
+          <tr><td><b>Band good morning</b> — band on upper back, hinge hips</td><td>3 × 12</td><td class="eq">Medium band</td></tr>
+          <tr><td><b>Plank</b> — squeeze glutes, don't sag hips</td><td>3 × 45 sec</td><td class="eq">Bodyweight</td></tr>
+          <tr><td><b>Brisk walk</b> — outdoor if possible, nasal breathing</td><td>12 min</td><td class="eq">—</td></tr>
+        </table>
+      </div>
+    </div>
+
+    <div class="section-label">Every session — warm-up & cool-down</div>
+    <div class="grid2">
+      <div class="rcard">
+        <h5>Warm-up · 8 minutes (never skip)</h5>
+        <p class="rmethod">2 min marching in place or easy step-ups · 10 arm circles each direction · 10 bodyweight squats · 10 hip hinges (hands on thighs) · 10 band pull-aparts · 1 light set of the first exercise at 50% weight.</p>
+      </div>
+      <div class="rcard">
+        <h5>Cool-down · 5 minutes</h5>
+        <p class="rmethod">Hamstring stretch 30 sec each leg · hip flexor stretch 30 sec each · chest doorway stretch 30 sec · thoracic rotation 8 each side · 5 deep belly breaths. On Day D the walk replaces most of this.</p>
+      </div>
+    </div>
+
+    <div class="section-label">Rest days & walking</div>
+    <div class="rest-row">
+      <div class="rest-card">
+        <h4>Tuesday · Rest + walk</h4>
+        <p>30–45 min brisk walk. Matches your 10k steps goal from the nutrition plan. Optional: 10 min band mobility (hips + shoulders).</p>
+      </div>
+      <div class="rest-card">
+        <h4>Thursday · Rest + walk</h4>
+        <p>Same as Tuesday. If legs are sore from Monday, add 5 min couch stretch per hip flexor.</p>
+      </div>
+      <div class="rest-card">
+        <h4>Sunday · Full rest</h4>
+        <p>Light moong dal khichdi dinner already planned — keep movement easy. A gentle 20 min stroll is fine; no structured training.</p>
+      </div>
+    </div>
+
+    <div class="section-label">Longevity non-negotiables</div>
+    <ul class="fix-list">
+      <li><b>Carries every week</b> — farmer and suitcase carries build grip strength, which is one of the strongest predictors of healthy ageing.<span class="add">Day A + Day D</span></li>
+      <li><b>Face pulls & rows every week</b> — desk posture and phone neck add up; pull twice as much volume as push over the week.<span class="add">Day C + Day D</span></li>
+      <li><b>Single-leg work</b> — lunges, step-ups, split squats train balance and prevent falls later.<span class="add">Day A + Day D</span></li>
+      <li><b>Controlled eccentrics</b> — 2–3 seconds on the lowering phase protects tendons and builds muscle at lower joint stress.<span class="add">All main lifts</span></li>
+      <li><b>Sleep 7–9 hours</b> — muscle repair and fat loss both happen off the floor. Training hard on 5 hours sleep works against longevity.<span class="add">Every night</span></li>
+    </ul>
+  </div>
+
+  <!-- TAB 8: COLOUR GUIDE -->
   <div id="colourguide" class="tabpanel">
     <div id="cg-tab">
       <style>
@@ -1587,7 +1788,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     </div>
   </div>
 
-  <footer>MERGED FORMULARY, WEEKLY PLAN, GROCERY LIST, RECIPES, NUTRITION TARGETS, FITTRACK & COLOUR GUIDE — ONE PAGE</footer>
+  <footer>FORMULARY · WEEKLY PLAN · GROCERIES · RECIPES · NUTRITION · FITTRACK · TRAINING · COLOUR GUIDE — ONE PAGE</footer>
 
 </div>
 
