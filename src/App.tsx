@@ -300,6 +300,10 @@ export default function App() {
         <Route path="/bjp" element={<BJP />} />
         <Route path="/communities" element={<IndianCommunities />} />
         <Route path="/ops/bookkeeping" element={<BookkeepingTracker />} />
+        <Route
+          path="/ops/kitchen-almanac"
+          element={<WealthToolStaticRedirect to="/ops/kitchen-almanac.html" />}
+        />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </BrowserRouter>

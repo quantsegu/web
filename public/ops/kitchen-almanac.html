@@ -1,0 +1,1638 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Kitchen Almanac</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Work+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#132420; --ink-2:#1c332c; --cream:#F6F0E2; --cream-dim:#e9dfc7;
+    --turmeric:#C7891F; --turmeric-2:#e3a94a; --rust:#8C3F32; --sage:#7C9A85;
+    --line: rgba(246,240,226,0.16);
+  }
+  *{box-sizing:border-box;}
+  body{margin:0; background:var(--ink); color:var(--cream); font-family:'Work Sans', sans-serif; -webkit-font-smoothing:antialiased;}
+  .wrap{max-width:1120px; margin:0 auto; padding:0 28px 100px;}
+
+  .hero{padding:70px 0 30px;}
+  .hero .eyebrow{font-family:'IBM Plex Mono', monospace; letter-spacing:0.14em; text-transform:uppercase; font-size:12px; color:var(--turmeric-2); margin-bottom:18px;}
+  .hero h1{font-family:'Fraunces', serif; font-weight:600; font-size:clamp(38px, 5.5vw, 60px); line-height:1.03; margin:0 0 16px; letter-spacing:-0.01em;}
+  .hero h1 em{font-style:italic; color:var(--turmeric-2); font-weight:500;}
+  .hero p.lede{font-size:16px; line-height:1.6; max-width:600px; color:var(--cream-dim);}
+
+  /* TABS */
+  .tabs{display:flex; gap:6px; border-bottom:1px solid var(--line); margin-bottom:44px; overflow-x:auto; padding-top:20px;}
+  .tab-btn{
+    font-family:'IBM Plex Mono', monospace; font-size:12.5px; letter-spacing:0.06em; text-transform:uppercase;
+    background:none; border:none; color:var(--sage); padding:12px 18px; cursor:pointer;
+    border-bottom:2px solid transparent; white-space:nowrap; transition:color 0.2s, border-color 0.2s;
+  }
+  .tab-btn:hover{color:var(--cream-dim);}
+  .tab-btn.active{color:var(--turmeric-2); border-bottom-color:var(--turmeric);}
+  .tabpanel{display:none;}
+  .tabpanel.active{display:block; animation:fade 0.25s ease;}
+  @keyframes fade{from{opacity:0; transform:translateY(4px);} to{opacity:1; transform:translateY(0);}}
+
+  .note-panel{margin:0 0 50px; background:var(--ink-2); border:1px solid var(--line); border-radius:4px; padding:30px 32px; display:grid; grid-template-columns:130px 1fr; gap:28px;}
+  @media (max-width:640px){ .note-panel{grid-template-columns:1fr; gap:16px;} }
+  .note-panel .label{font-family:'IBM Plex Mono', monospace; font-size:11px; letter-spacing:0.1em; text-transform:uppercase; color:var(--sage); padding-top:4px;}
+  .note-panel h3{font-family:'Fraunces', serif; font-weight:600; font-size:21px; margin:0 0 14px; color:var(--turmeric-2);}
+  .note-panel ul{margin:0; padding:0 0 0 18px;}
+  .note-panel li{margin-bottom:9px; line-height:1.55; font-size:14.5px; color:var(--cream-dim);}
+  .note-panel li b{color:var(--cream); font-weight:600;}
+  .flag{display:inline-block; font-family:'IBM Plex Mono', monospace; font-size:11px; background:var(--rust); color:var(--cream); padding:2px 8px; border-radius:2px; letter-spacing:0.05em; margin-right:8px;}
+
+  .section-label{font-family:'IBM Plex Mono', monospace; font-size:12px; letter-spacing:0.14em; text-transform:uppercase; color:var(--sage); margin:0 0 26px; display:flex; align-items:center; gap:14px;}
+  .section-label::after{content:''; flex:1; height:1px; background:var(--line);}
+
+  /* DRINK CARDS */
+  .grid2{display:grid; grid-template-columns:repeat(2, 1fr); gap:22px; margin-bottom:20px;}
+  @media (max-width:760px){ .grid2{grid-template-columns:1fr;} }
+  .card{background:var(--cream); color:var(--ink); border-radius:6px; overflow:hidden; transition:transform 0.25s ease, box-shadow 0.25s ease;}
+  .card:hover{transform:translateY(-3px); box-shadow:0 18px 40px rgba(0,0,0,0.35);}
+  .card-top{padding:24px 24px 18px; border-bottom:1px dashed rgba(19,36,32,0.2);}
+  .card-index{font-family:'IBM Plex Mono', monospace; font-size:11px; color:var(--rust); letter-spacing:0.1em; margin-bottom:10px;}
+  .card h3{font-family:'Fraunces', serif; font-size:23px; font-weight:600; margin:0 0 8px; line-height:1.1;}
+  .card .tagline{font-size:13.5px; color:#4b5c53; line-height:1.5; margin:0;}
+  .card-body{padding:18px 24px 24px;}
+  .protein-badge{display:inline-flex; align-items:baseline; gap:5px; background:var(--ink); color:var(--turmeric-2); font-family:'IBM Plex Mono', monospace; font-size:12px; padding:5px 10px; border-radius:20px; margin-bottom:14px;}
+  .protein-badge b{font-size:14px; color:var(--cream);}
+  .ingr-list{list-style:none; margin:0 0 14px; padding:0; font-size:13.5px; line-height:1.6;}
+  .ingr-list li{display:flex; justify-content:space-between; border-bottom:1px solid rgba(19,36,32,0.08); padding:4px 0;}
+  .ingr-list li span:last-child{font-family:'IBM Plex Mono', monospace; font-size:11.5px; color:#6b7a71; white-space:nowrap; padding-left:12px;}
+  .method{font-size:13px; color:#3d4a43; line-height:1.6; margin:0 0 14px;}
+  .tags{display:flex; flex-wrap:wrap; gap:6px; margin-bottom:12px;}
+  .tag{font-family:'IBM Plex Mono', monospace; font-size:10px; letter-spacing:0.03em; text-transform:uppercase; padding:4px 9px; border-radius:20px; border:1px solid rgba(19,36,32,0.25); color:#3d4a43;}
+  .tag.iron{background:#f1ddd6; border-color:transparent; color:var(--rust);}
+  .tag.calcium{background:#e6ecec; border-color:transparent; color:#3a5f5f;}
+  .tag.zinc{background:#eee4d3; border-color:transparent; color:#8a6a25;}
+  .tag.omega{background:#e2e9dd; border-color:transparent; color:#4f6b45;}
+  .tag.b12{background:#e8e0ee; border-color:transparent; color:#5c4177;}
+  .tag.selenium{background:#fbeccb; border-color:transparent; color:#a3661a;}
+  .timing-note{display:flex; gap:10px; background:rgba(140,63,50,0.08); border-left:3px solid var(--rust); padding:9px 13px; border-radius:0 4px 4px 0; font-size:12px; line-height:1.5; color:#6b3527;}
+
+  /* WEEK DAY ROWS */
+  .day{background:var(--cream); color:var(--ink); border-radius:6px; margin-bottom:16px; overflow:hidden;}
+  .day-head{display:flex; align-items:baseline; justify-content:space-between; padding:16px 24px; border-bottom:1px dashed rgba(19,36,32,0.18); background:rgba(199,137,31,0.08);}
+  .day-head .dname{font-family:'Fraunces', serif; font-weight:600; font-size:20px;}
+  .day-head .dprotein{font-family:'IBM Plex Mono', monospace; font-size:12px; color:var(--rust);}
+  .meals{display:grid; grid-template-columns:repeat(4, 1fr);}
+  @media (max-width:820px){ .meals{grid-template-columns:1fr;} }
+  .meal{padding:16px 20px; border-right:1px solid rgba(19,36,32,0.1);}
+  .meal:last-child{border-right:none;}
+  @media (max-width:820px){ .meal{border-right:none; border-bottom:1px solid rgba(19,36,32,0.1);} .meal:last-child{border-bottom:none;} }
+  .meal .slot{font-family:'IBM Plex Mono', monospace; font-size:10.5px; letter-spacing:0.08em; text-transform:uppercase; color:#7a8a7f; margin-bottom:6px;}
+  .meal .content{font-size:13.5px; line-height:1.5; color:#2b3a33;}
+
+  /* GROCERY */
+  .grocery-grid{display:grid; grid-template-columns:repeat(3, 1fr); gap:18px;}
+  @media (max-width:900px){ .grocery-grid{grid-template-columns:repeat(2,1fr);} }
+  @media (max-width:600px){ .grocery-grid{grid-template-columns:1fr;} }
+  .gcard{background:var(--ink-2); border:1px solid var(--line); border-radius:6px; padding:22px 22px 8px;}
+  .gcard h4{font-family:'Fraunces', serif; font-size:17px; color:var(--turmeric-2); margin:0 0 14px;}
+  .gcard ul{list-style:none; margin:0; padding:0;}
+  .gcard li{display:flex; align-items:flex-start; gap:10px; padding:7px 0; border-bottom:1px solid rgba(246,240,226,0.06); font-size:13px; line-height:1.4;}
+  .gcard li input{margin-top:2px; accent-color:var(--turmeric);}
+  .gcard li .qty{margin-left:auto; font-family:'IBM Plex Mono', monospace; font-size:11px; color:var(--sage); white-space:nowrap; padding-left:10px;}
+  .gcard li span.name{color:var(--cream-dim);}
+
+  /* RECIPES */
+  .recipe-group{margin-bottom:40px;}
+  .recipe-group-title{font-family:'Fraunces', serif; font-size:19px; color:var(--turmeric-2); margin:0 0 16px; font-weight:600;}
+  .recipe-grid{display:grid; grid-template-columns:repeat(2,1fr); gap:16px;}
+  @media (max-width:760px){ .recipe-grid{grid-template-columns:1fr;} }
+  .rcard{background:var(--ink-2); border:1px solid var(--line); border-radius:6px; padding:20px 22px;}
+  .rcard h5{font-family:'Fraunces', serif; font-size:17px; margin:0 0 10px; color:var(--cream);}
+  .rcard .ringr{font-size:12.5px; color:var(--sage); line-height:1.5; margin:0 0 10px;}
+  .rcard .rmethod{font-size:13px; color:var(--cream-dim); line-height:1.55; margin:0;}
+
+  /* NUTRITION TAB */
+  .stat-grid{display:grid; grid-template-columns:repeat(4,1fr); gap:14px; margin-bottom:40px;}
+  @media (max-width:820px){ .stat-grid{grid-template-columns:repeat(2,1fr);} }
+  .stat{background:var(--ink-2); border:1px solid var(--line); border-radius:6px; padding:18px 20px;}
+  .stat .slabel{font-family:'IBM Plex Mono', monospace; font-size:10.5px; letter-spacing:0.08em; text-transform:uppercase; color:var(--sage); margin-bottom:8px;}
+  .stat .sval{font-family:'Fraunces', serif; font-size:26px; font-weight:600; color:var(--cream);}
+  .stat .ssub{font-size:11.5px; color:var(--cream-dim); margin-top:4px;}
+
+  .compare{background:var(--ink-2); border:1px solid var(--line); border-radius:6px; padding:26px 28px; margin-bottom:40px;}
+  .comp-row{margin-bottom:22px;}
+  .comp-row:last-child{margin-bottom:0;}
+  .comp-row .chead{display:flex; justify-content:space-between; align-items:baseline; margin-bottom:8px;}
+  .comp-row .cname{font-family:'Fraunces', serif; font-size:16px; color:var(--cream);}
+  .comp-row .cnums{font-family:'IBM Plex Mono', monospace; font-size:12px; color:var(--sage);}
+  .comp-row .cnums b{color:var(--turmeric-2);}
+  .bar-track{position:relative; height:10px; background:rgba(246,240,226,0.08); border-radius:20px; overflow:hidden;}
+  .bar-fill{position:absolute; top:0; left:0; height:100%; border-radius:20px; background:linear-gradient(90deg, var(--rust), var(--turmeric));}
+  .bar-fill.good{background:linear-gradient(90deg, #4f6b45, var(--sage));}
+  .comp-row .cgap{font-size:12px; color:var(--rust); margin-top:6px;}
+  .comp-row .cgap.good{color:var(--sage);}
+
+  .micro-table{width:100%; border-collapse:collapse; margin-bottom:40px;}
+  .micro-table th{font-family:'IBM Plex Mono', monospace; font-size:10.5px; letter-spacing:0.06em; text-transform:uppercase; color:var(--sage); text-align:left; padding:10px 14px; border-bottom:1px solid var(--line);}
+  .micro-table td{padding:12px 14px; border-bottom:1px solid var(--line); font-size:13.5px; color:var(--cream-dim);}
+  .micro-table td.mname{color:var(--cream); font-weight:500;}
+  .status-pill{display:inline-block; font-family:'IBM Plex Mono', monospace; font-size:10.5px; padding:3px 10px; border-radius:20px; text-transform:uppercase; letter-spacing:0.04em;}
+  .status-pill.good{background:rgba(124,154,133,0.18); color:var(--sage);}
+  .status-pill.watch{background:rgba(140,63,50,0.18); color:#d99a8a;}
+
+  .fix-list{list-style:none; margin:0; padding:0;}
+  .fix-list li{background:var(--ink-2); border:1px solid var(--line); border-left:3px solid var(--turmeric); border-radius:0 6px 6px 0; padding:16px 20px; margin-bottom:12px; font-size:14px; line-height:1.55; color:var(--cream-dim);}
+  .fix-list li b{color:var(--cream);}
+  .fix-list li .add{font-family:'IBM Plex Mono', monospace; font-size:12px; color:var(--turmeric-2); display:block; margin-top:5px;}
+
+  footer{text-align:center; font-family:'IBM Plex Mono', monospace; font-size:11px; color:var(--sage); letter-spacing:0.05em; padding-top:60px;}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="hero">
+    <div class="eyebrow">Drinks · Week Plan · Groceries · Recipes — all in one place</div>
+    <h1>The Kitchen <em>Almanac</em></h1>
+    <p class="lede">Everything merged into one page: the five drinks, the full week of meals built around them, the shopping list, and the actual recipes for every dish on the plan.</p>
+  </div>
+
+  <nav class="tabs" id="tabNav">
+    <button class="tab-btn active" onclick="showTab('drinks')">01 · The Formulary</button>
+    <button class="tab-btn" onclick="showTab('week')">02 · The Week</button>
+    <button class="tab-btn" onclick="showTab('groceries')">03 · Groceries</button>
+    <button class="tab-btn" onclick="showTab('recipes')">04 · Recipes</button>
+    <button class="tab-btn" onclick="showTab('nutrition')">05 · Nutrition Targets</button>
+    <button class="tab-btn" onclick="showTab('fittrack')">06 · FitTrack</button>
+    <button class="tab-btn" onclick="showTab('colourguide')">07 · Colour Guide</button>
+  </nav>
+
+  <!-- TAB 1: DRINKS -->
+  <div id="drinks" class="tabpanel active">
+    <div class="note-panel">
+      <div class="label">Herbalist's<br>Notes</div>
+      <div>
+        <h3>Eating for thyroid support</h3>
+        <ul>
+          <li><b>Selenium & zinc</b> help convert T4 into active T3 — Brazil nuts, pumpkin seeds, and hemp seeds do this work below.</li>
+          <li><b>Iron</b> deficiency is common alongside hypothyroidism — always paired here with vitamin C for absorption.</li>
+          <li><span class="flag">timing</span>If you're on thyroid medication: take it on an empty stomach, then wait <b>30–60+ minutes</b> before coffee, dairy, calcium, or iron. Treat these drinks as a proper breakfast well after your dose.</li>
+          <li><b>Iodine</b> — don't self-add kelp or seaweed. Ordinary iodized salt is enough; excess iodine can flare autoimmune thyroid conditions.</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="section-label">The Formulary — 01 to 05</div>
+    <div class="grid2">
+      <div class="card">
+        <div class="card-top"><div class="card-index">01 — DAILY BASE</div><h3>Green Power Protein</h3><p class="tagline">Everyday driver. Iron, magnesium, calcium in one glass.</p></div>
+        <div class="card-body">
+          <div class="protein-badge">PROTEIN <b>~33g</b></div>
+          <ul class="ingr-list">
+            <li><span>Fresh spinach, packed</span><span>30 g</span></li>
+            <li><span>Frozen banana</span><span>1</span></li>
+            <li><span>Skyr or quark</span><span>200 g</span></li>
+            <li><span>Peanut or almond butter</span><span>20 g</span></li>
+            <li><span>Chia seeds</span><span>15 g</span></li>
+            <li><span>Milk</span><span>150 ml</span></li>
+            <li><span>Ground flaxseed</span><span>10 g</span></li>
+          </ul>
+          <p class="method">Blend everything 45–60 sec until smooth. Let sit 3–5 min so the chia thickens.</p>
+          <div class="tags"><span class="tag iron">Iron</span><span class="tag calcium">Calcium</span><span class="tag b12">B12</span><span class="tag omega">Omega-3</span></div>
+          <div class="timing-note">Contains dairy + iron — keep 30–60 min clear of thyroid medication.</div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-top"><div class="card-index">02 — IRON FOCUS</div><h3>Beet Berry Iron Boost</h3><p class="tagline">Beetroot iron, absorbed thanks to vitamin C.</p></div>
+        <div class="card-body">
+          <div class="protein-badge">PROTEIN <b>~21g</b></div>
+          <ul class="ingr-list">
+            <li><span>Cooked beetroot</span><span>50 g</span></li>
+            <li><span>Frozen mixed berries</span><span>150 g</span></li>
+            <li><span>Orange, peeled</span><span>1</span></li>
+            <li><span>Quark or skyr</span><span>150 g</span></li>
+            <li><span>Pumpkin seeds</span><span>15 g</span></li>
+            <li><span>Water or milk</span><span>100 ml</span></li>
+          </ul>
+          <p class="method">Blend until smooth. Rotate 3–4x/week rather than daily.</p>
+          <div class="tags"><span class="tag iron">Iron</span><span class="tag zinc">Zinc</span><span class="tag omega">Vitamin C</span></div>
+          <div class="timing-note">Iron-heavy — same medication gap applies.</div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-top"><div class="card-index">03 — COFFEE</div><h3>Mocha Protein</h3><p class="tagline">A real breakfast in a coffee cup.</p></div>
+        <div class="card-body">
+          <div class="protein-badge">PROTEIN <b>~29g</b></div>
+          <ul class="ingr-list">
+            <li><span>Cold brew coffee</span><span>150 ml</span></li>
+            <li><span>Frozen banana</span><span>1</span></li>
+            <li><span>Skyr or quark</span><span>150 g</span></li>
+            <li><span>Raw cacao powder</span><span>10 g</span></li>
+            <li><span>Peanut butter</span><span>15 g</span></li>
+            <li><span>Milk</span><span>100 ml</span></li>
+            <li><span>Pumpkin or hemp seeds</span><span>10 g</span></li>
+          </ul>
+          <p class="method">Blend until smooth and frothy.</p>
+          <div class="tags"><span class="tag zinc">Magnesium</span><span class="tag iron">Iron</span><span class="tag zinc">Zinc</span></div>
+          <div class="timing-note">Coffee cuts thyroid medication absorption most — leave the longest gap before this one.</div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-top"><div class="card-index">04 — EVENING</div><h3>Golden Turmeric Protein Milk</h3><p class="tagline">Warm, spiced, carrying real protein.</p></div>
+        <div class="card-body">
+          <div class="protein-badge">PROTEIN <b>~19g</b></div>
+          <ul class="ingr-list">
+            <li><span>Whole milk</span><span>250 ml</span></li>
+            <li><span>Skim milk powder</span><span>20 g</span></li>
+            <li><span>Turmeric powder</span><span>1 tsp</span></li>
+            <li><span>Fresh ginger, grated</span><span>1 tsp</span></li>
+            <li><span>Ground cardamom</span><span>¼ tsp</span></li>
+            <li><span>Black pepper</span><span>1 pinch</span></li>
+            <li><span>Honey or dates</span><span>1 tsp</span></li>
+          </ul>
+          <p class="method">Warm milk gently, whisk in dry ingredients, remove from heat, stir in sweetener. Don't skip the black pepper — it boosts curcumin absorption.</p>
+          <div class="tags"><span class="tag calcium">Calcium</span><span class="tag b12">Casein</span></div>
+          <div class="timing-note">Dairy-based — fine any time away from your medication window.</div>
+        </div>
+      </div>
+
+      <div class="card" style="grid-column:1/-1;">
+        <div class="card-top"><div class="card-index">05 — THYROID SUPPORT</div><h3>Selenium & Zinc Support Smoothie</h3><p class="tagline">Built around T4-to-T3 conversion — Brazil nuts are the whole point.</p></div>
+        <div class="card-body">
+          <div class="protein-badge">PROTEIN <b>~24g</b></div>
+          <ul class="ingr-list">
+            <li><span>Brazil nuts (max 2–3/day)</span><span>2 whole</span></li>
+            <li><span>Pumpkin seeds</span><span>15 g</span></li>
+            <li><span>Frozen banana</span><span>1</span></li>
+            <li><span>Blueberries</span><span>100 g</span></li>
+            <li><span>Greek yogurt or skyr</span><span>180 g</span></li>
+            <li><span>Milk</span><span>120 ml</span></li>
+          </ul>
+          <p class="method">Blend until smooth. Just 2 Brazil nuts cover your full daily selenium need — more isn't better, selenium is toxic in excess.</p>
+          <div class="tags"><span class="tag selenium">Selenium</span><span class="tag zinc">Zinc</span><span class="tag calcium">Calcium</span></div>
+          <div class="timing-note">Dairy-based — keep the usual gap from thyroid medication.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TAB 2: WEEK -->
+  <div id="week" class="tabpanel">
+    <div class="note-panel">
+      <div class="label">Kitchen<br>Notes</div>
+      <div>
+        <h3>How this week works — revised for 2,200 kcal / high protein</h3>
+        <ul>
+          <li><b>Updated target: ~2,200 kcal/day, ~165–175g protein.</b> To fit real protein into a tighter calorie budget, every smoothie now includes a scoop of protein powder, dal/paneer portions are bigger, and oil/ghee/cream/nuts are trimmed back — protein-dense foods carry more nutrition per calorie than added fats do.</li>
+          <li>Rice is now ~120g cooked (not 150g) and most dinners use <b>2 chapati</b> instead of 3 — the calories saved get redirected into dal and paneer, not cut outright.</li>
+          <li>Evening snacks shifted from nuts/toast (calorie-dense) to buttermilk, curd, or roasted chana (protein-dense, lighter).</li>
+          <li>Have your morning drink <b>after</b> your medication window, as a late breakfast.</li>
+          <li>Cabbage and cauliflower appear once each, always <b>cooked</b>, never raw or daily.</li>
+          <li>These numbers are estimates from recipe composition, not lab-measured — for a target this precise, weighing portions and logging in an app (Cronometer, MyFitnessPal) for a week will tell you exactly where you land.</li>
+          <li><b>Mozzarella works too</b> — 30g fresh mozzarella diced into the cucumber-tomato salad adds ~6g protein for ~70 kcal, a good neutral swap when you want a change from paneer.</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="section-label">The Week</div>
+
+    <div class="day"><div class="day-head"><span class="dname">Monday</span><span class="dprotein">≈2,190 kcal · ≈168g protein</span></div>
+      <div class="meals">
+        <div class="meal"><div class="slot">Morning</div><div class="content">Green Power Smoothie + 1 scoop protein powder</div></div>
+        <div class="meal"><div class="slot">Lunch</div><div class="content">Rice (120g) · moong dal (1.5 cup) · bhindi sabzi (light oil) · curd</div></div>
+        <div class="meal"><div class="slot">Evening</div><div class="content">Buttermilk (chaas) + roasted chana snack</div></div>
+        <div class="meal"><div class="slot">Dinner</div><div class="content">2 chapati · rajma curry (extra spoon) · sautéed spinach</div></div>
+      </div></div>
+
+    <div class="day"><div class="day-head"><span class="dname">Tuesday</span><span class="dprotein">≈2,210 kcal · ≈172g protein</span></div>
+      <div class="meals">
+        <div class="meal"><div class="slot">Morning</div><div class="content">Beet Berry Boost + 1 scoop protein powder</div></div>
+        <div class="meal"><div class="slot">Lunch</div><div class="content">Rice (120g) · chana dal · paneer bhurji (250g paneer) · salad · curd</div></div>
+        <div class="meal"><div class="slot">Evening</div><div class="content">Small handful walnuts + pumpkin seeds (reduced portion)</div></div>
+        <div class="meal"><div class="slot">Dinner</div><div class="content">2 chapati · mixed vegetable curry (light oil) · sprouts salad</div></div>
+      </div></div>
+
+    <div class="day"><div class="day-head"><span class="dname">Wednesday</span><span class="dprotein">≈2,180 kcal · ≈165g protein</span></div>
+      <div class="meals">
+        <div class="meal"><div class="slot">Morning</div><div class="content">Mocha Protein Smoothie + 1 scoop protein powder</div></div>
+        <div class="meal"><div class="slot">Lunch</div><div class="content">Rice (120g) · toor dal (1.5 cup) · lauki sabzi · curd</div></div>
+        <div class="meal"><div class="slot">Evening</div><div class="content">2 Brazil nuts + fruit + small curd bowl</div></div>
+        <div class="meal"><div class="slot">Dinner</div><div class="content">2 chapati · chole (extra spoon) · cooked cabbage sabzi</div></div>
+      </div></div>
+
+    <div class="day"><div class="day-head"><span class="dname">Thursday</span><span class="dprotein">≈2,230 kcal · ≈176g protein</span></div>
+      <div class="meals">
+        <div class="meal"><div class="slot">Morning</div><div class="content">Green Power Smoothie + 1 scoop protein powder</div></div>
+        <div class="meal"><div class="slot">Lunch</div><div class="content">Rice (120g) · masoor dal · paneer tikka (250g paneer) · salad</div></div>
+        <div class="meal"><div class="slot">Evening</div><div class="content">1 slice toast, thin peanut butter, or curd bowl</div></div>
+        <div class="meal"><div class="slot">Dinner</div><div class="content">2 chapati · palak paneer (200g paneer)</div></div>
+      </div></div>
+
+    <div class="day"><div class="day-head"><span class="dname">Friday</span><span class="dprotein">≈2,170 kcal · ≈163g protein</span></div>
+      <div class="meals">
+        <div class="meal"><div class="slot">Morning</div><div class="content">Beet Berry Boost + 1 scoop protein powder</div></div>
+        <div class="meal"><div class="slot">Lunch</div><div class="content">Rice (120g) · rajma (1.5 cup) · bhindi sabzi · curd</div></div>
+        <div class="meal"><div class="slot">Evening</div><div class="content">Small roasted pumpkin seeds + coffee</div></div>
+        <div class="meal"><div class="slot">Dinner</div><div class="content">2 chapati · vegetable kurma (light coconut) · sprouts</div></div>
+      </div></div>
+
+    <div class="day"><div class="day-head"><span class="dname">Saturday</span><span class="dprotein">≈2,240 kcal · ≈174g protein</span></div>
+      <div class="meals">
+        <div class="meal"><div class="slot">Morning</div><div class="content">Golden Turmeric Protein Milk (as is — already efficient)</div></div>
+        <div class="meal"><div class="slot">Lunch</div><div class="content">Rice (120g) · chana masala (1.5 cup) · salad · curd</div></div>
+        <div class="meal"><div class="slot">Evening</div><div class="content">Selenium & Zinc Support Smoothie</div></div>
+        <div class="meal"><div class="slot">Dinner</div><div class="content">2 chapati · paneer curry (200g paneer, less cream) · seasonal sabzi</div></div>
+      </div></div>
+
+    <div class="day"><div class="day-head"><span class="dname">Sunday</span><span class="dprotein">≈2,150 kcal · ≈160g protein</span></div>
+      <div class="meals">
+        <div class="meal"><div class="slot">Morning</div><div class="content">Mocha Protein Smoothie + 1 scoop protein powder (weekend brunch)</div></div>
+        <div class="meal"><div class="slot">Lunch</div><div class="content">Rice (120g) · dal makhani (light cream) · mixed veg · raita</div></div>
+        <div class="meal"><div class="slot">Evening</div><div class="content">Fruit + a few nuts + small curd bowl</div></div>
+        <div class="meal"><div class="slot">Dinner</div><div class="content">Light moong dal soup / khichdi with a spoon of ghee</div></div>
+      </div></div>
+  </div>
+
+  <!-- TAB 3: GROCERIES -->
+  <div id="groceries" class="tabpanel">
+    <div class="section-label">Grocery List — This Week</div>
+    <div class="grocery-grid">
+      <div class="gcard"><h4>Produce</h4><ul>
+        <li><input type="checkbox"><span class="name">Spinach</span><span class="qty">400 g</span></li>
+        <li><input type="checkbox"><span class="name">Beetroot</span><span class="qty">2 small</span></li>
+        <li><input type="checkbox"><span class="name">Bananas</span><span class="qty">1 bunch (6–7)</span></li>
+        <li><input type="checkbox"><span class="name">Frozen mixed berries</span><span class="qty">400 g bag</span></li>
+        <li><input type="checkbox"><span class="name">Oranges</span><span class="qty">3</span></li>
+        <li><input type="checkbox"><span class="name">Blueberries</span><span class="qty">1 small punnet</span></li>
+        <li><input type="checkbox"><span class="name">Bhindi (okra)</span><span class="qty">500 g</span></li>
+        <li><input type="checkbox"><span class="name">Lauki</span><span class="qty">1 medium</span></li>
+        <li><input type="checkbox"><span class="name">Cabbage</span><span class="qty">1 small</span></li>
+        <li><input type="checkbox"><span class="name">Mixed veg (carrot, beans, peas)</span><span class="qty">600 g</span></li>
+        <li><input type="checkbox"><span class="name">Tomatoes</span><span class="qty">1 kg</span></li>
+        <li><input type="checkbox"><span class="name">Onions</span><span class="qty">750 g</span></li>
+        <li><input type="checkbox"><span class="name">Garlic & ginger</span><span class="qty">1 bulb / 1 piece</span></li>
+        <li><input type="checkbox"><span class="name">Cucumber</span><span class="qty">3</span></li>
+        <li><input type="checkbox"><span class="name">Sprouts</span><span class="qty">300 g</span></li>
+        <li><input type="checkbox"><span class="name">Coriander & mint</span><span class="qty">1 bunch each</span></li>
+        <li><input type="checkbox"><span class="name">Lemons</span><span class="qty">4–5</span></li>
+        <li><input type="checkbox"><span class="name">Seasonal veg</span><span class="qty">250 g</span></li>
+      </ul></div>
+
+      <div class="gcard"><h4>Dairy & Proteins</h4><ul>
+        <li><input type="checkbox"><span class="name">Skyr or quark</span><span class="qty">1.2 kg</span></li>
+        <li><input type="checkbox"><span class="name">Milk</span><span class="qty">2 L</span></li>
+        <li><input type="checkbox"><span class="name">Paneer</span><span class="qty">700 g</span></li>
+        <li><input type="checkbox"><span class="name">Plain curd/yogurt</span><span class="qty">750 g</span></li>
+        <li><input type="checkbox"><span class="name">Skim milk powder</span><span class="qty">small pack</span></li>
+        <li><input type="checkbox"><span class="name">Ghee or butter</span><span class="qty">small tub</span></li>
+      </ul></div>
+
+      <div class="gcard"><h4>Grains & Pulses</h4><ul>
+        <li><input type="checkbox"><span class="name">Rice</span><span class="qty">1 kg</span></li>
+        <li><input type="checkbox"><span class="name">Whole wheat atta</span><span class="qty">1 kg</span></li>
+        <li><input type="checkbox"><span class="name">Whole grain bread</span><span class="qty">1 loaf</span></li>
+        <li><input type="checkbox"><span class="name">Toor dal</span><span class="qty">200 g</span></li>
+        <li><input type="checkbox"><span class="name">Moong dal</span><span class="qty">200 g</span></li>
+        <li><input type="checkbox"><span class="name">Chana dal</span><span class="qty">150 g</span></li>
+        <li><input type="checkbox"><span class="name">Masoor dal</span><span class="qty">150 g</span></li>
+        <li><input type="checkbox"><span class="name">Rajma</span><span class="qty">200 g</span></li>
+        <li><input type="checkbox"><span class="name">Chickpeas</span><span class="qty">250 g</span></li>
+        <li><input type="checkbox"><span class="name">Whole urad dal (for dal makhani)</span><span class="qty">100 g</span></li>
+      </ul></div>
+
+      <div class="gcard"><h4>Nuts & Seeds</h4><ul>
+        <li><input type="checkbox"><span class="name">Peanut butter</span><span class="qty">1 jar</span></li>
+        <li><input type="checkbox"><span class="name">Chia seeds</span><span class="qty">100 g pack</span></li>
+        <li><input type="checkbox"><span class="name">Flaxseed, ground</span><span class="qty">100 g pack</span></li>
+        <li><input type="checkbox"><span class="name">Pumpkin seeds</span><span class="qty">200 g pack</span></li>
+        <li><input type="checkbox"><span class="name">Brazil nuts</span><span class="qty">small bag</span></li>
+        <li><input type="checkbox"><span class="name">Walnuts</span><span class="qty">small pack</span></li>
+        <li><input type="checkbox"><span class="name">Grated coconut (for kurma)</span><span class="qty">50 g</span></li>
+      </ul></div>
+
+      <div class="gcard"><h4>Pantry & Spices</h4><ul>
+        <li><input type="checkbox"><span class="name">Turmeric, cumin, coriander powder</span><span class="qty">check stock</span></li>
+        <li><input type="checkbox"><span class="name">Cardamom, black pepper</span><span class="qty">check stock</span></li>
+        <li><input type="checkbox"><span class="name">Garam masala, chili powder</span><span class="qty">check stock</span></li>
+        <li><input type="checkbox"><span class="name">Mustard seeds, curry leaves</span><span class="qty">check stock</span></li>
+        <li><input type="checkbox"><span class="name">Chaat masala, amchur</span><span class="qty">check stock</span></li>
+        <li><input type="checkbox"><span class="name">Iodized salt, cooking oil</span><span class="qty">check stock</span></li>
+        <li><input type="checkbox"><span class="name">Raw cacao powder</span><span class="qty">small pack</span></li>
+        <li><input type="checkbox"><span class="name">Honey or dates</span><span class="qty">1 jar / 1 pack</span></li>
+      </ul></div>
+
+      <div class="gcard"><h4>Beverages</h4><ul>
+        <li><input type="checkbox"><span class="name">Coffee (cold brew or beans)</span><span class="qty">for 2 smoothies + regular cups</span></li>
+        <li><input type="checkbox"><span class="name">Tea</span><span class="qty">check stock</span></li>
+      </ul></div>
+    </div>
+  </div>
+
+  <!-- TAB 4: RECIPES -->
+  <div id="recipes" class="tabpanel">
+    <div class="section-label">Full Recipes</div>
+
+    <div class="recipe-group">
+      <div class="recipe-group-title">Dals</div>
+      <div class="recipe-grid">
+        <div class="rcard"><h5>Moong Dal</h5>
+          <p class="ringr">1 cup yellow moong dal · 1 tomato · ½ tsp turmeric · 1 tsp cumin seeds · 1 clove garlic · 1 tsp ghee · salt · coriander</p>
+          <p class="rmethod">Boil dal with turmeric and salt until soft, 15–20 min. Temper cumin and garlic in ghee, pour over the dal, simmer with chopped tomato 5 min. Garnish with coriander.</p></div>
+
+        <div class="rcard"><h5>Chana Dal</h5>
+          <p class="ringr">1 cup chana dal (soaked 30 min) · 1 onion · 1 tomato · ginger-garlic paste · turmeric · coriander powder · oil · salt</p>
+          <p class="rmethod">Boil dal 20–25 min until soft but holding shape. Sauté onion until golden, add ginger-garlic, tomato, and spices, cook to a paste. Add dal, simmer 10 min.</p></div>
+
+        <div class="rcard"><h5>Toor Dal</h5>
+          <p class="ringr">1 cup toor dal · 1 tomato · curry leaves · mustard seeds · 1 dried red chili · pinch asafoetida · turmeric · salt</p>
+          <p class="rmethod">Pressure cook dal with turmeric and salt until mushy. Temper mustard seeds, curry leaves, chili, and asafoetida in oil, pour over the dal, simmer 5 min.</p></div>
+
+        <div class="rcard"><h5>Masoor Dal</h5>
+          <p class="ringr">1 cup red masoor dal · 1 onion · 1 tomato · 1 tsp cumin · turmeric · garlic · salt</p>
+          <p class="rmethod">Cooks fast — boil dal with turmeric 15 min until soft. Sauté onion, garlic, cumin, and tomato, stir into the dal, simmer 5–8 min.</p></div>
+
+        <div class="rcard"><h5>Dal Makhani (Quick Version)</h5>
+          <p class="ringr">½ cup whole urad dal (soaked overnight) · ¼ cup cooked rajma · 1 tbsp butter · 2 tbsp cream or milk · 1 tomato pureed · ginger-garlic · garam masala · salt</p>
+          <p class="rmethod">Pressure cook the soaked urad dal 20 min until soft, stir in cooked rajma. Sauté ginger-garlic in butter, add tomato puree and garam masala, cook down, mix into the dal, finish with cream, simmer 10 min.</p></div>
+
+        <div class="rcard"><h5>Moong Dal Soup / Light Khichdi</h5>
+          <p class="ringr">½ cup split moong dal · ¼ cup rice (for khichdi) · cumin · turmeric · ghee · ginger · salt</p>
+          <p class="rmethod">Boil dal (and rice, if making khichdi) with turmeric, ginger, and salt until soft and porridge-like. Temper with ghee and cumin. Easy on the stomach for a Sunday night.</p></div>
+      </div>
+    </div>
+
+    <div class="recipe-group">
+      <div class="recipe-group-title">Legume Curries</div>
+      <div class="recipe-grid">
+        <div class="rcard"><h5>Rajma (Kidney Bean Curry)</h5>
+          <p class="ringr">1 cup rajma (soaked overnight, boiled soft) · 1 onion · 2 tomatoes · ginger-garlic · cumin · coriander powder · garam masala · oil · salt</p>
+          <p class="rmethod">Sauté onion until golden, add ginger-garlic, spices, and tomatoes, cook to a thick gravy. Add the boiled rajma with a little cooking liquid, simmer 15–20 min until thick.</p></div>
+
+        <div class="rcard"><h5>Chana Masala / Chole</h5>
+          <p class="ringr">1 cup chickpeas (soaked, boiled soft) · 1 onion · 2 tomatoes · ginger-garlic · cumin · coriander powder · garam masala · pinch amchur (optional) · oil · salt</p>
+          <p class="rmethod">Same method as rajma — build an onion-tomato-spice gravy, add chickpeas, simmer 15 min. Add amchur for the tangier "chole" version (Wednesday); skip it for the milder "chana masala" (Saturday).</p></div>
+      </div>
+    </div>
+
+    <div class="recipe-group">
+      <div class="recipe-group-title">Vegetable Sabzis</div>
+      <div class="recipe-grid">
+        <div class="rcard"><h5>Bhindi (Okra) Sabzi</h5>
+          <p class="ringr">250 g okra, sliced · 1 onion · turmeric · coriander powder · oil · salt</p>
+          <p class="rmethod">Sauté okra alone on medium-high heat 8–10 min until it stops being sticky. Add onion, turmeric, coriander powder, and salt, cook another 8–10 min until tender.</p></div>
+
+        <div class="rcard"><h5>Lauki (Bottle Gourd) Sabzi</h5>
+          <p class="ringr">1 medium lauki, peeled and cubed · cumin seeds · turmeric · 1 green chili · oil · salt</p>
+          <p class="rmethod">Temper cumin and chili in oil, add lauki, turmeric, and salt, cover and cook 12–15 min until soft, stirring occasionally.</p></div>
+
+        <div class="rcard"><h5>Cooked Cabbage Sabzi</h5>
+          <p class="ringr">½ small cabbage, shredded · mustard seeds · pinch turmeric · 1 dried red chili · oil · salt</p>
+          <p class="rmethod">Temper mustard seeds and chili in oil, add cabbage and turmeric, stir-fry on medium heat 8–10 min until just tender — don't overcook past soft-crisp.</p></div>
+
+        <div class="rcard"><h5>Mixed Vegetable Curry</h5>
+          <p class="ringr">2 cups mixed vegetables (carrot, beans, peas, potato) · 1 onion · 1 tomato · ginger-garlic · coriander powder · turmeric · oil · salt</p>
+          <p class="rmethod">Build an onion-tomato-spice base, add vegetables and a splash of water, cover and simmer 15–18 min until tender.</p></div>
+
+        <div class="rcard"><h5>Vegetable Kurma</h5>
+          <p class="ringr">2 cups mixed vegetables · 2 tbsp grated coconut · fennel seeds · 1 green chili · 1 onion · ginger-garlic · oil · salt</p>
+          <p class="rmethod">Grind coconut, fennel, and green chili to a paste. Sauté onion and ginger-garlic, add vegetables and a little water, cook until nearly tender, stir in the coconut paste, simmer 5–8 min.</p></div>
+
+        <div class="rcard"><h5>Sautéed Spinach</h5>
+          <p class="ringr">200 g spinach · 1 clove garlic, sliced · cumin seeds · oil · salt · lemon juice</p>
+          <p class="rmethod">Sauté garlic and cumin in oil until fragrant, add spinach, cook 3–4 min just until wilted, finish with lemon juice.</p></div>
+      </div>
+    </div>
+
+    <div class="recipe-group">
+      <div class="recipe-group-title">Paneer Dishes</div>
+      <div class="recipe-grid">
+        <div class="rcard"><h5>Paneer Bhurji</h5>
+          <p class="ringr">200 g paneer, crumbled · 1 onion · 1 tomato · turmeric · 1 green chili · oil · salt · coriander</p>
+          <p class="rmethod">Sauté onion and chili until soft, add tomato and turmeric, cook down, fold in crumbled paneer, warm through 3–4 min. Garnish with coriander.</p></div>
+
+        <div class="rcard"><h5>Paneer Tikka (Pan-Seared)</h5>
+          <p class="ringr">200 g paneer, cubed · 3 tbsp thick yogurt · ginger-garlic paste · tikka masala · turmeric · oil</p>
+          <p class="rmethod">Marinate paneer in yogurt and spices 20–30 min. Pan-sear in a hot skillet, turning until lightly charred on all sides, 6–8 min.</p></div>
+
+        <div class="rcard"><h5>Palak Paneer</h5>
+          <p class="ringr">200 g spinach, blanched and pureed · 150 g paneer, cubed · 1 onion · ginger-garlic · turmeric · 1 tbsp cream · oil · salt</p>
+          <p class="rmethod">Sauté onion and ginger-garlic, add spinach puree and turmeric, simmer 5 min. Add paneer and cream, simmer 5 more min — don't overcook the paneer.</p></div>
+
+        <div class="rcard"><h5>Paneer Curry (Butter-Masala Style)</h5>
+          <p class="ringr">200 g paneer, cubed · 1 onion · 2 tomatoes · ginger-garlic · garam masala · 1 tbsp butter · 2 tbsp cream · salt</p>
+          <p class="rmethod">Cook onion, ginger-garlic, and tomatoes to a soft base (blend smooth if you like it velvety). Return to the pan with butter and garam masala, add paneer and cream, simmer 5–8 min.</p></div>
+      </div>
+    </div>
+
+    <div class="recipe-group">
+      <div class="recipe-group-title">Salads, Snacks & Sides</div>
+      <div class="recipe-grid">
+        <div class="rcard"><h5>Cucumber-Tomato Salad</h5>
+          <p class="ringr">1 cucumber · 1 tomato · lemon juice · salt · black pepper · coriander</p>
+          <p class="rmethod">Dice everything, toss with lemon juice, salt, and pepper. No cooking needed.</p></div>
+
+        <div class="rcard"><h5>Sprouts Salad</h5>
+          <p class="ringr">1 cup mixed sprouts · 1 tomato · ½ onion · lemon juice · chaat masala · coriander</p>
+          <p class="rmethod">Lightly steam sprouts 3–4 min if you prefer them less raw, toss with diced vegetables, lemon juice, and chaat masala.</p></div>
+
+        <div class="rcard"><h5>Roasted Chana Snack</h5>
+          <p class="ringr">1 cup boiled chickpeas · chaat masala · cumin powder · oil · salt</p>
+          <p class="rmethod">Pat chickpeas dry, toss with a little oil and spices, roast in a pan or oven at 180°C until crisp, 15–20 min.</p></div>
+
+        <div class="rcard"><h5>Raita</h5>
+          <p class="ringr">1 cup curd · ½ cucumber, grated · roasted cumin powder · salt · coriander</p>
+          <p class="rmethod">Whisk curd smooth, fold in grated cucumber, season with roasted cumin and salt.</p></div>
+
+        <div class="rcard"><h5>Mozzarella Caprese-Style Salad</h5>
+          <p class="ringr">30g fresh mozzarella, diced · 1 tomato · a few basil leaves · olive oil · black pepper · pinch salt</p>
+          <p class="rmethod">Layer or toss diced tomato and mozzarella with torn basil, a drizzle of olive oil, salt, and pepper. Good swap into the Cucumber-Tomato Salad or as its own light evening protein bite. ~6g protein, ~70 kcal for 30g mozzarella.</p></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TAB 5: NUTRITION TARGETS -->
+  <div id="nutrition" class="tabpanel">
+    <div class="note-panel">
+      <div class="label">Goal<br>Read</div>
+      <div>
+        <h3>Recomposition, not just cutting</h3>
+        <ul>
+          <li>94 kg · 171 cm · 43 yrs · training 4x/week + ~10k steps/day.</li>
+          <li>Losing fat while building muscle needs a <b>moderate</b> deficit, not an aggressive one — too steep a cut and the body burns muscle right alongside fat, working against the training.</li>
+          <li>The biggest lever here isn't eating less — it's <b>protein being too low</b>. The current week's plan sits around 90–100g/day; recomposition at your bodyweight wants closer to <b>180g/day</b>.</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="section-label">Your Numbers</div>
+    <div class="stat-grid">
+      <div class="stat"><div class="slabel">BMR</div><div class="sval">1,800</div><div class="ssub">kcal at rest</div></div>
+      <div class="stat"><div class="slabel">Maintenance (TDEE)</div><div class="sval">2,850</div><div class="ssub">kcal, current activity</div></div>
+      <div class="stat"><div class="slabel">Working Target</div><div class="sval">~2,200</div><div class="ssub">kcal/day (current choice)</div></div>
+      <div class="stat"><div class="slabel">Expected Pace</div><div class="sval">~0.5–0.7</div><div class="ssub">kg fat loss/week</div></div>
+    </div>
+    <p style="font-size:13px; color:var(--cream-dim); line-height:1.6; margin:-24px 0 40px;">2,200 kcal is a bigger deficit (~650 kcal/day) than the 2,300–2,450 originally suggested — workable, just means protein needs to be even more deliberate so muscle isn't what gets burned for the gap. Revisit this number if energy or gym performance drops noticeably.</p>
+
+    <div class="section-label">Target vs. Current Plan</div>
+    <div class="compare">
+
+      <div class="comp-row">
+        <div class="chead"><span class="cname">Protein (revised week)</span><span class="cnums">now <b>~165–176g</b> / ideal <b>~180g</b></span></div>
+        <div class="bar-track"><div class="bar-fill good" style="width:93%"></div></div>
+        <div class="cgap good">Big improvement from ~95g — protein powder, bigger dal/paneer portions, and trimmed fats got most of the way there.</div>
+      </div>
+
+      <div class="comp-row">
+        <div class="chead"><span class="cname">Calories (revised week)</span><span class="cnums">now <b>~2,150–2,240</b> / working target <b>~2,200</b></span></div>
+        <div class="bar-track"><div class="bar-fill good" style="width:98%"></div></div>
+        <div class="cgap good">Sitting right around your working target — a deliberate deficit, not an accidental one.</div>
+      </div>
+
+      <div class="comp-row">
+        <div class="chead"><span class="cname">Fiber</span><span class="cnums">current <b>~38g</b> / target <b>~32–35g</b></span></div>
+        <div class="bar-track"><div class="bar-fill good" style="width:100%"></div></div>
+        <div class="cgap good">Already on target — dal, sabzi, chia, and flax are doing the job.</div>
+      </div>
+
+      <div class="comp-row">
+        <div class="chead"><span class="cname">Fat</span><span class="cnums">current <b>~60g</b> / target <b>~70g</b></span></div>
+        <div class="bar-track"><div class="bar-fill good" style="width:86%"></div></div>
+        <div class="cgap good">Close enough — the additions below will close this naturally.</div>
+      </div>
+
+      <div class="comp-row">
+        <div class="chead"><span class="cname">Carbohydrates</span><span class="cnums">current <b>~245g</b> / target <b>~230–260g</b></span></div>
+        <div class="bar-track"><div class="bar-fill good" style="width:100%"></div></div>
+        <div class="cgap good">On target — rice and chapati portions don't need to change.</div>
+      </div>
+
+      <div class="comp-row">
+        <div class="chead"><span class="cname">Water</span><span class="cnums">target <b>~3–3.5L/day</b></span></div>
+        <div class="bar-track"><div class="bar-fill good" style="width:100%"></div></div>
+        <div class="cgap good">Worth tracking separately — training + 10k steps pushes this up.</div>
+      </div>
+
+    </div>
+
+    <div class="section-label">Micronutrient Checklist</div>
+    <table class="micro-table">
+      <tr><th>Nutrient</th><th>Daily Target</th><th>From This Plan</th></tr>
+      <tr><td class="mname">Iron</td><td>~8mg</td><td><span class="status-pill good">Good</span> — spinach, beetroot, paired with vitamin C</td></tr>
+      <tr><td class="mname">Calcium</td><td>~1,000mg</td><td><span class="status-pill good">Good</span> — skyr, paneer, curd, milk throughout</td></tr>
+      <tr><td class="mname">Zinc</td><td>~11mg</td><td><span class="status-pill good">Good</span> — pumpkin seeds, dal, paneer</td></tr>
+      <tr><td class="mname">Magnesium</td><td>~400–420mg</td><td><span class="status-pill good">Good</span> — cacao, seeds, spinach, whole grains</td></tr>
+      <tr><td class="mname">Selenium</td><td>~55mcg</td><td><span class="status-pill good">Good</span> — 2 Brazil nuts alone covers it, don't add more</td></tr>
+      <tr><td class="mname">Vitamin B12</td><td>~2.4mcg</td><td><span class="status-pill good">Good</span> — dairy across nearly every meal</td></tr>
+      <tr><td class="mname">Potassium</td><td>~3,400mg</td><td><span class="status-pill good">Good</span> — banana, spinach, beetroot, dal</td></tr>
+      <tr><td class="mname">Vitamin D</td><td>~800–2,000 IU</td><td><span class="status-pill watch">Watch</span> — not reliably covered by food alone, especially in Swiss winter</td></tr>
+      <tr><td class="mname">Iodine</td><td>~150mcg</td><td><span class="status-pill watch">Watch</span> — depends entirely on iodized salt use; don't self-supplement further</td></tr>
+    </table>
+
+    <div class="section-label">Closing the Protein Gap — Now Applied to the Week</div>
+    <ul class="fix-list">
+      <li><b>Add 1 scoop (25g) protein powder to your daily morning smoothie</b> — whey isolate or a plant blend if preferred.<span class="add">+25g protein · +110 kcal</span></li>
+      <li><b>Bump paneer portions from 150–200g to 250–300g</b> on paneer days (Tue, Thu, Sat).<span class="add">+10–15g protein · +100 kcal</span></li>
+      <li><b>Add a mid-morning or post-workout snack: 200g skyr/Greek yogurt + a banana</b> on training days.<span class="add">+20g protein · +200 kcal</span></li>
+      <li><b>On non-paneer days, add a 1.5x dal portion or a handful of roasted soy chunks</b> at lunch.<span class="add">+10–15g protein · +90 kcal</span></li>
+      <li><b>Add 1–2 extra tbsp peanut or almond butter</b> across the day — on toast, or stirred into curd.<span class="add">+7g protein · +190 kcal</span></li>
+      <li><b>On training days, add a post-workout shake</b> — whey/casein blend with milk, within an hour of training.<span class="add">+25–30g protein · +200 kcal</span></li>
+    </ul>
+    <p style="font-size:13.5px; color:var(--cream-dim); line-height:1.6; margin-top:-4px;">Stacking two or three of these (not all six every day) comfortably closes both the protein and calorie gap — landing you near ~180g protein and ~2,350–2,450 kcal without changing the core week's structure.</p>
+  </div>
+
+  <!-- TAB 6: FITTRACK -->
+  <div id="fittrack" class="tabpanel">
+    <div class="note-panel">
+      <div class="label">Save<br>State</div>
+      <div>
+        <h3>Your weight log now actually saves</h3>
+        <ul>
+          <li>This dashboard runs in its own isolated frame below (it has its own styling and navigation — Dashboard, Weight Log, Nutrition, Exercise, Schedule tabs inside it).</li>
+          <li>Entries you log are saved to persistent storage tied to this page, not just your browser's temporary memory — they'll be there next time you open this file.</li>
+          <li>Calorie/protein targets inside it have been aligned to your current <b>~2,200 kcal / ~170g protein</b> working numbers from the Nutrition Targets tab.</li>
+        </ul>
+      </div>
+    </div>
+    <textarea id="fittrack-source" style="display:none;">
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>My Fitness Journey — 94kg → 72kg | South Indian Plan</title>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,300;0,600;0,900;1,300&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #0e0e0f;
+  --surface: #161618;
+  --surface2: #1e1e21;
+  --surface3: #252528;
+  --accent: #c8f06e;
+  --accent2: #7c5cbf;
+  --accent3: #f0855a;
+  --text: #f0ede8;
+  --text2: #9d9a95;
+  --text3: #5a5855;
+  --border: rgba(255,255,255,0.07);
+  --radius: 16px;
+  --radius-sm: 10px;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;font-size:15px;line-height:1.6;min-height:100vh;overflow-x:hidden}
+::-webkit-scrollbar{width:4px}
+::-webkit-scrollbar-track{background:var(--bg)}
+::-webkit-scrollbar-thumb{background:var(--surface3);border-radius:4px}
+nav{position:fixed;top:0;left:0;right:0;z-index:100;background:rgba(14,14,15,0.85);backdrop-filter:blur(20px);border-bottom:1px solid var(--border);padding:0 2rem;display:flex;align-items:center;justify-content:space-between;height:60px}
+.nav-logo{font-family:'Fraunces',serif;font-size:18px;font-weight:600;color:var(--accent);letter-spacing:-0.5px}
+.nav-links{display:flex;gap:4px}
+.nav-link{padding:6px 14px;border-radius:8px;font-size:13px;font-weight:500;color:var(--text2);cursor:pointer;transition:all 0.2s;border:none;background:transparent}
+.nav-link:hover,.nav-link.active{background:var(--surface2);color:var(--text)}
+.page{display:none;padding-top:72px;min-height:100vh;animation:fadeIn 0.4s ease}
+.page.active{display:block}
+@keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+.container{max-width:900px;margin:0 auto;padding:2rem 1.5rem}
+.hero{padding:3rem 1.5rem 2rem;max-width:900px;margin:0 auto}
+.hero-tag{display:inline-block;background:rgba(200,240,110,0.12);color:var(--accent);border:1px solid rgba(200,240,110,0.25);border-radius:20px;padding:4px 14px;font-size:12px;font-weight:500;letter-spacing:0.5px;margin-bottom:1rem}
+.hero h1{font-family:'Fraunces',serif;font-size:clamp(2.2rem,5vw,3.5rem);font-weight:900;line-height:1.1;margin-bottom:0.75rem;letter-spacing:-1px}
+.hero h1 span{color:var(--accent)}
+.hero p{color:var(--text2);font-size:16px;max-width:520px;margin-bottom:2rem}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:1.5rem;transition:border-color 0.2s}
+.card:hover{border-color:rgba(255,255,255,0.12)}
+.card-sm{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);padding:1rem}
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:1rem}
+.grid-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:1rem}
+.grid-4{display:grid;grid-template-columns:repeat(4,1fr);gap:1rem}
+@media(max-width:640px){.grid-2,.grid-3,.grid-4{grid-template-columns:1fr}}
+.stat{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);padding:1.25rem}
+.stat-label{font-size:12px;color:var(--text3);font-weight:500;letter-spacing:0.5px;text-transform:uppercase;margin-bottom:6px}
+.stat-value{font-family:'Fraunces',serif;font-size:2rem;font-weight:600;line-height:1}
+.stat-sub{font-size:12px;color:var(--text2);margin-top:4px}
+.stat.accent{border-color:rgba(200,240,110,0.3);background:rgba(200,240,110,0.05)}
+.stat.accent .stat-value{color:var(--accent)}
+.stat.purple{border-color:rgba(124,92,191,0.3);background:rgba(124,92,191,0.05)}
+.stat.purple .stat-value{color:#b09fe0}
+.stat.orange{border-color:rgba(240,133,90,0.3);background:rgba(240,133,90,0.05)}
+.stat.orange .stat-value{color:var(--accent3)}
+.progress-track{background:var(--surface3);border-radius:4px;height:8px;overflow:hidden;margin:8px 0}
+.progress-fill{height:100%;border-radius:4px;background:linear-gradient(90deg,var(--accent2),var(--accent));transition:width 1s ease}
+.section-head{margin:2rem 0 1rem;display:flex;align-items:center;gap:12px}
+.section-head h2{font-family:'Fraunces',serif;font-size:1.4rem;font-weight:600;letter-spacing:-0.5px}
+.section-head::after{content:'';flex:1;height:1px;background:var(--border)}
+.badge{display:inline-block;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:500}
+.badge-green{background:rgba(200,240,110,0.15);color:var(--accent)}
+.badge-purple{background:rgba(124,92,191,0.2);color:#c4b3f0}
+.badge-orange{background:rgba(240,133,90,0.15);color:var(--accent3)}
+.badge-gray{background:var(--surface3);color:var(--text2)}
+.btn{display:inline-flex;align-items:center;gap:8px;padding:10px 20px;border-radius:10px;font-size:14px;font-weight:500;cursor:pointer;transition:all 0.2s;border:none;font-family:'DM Sans',sans-serif}
+.btn-primary{background:var(--accent);color:#0e0e0f}
+.btn-primary:hover{background:#d8ff7e;transform:translateY(-1px)}
+.btn-secondary{background:var(--surface2);color:var(--text);border:1px solid var(--border)}
+.btn-secondary:hover{background:var(--surface3)}
+.btn-sm{padding:7px 14px;font-size:13px;border-radius:8px}
+input[type=number],input[type=date],input[type=text],select,textarea{background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius-sm);padding:10px 14px;color:var(--text);font-family:'DM Sans',sans-serif;font-size:14px;width:100%;outline:none;transition:border-color 0.2s}
+input:focus,select:focus,textarea:focus{border-color:rgba(200,240,110,0.4)}
+label{font-size:12px;font-weight:500;color:var(--text2);display:block;margin-bottom:6px;letter-spacing:0.3px}
+.form-group{margin-bottom:1rem}
+.weight-entry{display:flex;align-items:center;justify-content:space-between;padding:12px 0;border-bottom:1px solid var(--border)}
+.weight-entry:last-child{border-bottom:none}
+.w-date{font-size:13px;color:var(--text2)}
+.w-val{font-family:'Fraunces',serif;font-size:1.3rem;font-weight:600}
+.w-delta{font-size:12px;padding:2px 8px;border-radius:12px}
+.w-down{background:rgba(200,240,110,0.12);color:var(--accent)}
+.w-up{background:rgba(240,133,90,0.15);color:var(--accent3)}
+.w-same{background:var(--surface3);color:var(--text2)}
+.delete-btn{background:none;border:none;color:var(--text3);cursor:pointer;font-size:16px;padding:4px 8px;border-radius:6px;transition:color 0.2s}
+.delete-btn:hover{color:var(--accent3)}
+#weightChart{width:100%;height:220px;position:relative}
+.chart-line{stroke:var(--accent);stroke-width:2;fill:none}
+.chart-area{fill:url(#areaGrad);opacity:0.3}
+.chart-dot{fill:var(--accent);cursor:pointer}
+.chart-dot:hover{fill:var(--accent3);r:5}
+.meal-row{display:grid;grid-template-columns:120px 1fr 70px;gap:12px;padding:12px 0;border-bottom:1px solid var(--border);align-items:start}
+.meal-row:last-child{border-bottom:none}
+.meal-time{font-size:12px;font-weight:500;color:var(--accent);font-variant-numeric:tabular-nums}
+.meal-desc{font-size:13px;color:var(--text)}
+.meal-protein{font-size:13px;font-weight:500;color:var(--text2);text-align:right}
+.ex-row{display:grid;grid-template-columns:1fr 60px 80px 1fr;gap:10px;padding:10px 0;border-bottom:1px solid var(--border);align-items:center;font-size:13px}
+.ex-row:last-child{border-bottom:none}
+.ex-name{font-weight:500;color:var(--text)}
+.ex-sets,.ex-reps{color:var(--text2);text-align:center}
+.ex-note{color:var(--text3);font-size:12px}
+.ex-header{font-size:11px;font-weight:500;color:var(--text3);text-transform:uppercase;letter-spacing:0.5px;padding-bottom:8px;border-bottom:1px solid var(--border)}
+.day-tabs{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:1.25rem}
+.day-tab{padding:7px 16px;border-radius:8px;font-size:13px;font-weight:500;cursor:pointer;border:1px solid var(--border);background:var(--surface2);color:var(--text2);transition:all 0.2s}
+.day-tab.active{background:var(--accent2);color:white;border-color:var(--accent2)}
+.week-schedule{display:grid;grid-template-columns:repeat(7,1fr);gap:6px;margin:1rem 0}
+.day-cell{border-radius:var(--radius-sm);padding:12px 8px;text-align:center}
+.day-cell .day-name{font-size:11px;font-weight:500;text-transform:uppercase;letter-spacing:0.5px;color:var(--text3);margin-bottom:4px}
+.day-cell .day-type{font-size:12px;font-weight:500;line-height:1.3}
+.training-day{background:rgba(124,92,191,0.15);border:1px solid rgba(124,92,191,0.25)}
+.training-day .day-type{color:#c4b3f0}
+.rest-day{background:var(--surface2);border:1px solid var(--border)}
+.rest-day .day-type{color:var(--text3)}
+.food-category{margin-bottom:1.25rem}
+.food-cat-title{font-size:11px;font-weight:500;color:var(--text3);text-transform:uppercase;letter-spacing:0.8px;margin-bottom:8px;padding-bottom:6px;border-bottom:1px solid var(--border)}
+.food-items{display:flex;flex-wrap:wrap;gap:6px}
+.food-chip{background:var(--surface2);border:1px solid var(--border);border-radius:20px;padding:5px 12px;font-size:12px;color:var(--text2);display:flex;align-items:center;gap:6px}
+.food-chip span{color:var(--accent);font-weight:500}
+.tip-item{display:flex;gap:12px;padding:12px 0;border-bottom:1px solid var(--border)}
+.tip-item:last-child{border-bottom:none}
+.milestone{display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid var(--border)}
+.milestone:last-child{border-bottom:none}
+.m-kg{font-family:'Fraunces',serif;font-size:1.1rem;font-weight:600;color:var(--text2);min-width:52px}
+.m-kg.reached{color:var(--accent)}
+.m-bar-wrap{flex:1;background:var(--surface3);border-radius:4px;height:6px;overflow:hidden}
+.m-bar{height:100%;border-radius:4px;background:var(--accent);transition:width 1s ease}
+.m-check{font-size:16px;min-width:24px;text-align:center}
+.toast{position:fixed;bottom:24px;right:24px;background:var(--surface2);border:1px solid rgba(200,240,110,0.3);color:var(--accent);padding:12px 20px;border-radius:10px;font-size:14px;font-weight:500;z-index:300;transform:translateY(80px);opacity:0;transition:all 0.3s}
+.toast.show{transform:translateY(0);opacity:1}
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-logo">◎ FitTrack</div>
+  <div class="nav-links">
+    <button class="nav-link active" onclick="showPage('dashboard')">Dashboard</button>
+    <button class="nav-link" onclick="showPage('tracker')">Weight Log</button>
+    <button class="nav-link" onclick="showPage('nutrition')">Nutrition</button>
+    <button class="nav-link" onclick="showPage('exercise')">Exercise</button>
+    <button class="nav-link" onclick="showPage('schedule')">Schedule</button>
+  </div>
+</nav>
+
+<div id="page-dashboard" class="page active">
+  <div class="hero">
+    <div class="hero-tag">WEEK <span id="current-week">1</span> OF 24</div>
+    <h1>Your journey to<br><span id="hero-remaining">22 kg</span> lighter</h1>
+    <p>43 yrs · Started at 94 kg · Target 72 kg · South Indian Vegetarian</p>
+  </div>
+  <div class="container" style="padding-top:0">
+    <div class="grid-4" style="margin-bottom:1rem">
+      <div class="stat accent">
+        <div class="stat-label">Current Weight</div>
+        <div class="stat-value" id="dash-current">94.0<span style="font-size:1rem;font-weight:300"> kg</span></div>
+        <div class="stat-sub" id="dash-change">No entries yet</div>
+      </div>
+      <div class="stat">
+        <div class="stat-label">Starting Weight</div>
+        <div class="stat-value">94<span style="font-size:1rem;font-weight:300"> kg</span></div>
+        <div class="stat-sub">Age 43 · July 2026</div>
+      </div>
+      <div class="stat purple">
+        <div class="stat-label">Target Weight</div>
+        <div class="stat-value">72<span style="font-size:1rem;font-weight:300"> kg</span></div>
+        <div class="stat-sub">22 kg to lose</div>
+      </div>
+      <div class="stat orange">
+        <div class="stat-label">BMI</div>
+        <div class="stat-value" id="dash-bmi">32.1</div>
+        <div class="stat-sub" id="dash-bmi-label">Obese → target: 24.6</div>
+      </div>
+    </div>
+    <div class="card" style="margin-bottom:1rem">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+        <div>
+          <div style="font-size:13px;font-weight:500">Journey Progress</div>
+          <div style="font-size:12px;color:var(--text3);margin-top:2px">94 kg → 72 kg</div>
+        </div>
+        <div style="font-family:'Fraunces',serif;font-size:1.4rem;font-weight:600;color:var(--accent)" id="dash-pct">0%</div>
+      </div>
+      <div class="progress-track" style="height:10px">
+        <div class="progress-fill" id="main-progress" style="width:0%"></div>
+      </div>
+      <div style="display:flex;justify-content:space-between;margin-top:6px;font-size:11px;color:var(--text3)">
+        <span>94 kg start</span>
+        <span id="dash-lost">0 kg lost</span>
+        <span>72 kg goal</span>
+      </div>
+    </div>
+    <div class="section-head"><h2>Milestones</h2></div>
+    <div class="card">
+      <div id="milestones-list"></div>
+    </div>
+    <div class="grid-2" style="margin-top:1rem">
+      <div class="card">
+        <div style="font-size:13px;font-weight:500;margin-bottom:1rem;display:flex;justify-content:space-between">
+          Today's Nutrition <span class="badge badge-green">2,200 kcal target</span>
+        </div>
+        <div class="meal-row" style="font-size:11px;color:var(--text3);font-weight:500;padding-top:0;padding-bottom:8px;border-bottom:1px solid var(--border)">
+          <div>TIME</div><div>MEAL</div><div style="text-align:right">PROTEIN</div>
+        </div>
+        <div class="meal-row"><div class="meal-time">7:00 AM</div><div class="meal-desc">Idli (3 nos) + sambar (1 cup) + coconut chutney + 1 scoop whey in milk</div><div class="meal-protein">~38g</div></div>
+        <div class="meal-row"><div class="meal-time">10:00 AM</div><div class="meal-desc">Curd rice (small) + roasted peanuts + 1 banana</div><div class="meal-protein">~18g</div></div>
+        <div class="meal-row"><div class="meal-time">1:00 PM</div><div class="meal-desc">Brown rice + sambar + rasam + kootu (dal+veg) + curd + papad</div><div class="meal-protein">~35g</div></div>
+        <div class="meal-row"><div class="meal-time">4:00 PM</div><div class="meal-desc">Sundal (boiled chana/moong) + 1 scoop whey shake OR peanut chikki</div><div class="meal-protein">~28g</div></div>
+        <div class="meal-row"><div class="meal-time">7:00 PM</div><div class="meal-desc">Pongal (ven pongal) + sambar + sautéed greens (spinach/drumstick)</div><div class="meal-protein">~32g</div></div>
+        <div class="meal-row"><div class="meal-time">9:00 PM</div><div class="meal-desc">Moong dal kanji (porridge) OR light rasam rice + buttermilk</div><div class="meal-protein">~18g</div></div>
+        <div style="margin-top:10px;padding-top:10px;border-top:1px solid var(--border);display:flex;justify-content:space-between;font-size:13px">
+          <span style="color:var(--text2)">Total protein</span>
+          <span style="font-weight:500;color:var(--accent)">~169g ✓</span>
+        </div>
+      </div>
+      <div class="card">
+        <div style="font-size:13px;font-weight:500;margin-bottom:1rem">Quick Log Weight</div>
+        <div class="form-group">
+          <label>Today's Weight (kg)</label>
+          <input type="number" id="quick-weight" placeholder="e.g. 94.5" step="0.1" min="50" max="200">
+        </div>
+        <div class="form-group">
+          <label>Date</label>
+          <input type="date" id="quick-date">
+        </div>
+        <div class="form-group">
+          <label>Note (optional)</label>
+          <input type="text" id="quick-note" placeholder="e.g. After gym, morning">
+        </div>
+        <button class="btn btn-primary" style="width:100%;justify-content:center" onclick="addWeight()">Log Weight</button>
+        <div style="margin-top:1rem;padding-top:1rem;border-top:1px solid var(--border);font-size:12px;color:var(--text3);text-align:center">
+          Weigh yourself every morning, same time, before eating
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="page-tracker" class="page">
+  <div class="container">
+    <div class="section-head" style="margin-top:1.5rem"><h2>Weight History</h2></div>
+    <div class="card" style="margin-bottom:1rem">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem">
+        <div>
+          <div style="font-size:13px;font-weight:500">Weight Trend</div>
+          <div style="font-size:12px;color:var(--text3)">94 kg → 72 kg target</div>
+        </div>
+        <div style="font-size:12px;color:var(--text2)" id="chart-range">No data yet</div>
+      </div>
+      <div id="weightChart">
+        <svg id="chart-svg" width="100%" height="220" viewBox="0 0 800 220" preserveAspectRatio="none">
+          <defs>
+            <linearGradient id="areaGrad" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stop-color="#c8f06e" stop-opacity="0.4"/>
+              <stop offset="100%" stop-color="#c8f06e" stop-opacity="0"/>
+            </linearGradient>
+          </defs>
+          <line x1="0" y1="200" x2="800" y2="200" stroke="rgba(255,255,255,0.06)" stroke-width="1"/>
+          <text x="10" y="18" fill="#5a5855" font-size="11" font-family="DM Sans">Add your first weight entry below</text>
+          <line id="target-line" x1="0" y1="180" x2="800" y2="180" stroke="rgba(200,240,110,0.25)" stroke-width="1" stroke-dasharray="5,4"/>
+          <text id="target-label" x="710" y="175" fill="rgba(200,240,110,0.5)" font-size="10" font-family="DM Sans">72 kg target</text>
+          <path id="chart-area" class="chart-area" d=""/>
+          <path id="chart-line" class="chart-line" d=""/>
+          <g id="chart-dots"></g>
+        </svg>
+      </div>
+    </div>
+    <div class="grid-2">
+      <div class="card">
+        <div style="font-size:13px;font-weight:500;margin-bottom:1rem">Log New Entry</div>
+        <div class="form-group">
+          <label>Weight (kg)</label>
+          <input type="number" id="log-weight" placeholder="e.g. 94.2" step="0.1" min="50" max="200">
+        </div>
+        <div class="form-group">
+          <label>Date</label>
+          <input type="date" id="log-date">
+        </div>
+        <div class="form-group">
+          <label>Note</label>
+          <input type="text" id="log-note" placeholder="Morning, after workout...">
+        </div>
+        <button class="btn btn-primary" onclick="addWeightFromLog()" style="width:100%;justify-content:center">Add Entry</button>
+      </div>
+      <div class="card">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem">
+          <div style="font-size:13px;font-weight:500">Weight Log</div>
+          <div style="font-size:12px;color:var(--text2)" id="entry-count">0 entries</div>
+        </div>
+        <div id="weight-list" style="max-height:260px;overflow-y:auto">
+          <div style="text-align:center;padding:2rem;color:var(--text3);font-size:13px">No entries yet.<br>Log your first weight above.</div>
+        </div>
+      </div>
+    </div>
+    <div class="section-head" style="margin-top:1.5rem"><h2>Stats</h2></div>
+    <div class="grid-4">
+      <div class="stat accent"><div class="stat-label">Total Lost</div><div class="stat-value" id="stat-lost">—</div><div class="stat-sub">since start</div></div>
+      <div class="stat"><div class="stat-label">Still to Lose</div><div class="stat-value" id="stat-remaining">22 kg</div><div class="stat-sub">to reach 72 kg</div></div>
+      <div class="stat purple"><div class="stat-label">Best Week</div><div class="stat-value" id="stat-best">—</div><div class="stat-sub">most in 7 days</div></div>
+      <div class="stat orange"><div class="stat-label">Avg/Week</div><div class="stat-value" id="stat-avg">—</div><div class="stat-sub">projected pace</div></div>
+    </div>
+  </div>
+</div>
+
+<div id="page-nutrition" class="page">
+  <div class="container">
+    <div class="section-head" style="margin-top:1.5rem"><h2>South Indian Nutrition Plan</h2></div>
+    <div class="grid-4" style="margin-bottom:1.25rem">
+      <div class="stat accent"><div class="stat-label">Daily Calories</div><div class="stat-value">2,200</div><div class="stat-sub">kcal/day</div></div>
+      <div class="stat"><div class="stat-label">Protein</div><div class="stat-value">170g</div><div class="stat-sub">per day target</div></div>
+      <div class="stat purple"><div class="stat-label">Carbs</div><div class="stat-value">200g</div><div class="stat-sub">brown rice base</div></div>
+      <div class="stat orange"><div class="stat-label">Fats</div><div class="stat-value">55g</div><div class="stat-sub">coconut + sesame</div></div>
+    </div>
+    <div style="background:rgba(200,240,110,0.07);border:1px solid rgba(200,240,110,0.2);border-radius:var(--radius-sm);padding:12px 16px;margin-bottom:1rem;font-size:13px;color:var(--text2)">
+      <strong style="color:var(--accent)">South Indian strategy:</strong> Rice is your carb base — keep portions to 1 cup cooked. Boost protein with sambar (dal-rich), sundal, whey, and curd at every meal. Add drumstick / moringa wherever possible. Fresh mozzarella (30g) also works as an occasional protein add-on in salads if you want a change from paneer.
+    </div>
+    <div class="card" style="margin-bottom:1rem">
+      <div style="font-size:13px;font-weight:500;margin-bottom:1rem">Full Day South Indian Meal Plan</div>
+      <div class="meal-row" style="font-size:11px;color:var(--text3);font-weight:500;letter-spacing:0.5px;text-transform:uppercase;padding-top:0;padding-bottom:8px">
+        <div>Time</div><div>What to Eat</div><div style="text-align:right">Protein</div>
+      </div>
+      <div class="meal-row"><div class="meal-time">7:00 AM<br><span style="font-size:10px;color:var(--text3)">Breakfast</span></div><div class="meal-desc">3 idli + 1 cup thick sambar (toor dal) + coconut chutney + 1 scoop whey in 250ml milk</div><div class="meal-protein" style="color:var(--accent)">~38g</div></div>
+      <div class="meal-row"><div class="meal-time">10:00 AM<br><span style="font-size:10px;color:var(--text3)">Mid-morning</span></div><div class="meal-desc">Sundal — boiled black chana / moong with mustard, curry leaves, coconut + handful peanuts</div><div class="meal-protein">~20g</div></div>
+      <div class="meal-row"><div class="meal-time">1:00 PM<br><span style="font-size:10px;color:var(--text3)">Lunch</span></div><div class="meal-desc">1 cup brown rice + sambar (extra dal) + drumstick kootu + paruppu (toor dal) + curd + small papad</div><div class="meal-protein" style="color:var(--accent)">~38g</div></div>
+      <div class="meal-row"><div class="meal-time">4:00 PM<br><span style="font-size:10px;color:var(--text3)">Pre-workout</span></div><div class="meal-desc">Ven pongal (small) — rice + moong dal cooked together + cumin + pepper + ghee (1 tsp) OR 1 scoop whey + banana</div><div class="meal-protein">~25g</div></div>
+      <div class="meal-row"><div class="meal-time">7:00 PM<br><span style="font-size:10px;color:var(--text3)">Post-workout</span></div><div class="meal-desc">Sambar rice (one-pot) — brown rice cooked in thick sambar + potato / brinjal + sautéed spinach on side</div><div class="meal-protein" style="color:var(--accent)">~32g</div></div>
+      <div class="meal-row"><div class="meal-time">9:00 PM<br><span style="font-size:10px;color:var(--text3)">Dinner</span></div><div class="meal-desc">Curd rice (small — 1 cup cooked rice + curd + mustard tempering) + rasam + cucumber raita</div><div class="meal-protein">~18g</div></div>
+      <div style="padding:12px 0 0;display:flex;justify-content:space-between;font-size:13px;font-weight:500">
+        <span style="color:var(--text2)">Total daily protein</span>
+        <span style="color:var(--accent)">~171g ✓</span>
+      </div>
+    </div>
+    <div class="card" style="margin-bottom:1rem">
+      <div style="font-size:13px;font-weight:500;margin-bottom:1rem">Best One-Pot South Indian Dishes (High Protein)</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+        <div style="background:var(--surface2);border-radius:10px;padding:12px">
+          <div style="font-size:12px;font-weight:500;color:var(--accent);margin-bottom:6px">Ven Pongal</div>
+          <div style="font-size:12px;color:var(--text2);line-height:1.5">Rice + moong dal (1:1) with ghee, cumin, pepper, ginger. ~22g protein/bowl. Best pre-workout.</div>
+        </div>
+        <div style="background:var(--surface2);border-radius:10px;padding:12px">
+          <div style="font-size:12px;font-weight:500;color:var(--accent);margin-bottom:6px">Sambar Rice</div>
+          <div style="font-size:12px;color:var(--text2);line-height:1.5">Brown rice cooked with extra-thick toor dal sambar + drumstick. ~28g protein/bowl. Post-workout.</div>
+        </div>
+        <div style="background:var(--surface2);border-radius:10px;padding:12px">
+          <div style="font-size:12px;font-weight:500;color:var(--accent);margin-bottom:6px">Kootu (Dal + Veg)</div>
+          <div style="font-size:12px;color:var(--text2);line-height:1.5">Chana dal / toor dal with raw banana, yam, or drumstick. ~18g protein. Side for every lunch.</div>
+        </div>
+        <div style="background:var(--surface2);border-radius:10px;padding:12px">
+          <div style="font-size:12px;font-weight:500;color:var(--accent);margin-bottom:6px">Paruppu Sadam</div>
+          <div style="font-size:12px;color:var(--text2);line-height:1.5">Toor dal cooked soft, mixed with rice + ghee + turmeric. ~20g protein. Easy daily lunch base.</div>
+        </div>
+        <div style="background:var(--surface2);border-radius:10px;padding:12px">
+          <div style="font-size:12px;font-weight:500;color:var(--accent);margin-bottom:6px">Moong Dal Kanji</div>
+          <div style="font-size:12px;color:var(--text2);line-height:1.5">Thin rice-moong porridge with salt, cumin, curry leaves. ~16g protein. Light easy dinner.</div>
+        </div>
+        <div style="background:var(--surface2);border-radius:10px;padding:12px">
+          <div style="font-size:12px;font-weight:500;color:var(--accent);margin-bottom:6px">Curd Rice</div>
+          <div style="font-size:12px;color:var(--text2);line-height:1.5">Cooked rice + thick curd + mustard + curry leaves + ginger. ~18g protein. Cooling, easy digestion.</div>
+        </div>
+        <div style="background:var(--surface2);border-radius:10px;padding:12px">
+          <div style="font-size:12px;font-weight:500;color:var(--accent);margin-bottom:6px">Sundal (Protein Snack)</div>
+          <div style="font-size:12px;color:var(--text2);line-height:1.5">Boiled black chana / moong / rajma with coconut, mustard, curry leaves. ~20g protein.</div>
+        </div>
+        <div style="background:var(--surface2);border-radius:10px;padding:12px">
+          <div style="font-size:12px;font-weight:500;color:var(--accent);margin-bottom:6px">Rasam</div>
+          <div style="font-size:12px;color:var(--text2);line-height:1.5">Thin tamarind + tomato + toor dal soup with pepper, cumin, garlic. Drink as soup daily.</div>
+        </div>
+      </div>
+    </div>
+    <div class="grid-2">
+      <div class="card">
+        <div style="font-size:13px;font-weight:500;margin-bottom:1rem">Best South Indian Protein Sources</div>
+        <div class="food-category">
+          <div class="food-cat-title">Dal & Pulses</div>
+          <div class="food-items">
+            <div class="food-chip">Toor dal <span>22g/100g dry</span></div>
+            <div class="food-chip">Moong dal <span>24g/100g dry</span></div>
+            <div class="food-chip">Chana dal <span>22g/100g dry</span></div>
+            <div class="food-chip">Black chana <span>19g/100g dry</span></div>
+          </div>
+        </div>
+        <div class="food-category">
+          <div class="food-cat-title">Dairy</div>
+          <div class="food-items">
+            <div class="food-chip">Thick curd <span>10g/100g</span></div>
+            <div class="food-chip">Buttermilk <span>3g/glass</span></div>
+            <div class="food-chip">Whey protein <span>25g/scoop</span></div>
+            <div class="food-chip">Mozzarella <span>~7g/30g</span></div>
+          </div>
+        </div>
+        <div class="food-category">
+          <div class="food-cat-title">Seeds & Nuts</div>
+          <div class="food-items">
+            <div class="food-chip">Peanuts <span>26g/100g</span></div>
+            <div class="food-chip">Sesame (til) <span>18g/100g</span></div>
+            <div class="food-chip">Coconut (fresh) <span>3g/100g</span></div>
+          </div>
+        </div>
+        <div class="food-category">
+          <div class="food-cat-title">Vegetables</div>
+          <div class="food-items">
+            <div class="food-chip">Drumstick / Moringa <span>9g/100g</span></div>
+            <div class="food-chip">Raw banana <span>decent fibre</span></div>
+            <div class="food-chip">Cluster beans <span>3g/100g</span></div>
+          </div>
+        </div>
+      </div>
+      <div class="card">
+        <div style="font-size:13px;font-weight:500;margin-bottom:1rem">South Indian Foods to Limit</div>
+        <div style="display:flex;flex-direction:column;gap:8px">
+          <div style="display:flex;gap:10px;align-items:flex-start;padding:8px;background:rgba(240,133,90,0.07);border-radius:8px;border:1px solid rgba(240,133,90,0.15)">
+            <span style="color:var(--accent3);font-size:14px;margin-top:1px">✕</span>
+            <div><div style="font-size:13px;font-weight:500">White rice in large portions (&gt;2 cups)</div><div style="font-size:12px;color:var(--text3)">Switch to 1 cup cooked brown rice per meal</div></div>
+          </div>
+          <div style="display:flex;gap:10px;align-items:flex-start;padding:8px;background:rgba(240,133,90,0.07);border-radius:8px;border:1px solid rgba(240,133,90,0.15)">
+            <span style="color:var(--accent3);font-size:14px;margin-top:1px">✕</span>
+            <div><div style="font-size:13px;font-weight:500">Medhu vada, bonda, bajji daily</div><div style="font-size:12px;color:var(--text3)">Save for once a week; replace with idli or sundal</div></div>
+          </div>
+          <div style="display:flex;gap:10px;align-items:flex-start;padding:8px;background:rgba(240,133,90,0.07);border-radius:8px;border:1px solid rgba(240,133,90,0.15)">
+            <span style="color:var(--accent3);font-size:14px;margin-top:1px">✕</span>
+            <div><div style="font-size:13px;font-weight:500">Sweetened filter coffee (3–4 cups)</div><div style="font-size:12px;color:var(--text3)">Reduce sugar to ½ tsp per cup</div></div>
+          </div>
+          <div style="display:flex;gap:10px;align-items:flex-start;padding:8px;background:rgba(240,133,90,0.07);border-radius:8px;border:1px solid rgba(240,133,90,0.15)">
+            <span style="color:var(--accent3);font-size:14px;margin-top:1px">✕</span>
+            <div><div style="font-size:13px;font-weight:500">Plain rice + rasam only (no dal)</div><div style="font-size:12px;color:var(--text3)">Always add kootu, paruppu or sambar</div></div>
+          </div>
+          <div style="display:flex;gap:10px;align-items:flex-start;padding:8px;background:rgba(200,240,110,0.05);border-radius:8px;border:1px solid rgba(200,240,110,0.15)">
+            <span style="color:var(--accent);font-size:14px;margin-top:1px">✓</span>
+            <div><div style="font-size:13px;font-weight:500">Ghee — 1 tsp per meal is fine</div><div style="font-size:12px;color:var(--text3)">Traditional and helps absorb fat-soluble vitamins</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="page-exercise" class="page">
+  <div class="container">
+    <div class="section-head" style="margin-top:1.5rem"><h2>Exercise Programme</h2></div>
+    <div class="day-tabs">
+      <button class="day-tab active" onclick="showExDay('A',this)">Day A — Push</button>
+      <button class="day-tab" onclick="showExDay('B',this)">Day B — Pull</button>
+      <button class="day-tab" onclick="showExDay('C',this)">Day C — Legs</button>
+      <button class="day-tab" onclick="showExDay('D',this)">Day D — Full Body</button>
+    </div>
+    <div id="exA" class="ex-panel">
+      <div class="card" style="margin-bottom:1rem">
+        <div style="display:flex;gap:10px;align-items:center;margin-bottom:1rem">
+          <span class="badge badge-purple">Chest · Shoulders · Triceps · Core</span>
+          <span class="badge badge-gray">Monday</span>
+        </div>
+        <div class="ex-row ex-header"><div>Exercise</div><div style="text-align:center">Sets</div><div style="text-align:center">Reps</div><div>Notes</div></div>
+        <div class="ex-row"><div class="ex-name">Dumbbell Bench Press</div><div class="ex-sets">4</div><div class="ex-reps">6–8</div><div class="ex-note">Primary chest builder</div></div>
+        <div class="ex-row"><div class="ex-name">Incline Dumbbell Press</div><div class="ex-sets">3</div><div class="ex-reps">8–10</div><div class="ex-note">Upper chest — 30–45° incline</div></div>
+        <div class="ex-row"><div class="ex-name">Seated Shoulder Press</div><div class="ex-sets">4</div><div class="ex-reps">8–10</div><div class="ex-note">Don't lock out elbows</div></div>
+        <div class="ex-row"><div class="ex-name">Lateral Raises</div><div class="ex-sets">3</div><div class="ex-reps">12–15</div><div class="ex-note">Light weight, perfect form</div></div>
+        <div class="ex-row"><div class="ex-name">Tricep Pushdowns / Dips</div><div class="ex-sets">3</div><div class="ex-reps">10–12</div><div class="ex-note">Keep elbows tucked</div></div>
+        <div class="ex-row"><div class="ex-name">Plank Hold</div><div class="ex-sets">3</div><div class="ex-reps">45 sec</div><div class="ex-note">Neutral spine</div></div>
+      </div>
+    </div>
+    <div id="exB" class="ex-panel" style="display:none">
+      <div class="card" style="margin-bottom:1rem">
+        <div style="display:flex;gap:10px;align-items:center;margin-bottom:1rem">
+          <span class="badge badge-purple">Back · Biceps · Rear Delts · Posture</span>
+          <span class="badge badge-gray">Wednesday</span>
+        </div>
+        <div class="ex-row ex-header"><div>Exercise</div><div style="text-align:center">Sets</div><div style="text-align:center">Reps</div><div>Notes</div></div>
+        <div class="ex-row"><div class="ex-name">Romanian Deadlift</div><div class="ex-sets">4</div><div class="ex-reps">5–6</div><div class="ex-note">Learn form first</div></div>
+        <div class="ex-row"><div class="ex-name">Pull-Ups / Lat Pulldown</div><div class="ex-sets">4</div><div class="ex-reps">6–10</div><div class="ex-note">Full range of motion</div></div>
+        <div class="ex-row"><div class="ex-name">Dumbbell Row</div><div class="ex-sets">3</div><div class="ex-reps">8–10</div><div class="ex-note">Brace the core</div></div>
+        <div class="ex-row"><div class="ex-name">Face Pulls</div><div class="ex-sets">3</div><div class="ex-reps">15</div><div class="ex-note">Do NOT skip this</div></div>
+        <div class="ex-row"><div class="ex-name">Dumbbell Bicep Curl</div><div class="ex-sets">3</div><div class="ex-reps">10–12</div><div class="ex-note">Supinate at the top</div></div>
+        <div class="ex-row"><div class="ex-name">Reverse Fly</div><div class="ex-sets">3</div><div class="ex-reps">12–15</div><div class="ex-note">Rear delts and posture</div></div>
+      </div>
+    </div>
+    <div id="exC" class="ex-panel" style="display:none">
+      <div class="card" style="margin-bottom:1rem">
+        <div style="display:flex;gap:10px;align-items:center;margin-bottom:1rem">
+          <span class="badge badge-purple">Quads · Hamstrings · Glutes · Calves</span>
+          <span class="badge badge-gray">Friday</span>
+        </div>
+        <div class="ex-row ex-header"><div>Exercise</div><div style="text-align:center">Sets</div><div style="text-align:center">Reps</div><div>Notes</div></div>
+        <div class="ex-row"><div class="ex-name">Goblet Squat / Barbell Squat</div><div class="ex-sets">4</div><div class="ex-reps">6–8</div><div class="ex-note">Most important leg exercise</div></div>
+        <div class="ex-row"><div class="ex-name">Romanian Deadlift</div><div class="ex-sets">3</div><div class="ex-reps">8–10</div><div class="ex-note">Hamstrings and glutes</div></div>
+        <div class="ex-row"><div class="ex-name">Leg Press</div><div class="ex-sets">3</div><div class="ex-reps">10–12</div><div class="ex-note">Easier on knees</div></div>
+        <div class="ex-row"><div class="ex-name">Walking Lunges</div><div class="ex-sets">3</div><div class="ex-reps">12 each leg</div><div class="ex-note">Balance and glute activation</div></div>
+        <div class="ex-row"><div class="ex-name">Leg Curl (machine)</div><div class="ex-sets">3</div><div class="ex-reps">10–12</div><div class="ex-note">Hamstring isolation</div></div>
+        <div class="ex-row"><div class="ex-name">Standing Calf Raise</div><div class="ex-sets">4</div><div class="ex-reps">15–20</div><div class="ex-note">Often neglected — go heavy</div></div>
+      </div>
+    </div>
+    <div id="exD" class="ex-panel" style="display:none">
+      <div class="card" style="margin-bottom:1rem">
+        <div style="display:flex;gap:10px;align-items:center;margin-bottom:1rem">
+          <span class="badge badge-purple">Full Body Power · Core · Fat Burn</span>
+          <span class="badge badge-gray">Saturday</span>
+        </div>
+        <div class="ex-row ex-header"><div>Exercise</div><div style="text-align:center">Sets</div><div style="text-align:center">Reps</div><div>Notes</div></div>
+        <div class="ex-row"><div class="ex-name">Kettlebell Swing</div><div class="ex-sets">4</div><div class="ex-reps">15</div><div class="ex-note">Hip hinge</div></div>
+        <div class="ex-row"><div class="ex-name">Dumbbell Thruster</div><div class="ex-sets">3</div><div class="ex-reps">10</div><div class="ex-note">Squat to overhead press</div></div>
+        <div class="ex-row"><div class="ex-name">Push-Up Variations</div><div class="ex-sets">3</div><div class="ex-reps">Max</div><div class="ex-note">Standard / wide / diamond</div></div>
+        <div class="ex-row"><div class="ex-name">Inverted Row / TRX Row</div><div class="ex-sets">3</div><div class="ex-reps">12</div><div class="ex-note">Back and core</div></div>
+        <div class="ex-row"><div class="ex-name">Farmer's Carry</div><div class="ex-sets">3</div><div class="ex-reps">30m walk</div><div class="ex-note">Grip, core, full body</div></div>
+        <div class="ex-row"><div class="ex-name">Dead Bug</div><div class="ex-sets">3</div><div class="ex-reps">10 each side</div><div class="ex-note">Deep core stability</div></div>
+      </div>
+    </div>
+    <div class="card" style="margin-bottom:1rem">
+      <div style="font-size:13px;font-weight:500;margin-bottom:1rem">Warm-Up (every session — never skip)</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+        <div style="background:var(--surface2);border-radius:8px;padding:10px;font-size:13px;color:var(--text2)">5 min light cardio (treadmill walk or cycle)</div>
+        <div style="background:var(--surface2);border-radius:8px;padding:10px;font-size:13px;color:var(--text2)">Hip circles + shoulder rolls × 10 each</div>
+        <div style="background:var(--surface2);border-radius:8px;padding:10px;font-size:13px;color:var(--text2)">Bodyweight squats × 10, arm swings × 10</div>
+        <div style="background:var(--surface2);border-radius:8px;padding:10px;font-size:13px;color:var(--text2)">Light set at 50% weight before working sets</div>
+      </div>
+    </div>
+    <div class="card">
+      <div style="font-size:13px;font-weight:500;margin-bottom:1rem">Cardio — Protect Muscle at 43</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px">
+        <div style="background:rgba(200,240,110,0.07);border:1px solid rgba(200,240,110,0.15);border-radius:10px;padding:1rem">
+          <div style="font-size:12px;color:var(--accent);font-weight:500;margin-bottom:4px">HIIT</div>
+          <div style="font-size:13px;color:var(--text)">30 sec sprint + 90 sec walk</div>
+          <div style="font-size:12px;color:var(--text3);margin-top:4px">2× per week · 20 min</div>
+        </div>
+        <div style="background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:1rem">
+          <div style="font-size:12px;color:var(--text2);font-weight:500;margin-bottom:4px">BRISK WALK</div>
+          <div style="font-size:13px;color:var(--text)">Post-dinner walk outside</div>
+          <div style="font-size:12px;color:var(--text3);margin-top:4px">Daily · 30–45 min</div>
+        </div>
+        <div style="background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:1rem">
+          <div style="font-size:12px;color:var(--text2);font-weight:500;margin-bottom:4px">OPTIONAL</div>
+          <div style="font-size:13px;color:var(--text)">Yoga or swimming</div>
+          <div style="font-size:12px;color:var(--text3);margin-top:4px">1× per week · 30 min</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="page-schedule" class="page">
+  <div class="container">
+    <div class="section-head" style="margin-top:1.5rem"><h2>Weekly Schedule</h2></div>
+    <div class="card" style="margin-bottom:1rem">
+      <div style="font-size:13px;font-weight:500;margin-bottom:1rem">Training Week Structure</div>
+      <div class="week-schedule">
+        <div class="training-day day-cell"><div class="day-name">Mon</div><div class="day-type">Day A<br>Push</div></div>
+        <div class="rest-day day-cell"><div class="day-name">Tue</div><div class="day-type">Rest +<br>Walk</div></div>
+        <div class="training-day day-cell"><div class="day-name">Wed</div><div class="day-type">Day B<br>Pull</div></div>
+        <div class="rest-day day-cell"><div class="day-name">Thu</div><div class="day-type">Rest +<br>Walk</div></div>
+        <div class="training-day day-cell"><div class="day-name">Fri</div><div class="day-type">Day C<br>Legs</div></div>
+        <div class="training-day day-cell"><div class="day-name">Sat</div><div class="day-type">Day D<br>Power</div></div>
+        <div class="rest-day day-cell"><div class="day-name">Sun</div><div class="day-type">Full<br>Rest</div></div>
+      </div>
+    </div>
+    <div class="card" style="margin-bottom:1rem">
+      <div style="font-size:13px;font-weight:500;margin-bottom:1rem">Daily Routine</div>
+      <div style="display:flex;flex-direction:column;gap:0">
+        <div style="display:grid;grid-template-columns:90px 1fr;gap:12px;padding:10px 0;border-bottom:1px solid var(--border)"><span style="font-size:13px;font-weight:500;color:var(--accent);font-variant-numeric:tabular-nums">7:00 AM</span><span style="font-size:13px;color:var(--text)">Wake up — drink 500ml water immediately</span></div>
+        <div style="display:grid;grid-template-columns:90px 1fr;gap:12px;padding:10px 0;border-bottom:1px solid var(--border)"><span style="font-size:13px;font-weight:500;color:var(--accent);font-variant-numeric:tabular-nums">7:15 AM</span><span style="font-size:13px;color:var(--text)">Breakfast — 3 idli + sambar + coconut chutney + whey in milk</span></div>
+        <div style="display:grid;grid-template-columns:90px 1fr;gap:12px;padding:10px 0;border-bottom:1px solid var(--border)"><span style="font-size:13px;color:var(--text2);font-variant-numeric:tabular-nums">10:00 AM</span><span style="font-size:13px;color:var(--text)">Sundal (black chana / moong) + peanuts</span></div>
+        <div style="display:grid;grid-template-columns:90px 1fr;gap:12px;padding:10px 0;border-bottom:1px solid var(--border)"><span style="font-size:13px;color:var(--text2);font-variant-numeric:tabular-nums">1:00 PM</span><span style="font-size:13px;color:var(--text)">Lunch — brown rice + sambar + kootu + paruppu + curd + rasam</span></div>
+        <div style="display:grid;grid-template-columns:90px 1fr;gap:12px;padding:10px 0;border-bottom:1px solid var(--border)"><span style="font-size:13px;font-weight:500;color:var(--accent);font-variant-numeric:tabular-nums">4:00 PM</span><span style="font-size:13px;color:var(--text)">Pre-workout — ven pongal (small) OR whey shake + banana</span></div>
+        <div style="display:grid;grid-template-columns:90px 1fr;gap:12px;padding:10px 0;border-bottom:1px solid var(--border)"><span style="font-size:13px;font-weight:500;color:var(--accent2);font-variant-numeric:tabular-nums">5:00 PM</span><span style="font-size:13px;color:var(--text)"><strong>Training session</strong> — 60–70 min max</span></div>
+        <div style="display:grid;grid-template-columns:90px 1fr;gap:12px;padding:10px 0;border-bottom:1px solid var(--border)"><span style="font-size:13px;font-weight:500;color:var(--accent);font-variant-numeric:tabular-nums">6:30 PM</span><span style="font-size:13px;color:var(--text)">Post-workout — sambar rice or paruppu sadam within 30–45 min</span></div>
+        <div style="display:grid;grid-template-columns:90px 1fr;gap:12px;padding:10px 0;border-bottom:1px solid var(--border)"><span style="font-size:13px;color:var(--text2);font-variant-numeric:tabular-nums">8:30 PM</span><span style="font-size:13px;color:var(--text)">Light dinner — curd rice + rasam OR moong kanji</span></div>
+        <div style="display:grid;grid-template-columns:90px 1fr;gap:12px;padding:10px 0;border-bottom:1px solid var(--border)"><span style="font-size:13px;color:var(--text2);font-variant-numeric:tabular-nums">9:30 PM</span><span style="font-size:13px;color:var(--text)">30-min evening walk — aids digestion + fat loss</span></div>
+        <div style="display:grid;grid-template-columns:90px 1fr;gap:12px;padding:10px 0"><span style="font-size:13px;font-weight:500;color:#b09fe0;font-variant-numeric:tabular-nums">10:30 PM</span><span style="font-size:13px;color:var(--text)">Sleep — 7–9 hours non-negotiable for testosterone</span></div>
+      </div>
+    </div>
+    <div class="grid-2">
+      <div class="card">
+        <div style="font-size:13px;font-weight:500;margin-bottom:1rem">Supplements Schedule</div>
+        <div style="font-size:11px;color:var(--text3);font-weight:500;text-transform:uppercase;letter-spacing:0.5px;padding-bottom:8px;border-bottom:1px solid var(--border)">Morning</div>
+        <div style="padding:8px 0;font-size:13px;border-bottom:1px solid var(--border);color:var(--text)">Whey protein · Vitamin D3 · Ashwagandha</div>
+        <div style="font-size:11px;color:var(--text3);font-weight:500;text-transform:uppercase;letter-spacing:0.5px;padding:8px 0 6px;border-bottom:1px solid var(--border)">Post-Workout</div>
+        <div style="padding:8px 0;font-size:13px;border-bottom:1px solid var(--border);color:var(--text)">Creatine monohydrate 5g · Whey if needed</div>
+        <div style="font-size:11px;color:var(--text3);font-weight:500;text-transform:uppercase;letter-spacing:0.5px;padding:8px 0 6px;border-bottom:1px solid var(--border)">With Meals</div>
+        <div style="padding:8px 0;font-size:13px;border-bottom:1px solid var(--border);color:var(--text)">Omega-3 algae oil (DHA/EPA) · Zinc</div>
+        <div style="font-size:11px;color:var(--text3);font-weight:500;text-transform:uppercase;letter-spacing:0.5px;padding:8px 0 6px;border-bottom:1px solid var(--border)">Before Bed</div>
+        <div style="padding:8px 0;font-size:13px;color:var(--text)">Magnesium glycinate 300–400mg · B12</div>
+      </div>
+      <div class="card">
+        <div style="font-size:13px;font-weight:500;margin-bottom:1rem">Progress Expectations</div>
+        <div style="display:flex;flex-direction:column;gap:0">
+          <div style="padding:9px 0;border-bottom:1px solid var(--border);display:grid;grid-template-columns:80px 1fr;gap:8px"><span style="font-size:12px;font-weight:500;color:var(--accent)">Wk 1–2</span><span style="font-size:13px;color:var(--text2)">~92–93 kg · Body adjusting</span></div>
+          <div style="padding:9px 0;border-bottom:1px solid var(--border);display:grid;grid-template-columns:80px 1fr;gap:8px"><span style="font-size:12px;font-weight:500;color:var(--accent)">Wk 3–4</span><span style="font-size:13px;color:var(--text2)">~90–91 kg · Noticeably stronger</span></div>
+          <div style="padding:9px 0;border-bottom:1px solid var(--border);display:grid;grid-template-columns:80px 1fr;gap:8px"><span style="font-size:12px;font-weight:500;color:var(--accent)">Wk 6–8</span><span style="font-size:13px;color:var(--text2)">~87–89 kg · Clothes fitting better</span></div>
+          <div style="padding:9px 0;border-bottom:1px solid var(--border);display:grid;grid-template-columns:80px 1fr;gap:8px"><span style="font-size:12px;font-weight:500;color:var(--accent)">Wk 12</span><span style="font-size:13px;color:var(--text2)">~84–86 kg · Visible change</span></div>
+          <div style="padding:9px 0;border-bottom:1px solid var(--border);display:grid;grid-template-columns:80px 1fr;gap:8px"><span style="font-size:12px;font-weight:500;color:var(--accent)">Wk 20</span><span style="font-size:13px;color:var(--text2)">~78–81 kg · Lean and strong</span></div>
+          <div style="padding:9px 0;display:grid;grid-template-columns:80px 1fr;gap:8px"><span style="font-size:12px;font-weight:500;color:var(--accent)">Wk 24</span><span style="font-size:13px;color:var(--text)"><strong>~72–75 kg · Goal reached</strong></span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const START_WEIGHT = 94;
+const TARGET_WEIGHT = 72;
+const START_DATE = new Date('2026-07-06');
+const HEIGHT_CM = 171;
+
+let weightLog = [];
+
+function storageRequest(action, key, value){
+  return new Promise(function(resolve){
+    var id = Math.random().toString(36).slice(2);
+    function handler(e){
+      if(e.data && e.data.id === id){
+        window.removeEventListener('message', handler);
+        resolve(e.data.value);
+      }
+    }
+    window.addEventListener('message', handler);
+    parent.postMessage({type:'ft-storage', action:action, key:key, value:value, id:id}, '*');
+  });
+}
+async function loadWeights(){
+  var raw = await storageRequest('get','fittrack_weights');
+  try{ return raw ? JSON.parse(raw) : []; }catch(e){ return []; }
+}
+async function persistWeights(){
+  await storageRequest('set','fittrack_weights', JSON.stringify(weightLog));
+}
+
+function showPage(id) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-link').forEach(n => n.classList.remove('active'));
+  document.getElementById('page-' + id).classList.add('active');
+  event.target.classList.add('active');
+  if (id === 'dashboard') renderDashboard();
+  if (id === 'tracker') renderTracker();
+}
+
+function showExDay(day, btn) {
+  document.querySelectorAll('.ex-panel').forEach(p => p.style.display = 'none');
+  document.querySelectorAll('.day-tab').forEach(b => b.classList.remove('active'));
+  document.getElementById('ex' + day).style.display = 'block';
+  btn.classList.add('active');
+}
+
+function getCurrentWeight() {
+  if (weightLog.length === 0) return START_WEIGHT;
+  return weightLog[weightLog.length - 1].weight;
+}
+
+async function addWeight() {
+  const w = parseFloat(document.getElementById('quick-weight').value);
+  const d = document.getElementById('quick-date').value;
+  const n = document.getElementById('quick-note').value;
+  if (!w || !d) { showToast('Please enter weight and date'); return; }
+  await saveWeight(w, d, n);
+  document.getElementById('quick-weight').value = '';
+  document.getElementById('quick-note').value = '';
+  renderDashboard();
+  showToast('Weight logged: ' + w + ' kg');
+}
+
+async function addWeightFromLog() {
+  const w = parseFloat(document.getElementById('log-weight').value);
+  const d = document.getElementById('log-date').value;
+  const n = document.getElementById('log-note').value;
+  if (!w || !d) { showToast('Please enter weight and date'); return; }
+  await saveWeight(w, d, n);
+  document.getElementById('log-weight').value = '';
+  document.getElementById('log-note').value = '';
+  renderTracker();
+  showToast('Entry saved: ' + w + ' kg');
+}
+
+async function saveWeight(w, d, n) {
+  weightLog.push({ weight: w, date: d, note: n || '' });
+  weightLog.sort((a, b) => a.date.localeCompare(b.date));
+  await persistWeights();
+}
+
+async function deleteWeight(idx) {
+  weightLog.splice(idx, 1);
+  await persistWeights();
+  renderTracker();
+  renderDashboard();
+  showToast('Entry deleted');
+}
+
+function renderDashboard() {
+  const cw = getCurrentWeight();
+  const lost = Math.max(0, START_WEIGHT - cw);
+  const pct = Math.min(100, Math.round((lost / (START_WEIGHT - TARGET_WEIGHT)) * 100));
+  const remaining = Math.max(0, cw - TARGET_WEIGHT);
+
+  document.getElementById('dash-current').innerHTML = cw.toFixed(1) + '<span style="font-size:1rem;font-weight:300"> kg</span>';
+  document.getElementById('dash-pct').textContent = pct + '%';
+  document.getElementById('main-progress').style.width = pct + '%';
+  document.getElementById('dash-lost').textContent = lost.toFixed(1) + ' kg lost';
+  document.getElementById('hero-remaining').textContent = remaining.toFixed(1) + ' kg';
+
+  const h = HEIGHT_CM / 100;
+  const bmi = (cw / (h * h)).toFixed(1);
+  document.getElementById('dash-bmi').textContent = bmi;
+
+  if (weightLog.length >= 2) {
+    const prev = weightLog[weightLog.length - 2].weight;
+    const diff = (cw - prev).toFixed(1);
+    const changeEl = document.getElementById('dash-change');
+    if (diff < 0) { changeEl.innerHTML = '<span style="color:var(--accent)">' + diff + ' kg from last entry ↓</span>'; }
+    else if (diff > 0) { changeEl.innerHTML = '<span style="color:var(--accent3)">+' + diff + ' kg from last entry ↑</span>'; }
+    else { changeEl.textContent = 'No change from last entry'; }
+  }
+
+  const now = new Date();
+  const weekNum = Math.max(1, Math.ceil((now - START_DATE) / (7 * 24 * 60 * 60 * 1000)));
+  document.getElementById('current-week').textContent = Math.min(weekNum, 24);
+
+  const milestones = [94, 91, 88, 85, 82, 79, 76, 74, 72];
+  const mlEl = document.getElementById('milestones-list');
+  mlEl.innerHTML = milestones.map((m, i) => {
+    const reached = cw <= m;
+    const barW = reached ? 100 : Math.max(0, Math.round(((START_WEIGHT - cw) / (START_WEIGHT - m)) * 100));
+    return `<div class="milestone">
+      <div class="m-kg ${reached ? 'reached' : ''}">${m} kg</div>
+      <div class="m-bar-wrap"><div class="m-bar" style="width:${Math.min(100,barW)}%"></div></div>
+      <div class="m-check">${reached ? '✓' : (m === TARGET_WEIGHT ? '🎯' : '')}</div>
+    </div>`;
+  }).join('');
+
+  const qd = document.getElementById('quick-date');
+  if (!qd.value) qd.value = new Date().toISOString().split('T')[0];
+}
+
+function renderTracker() {
+  const listEl = document.getElementById('weight-list');
+  const countEl = document.getElementById('entry-count');
+  countEl.textContent = weightLog.length + ' ' + (weightLog.length === 1 ? 'entry' : 'entries');
+  if (weightLog.length === 0) {
+    listEl.innerHTML = '<div style="text-align:center;padding:2rem;color:var(--text3);font-size:13px">No entries yet.<br>Log your first weight above.</div>';
+    clearChart();
+    resetStats();
+    return;
+  }
+  const reversed = [...weightLog].reverse();
+  listEl.innerHTML = reversed.map((entry, i) => {
+    const realIdx = weightLog.length - 1 - i;
+    const prev = realIdx > 0 ? weightLog[realIdx - 1].weight : entry.weight;
+    const diff = (entry.weight - prev).toFixed(1);
+    const deltaClass = diff < 0 ? 'w-down' : (diff > 0 ? 'w-up' : 'w-same');
+    const deltaText = diff < 0 ? diff + ' kg' : (diff > 0 ? '+' + diff + ' kg' : '—');
+    const dateStr = new Date(entry.date + 'T00:00:00').toLocaleDateString('en-GB', {day:'numeric',month:'short',year:'numeric'});
+    return `<div class="weight-entry">
+      <div>
+        <div class="w-val">${entry.weight.toFixed(1)} kg</div>
+        <div class="w-date">${dateStr}${entry.note ? ' · ' + entry.note : ''}</div>
+      </div>
+      <div style="display:flex;align-items:center;gap:10px">
+        <span class="w-delta ${deltaClass}">${deltaText}</span>
+        <button class="delete-btn" onclick="deleteWeight(${realIdx})">×</button>
+      </div>
+    </div>`;
+  }).join('');
+
+  const cw = getCurrentWeight();
+  const lost = (START_WEIGHT - cw).toFixed(1);
+  const remaining = (cw - TARGET_WEIGHT).toFixed(1);
+  document.getElementById('stat-lost').textContent = lost > 0 ? lost + ' kg' : '0 kg';
+  document.getElementById('stat-remaining').textContent = remaining > 0 ? remaining + ' kg' : '0 kg';
+
+  if (weightLog.length >= 2) {
+    let bestWeek = 0;
+    for (let i = 0; i < weightLog.length - 1; i++) {
+      const diff = weightLog[i].weight - weightLog[i+1].weight;
+      if (diff > bestWeek) bestWeek = diff;
+    }
+    document.getElementById('stat-best').textContent = bestWeek.toFixed(1) + ' kg';
+    const totalDays = Math.max(1, (new Date(weightLog[weightLog.length-1].date) - new Date(weightLog[0].date)) / (1000*60*60*24));
+    const weeklyAvg = ((START_WEIGHT - cw) / totalDays * 7).toFixed(2);
+    document.getElementById('stat-avg').textContent = weeklyAvg > 0 ? weeklyAvg + ' kg' : '—';
+  }
+  drawChart();
+  const ld = document.getElementById('log-date');
+  if (!ld.value) ld.value = new Date().toISOString().split('T')[0];
+}
+
+function resetStats() {
+  ['stat-lost','stat-best','stat-avg'].forEach(id => document.getElementById(id).textContent = '—');
+  document.getElementById('stat-remaining').textContent = '22 kg';
+}
+
+function clearChart() {
+  document.getElementById('chart-line').setAttribute('d','');
+  document.getElementById('chart-area').setAttribute('d','');
+  document.getElementById('chart-dots').innerHTML = '';
+  document.getElementById('chart-range').textContent = 'No data yet';
+}
+
+function drawChart() {
+  if (weightLog.length < 1) { clearChart(); return; }
+  const W = 800, H = 220, PAD = { top:20, right:20, bottom:30, left:10 };
+  const plotW = W - PAD.left - PAD.right;
+  const plotH = H - PAD.top - PAD.bottom;
+  const weights = weightLog.map(e => e.weight);
+  const minW = Math.min(...weights, TARGET_WEIGHT) - 2;
+  const maxW = Math.max(...weights, START_WEIGHT) + 2;
+  const n = weightLog.length;
+  const xScale = i => PAD.left + (n === 1 ? plotW / 2 : (i / (n - 1)) * plotW);
+  const yScale = w => PAD.top + plotH - ((w - minW) / (maxW - minW)) * plotH;
+  const ty = yScale(TARGET_WEIGHT);
+  document.getElementById('target-line').setAttribute('y1', ty);
+  document.getElementById('target-line').setAttribute('y2', ty);
+  document.getElementById('target-label').setAttribute('y', ty - 5);
+  const pts = weightLog.map((e, i) => [xScale(i), yScale(e.weight)]);
+  const linePath = pts.map((p, i) => (i === 0 ? `M${p[0]},${p[1]}` : `L${p[0]},${p[1]}`)).join(' ');
+  document.getElementById('chart-line').setAttribute('d', linePath);
+  const areaPath = linePath + ` L${pts[pts.length-1][0]},${H-PAD.bottom} L${pts[0][0]},${H-PAD.bottom} Z`;
+  document.getElementById('chart-area').setAttribute('d', areaPath);
+  const dotsG = document.getElementById('chart-dots');
+  dotsG.innerHTML = pts.map((p, i) => {
+    const w = weightLog[i].weight;
+    return `<circle class="chart-dot" cx="${p[0]}" cy="${p[1]}" r="4">
+      <title>${w} kg — ${weightLog[i].date}</title>
+    </circle>
+    <text x="${p[0]}" y="${p[1]-8}" text-anchor="middle" fill="rgba(200,240,110,0.7)" font-size="9" font-family="DM Sans">${w}</text>`;
+  }).join('');
+  const d1 = new Date(weightLog[0].date + 'T00:00:00').toLocaleDateString('en-GB',{day:'numeric',month:'short'});
+  const d2 = new Date(weightLog[weightLog.length-1].date + 'T00:00:00').toLocaleDateString('en-GB',{day:'numeric',month:'short'});
+  document.getElementById('chart-range').textContent = n === 1 ? d1 : d1 + ' → ' + d2;
+}
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2500);
+}
+
+document.addEventListener('DOMContentLoaded', async () => {
+  document.getElementById('quick-date').value = new Date().toISOString().split('T')[0];
+  document.getElementById('log-date').value = new Date().toISOString().split('T')[0];
+  weightLog = await loadWeights();
+  renderDashboard();
+});
+</script>
+</body>
+</html>
+    </textarea>
+    <iframe id="fittrackFrame" style="width:100%;height:1600px;border:none;border-radius:8px;"></iframe>
+  </div>
+
+  <!-- TAB 7: COLOUR GUIDE -->
+  <div id="colourguide" class="tabpanel">
+    <div id="cg-tab">
+      <style>
+        #cg-tab { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #F9F7F4; color: #1a1a1a; padding: 2rem; border-radius: 8px; }
+        #cg-tab h1 { font-size: 17px; font-weight: 600; margin-bottom: 4px; }
+        #cg-tab .subtitle { font-size: 12px; color: #666; margin-bottom: 1.5rem; }
+        #cg-tab .skin-ref { display: flex; align-items: center; gap: 10px; background: #fff; border: 1px solid #e8e3dc; border-radius: 10px; padding: 10px 14px; margin-bottom: 1.5rem; }
+        #cg-tab .skin-dot { width: 32px; height: 32px; border-radius: 50%; background: #A87650; border: 2px solid rgba(168,118,80,0.25); flex-shrink: 0; }
+        #cg-tab .skin-meta { font-size: 11px; color: #555; line-height: 1.5; }
+        #cg-tab .skin-meta strong { color: #222; }
+        #cg-tab .cg-section-label { font-size: 10px; font-weight: 600; letter-spacing: 0.07em; text-transform: uppercase; color: #999; margin-bottom: 10px; }
+        #cg-tab .cg-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 12px; margin-bottom: 1.5rem; }
+        #cg-tab .cg-card { background: #fff; border: 1px solid #e8e3dc; border-radius: 10px; overflow: hidden; }
+        #cg-tab .swatches { display: flex; height: 80px; }
+        #cg-tab .sw { flex: 1; display: flex; align-items: flex-end; justify-content: center; padding-bottom: 6px; }
+        #cg-tab .sw span { font-size: 9px; font-weight: 600; letter-spacing: 0.04em; }
+        #cg-tab .cg-card-body { padding: 10px 12px; }
+        #cg-tab .combo-name { font-size: 12px; font-weight: 600; color: #1a1a1a; margin-bottom: 2px; }
+        #cg-tab .hex-row { font-size: 10px; color: #888; margin-bottom: 6px; font-family: monospace; }
+        #cg-tab .cg-tag { display: inline-block; font-size: 9px; font-weight: 600; padding: 2px 7px; border-radius: 20px; }
+        #cg-tab .tag-casual   { background: #E1F5EE; color: #085041; }
+        #cg-tab .tag-smart    { background: #FAEEDA; color: #633806; }
+        #cg-tab .tag-formal   { background: #EDE8FA; color: #3C3489; }
+        #cg-tab .tag-power    { background: #FAECE7; color: #712B13; }
+        #cg-tab .avoids { background: #fff; border: 1px solid #e8e3dc; border-radius: 10px; padding: 12px 14px; margin-bottom: 1.5rem; }
+        #cg-tab .avoid-list { list-style: none; margin-top: 8px; }
+        #cg-tab .avoid-list li { font-size: 11px; color: #555; padding: 3px 0; display: flex; gap: 6px; }
+        #cg-tab .avoid-list li::before { content: "×"; color: #c0392b; font-weight: 700; }
+        #cg-tab .best-list { list-style: none; margin-top: 8px; }
+        #cg-tab .best-list li { font-size: 11px; color: #555; padding: 3px 0; display: flex; gap: 6px; }
+        #cg-tab .best-list li::before { content: "✓"; color: #1D7A50; font-weight: 700; }
+        #cg-tab .cg-footer { font-size: 10px; color: #aaa; border-top: 1px solid #e8e3dc; padding-top: 10px; margin-top: 0.5rem; }
+      </style>
+
+      <h1>Outfit colour guide</h1>
+      <p class="subtitle">Calibrated for lighter warm South Asian complexion · July 2026</p>
+
+      <div class="skin-ref">
+        <div class="skin-dot"></div>
+        <div class="skin-meta">
+          <strong>Skin tone:</strong> Lighter warm medium-brown · South Asian undertone<br>
+          Works with jewel tones, pastels (saturated), earth tones, deep neutrals
+        </div>
+      </div>
+
+      <p class="cg-section-label">Combinations</p>
+
+      <div class="cg-grid">
+        <div class="cg-card"><div class="swatches"><div class="sw" style="background:#F5ECD7;"><span style="color:#7a5c30;">Ivory</span></div><div class="sw" style="background:#1B2A4A;"><span style="color:#aab8d0;">Navy</span></div></div><div class="cg-card-body"><div class="combo-name">Ivory + Navy</div><div class="hex-row">#F5ECD7 · #1B2A4A</div><span class="cg-tag tag-smart">Smart casual</span></div></div>
+        <div class="cg-card"><div class="swatches"><div class="sw" style="background:#1C5FA8;"><span style="color:#b5d4f4;">Cobalt</span></div><div class="sw" style="background:#3A3A3A;"><span style="color:#aaa;">Charcoal</span></div></div><div class="cg-card-body"><div class="combo-name">Cobalt + Charcoal</div><div class="hex-row">#1C5FA8 · #3A3A3A</div><span class="cg-tag tag-formal">Formal</span></div></div>
+        <div class="cg-card"><div class="swatches"><div class="sw" style="background:#1D7A50;"><span style="color:#9FE1CB;">Emerald</span></div><div class="sw" style="background:#C9A96E;"><span style="color:#5a3c10;">Camel</span></div></div><div class="cg-card-body"><div class="combo-name">Emerald + Camel</div><div class="hex-row">#1D7A50 · #C9A96E</div><span class="cg-tag tag-formal">Formal</span></div></div>
+        <div class="cg-card"><div class="swatches"><div class="sw" style="background:#6B1F3A;"><span style="color:#f4c0d1;">Burgundy</span></div><div class="sw" style="background:#2C2C2A;"><span style="color:#888;">Black</span></div></div><div class="cg-card-body"><div class="combo-name">Burgundy + Black</div><div class="hex-row">#6B1F3A · #2C2C2A</div><span class="cg-tag tag-power">Power look</span></div></div>
+        <div class="cg-card"><div class="swatches"><div class="sw" style="background:#C18A10;"><span style="color:#412402;">Mustard</span></div><div class="sw" style="background:#4A5240;"><span style="color:#C0DD97;">Olive</span></div></div><div class="cg-card-body"><div class="combo-name">Mustard + Olive</div><div class="hex-row">#C18A10 · #4A5240</div><span class="cg-tag tag-casual">Casual</span></div></div>
+        <div class="cg-card"><div class="swatches"><div class="sw" style="background:#B84A1A;"><span style="color:#f5c4b3;">Terracotta</span></div><div class="sw" style="background:#F5ECD7;"><span style="color:#7a5c30;">Cream</span></div></div><div class="cg-card-body"><div class="combo-name">Terracotta + Cream</div><div class="hex-row">#B84A1A · #F5ECD7</div><span class="cg-tag tag-casual">Casual</span></div></div>
+        <div class="cg-card"><div class="swatches"><div class="sw" style="background:#0F7B7B;"><span style="color:#9FE1CB;">Teal</span></div><div class="sw" style="background:#F5ECD7;"><span style="color:#7a5c30;">Beige</span></div></div><div class="cg-card-body"><div class="combo-name">Teal + Beige</div><div class="hex-row">#0F7B7B · #F5ECD7</div><span class="cg-tag tag-smart">Smart casual</span></div></div>
+        <div class="cg-card"><div class="swatches"><div class="sw" style="background:#5534B7;"><span style="color:#CECBF6;">Amethyst</span></div><div class="sw" style="background:#3A3A3A;"><span style="color:#aaa;">Charcoal</span></div></div><div class="cg-card-body"><div class="combo-name">Amethyst + Charcoal</div><div class="hex-row">#5534B7 · #3A3A3A</div><span class="cg-tag tag-power">Power look</span></div></div>
+        <div class="cg-card"><div class="swatches"><div class="sw" style="background:#7BAFD4;"><span style="color:#042C53;">Dusty blue</span></div><div class="sw" style="background:#F5ECD7;"><span style="color:#7a5c30;">Off-white</span></div></div><div class="cg-card-body"><div class="combo-name">Dusty blue + Off-white</div><div class="hex-row">#7BAFD4 · #F5ECD7</div><span class="cg-tag tag-casual">Casual</span></div></div>
+        <div class="cg-card"><div class="swatches"><div class="sw" style="background:#C47BA0;"><span style="color:#4B1528;">Rose</span></div><div class="sw" style="background:#3A3A3A;"><span style="color:#aaa;">Charcoal</span></div></div><div class="cg-card-body"><div class="combo-name">Rose + Charcoal</div><div class="hex-row">#C47BA0 · #3A3A3A</div><span class="cg-tag tag-smart">Smart casual</span></div></div>
+        <div class="cg-card"><div class="swatches"><div class="sw" style="background:#8FA88C;"><span style="color:#173404;">Sage green</span></div><div class="sw" style="background:#1B2A4A;"><span style="color:#aab8d0;">Navy</span></div></div><div class="cg-card-body"><div class="combo-name">Sage + Navy</div><div class="hex-row">#8FA88C · #1B2A4A</div><span class="cg-tag tag-smart">Smart casual</span></div></div>
+        <div class="cg-card"><div class="swatches"><div class="sw" style="background:#E8A87C;"><span style="color:#4A1B0C;">Peach</span></div><div class="sw" style="background:#4A5240;"><span style="color:#C0DD97;">Olive</span></div></div><div class="cg-card-body"><div class="combo-name">Peach + Olive</div><div class="hex-row">#E8A87C · #4A5240</div><span class="cg-tag tag-casual">Casual</span></div></div>
+      </div>
+
+      <div class="avoids">
+        <p class="cg-section-label">Avoid or use carefully</p>
+        <ul class="avoid-list">
+          <li>Stark bright white (use ivory/off-white instead)</li>
+          <li>Washed-out pastels — only saturated pastels work</li>
+          <li>All-beige or head-to-toe light neutrals</li>
+          <li>Neon yellow or fluorescent tones</li>
+        </ul>
+        <br>
+        <p class="cg-section-label">Best standalone colours</p>
+        <ul class="best-list">
+          <li>Jewel tones — sapphire, emerald, amethyst, teal, cobalt</li>
+          <li>Earth tones — terracotta, rust, mustard, camel, olive</li>
+          <li>Deep neutrals — charcoal, navy, espresso brown</li>
+          <li>Lighter skin bonus — dusty blue, sage, peach, rose</li>
+        </ul>
+      </div>
+
+      <p class="cg-footer">Generated July 2026 · Calibrated for lighter warm medium-brown South Asian complexion</p>
+    </div>
+  </div>
+
+  <footer>MERGED FORMULARY, WEEKLY PLAN, GROCERY LIST, RECIPES, NUTRITION TARGETS, FITTRACK & COLOUR GUIDE — ONE PAGE</footer>
+
+</div>
+
+<script>
+function showTab(name){
+  document.querySelectorAll('.tabpanel').forEach(function(p){ p.classList.remove('active'); });
+  document.querySelectorAll('.tab-btn').forEach(function(b){ b.classList.remove('active'); });
+  document.getElementById(name).classList.add('active');
+  event.currentTarget.classList.add('active');
+}
+
+// Load the FitTrack sub-app into its isolated frame
+document.getElementById('fittrackFrame').srcdoc = document.getElementById('fittrack-source').value;
+
+async function almanacStorageGet(key) {
+  if (typeof window.storage !== 'undefined' && window.storage.get) {
+    try {
+      var r = await window.storage.get(key);
+      return r ? r.value : null;
+    } catch (err) {}
+  }
+  return localStorage.getItem(key);
+}
+async function almanacStorageSet(key, value) {
+  if (typeof window.storage !== 'undefined' && window.storage.set) {
+    try {
+      await window.storage.set(key, value);
+      return;
+    } catch (err) {}
+  }
+  localStorage.setItem(key, value);
+}
+
+window.addEventListener('message', async function(e){
+  if(!e.data || e.data.type !== 'ft-storage') return;
+  var msg = e.data;
+  if(msg.action === 'get'){
+    var val = await almanacStorageGet(msg.key);
+    e.source.postMessage({id: msg.id, value: val}, '*');
+  } else if(msg.action === 'set'){
+    await almanacStorageSet(msg.key, msg.value);
+    e.source.postMessage({id: msg.id, value: true}, '*');
+  }
+});
+</script>
+
+</body>
+</html>
