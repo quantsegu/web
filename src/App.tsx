@@ -7,6 +7,8 @@ import IndianCommunities from '../pages/IndianCommunities';
 import BookkeepingTracker from '../pages/BookkeepingTracker';
 import WealthTools from '../pages/WealthTools';
 import InvestmentUniverse from '../pages/InvestmentUniverse';
+import Blog from '../pages/Blog';
+import BlogPost from '../pages/BlogPost';
 import WealthToolFrame from '../components/WealthToolFrame';
 
 /** Full-page navigation to static HTML tools (avoids blank React iframe shell). */
@@ -297,6 +299,8 @@ export default function App() {
           path="/wealth-tools/swiss-tax-locator/index.html"
           element={<Navigate to="/wealth-tools/swiss-tax-locator" replace />}
         />
+        <Route path="/blog" element={<Blog />} />
+        <Route path="/blog/:slug" element={<BlogPost />} />
         <Route path="/bjp" element={<BJP />} />
         <Route path="/communities" element={<IndianCommunities />} />
         <Route path="/ops/bookkeeping" element={<BookkeepingTracker />} />

@@ -43,6 +43,7 @@ export default function Footer() {
               <li><Link to="/wealth-tools/investment-universe" className="text-gray-300 hover:text-saffron-300 transition-colors duration-200">Investment Universe</Link></li>
               <li><a href="/wealth-tools/retirement-income-planner" className="text-gray-300 hover:text-saffron-300 transition-colors duration-200">Retirement Income Planner</a></li>
               <li><Link to="/communities" className="text-gray-300 hover:text-saffron-300 transition-colors duration-200">Indian Communities</Link></li>
+              <li><Link to="/blog" className="text-gray-300 hover:text-saffron-300 transition-colors duration-200">Blog</Link></li>
               <li><a href="https://disciplined-recreation-production.up.railway.app/login" target="_blank" rel="noopener noreferrer" className="text-gray-300 hover:text-saffron-300 transition-colors duration-200">Balaji POS Login</a></li>
               <li><a href="/#contact" className="text-gray-300 hover:text-saffron-300 transition-colors duration-200">Contact</a></li>
               <li><Link to="/bjp" className="text-gray-400 hover:text-saffron-300 transition-colors duration-200 text-sm">BJP support (personal)</Link></li>

@@ -17,6 +17,7 @@ const navItems: NavItem[] = [
   { type: 'route', to: '/wealth-tools', label: 'Wealth Tools' },
   { type: 'route', to: '/resources', label: 'Resources' },
   { type: 'route', to: '/communities', label: 'Communities' },
+  { type: 'route', to: '/blog', label: 'Blog' },
   { type: 'section', hash: 'contact', label: 'Contact' },
 ];
 
