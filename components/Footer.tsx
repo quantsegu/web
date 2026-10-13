@@ -8,7 +8,14 @@ export default function Footer() {
       <div className="max-w-6xl mx-auto">
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-8">
           <div className="sm:col-span-2 lg:col-span-2">
-            <h3 className="text-xl font-bold text-white mb-4">Shreshti</h3>
+            <img
+              src="/brands/shreshti-logo-dark.png"
+              alt="Shreshti — Seva · Sanskriti · Vikas"
+              width={542}
+              height={192}
+              loading="lazy"
+              className="h-20 w-auto mb-4"
+            />
             <p className="text-gray-300 mb-4 max-w-md">
               Established in the Netherlands, Shreshti is a dynamic organization with subsidiaries spanning multiple industries and regions.
             </p>
@@ -18,6 +25,7 @@ export default function Footer() {
             <h4 className="text-lg font-semibold text-white mb-4">Quick Links</h4>
             <ul className="space-y-2">
               <li><Link to="/" className="text-gray-300 hover:text-saffron-300 transition-colors duration-200">Home</Link></li>
+              <li><a href="/#story" className="text-gray-300 hover:text-saffron-300 transition-colors duration-200">Our Story</a></li>
               <li><a href="/#sanatan-dharma" className="text-gray-300 hover:text-saffron-300 transition-colors duration-200">Sanātana Dharma</a></li>
               <li><a href="/#subsidiaries" className="text-gray-300 hover:text-saffron-300 transition-colors duration-200">Subsidiaries</a></li>
               <li><a href="/#collaborations" className="text-gray-300 hover:text-saffron-300 transition-colors duration-200">Collaborations</a></li>

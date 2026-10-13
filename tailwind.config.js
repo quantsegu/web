@@ -32,6 +32,13 @@ export default {
           DEFAULT: "#0A1628",
           light: "#122038",
         },
+        // Shreshti brand palette (logo / brand story)
+        brand: {
+          saffron: "#E87A00",
+          emerald: "#005B3A",
+          gold: "#D4AF37",
+          midnight: "#0E2338",
+        },
       },
       fontFamily: {
         display: ['"Segoe UI"', "system-ui", "sans-serif"],

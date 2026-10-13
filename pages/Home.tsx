@@ -1,6 +1,7 @@
 import { useRef, useEffect } from "react";
 import Navbar from "../components/Navbar";
 import Hero from "../components/Hero";
+import BrandStory from "../components/BrandStory";
 import SanatanDharmaLiving from "../components/SanatanDharmaLiving";
 import Subsidiaries from "../components/Subsidiaries";
 import Collaborations from "../components/Collaborations";
@@ -281,6 +282,7 @@ export default function Home({
       <div className="relative z-10">
         <Navbar />
         <Hero />
+        <BrandStory />
         <SanatanDharmaLiving />
         <Subsidiaries />
         <Collaborations />

@@ -8,6 +8,7 @@ type NavItem =
 
 const navItems: NavItem[] = [
   { type: 'route', to: '/', label: 'Home' },
+  { type: 'section', hash: 'story', label: 'Our Story' },
   { type: 'section', hash: 'sanatan-dharma', label: 'Sanātana Dharma' },
   { type: 'section', hash: 'subsidiaries', label: 'Subsidiaries' },
   { type: 'section', hash: 'collaborations', label: 'Collaborations' },
@@ -59,17 +60,23 @@ function NavAnchor({
 export default function Navbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const linkClass =
-    'text-white hover:text-saffron-300 px-2.5 py-2 rounded-md text-sm font-medium transition-colors';
+    'text-white hover:text-saffron-300 px-2 py-2 rounded-md text-sm font-medium transition-colors';
 
   return (
     <nav className="fixed top-0 left-0 w-full z-50 bg-bjp-navy/90 backdrop-blur-md border-b border-saffron-500/20">
       <div className="tricolor-bar" />
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
-          <Link to="/" className="text-white text-xl font-bold tracking-tight">
-            Shreshti
+          <Link to="/" className="flex items-center shrink-0">
+            <img
+              src="/brands/shreshti-logo-dark.png"
+              alt="Shreshti — Seva · Sanskriti · Vikas"
+              width={542}
+              height={192}
+              className="h-11 w-auto"
+            />
           </Link>
-          <div className="hidden lg:flex items-baseline gap-1">
+          <div className="hidden xl:flex items-baseline gap-1">
             {navItems.map((item) => (
               <NavAnchor key={item.label} item={item} className={linkClass} />
             ))}
@@ -77,7 +84,7 @@ export default function Navbar() {
           <button
             type="button"
             onClick={() => setIsMenuOpen(!isMenuOpen)}
-            className="lg:hidden inline-flex items-center justify-center p-2 rounded-md text-white hover:text-saffron-300 focus:outline-none"
+            className="xl:hidden inline-flex items-center justify-center p-2 rounded-md text-white hover:text-saffron-300 focus:outline-none"
             aria-label="Toggle menu"
           >
             {isMenuOpen ? <X size={24} /> : <Menu size={24} />}
@@ -86,7 +93,7 @@ export default function Navbar() {
       </div>
 
       {isMenuOpen && (
-        <div className="lg:hidden bg-bjp-navy/95 backdrop-blur-md border-t border-saffron-500/20">
+        <div className="xl:hidden bg-bjp-navy/95 backdrop-blur-md border-t border-saffron-500/20">
           <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3">
             {navItems.map((item) => (
               <NavAnchor

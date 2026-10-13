@@ -3,9 +3,19 @@ import { motion } from 'motion/react';
 
 export default function Hero() {
   return (
-    <section id="home" className="relative min-h-screen flex items-center justify-center px-4 sm:px-6 lg:px-8">
+    <section id="home" className="relative min-h-screen flex items-center justify-center px-4 sm:px-6 lg:px-8 pt-28 pb-24">
       <div className="tricolor-bar absolute top-16 left-0 right-0 z-20" />
       <div className="text-center z-10 max-w-4xl">
+        <motion.img
+          src="/brands/shreshti-emblem.png"
+          alt=""
+          width={384}
+          height={384}
+          className="mx-auto mb-6 h-32 w-32 sm:h-40 sm:w-40 md:h-44 md:w-44 drop-shadow-[0_0_36px_rgba(212,175,55,0.35)]"
+          initial={{ opacity: 0, scale: 0.9 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 0.8 }}
+        />
         <motion.p
           className="text-saffron-400 text-sm font-bold tracking-widest uppercase mb-3"
           initial={{ opacity: 0 }}
