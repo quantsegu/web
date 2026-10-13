@@ -22,3 +22,6 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+# GraQle — config may contain API keys
+graqle.yaml
+.graqle/
