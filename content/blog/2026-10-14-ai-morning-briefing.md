@@ -8,7 +8,7 @@ tags:
   - Financial Services
 ---
 
-*Compiled with Claude (AI-assisted research) on 14 October 2026. Primary sources are used wherever they could be opened, and single-source or secondary claims are labelled inline. Check the linked sources before relying on any figure.*
+**Disclaimer:** *Compiled with Claude (AI-assisted research) on 14 October 2026. Primary sources are used wherever they could be opened, and single-source or secondary claims are labelled inline. Check the linked sources before relying on any figure.*
 
 **Window covered:** Tuesday 13 Oct 07:30 to Wednesday 14 Oct about 08:00 CEST. Items dated before the window appear only as tagged background.
 
