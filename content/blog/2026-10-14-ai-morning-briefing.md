@@ -8,8 +8,6 @@ tags:
   - Financial Services
 ---
 
-**Disclaimer:** *Compiled with Claude (AI-assisted research) on 14 October 2026. Primary sources are used wherever they could be opened, and single-source or secondary claims are labelled inline. Check the linked sources before relying on any figure.*
-
 **Window covered:** Tuesday 13 Oct 07:30 to Wednesday 14 Oct about 08:00 CEST. Items dated before the window appear only as tagged background.
 
 **Today in one line:** Google's Gemini 4 Argon is reported to be broadly available but Google's own post still describes a limited rollout, Anthropic explains why agent-scale code volume pushed it off git, Microsoft shipped a record patch set that it credits to LLM-driven bug finding, and Reuters reports the big labs want a say over what outside evaluators publish. No new publications surfaced from FINMA, EBA, ESMA, BIS, NIST or the SEC, and nothing new from Databricks or Snowflake.
