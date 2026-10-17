@@ -1,0 +1,893 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lakshmi Narayana Segu — Data, Enterprise &amp; AI Architect</title>
+<meta name="description" content="Twenty years across trading floors, banks, asset managers and data platforms. Today I lead data, enterprise and AI architecture at RepRisk and build open-source tools for governed data and AI.">
+<meta name="theme-color" content="#0E2338">
+<meta property="og:type" content="profile">
+<meta property="og:title" content="Lakshmi Narayana Segu — Data, Enterprise &amp; AI Architect">
+<meta property="og:description" content="From the Bombay Stock Exchange to leading data and AI architecture at RepRisk. Career timeline, skills, publications and open source.">
+<meta property="og:image" content="/founders/lakshmi-narayana-segu.jpg">
+<meta name="twitter:card" content="summary">
+<link rel="icon" href="/favicon.ico" sizes="16x16 32x32 48x48">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --midnight:#0E2338; --midnight-2:#13304c; --ink:#081523;
+    --gold:#D4AF37; --gold-soft:#e6cb73;
+    --emerald:#2fa57a; --saffron:#E87A00;
+    --text:#e8edf2; --muted:#a3b3c4; --line:rgba(230,203,115,0.16);
+    --card:rgba(255,255,255,0.045);
+  }
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth; scroll-padding-top:76px;}
+  body{margin:0; background:var(--ink); color:var(--text); font-family:'Inter',system-ui,sans-serif; line-height:1.6; -webkit-font-smoothing:antialiased;
+    background-image:radial-gradient(1200px 600px at 85% -10%, rgba(212,175,55,0.10), transparent 60%), radial-gradient(900px 500px at -10% 20%, rgba(47,165,122,0.09), transparent 60%);
+    background-attachment:fixed;}
+  a{color:var(--gold-soft); text-decoration:none;}
+  a:hover{color:#fff;}
+  :focus-visible{outline:2px solid var(--gold); outline-offset:3px; border-radius:4px;}
+  .wrap{max-width:1040px; margin:0 auto; padding:0 20px;}
+  h1,h2,h3{font-family:'Fraunces',Georgia,serif; font-weight:600; letter-spacing:-0.01em; margin:0;}
+  .eyebrow{font-size:12px; letter-spacing:0.16em; text-transform:uppercase; color:var(--gold); font-weight:600; margin:0 0 10px;}
+
+  /* top bar */
+  .bar{position:sticky; top:0; z-index:20; background:rgba(8,21,35,0.86); backdrop-filter:blur(10px); border-bottom:1px solid var(--line);}
+  .bar .wrap{display:flex; align-items:center; gap:18px; height:56px;}
+  .bar .mark{font-family:'Fraunces',serif; font-weight:700; color:#fff; white-space:nowrap;}
+  .bar nav{display:flex; gap:4px; margin-left:auto; overflow-x:auto; scrollbar-width:none;}
+  .bar nav::-webkit-scrollbar{display:none;}
+  .bar nav a{color:var(--muted); font-size:14px; padding:6px 10px; border-radius:6px; white-space:nowrap;}
+  .bar nav a:hover{color:#fff; background:rgba(255,255,255,0.06);}
+  .share{font:inherit; font-size:13px; font-weight:600; color:var(--ink); background:var(--gold); border:0; border-radius:999px; padding:7px 14px; cursor:pointer; white-space:nowrap;}
+  .share:hover{background:var(--gold-soft);}
+  @media (max-width:640px){ .bar .mark{display:none;} .bar nav{margin-left:0;} }
+
+  /* hero */
+  .hero{padding:56px 0 36px; display:grid; grid-template-columns:260px 1fr; gap:40px; align-items:center;}
+  .portrait{position:relative;}
+  .portrait img{width:100%; height:auto; aspect-ratio:1/1; object-fit:cover; border-radius:24px; display:block; border:1px solid var(--line); box-shadow:0 24px 60px rgba(0,0,0,0.45);}
+  .portrait::after{content:""; position:absolute; inset:-10px 10px 10px -10px; border:1px solid var(--gold); border-radius:28px; opacity:0.35; z-index:-1;}
+  .hero h1{font-size:clamp(34px,5.4vw,56px); line-height:1.05; color:#fff;}
+  .hero h1 span{color:var(--gold-soft);}
+  .hero .role{margin:16px 0 0; color:var(--muted); font-size:17px;}
+  .hero .role b{color:var(--text); font-weight:600;}
+  .hero .lede{margin:18px 0 0; font-size:17px; color:var(--text); max-width:620px;}
+  .links{display:flex; flex-wrap:wrap; gap:10px; margin-top:24px;}
+  .btn{display:inline-flex; align-items:center; gap:8px; padding:10px 18px; border-radius:999px; font-weight:600; font-size:14px; border:1px solid var(--line); color:var(--text); background:var(--card);}
+  .btn:hover{border-color:var(--gold); color:#fff;}
+  .btn.primary{background:linear-gradient(90deg,var(--saffron),var(--emerald)); border-color:transparent; color:#fff;}
+  .btn.primary:hover{filter:brightness(1.1);}
+  @media (max-width:760px){ .hero{grid-template-columns:1fr; gap:28px; padding-top:36px;} .portrait{max-width:200px;} }
+
+  .stats{display:grid; grid-template-columns:repeat(4,1fr); gap:14px; margin:8px 0 0;}
+  .stat{background:var(--card); border:1px solid var(--line); border-radius:16px; padding:18px 18px 16px;}
+  .stat b{display:block; font-family:'Fraunces',serif; font-size:clamp(28px,4vw,40px); color:var(--gold-soft); line-height:1;}
+  .stat span{display:block; margin-top:8px; font-size:13px; color:var(--muted); line-height:1.4;}
+  @media (max-width:760px){ .stats{grid-template-columns:repeat(2,1fr);} }
+
+  section{padding:64px 0 8px;}
+  section > .wrap > h2{font-size:clamp(26px,3.6vw,36px); color:#fff; margin-bottom:8px;}
+  .sub{color:var(--muted); max-width:640px; margin:0 0 28px;}
+
+  /* conversation */
+  .ask{display:flex; flex-wrap:wrap; gap:10px; margin-bottom:18px;}
+  .chip{font:inherit; font-size:14px; color:var(--text); background:var(--card); border:1px solid var(--line); border-radius:999px; padding:9px 16px; cursor:pointer; transition:.15s;}
+  .chip:hover{border-color:var(--gold);}
+  .chip[aria-pressed="true"]{background:var(--gold); color:var(--ink); border-color:var(--gold); font-weight:600;}
+  .answer{background:var(--card); border:1px solid var(--line); border-left:3px solid var(--gold); border-radius:14px; padding:22px 24px; max-width:760px; min-height:96px;}
+  .answer p{margin:0 0 12px;} .answer p:last-child{margin:0;}
+  .answer .q{font-family:'Fraunces',serif; font-size:19px; color:#fff; margin-bottom:10px;}
+  .answer[hidden]{display:none;}
+  /* without JS show all answers */
+  .qa-static .answer-item{background:var(--card); border:1px solid var(--line); border-radius:14px; padding:18px 22px; margin-bottom:12px;}
+
+  /* over time */
+  .ot-controls{position:sticky; top:56px; z-index:15; background:rgba(8,21,35,0.94); backdrop-filter:blur(10px); border:1px solid var(--line); border-radius:16px; padding:14px 18px 12px; margin-bottom:18px;}
+  .ot-top{display:flex; align-items:center; gap:16px; margin-bottom:12px;}
+  .play{font:inherit; font-size:14px; font-weight:600; color:var(--ink); background:var(--gold); border:0; border-radius:999px; padding:9px 16px; cursor:pointer; white-space:nowrap; min-width:92px;}
+  .play:hover{background:var(--gold-soft);}
+  .ot-date{font-family:'Fraunces',Georgia,serif; font-weight:600; font-size:clamp(26px,5vw,36px); line-height:1; color:var(--gold-soft);}
+  .ot-sub{font-size:13px; color:var(--muted); margin-top:4px;}
+  .lanes{position:relative; padding:0 9px;}
+  .lane-label{font-size:11px; letter-spacing:0.08em; text-transform:uppercase; color:var(--muted); margin:6px 0 3px -9px; padding-left:9px;}
+  .lane{position:relative; height:24px; background:rgba(255,255,255,0.04); border-radius:6px;}
+  .seg{position:absolute; top:2px; bottom:2px; border:0; border-radius:4px; background:var(--gold); color:var(--ink); font:inherit; font-size:10.5px; font-weight:600; line-height:20px; padding:0 5px; overflow:hidden; white-space:nowrap; text-overflow:ellipsis; text-align:left; cursor:pointer; opacity:0.32; transition:opacity .2s;}
+  .seg.par{background:var(--emerald);}
+  .seg.on{opacity:1;}
+  .seg:hover{opacity:0.8;}
+  .playhead{position:absolute; top:14px; bottom:0; width:2px; margin-left:-1px; background:#fff; box-shadow:0 0 8px rgba(255,255,255,0.6); pointer-events:none; border-radius:1px;}
+  .ticks{position:relative; height:16px; margin-top:4px; font-size:11px; color:var(--muted);}
+  .ticks span{position:absolute; transform:translateX(-50%);}
+  #ot-range{display:block; width:100%; margin:4px 0 0; accent-color:var(--gold); height:28px; cursor:pointer;}
+  .ot-grid{display:grid; grid-template-columns:1fr 1fr; gap:14px; margin-bottom:34px;}
+  @media (max-width:760px){ .ot-grid{grid-template-columns:1fr;} .ot-controls{padding:12px 14px 8px;} .lane-label{display:none;} .ot-top{gap:12px;} }
+  .ot-h{font-size:22px; color:#fff; margin:0 0 12px;}
+  .now-item{padding:12px 0; border-top:1px solid rgba(255,255,255,0.08);}
+  .now-item:first-of-type{border-top:0; padding-top:0;}
+  .now-item b{display:block; font-family:'Fraunces',serif; font-size:18px; color:#fff; font-weight:600;}
+  .now-item span{display:block; color:var(--muted); font-size:13.5px;}
+  .now-item p{margin:6px 0 6px; font-size:14.5px;}
+  .now-item .tag{margin-left:0; margin-right:6px;}
+  .mini{font-size:13px; color:var(--gold-soft); background:none; border:0; padding:0; cursor:pointer; font:inherit; font-size:13px;}
+  .mini:hover{color:#fff;}
+  .learn{margin:12px 0 0; padding-top:10px; border-top:1px dashed rgba(255,255,255,0.14); font-size:13px; color:var(--muted);}
+  .lead-now small{display:block; font-size:11px; letter-spacing:0.1em; text-transform:uppercase; color:var(--gold); font-weight:600; margin-bottom:6px;}
+  .lead-now b{display:block; font-family:'Fraunces',serif; font-size:24px; color:#fff; line-height:1.15; font-weight:600;}
+  .lead-now p{margin:8px 0 0; font-size:14.5px;}
+  .path{list-style:none; margin:16px 0 0; padding:0 0 0 14px; border-left:2px solid rgba(255,255,255,0.1);}
+  .path li{position:relative; padding:0 0 8px 12px; font-size:13px; color:var(--muted);}
+  .path li::before{content:""; position:absolute; left:-20px; top:6px; width:8px; height:8px; border-radius:50%; background:var(--gold);}
+  .path li.future{opacity:0.35;} .path li.future::before{background:rgba(255,255,255,0.3);}
+  .path li.cur{color:#fff; font-weight:600;}
+  .path em{font-style:normal; color:var(--gold-soft); margin-right:6px;}
+  .sk-grid{display:grid; grid-template-columns:repeat(auto-fill,minmax(310px,1fr)); gap:14px;}
+  .sk-area{background:var(--card); border:1px solid var(--line); border-radius:16px; padding:16px 18px 12px;}
+  .sk-area h3{font-size:17px; color:#fff; margin-bottom:8px; display:flex; justify-content:space-between; align-items:baseline;}
+  .sk-area h3 small{font-family:'Inter',sans-serif; font-size:12px; color:var(--muted); font-weight:400;}
+  .sk-row{display:grid; grid-template-columns:minmax(150px,1.6fr) 1.4fr 48px; gap:10px; align-items:center; padding:5px 0; font-size:13.5px;}
+  .sk-name .new{display:inline-block; font-size:10px; letter-spacing:0.06em; text-transform:uppercase; font-weight:700; color:var(--ink); background:var(--emerald); border-radius:999px; padding:1px 6px; margin-left:6px; vertical-align:middle;}
+  .sk-bar{height:8px; border-radius:4px; background:rgba(255,255,255,0.07); overflow:hidden;}
+  .sk-fill{display:block; height:100%; width:0; background:linear-gradient(90deg,var(--saffron),var(--gold)); border-radius:4px; transition:width .35s ease;}
+  .sk-yrs{font-size:12px; color:var(--muted); text-align:right;}
+  .ot-note{font-size:13px; color:var(--muted); margin:14px 0 0;}
+  details.job.now{box-shadow:0 0 0 1px var(--gold) inset;}
+  @media (prefers-reduced-motion:reduce){ .sk-fill,.seg{transition:none;} }
+
+  .tl-tools{display:flex; justify-content:flex-end; gap:18px; margin:-6px 0 12px;}
+  .link-btn{font:inherit; font-size:13px; color:var(--gold-soft); background:none; border:0; cursor:pointer; padding:4px 0;}
+  .link-btn:hover{color:#fff;}
+
+  details.job{background:var(--card); border:1px solid var(--line); border-radius:16px; margin-bottom:12px; overflow:hidden;}
+  details.job.par{margin-left:28px; border-left:3px solid var(--emerald);}
+  details.job[open]{background:rgba(255,255,255,0.065);}
+  details.job summary{list-style:none; cursor:pointer; padding:18px 22px; display:grid; grid-template-columns:150px 1fr 22px; gap:6px 20px; align-items:start;}
+  details.job summary::-webkit-details-marker{display:none;}
+  .when{font-size:13px; color:var(--gold-soft); font-weight:600; padding-top:3px;}
+  .when small{display:block; color:var(--muted); font-weight:400; margin-top:2px;}
+  .org{font-family:'Fraunces',serif; font-size:20px; color:#fff; line-height:1.25;}
+  .org small{display:block; font-family:'Inter',sans-serif; font-size:14px; color:var(--muted); margin-top:3px; font-weight:400;}
+  .tag{display:inline-block; font-family:'Inter',sans-serif; font-size:11px; letter-spacing:0.06em; text-transform:uppercase; font-weight:600; padding:2px 8px; border-radius:999px; margin-left:8px; vertical-align:middle; background:rgba(47,165,122,0.18); color:#7fe0b8;}
+  .tag.main{background:rgba(212,175,55,0.18); color:var(--gold-soft);}
+  .chev{width:10px; height:10px; border-right:2px solid var(--muted); border-bottom:2px solid var(--muted); transform:rotate(45deg); margin-top:8px; transition:.2s;}
+  details[open] .chev{transform:rotate(-135deg); margin-top:12px;}
+  .job-body{padding:0 22px 22px 22px; margin-left:170px;}
+  .job-body ul{margin:0; padding-left:20px;}
+  .job-body li{margin:0 0 8px; color:var(--text);}
+  .job-body li::marker{color:var(--gold);}
+  .job-body .meta{font-size:13px; color:var(--muted); margin:14px 0 0;}
+  @media (max-width:760px){
+    details.job summary{grid-template-columns:1fr 22px;}
+    .when{grid-column:1/2; order:-1;}
+    .chev{grid-row:1; grid-column:2;}
+    .job-body{margin-left:0;}
+    details.job.par{margin-left:12px;}
+  }
+
+  /* skills */
+  .filters{display:flex; flex-wrap:wrap; gap:8px; margin-bottom:20px;}
+  .skills{display:grid; grid-template-columns:repeat(auto-fill,minmax(300px,1fr)); gap:14px;}
+  .skill-group{background:var(--card); border:1px solid var(--line); border-radius:16px; padding:18px 20px;}
+  .skill-group h3{font-size:17px; color:#fff; margin-bottom:12px;}
+  .skill-group[hidden]{display:none;}
+  .tags{display:flex; flex-wrap:wrap; gap:6px;}
+  .tags span{font-size:12.5px; padding:4px 10px; border-radius:8px; background:rgba(255,255,255,0.07); color:var(--text);}
+
+  /* credentials */
+  .cols{display:grid; grid-template-columns:repeat(auto-fit,minmax(280px,1fr)); gap:14px;}
+  .panel{background:var(--card); border:1px solid var(--line); border-radius:16px; padding:20px 22px;}
+  .panel h3{font-size:18px; color:#fff; margin-bottom:12px;}
+  .panel ul{margin:0; padding:0; list-style:none;}
+  .panel li{padding:9px 0; border-top:1px solid rgba(255,255,255,0.07); font-size:14.5px;}
+  .panel li:first-child{border-top:0; padding-top:0;}
+  .panel li small{display:block; color:var(--muted); font-size:12.5px;}
+  .panel p{margin:0 0 10px; font-size:14.5px;}
+  .panel p:last-child{margin-bottom:0;}
+
+  /* contact */
+  .contact{margin:56px 0 0; padding:36px 28px; text-align:center; background:linear-gradient(135deg,rgba(232,122,0,0.16),rgba(47,165,122,0.16)); border:1px solid var(--line); border-radius:22px;}
+  .contact h2{font-size:clamp(24px,3.4vw,32px); color:#fff;}
+  .contact p{color:var(--muted); margin:10px auto 22px; max-width:520px;}
+  .contact .links{justify-content:center; margin-top:0;}
+  footer{padding:36px 0 56px; text-align:center; color:var(--muted); font-size:13px;}
+
+  /* reveal (only when JS is on) */
+  .js .reveal{opacity:0; transform:translateY(14px); transition:opacity .6s ease, transform .6s ease;}
+  .js .reveal.in{opacity:1; transform:none;}
+  @media (prefers-reduced-motion:reduce){ html{scroll-behavior:auto;} .js .reveal{opacity:1; transform:none; transition:none;} .chev{transition:none;} }
+
+  @media print{
+    body{background:#fff; color:#111;} .bar,.ask,.filters,.tl-tools,#ot,.share,.contact .links{display:none;}
+    .portrait::after{display:none;} .hero h1,.org,section > .wrap > h2,.stat b,.skill-group h3,.panel h3{color:#111;}
+    .stat,.skill-group,.panel,details.job{background:#fff; border-color:#ccc; break-inside:avoid;}
+    .answer,.qa-static .answer-item{border-color:#ccc; background:#fff;}
+    .tags span{background:#eee; color:#111;} a{color:#111;}
+  }
+</style>
+</head>
+<body>
+<script>document.documentElement.classList.add('js');</script>
+
+<header class="bar">
+  <div class="wrap">
+    <span class="mark">L. N. Segu</span>
+    <nav aria-label="Sections">
+      <a href="#talk">Talk</a>
+      <a href="#over-time">Over time</a>
+      <a href="#career">Career</a>
+      <a href="#skills">Toolbox</a>
+      <a href="#credentials">Credentials</a>
+      <a href="#connect">Connect</a>
+    </nav>
+    <button class="share" id="share" type="button">Share</button>
+  </div>
+</header>
+
+<main>
+<div class="wrap">
+  <div class="hero">
+    <div class="portrait">
+      <img src="/founders/lakshmi-narayana-segu.jpg" alt="Portrait of Lakshmi Narayana Segu" width="520" height="520">
+    </div>
+    <div>
+      <p class="eyebrow">Data · Enterprise · AI architecture</p>
+      <h1>Lakshmi Narayana Segu <span>&mdash; I make data and AI trustworthy at scale.</span></h1>
+      <p class="role"><b>Lead, Data, Enterprise &amp; AI Architecture</b> at RepRisk. Co-founder of TraceGov.ai and Lekhly. Based in Switzerland.</p>
+      <p class="lede">I started on the Bombay Stock Exchange in 2005 and have worked on trading floors, in banks and in asset managers since. I connect the trading systems, the data platform and, now, the AI agents that run on top of both.</p>
+      <div class="links">
+        <a class="btn primary" href="https://www.linkedin.com/in/lakshmisegu/" target="_blank" rel="noopener">LinkedIn</a>
+        <a class="btn" href="https://github.com/quantsegu" target="_blank" rel="noopener">GitHub</a>
+        <a class="btn" href="#career">See my career</a>
+      </div>
+    </div>
+  </div>
+
+  <div class="stats reveal" aria-label="At a glance">
+    <div class="stat"><b>20+</b><span>years across finance, data and AI</span></div>
+    <div class="stat"><b>14</b><span>data scientists led in credit-risk modelling at Rabobank</span></div>
+    <div class="stat"><b>6</b><span>architects led and mentored at APG</span></div>
+    <div class="stat"><b>3</b><span>papers on AI audit trails, published on SSRN in 2026</span></div>
+  </div>
+</div>
+
+<!-- TALK TO ME -->
+<section id="talk">
+  <div class="wrap reveal">
+    <p class="eyebrow">Conversation</p>
+    <h2>Ask me about&hellip;</h2>
+    <p class="sub">Pick a question. These are the things people usually want to know first.</p>
+    <div class="ask" id="ask" role="group" aria-label="Questions"></div>
+    <div class="answer" id="answer" aria-live="polite" hidden></div>
+    <div class="qa-static" id="qa-static">
+      <!-- Single source for the answers: used as-is without JS, enhanced into chips with JS -->
+      <div class="answer-item" data-q="What do you do today?">
+        <p>I lead data, enterprise and AI architecture at RepRisk. I set up the foundations: data governance, the data and AI architecture, and AI governance.</p>
+        <p>I own a Databricks and Snowflake lakehouse on AWS, run a Data Governance Council across five domains, and drive how we adopt AI, including agentic workflows and MCP servers.</p>
+        <p>Alongside that I co-founded TraceGov.ai (EU AI governance) and Lekhly (financial document infrastructure).</p>
+      </div>
+      <div class="answer-item" data-q="What have you built?">
+        <p>At work: a medallion lakehouse with quality gates and CI/CD across five environments, a 74-entity conceptual data model and a 194-term business glossary with lineage in an OpenMetadata catalogue.</p>
+        <p>In the open: HamiltonVault, a Data Vault engine with 100 passing tests, validated row by row against AutomateDV, loading 200k rows in about two seconds on DuckDB. Also HamiltonFlow, SQLMeshVault and SQLMeshFlow on <a href="https://github.com/quantsegu" target="_blank" rel="noopener">GitHub</a>.</p>
+        <p>Earlier: a platform to replace SAS and an Oracle warehouse at APG, and a grid that cut a risk run from about 18 hours to 40 minutes at HSBC.</p>
+      </div>
+      <div class="answer-item" data-q="How did it start?">
+        <p>With statistics. In 2005 I was a research assistant at the Bombay Stock Exchange, using R and SPSS to find patterns in exchange data and writing weekly reports.</p>
+        <p>From there: trade finance at Bank of America, quant support on the UBS trading floor in Hong Kong, then HSBC, where I moved from reporting to portfolio systems to heading innovation. The trading-floor years taught me that good data decides whether a model, or a trader, can be trusted.</p>
+      </div>
+      <div class="answer-item" data-q="How do you work with teams?">
+        <p>I am techno-functional: never only the business analyst and never only the engineer. I sit with the people who use the data, pin down the real requirement, then design something that works across platforms.</p>
+        <p>I have led teams of 22 (as architect at Sinewave), 14 data scientists (Rabobank) and 6 architects (APG), where I also chaired the Architecture Review Board and Design Authority. I work with regulators, external consultancies and open-source communities, including FINOS.</p>
+      </div>
+      <div class="answer-item" data-q="Which regulations do you know?">
+        <p>BCBS 239 data aggregation and lineage, DORA, SFTR, MiFID II and EMIR reporting, OFAC screening rules from my trade-finance years, and the EU's AI governance direction through TraceGov.ai.</p>
+        <p>At Rabobank I worked directly with the European Central Bank and the Dutch central bank on model reviews and data presentations.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- OVER TIME -->
+<section id="over-time">
+  <div class="wrap">
+    <p class="eyebrow reveal">Over time</p>
+    <h2 class="reveal">Watch my career unfold</h2>
+    <p class="sub reveal">Drag the slider, or press play, to see what I was doing at any point, what I was leading, and how each skill grew from the first role where I used it.</p>
+    <noscript><p class="sub">This interactive view needs JavaScript. The full career is listed below.</p></noscript>
+    <div class="ot" id="ot" hidden>
+      <div class="ot-controls">
+        <div class="ot-top">
+          <button class="play" id="play" type="button" aria-label="Play career animation">&#9654; Play</button>
+          <div>
+            <div class="ot-date" id="ot-date" aria-live="off"></div>
+            <div class="ot-sub" id="ot-sub"></div>
+          </div>
+        </div>
+        <div class="lanes" id="lanes"></div>
+        <input id="ot-range" type="range" aria-label="Point in my career" step="1">
+      </div>
+      <div class="ot-grid">
+        <div class="panel" id="ot-now" aria-live="polite"></div>
+        <div class="panel lead-now" id="ot-lead" aria-live="polite"></div>
+      </div>
+      <h3 class="ot-h">Skills by this point</h3>
+      <div class="filters" id="ot-filters" role="group" aria-label="Skill areas"></div>
+      <div class="sk-grid" id="sk-grid"></div>
+      <p class="ot-note">Bars show the years since the first role in which I used each skill. Leadership grows the same way.</p>
+    </div>
+  </div>
+</section>
+
+<!-- CAREER -->
+<section id="career">
+  <div class="wrap">
+    <p class="eyebrow reveal">Career</p>
+    <h2 class="reveal">Every role, in order</h2>
+    <p class="sub reveal">Newest first, by start date. Roles tagged in parallel ran alongside my main job at the time. The outlined card is where the slider above currently sits.</p>
+
+    <div class="tl-tools"><button class="link-btn" id="sort-order" type="button" aria-label="Sorted newest first. Switch order.">Newest first</button><button class="link-btn" id="toggle-all" type="button">Expand all</button></div>
+
+    <div id="jobs">
+
+<details class="job" open data-label="RepRisk" data-org="RepRisk" data-role="Lead, Data, Enterprise &amp; AI Architecture" data-line="Setting up data governance, the lakehouse and the AI architecture." data-start="2025.417" data-end="2026.75" data-present="1">
+        <summary>
+          <div class="when">Jun 2025 &ndash; present</div>
+          <div class="org">RepRisk <span class="tag main">Current</span><small>Lead &mdash; Data, Enterprise &amp; AI Architecture</small></div>
+          <span class="chev" aria-hidden="true"></span>
+        </summary>
+        <div class="job-body"><ul>
+          <li>Joined as lead data and AI architect to set up the foundations: data governance, data architecture, AI architecture and AI governance.</li>
+          <li>Own the Databricks and Snowflake medallion lakehouse on AWS: Unity Catalog, Airbyte CDC, SODA quality gates, SCD Type 2 and Databricks Asset Bundles CI/CD across five environments. Took the proof of concept through Architecture Board approval.</li>
+          <li>Set up the Data Governance Council across five domains, a 74-entity conceptual data model, a 194-term glossary and an OpenMetadata catalogue with lineage.</li>
+          <li>Drive AI adoption: agentic and code-based workflows, review of MCP servers and agentic processes, and LLM developments now in training and testing. These workflows gave analysts 3x to 5x more productivity, shortened time to market for ad hoc analysis with MCPs, and made the information analysts use consistent.</li>
+          <li>Built a 13-module Data Steward / Data Owner programme and a Data Vault 2.0 handbook. Tested Microsoft Fabric with Power BI and delivered Snowflake Marketplace data offerings. Own vendors, licensing and budget.</li>
+        </ul></div>
+      </details>
+
+<details class="job par" data-label="Ventures" data-org="Shreshti, TraceGov.ai, Lekhly" data-role="Architecture advisor and co-founder" data-line="Co-founding TraceGov.ai and Lekhly, and building open-source data engines." data-start="2024.0" data-end="2026.75" data-par="1" data-present="1">
+        <summary>
+          <div class="when">2024 &ndash; present</div>
+          <div class="org">Shreshti BV / Quantamix, TraceGov.ai, Lekhly <span class="tag">In parallel with APG, then RepRisk</span><small>Architecture advisor and co-founder</small></div>
+          <span class="chev" aria-hidden="true"></span>
+        </summary>
+        <div class="job-body"><ul>
+          <li>Co-founded TraceGov.ai, an EU AI governance platform, and Lekhly, financial document infrastructure.</li>
+          <li>Build open-source libraries: HamiltonVault (100 passing tests, validated row by row against AutomateDV, 200k rows in about 2 seconds on DuckDB), HamiltonFlow, SQLMeshVault and SQLMeshFlow.</li>
+          <li>Support FINOS in building the ontology behind a common data model, and in setting up AI regulatory frameworks for fintech.</li>
+          <li>Advise founders and CTOs on data platform design, AI/LLM integration, MLOps and cloud strategy. Develop AI-based enablement and training for organisations.</li>
+        </ul></div>
+      </details>
+
+<details class="job par" data-label="IOMETE" data-org="IOMETE" data-role="Developer Advocate / Product Owner" data-line="Guiding product direction for an Iceberg-based lakehouse platform." data-start="2022.083" data-end="2024.0" data-par="1">
+        <summary>
+          <div class="when">Feb 2022 &ndash; Dec 2023<small>Part-time</small></div>
+          <div class="org">IOMETE <span class="tag">In parallel with APG</span><small>Developer Advocate / Product Owner</small></div>
+          <span class="chev" aria-hidden="true"></span>
+        </summary>
+        <div class="job-body"><ul>
+          <li>The founder asked me to guide what to build and how. I worked as a consultant alongside my APG role.</li>
+          <li>Managed the product backlog for an AWS and Kubernetes lakehouse platform (Kotlin, Spark for compute, Apache Iceberg tables), weighing client requirements against market patterns.</li>
+          <li>Worked in depth with Apache Iceberg and gave architectural guidance to enterprise clients.</li>
+        </ul></div>
+      </details>
+
+<details class="job" data-label="APG" data-org="APG Asset Management" data-role="Enterprise &amp; Data Architect" data-line="Leading the move off SAS and Oracle onto Databricks." data-start="2021.083" data-end="2025.25">
+        <summary>
+          <div class="when">Feb 2021 &ndash; Mar 2025<small>Second stint</small></div>
+          <div class="org">APG Asset Management <span class="tag main">Main</span><small>Enterprise (Business) Architect &amp; Data Architect</small></div>
+          <span class="chev" aria-hidden="true"></span>
+        </summary>
+        <div class="job-body"><ul>
+          <li>Invited back by former colleagues to lead the move from a SAS and Oracle data warehouse to a modern platform for large-scale data processing and analysis.</li>
+          <li>Evaluated Snowflake, Azure Synapse and Databricks. Databricks came out ahead, and I designed the setup, the management organisation and how it fits together.</li>
+          <li>About 95% of the architecture I proposed was adopted, because of its cost efficiency and the principles behind it. The new platform saved nearly 20% against the previous cost and setup, around USD 3 million a year.</li>
+          <li>Solution architecture for the Databricks and Azure platform across data products, private markets, treasury, fixed income, real estate, OMS and EMS, plus the Unity Catalog structure and Collibra governance. Built a conceptual model on the IBM industry data model.</li>
+          <li>First delivery was responsible investment: data from about 30 sources for ESG and business-conduct risk, with a flexible calculation layer analysts configure themselves.</li>
+          <li>Planned the migration of the group's Cloudera estate to Databricks.</li>
+          <li>Founded and chaired the Architecture Review Board and Design Authority. Led and mentored 6 architects. Coordinated external consultancies on data architecture, AI governance and infrastructure as code.</li>
+          <li>Supported the front-office move from Bloomberg AIM to Thinkfolio, DORA and SFTR compliance work, and identity and access management policy. Won best AI/LLM project at the APG hackathon.</li>
+        </ul></div>
+      </details>
+
+<details class="job" data-label="Rabobank" data-org="Rabobank" data-role="Senior Data Scientist / Product Owner" data-line="Leading 14 data scientists on credit-risk models." data-start="2019.083" data-end="2021.083">
+        <summary>
+          <div class="when">Feb 2019 &ndash; Feb 2021</div>
+          <div class="org">Rabobank <span class="tag main">Main</span><small>Senior Data Scientist / Product Owner, credit risk</small></div>
+          <span class="chev" aria-hidden="true"></span>
+        </summary>
+        <div class="job-body"><ul>
+          <li>Led a team of 14 data scientists building credit-risk models for corporate clients, on Snowflake and Databricks, with Python and PySpark.</li>
+          <li>Replaced the repeated fetch-and-discard of data for each model with reusable research data in the enterprise lake, fed by Airflow pipelines. Model development ran about 40% faster, with the cycle cut from two years to about fourteen months.</li>
+          <li>Built Power BI and Streamlit dashboards showing portfolio managers how new models would change their portfolios.</li>
+          <li>Worked with the European Central Bank and the Dutch central bank on model reviews and data presentations, remotely during COVID.</li>
+          <li>Separately: architected the REHAB historical data platform and delivered GRFD, the integrated finance and risk data set, with BCBS 239-aligned lineage and governance in Collibra.</li>
+          <li>An innovation hackathon project supported a roughly 40% reduction in interest rates paid by farmers in Africa. I did the modelling and data preparation, and aligned the parties on what the product should do.</li>
+        </ul></div>
+      </details>
+
+<details class="job" data-label="APG" data-org="APG Asset Management" data-role="Senior Big Data &amp; Master Data Business Analyst" data-line="Transforming trading, accounting and master-data systems." data-start="2016.167" data-end="2019.083">
+        <summary>
+          <div class="when">Mar 2016 &ndash; Jan 2019<small>First stint</small></div>
+          <div class="org">APG Asset Management <span class="tag main">Main</span><small>Senior Big Data &amp; Master Data Business Analyst</small></div>
+          <span class="chev" aria-hidden="true"></span>
+        </summary>
+        <div class="job-body"><ul>
+          <li>Drove the transformation to Murex, a new corporate-actions system (SunGard XSP) and Advent Geneva for accounting, and took all applications live with reconciliations documented and tested.</li>
+          <li>Mapped the front-to-back flows from Bloomberg AIM and Murex into transactions, accounting and corporate actions.</li>
+          <li>Led security and party mastering in the enterprise Markit EDM golden source.</li>
+          <li>Built custom market curves in Python, including a React-based mortgage curve for MBS valuation that replaced a costly, inflexible Murex curve.</li>
+          <li>Configured the common messaging model on TIBCO EMS using FpML, with earlier experience in FIXML, SWIFT MT and ISO 20022. Delivered SFTR, MiFID II and EMIR reporting.</li>
+        </ul></div>
+      </details>
+
+<details class="job par" data-label="Sinewave" data-org="Sinewave Computer Services" data-role="Senior Consultant and architect" data-line="Weekend architect modernising a tax and accounting platform." data-start="2012.333" data-end="2013.75" data-par="1">
+        <summary>
+          <div class="when">May 2012 &ndash; Sep 2013<small>Weekends</small></div>
+          <div class="org">Sinewave Computer Services <span class="tag">In parallel with HSBC</span><small>Senior Consultant and architect</small></div>
+          <span class="chev" aria-hidden="true"></span>
+        </summary>
+        <div class="job-body"><ul>
+          <li>Consulted on modernising an accounting and tax-assessment platform that accountants in India use to file returns for individuals, companies and multi-entity groups.</li>
+          <li>Moved the system to a modern C# stack with an MVC/MVVM architecture. Presented the design and worked directly with the CEO.</li>
+          <li>Delivered with a team of about 22, managing 3 directly. The redesign let the platform support 30% more clients.</li>
+        </ul></div>
+      </details>
+
+<details class="job" data-label="HSBC" data-org="HSBC" data-role="Senior Business Analyst, Innovation Lead" data-line="Reporting, portfolio systems, then head of innovation." data-start="2010.333" data-end="2016.083">
+        <summary>
+          <div class="when">May 2010 &ndash; Jan 2016</div>
+          <div class="org">HSBC <span class="tag main">Main</span><small>Senior Business Analyst &middot; Innovation Lead</small></div>
+          <span class="chev" aria-hidden="true"></span>
+        </summary>
+        <div class="job-body"><ul>
+          <li><b>Reporting and analytics.</b> Delivered transaction and performance reporting for equities, fixed income and FX, and fed risk insight back to traders.</li>
+          <li><b>Portfolio management.</b> Delivered solutions on Thinkfolio, Markit EDM, Bloomberg and TOMS. Launched several funds into production alongside the fund managers, about EUR 80 million in total.</li>
+          <li><b>Head of innovation.</b> Cut a risk calculation from about 18 hours to 40 minutes by using idle capacity on around 380 desktops as a compute grid, then to about 30 minutes on GPGPU.</li>
+          <li>Led a big-data project on Hortonworks that turned the data warehouse into a data lake, and built an enterprise knowledge base on open-source technology. Co-led the Innovation Lab in India.</li>
+          <li><b>Global Banking and Markets (2014&ndash;2016).</b> Brought together the risk calculation processes, delivered solutions on Sophis, Calypso and Murex for the fixed income and derivatives desks, and moved into a business specialist role with product control. Completed the IIQF Certificate in Quantitative Finance.</li>
+        </ul></div>
+      </details>
+
+<details class="job" data-label="UBS" data-org="UBS" data-role="Senior Analyst, quant team support" data-line="Supporting the quant team on the trading floor in Hong Kong." data-start="2007.75" data-end="2010.333">
+        <summary>
+          <div class="when">Oct 2007 &ndash; Apr 2010<small>Hong Kong</small></div>
+          <div class="org">UBS <span class="tag main">Main</span><small>Senior Analyst, quant team support</small></div>
+          <span class="chev" aria-hidden="true"></span>
+        </summary>
+        <div class="job-body"><ul>
+          <li>Worked on the trading floor beside the quant team, giving global desks technical support and data reporting.</li>
+          <li>Built reporting on real-time and historical data in KDB+/q, with Python, R and K.</li>
+          <li>Analysed slippage and the risk factors of quantitative trading, and checked that models behaved as expected on derivative sensitivities and volatility scenarios.</li>
+          <li>Began programming FPGAs with OpenCL, then picked up CUDA and GPGPU.</li>
+        </ul></div>
+      </details>
+
+<details class="job" data-label="BofA" data-org="Bank of America" data-role="Associate, trade finance" data-line="Building trade-finance and compliance tooling." data-start="2006.333" data-end="2007.75">
+        <summary>
+          <div class="when">May 2006 &ndash; Sep 2007<small>India</small></div>
+          <div class="org">Bank of America, Continuum Solutions <span class="tag main">Main</span><small>Associate, trade finance</small></div>
+          <span class="chev" aria-hidden="true"></span>
+        </summary>
+        <div class="job-body"><ul>
+          <li>Supported the export-import business with letter-of-credit solutions, written in C++ and C# with OFAC compliance rules built in. It won Best Six Sigma Project of the Year.</li>
+          <li>Wrote mainframe macros and built reporting and Excel-based tooling.</li>
+        </ul></div>
+      </details>
+
+<details class="job" data-label="BSE" data-org="Bombay Stock Exchange" data-role="Research Assistant" data-line="Researching exchange data with R and SPSS." data-start="2005.167" data-end="2005.75">
+        <summary>
+          <div class="when">Mar &ndash; Aug 2005</div>
+          <div class="org">Bombay Stock Exchange <span class="tag main">Main</span><small>Research Assistant</small></div>
+          <span class="chev" aria-hidden="true"></span>
+        </summary>
+        <div class="job-body"><ul>
+          <li>Where it started: used R and SPSS to find patterns in exchange data and studied how the exchange related to the wider economy.</li>
+          <li>Produced weekly economic and statistical reports.</li>
+        </ul></div>
+      </details>
+
+    </div>
+  </div>
+</section>
+
+<!-- SKILLS -->
+<section id="skills">
+  <div class="wrap">
+    <p class="eyebrow reveal">Toolbox</p>
+    <h2 class="reveal">Tools I work with</h2>
+    <p class="sub reveal">The full list by area. Tools change; the habit of tracing data from source to decision does not.</p>
+    <div class="filters" id="filters" role="group" aria-label="Skill areas"></div>
+    <div class="skills reveal" id="skills-grid">
+      <div class="skill-group" data-area="Architecture"><h3>Architecture &amp; governance</h3><div class="tags"><span>TOGAF</span><span>ArchiMate</span><span>BPMN</span><span>BizzDesign</span><span>Sparx EA</span><span>Power Designer</span><span>Collibra</span><span>OpenMetadata</span><span>Data Vault 2.0</span><span>BCBS 239</span><span>DORA</span><span>FINOS common data model</span><span>SAFe &amp; LeSS</span></div></div>
+      <div class="skill-group" data-area="Data platforms"><h3>Data platforms</h3><div class="tags"><span>Databricks</span><span>Unity Catalog</span><span>Snowflake</span><span>Apache Iceberg</span><span>Microsoft Fabric</span><span>Azure Data Factory</span><span>Airflow</span><span>Airbyte</span><span>SODA</span><span>dbt</span><span>SQLMesh</span><span>Apache Hamilton</span><span>DuckDB</span><span>Cloudera</span><span>Hortonworks</span></div></div>
+      <div class="skill-group" data-area="AI"><h3>AI &amp; agents</h3><div class="tags"><span>LLM development</span><span>Agentic workflows</span><span>MCP servers</span><span>AI governance</span><span>Palantir Foundry &amp; AIP</span><span>Claude Code &amp; Claude API</span><span>Prompt engineering</span></div></div>
+      <div class="skill-group" data-area="Data science"><h3>Data science &amp; quant</h3><div class="tags"><span>Python</span><span>PySpark</span><span>R</span><span>KDB+/q</span><span>SciPy &amp; NumPy</span><span>Dataiku</span><span>Credit-risk models</span><span>Power BI (DAX)</span><span>Streamlit</span><span>GPGPU &amp; CUDA</span></div></div>
+      <div class="skill-group" data-area="Finance"><h3>Capital-markets systems</h3><div class="tags"><span>Murex</span><span>Calypso</span><span>Sophis</span><span>Markit EDM</span><span>Advent Geneva</span><span>Thinkfolio</span><span>Bloomberg AIM</span><span>SimCorp</span><span>Fidessa</span></div></div>
+      <div class="skill-group" data-area="Finance"><h3>Messaging &amp; regulation</h3><div class="tags"><span>FpML</span><span>FIXML</span><span>SWIFT MT</span><span>ISO 20022</span><span>SFTR</span><span>MiFID II</span><span>EMIR</span><span>OFAC</span></div></div>
+    </div>
+  </div>
+</section>
+
+<!-- CREDENTIALS -->
+<section id="credentials">
+  <div class="wrap">
+    <p class="eyebrow reveal">Credentials &amp; community</p>
+    <h2 class="reveal">Learning, writing and giving back</h2>
+    <p class="sub reveal">A selection of current certifications and the work I share publicly.</p>
+    <div class="cols reveal">
+      <div class="panel">
+        <h3>Education</h3>
+        <ul>
+          <li>Master of International Business<small>2006</small></li>
+          <li>Bachelor of Computer Applications<small>2003</small></li>
+          <li>Machine Learning, Stanford University<small>2011</small></li>
+          <li>Certificate in Quantitative Finance, IIQF<small>2012</small></li>
+        </ul>
+      </div>
+      <div class="panel">
+        <h3>Recent certifications</h3>
+        <ul>
+          <li>SAP Data Architect<small>Oct 2026</small></li>
+          <li>AI Leadership, OpenAI<small>Oct 2026</small></li>
+          <li>Palantir Foundry &amp; AIP Builder Foundations, Ontology and AIP workflow courses<small>Sep 2026</small></li>
+          <li>Anthropic: Model Context Protocol, agent skills, Claude Code in Action, Building with the Claude API<small>May 2026</small></li>
+          <li>Hugging Face, AI Agents Fundamentals<small>Apr 2025</small></li>
+          <li>Collibra Solution Architect and Integration Engineer<small>Mar 2025</small></li>
+          <li>Databricks Platform Architect (GCP)<small>Mar 2025, valid to Mar 2027</small></li>
+          <li>Databricks Certified Solution Architect<small>2021</small></li>
+          <li>DAMA-DMBOK CDMP<small>Jan 2021</small></li>
+          <li>IAPP AIGP (AI governance)</li>
+        </ul>
+      </div>
+      <div class="panel">
+        <h3>Publications</h3>
+        <p>SSRN, July 2026, with co-authors:</p>
+        <ul>
+          <li>Claim Limits in AI Audit Records: Naming What a Record Cannot Prove</li>
+          <li>Long-Horizon Compatibility Contracts for AI Audit Trails</li>
+          <li>Proof-Carrying Data Obligations for AI Audit Trails: Implementation Lessons toward the PCT Open Specification</li>
+        </ul>
+      </div>
+      <div class="panel">
+        <h3>Open source &amp; community</h3>
+        <ul>
+          <li>Author of HamiltonVault, HamiltonFlow, SQLMeshVault and SQLMeshFlow<small><a href="https://github.com/quantsegu" target="_blank" rel="noopener">github.com/quantsegu</a></small></li>
+          <li>Contributor to FINOS (FDC3, Legend) and Apache Iceberg</li>
+          <li>Founder, Databricks Swiss User Group</li>
+          <li>Ambassador, The Linux Foundation<small>Since Feb 2025</small></li>
+          <li>Mentor, Startupbootcamp Fintech<small>Since Mar 2025</small></li>
+          <li>Contributor, Chief Architect Network<small>Since Feb 2025</small></li>
+          <li>VOG-certified youth chess instructor</li>
+        </ul>
+      </div>
+      <div class="panel">
+        <h3>Languages</h3>
+        <ul>
+          <li>Telugu and Hindi<small>Native</small></li>
+          <li>English<small>C1</small></li>
+          <li>Dutch<small>B1</small></li>
+          <li>German<small>A2</small></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="connect">
+  <div class="wrap">
+    <div class="contact reveal">
+      <h2>Let&rsquo;s talk</h2>
+      <p>Data platforms, AI governance, agentic workflows or financial-services architecture. I am happy to compare notes.</p>
+      <div class="links">
+        <a class="btn primary" href="https://www.linkedin.com/in/lakshmisegu/" target="_blank" rel="noopener">Message me on LinkedIn</a>
+        <a class="btn" href="https://github.com/quantsegu" target="_blank" rel="noopener">See my code</a>
+      </div>
+    </div>
+  </div>
+</section>
+</main>
+
+<footer><div class="wrap">&copy; <span id="yr">2026</span> Lakshmi Narayana Segu &middot; <a href="/">Shreshti</a></div></footer>
+
+<script>
+(function(){
+  var $ = function(s, r){ return (r||document).querySelector(s); };
+  var $$ = function(s, r){ return Array.prototype.slice.call((r||document).querySelectorAll(s)); };
+  var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  $('#yr').textContent = new Date().getFullYear();
+
+  /* Reveal on scroll */
+  if ('IntersectionObserver' in window){
+    var io = new IntersectionObserver(function(es){ es.forEach(function(e){ if(e.isIntersecting){ e.target.classList.add('in'); io.unobserve(e.target); } }); }, {threshold:0.08});
+    $$('.reveal').forEach(function(el){ io.observe(el); });
+  } else { $$('.reveal').forEach(function(el){ el.classList.add('in'); }); }
+
+  /* Conversation chips: built from the static answers */
+  var items = $$('#qa-static .answer-item');
+  var ask = $('#ask'), ans = $('#answer'), stat = $('#qa-static');
+  if (items.length){
+    stat.hidden = true;
+    items.forEach(function(it){
+      var b = document.createElement('button');
+      b.type = 'button'; b.className = 'chip'; b.textContent = it.getAttribute('data-q'); b.setAttribute('aria-pressed','false');
+      b.addEventListener('click', function(){
+        $$('.chip', ask).forEach(function(c){ c.setAttribute('aria-pressed','false'); });
+        b.setAttribute('aria-pressed','true');
+        ans.innerHTML = '<div class="q"></div>' + it.innerHTML;
+        $('.q', ans).textContent = it.getAttribute('data-q');
+        ans.hidden = false;
+      });
+      ask.appendChild(b);
+    });
+    $('.chip', ask).click();
+  }
+
+  /* ---------- Career over time ---------- */
+  var MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  var BASE = 2005;
+  var VMIN = 2;                 // Mar 2005, first role
+  var VMAX = 21 * 12 + 9;       // Oct 2026
+  var TMIN = BASE + VMIN / 12, TMAX = BASE + VMAX / 12;
+  var frac = function(t){ return Math.min(1, Math.max(0, (t - TMIN) / (TMAX - TMIN))); };
+  var fmt = function(v){ return MONTHS[v % 12] + ' ' + (BASE + Math.floor(v / 12)); };
+
+  var jobsBox = $('#jobs');
+  var jobEls = $$('details.job', jobsBox);
+  var J = jobEls.map(function(d){
+    return {el:d, label:d.dataset.label, org:d.dataset.org, role:d.dataset.role, line:d.dataset.line,
+      s:+d.dataset.start, e:+d.dataset.end, par:!!d.dataset.par, present:!!d.dataset.present};
+  });
+  var isActive = function(j, t){ return j.s <= t + 0.001 && (j.present || t < j.e - 0.001); };
+
+  /* Leadership milestones: what I was leading at each stage */
+  var LEAD = [
+    {t:2005.167, head:'Individual contributor', text:'Learning the craft: statistics first, then trade finance, then the trading floor.'},
+    {t:2010.333, head:'Working beside the business', text:'Sitting with traders and fund managers, pinning down real requirements and launching funds with them.'},
+    {t:2012.333, head:'Led a team of 22', text:'Architect for a platform rebuild, with 3 direct reports. Presented the design to the CEO.'},
+    {t:2019.083, head:'Led 14 data scientists', text:'Credit-risk models for corporate clients, reviewed with the European Central Bank and the Dutch central bank.'},
+    {t:2021.083, head:'Led 6 architects', text:'Chaired the Architecture Review Board and Design Authority, and advised the C-suite.'},
+    {t:2024.0, head:'Advising founders and CTOs', text:'Co-founding TraceGov.ai and Lekhly, contributing to FINOS and mentoring.'},
+    {t:2025.417, head:'Building governance from scratch', text:'A Data Governance Council across five domains, plus ownership of vendors, licensing and budget.'}
+  ];
+
+  /* Learning moments */
+  var LEARN = [
+    {t:2006.0, text:'Master of International Business'},
+    {t:2011.0, text:'Machine Learning at Stanford'},
+    {t:2012.0, text:'Certificate in Quantitative Finance (IIQF)'},
+    {t:2019.667, text:'Professional Scrum Product Owner'},
+    {t:2021.0, text:'Databricks Certified Solution Architect and DAMA CDMP'},
+    {t:2025.167, text:'Collibra and Hugging Face agent certifications'},
+    {t:2026.333, text:'Anthropic courses on MCP, agent skills and Claude Code'},
+    {t:2026.667, text:'Palantir Foundry and AIP certifications'}
+  ];
+
+  /* Skills: since = start of the first role where each appears */
+  var S = [
+    ['Analysis & quant','Statistics (R, SPSS)',2005.167],
+    ['Analysis & quant','Python',2007.75],
+    ['Analysis & quant','KDB+/q time series',2007.75],
+    ['Analysis & quant','GPU & grid computing',2007.75],
+    ['Analysis & quant','Derivatives & risk analytics',2007.75],
+    ['Analysis & quant','Credit-risk modelling & ML',2019.083],
+    ['Data & platforms','Reporting & BI',2010.333],
+    ['Data & platforms','Big data & data lakes',2010.333],
+    ['Data & platforms','Master data & golden sources',2010.333],
+    ['Data & platforms','Pipelines & ETL',2016.167],
+    ['Data & platforms','Cloud data platforms',2019.083],
+    ['Data & platforms','Lakehouse & Apache Iceberg',2021.083],
+    ['Data & platforms','Open-source data engines',2024.0],
+    ['Architecture & governance','Solution architecture',2012.333],
+    ['Architecture & governance','Data modelling',2019.083],
+    ['Architecture & governance','Data governance & lineage',2019.083],
+    ['Architecture & governance','Enterprise architecture',2021.083],
+    ['Finance & regulation','Trade finance & sanctions',2006.333],
+    ['Finance & regulation','Trading & portfolio systems',2010.333],
+    ['Finance & regulation','Messaging standards (FpML, ISO 20022)',2016.167],
+    ['Finance & regulation','Regulatory reporting',2016.167],
+    ['AI','LLM & agentic workflows',2024.0],
+    ['AI','AI governance',2024.0],
+    ['Leadership','Stakeholder management',2010.333],
+    ['Leadership','Leading technical teams',2012.333],
+    ['Leadership','Leading data scientists',2019.083],
+    ['Leadership','Regulator engagement',2019.083],
+    ['Leadership','Architecture governance boards',2021.083],
+    ['Leadership','Mentoring architects',2021.083],
+    ['Leadership','Advising founders & CTOs',2024.0],
+    ['Leadership','Setting up governance councils',2025.417]
+  ];
+
+  var ot = $('#ot'), range = $('#ot-range'), lanes = $('#lanes');
+  range.min = VMIN; range.max = VMAX; range.value = VMAX;
+
+  /* Two lanes: main roles and parallel work, with a playhead */
+  [['Main role', false], ['On the side', true]].forEach(function(l){
+    var lab = document.createElement('div'); lab.className = 'lane-label'; lab.textContent = l[0]; lanes.appendChild(lab);
+    var lane = document.createElement('div'); lane.className = 'lane'; lanes.appendChild(lane);
+    J.filter(function(j){ return j.par === l[1]; }).forEach(function(j){
+      var b = document.createElement('button');
+      b.type = 'button'; b.className = 'seg' + (j.par ? ' par' : '');
+      b.textContent = j.label; b.title = j.org + ' · ' + j.role;
+      var s = Math.max(j.s, TMIN), e = Math.min(j.present ? TMAX : j.e, TMAX);
+      b.style.left = (frac(s) * 100) + '%';
+      b.style.width = Math.max((frac(e) - frac(s)) * 100, 0.8) + '%';
+      b.addEventListener('click', function(){ setValue(Math.round((s - BASE) * 12) + 1); });
+      j.seg = b; lane.appendChild(b);
+    });
+  });
+  var head = document.createElement('div'); head.className = 'playhead'; lanes.appendChild(head);
+  var ticks = document.createElement('div'); ticks.className = 'ticks'; lanes.appendChild(ticks);
+  [2010, 2015, 2020, 2025].forEach(function(y){
+    var t = document.createElement('span'); t.textContent = y; t.style.left = (frac(y) * 100) + '%'; ticks.appendChild(t);
+  });
+
+  /* Skill rows (built once, updated on every move) */
+  var grid = $('#sk-grid'), areaNames = [], areas = {};
+  S.forEach(function(r){
+    if (!areas[r[0]]){
+      areaNames.push(r[0]);
+      var card = document.createElement('div'); card.className = 'sk-area';
+      card.innerHTML = '<h3><span></span><small></small></h3>';
+      $('h3 span', card).textContent = r[0];
+      areas[r[0]] = {card:card, count:$('h3 small', card), rows:[]};
+      grid.appendChild(card);
+    }
+    var row = document.createElement('div'); row.className = 'sk-row';
+    row.innerHTML = '<span class="sk-name"></span><span class="sk-bar"><span class="sk-fill"></span></span><span class="sk-yrs"></span>';
+    $('.sk-name', row).textContent = r[1];
+    areas[r[0]].card.appendChild(row);
+    areas[r[0]].rows.push({el:row, since:r[2], name:$('.sk-name', row), fill:$('.sk-fill', row), yrs:$('.sk-yrs', row)});
+  });
+
+  var areaFilter = 'All', fbox = $('#ot-filters');
+  ['All'].concat(areaNames).forEach(function(a, i){
+    var b = document.createElement('button');
+    b.type = 'button'; b.className = 'chip'; b.textContent = a; b.setAttribute('aria-pressed', i === 0 ? 'true' : 'false');
+    b.addEventListener('click', function(){
+      $$('.chip', fbox).forEach(function(c){ c.setAttribute('aria-pressed','false'); });
+      b.setAttribute('aria-pressed','true'); areaFilter = a; render();
+    });
+    fbox.appendChild(b);
+  });
+
+  var nowBox = $('#ot-now'), leadBox = $('#ot-lead');
+  var esc = function(s){ var d = document.createElement('div'); d.textContent = s; return d.innerHTML; };
+
+  function render(){
+    var v = +range.value, t = BASE + v / 12;
+    $('#ot-date').textContent = fmt(v);
+    var yrs = t - TMIN;
+    $('#ot-sub').textContent = yrs < 1 ? 'First year in the field' : Math.floor(yrs) + ' years in';
+    range.setAttribute('aria-valuetext', fmt(v));
+    head.style.left = 'calc(9px + (100% - 18px) * ' + frac(t) + ')';
+
+    var act = J.filter(function(j){ return isActive(j, t); }).sort(function(a, b){ return a.par - b.par; });
+    J.forEach(function(j){
+      var on = isActive(j, t);
+      j.seg.classList.toggle('on', on); j.el.classList.toggle('now', on);
+    });
+
+    /* What I was doing */
+    var h = '<h3>' + (t > TMAX - 0.01 ? 'What I am doing now' : 'What I was doing') + '</h3>';
+    if (act.length){
+      act.forEach(function(j){
+        h += '<div class="now-item"><b>' + esc(j.org) + '</b><span>' + (j.par ? '<span class="tag" style="display:inline-block">In parallel</span>' : '') + esc(j.role) + '</span><p>' + esc(j.line) + '</p><button type="button" class="mini" data-job="' + J.indexOf(j) + '">Read the details &rarr;</button></div>';
+      });
+    } else {
+      h += '<div class="now-item"><b>Studying</b><p>Completing a Master of International Business before moving into trade finance.</p></div>';
+    }
+    var recent = LEARN.filter(function(l){ return l.t <= t + 0.001 && l.t > t - 1; });
+    if (recent.length){ h += '<p class="learn"><b style="color:var(--text)">Learning:</b> ' + recent.map(function(l){ return esc(l.text); }).join('; ') + '</p>'; }
+    nowBox.innerHTML = h;
+
+    /* Leadership */
+    var cur = 0;
+    LEAD.forEach(function(m, i){ if (m.t <= t + 0.001) cur = i; });
+    var lh = '<small>Leadership at this point</small><b>' + esc(LEAD[cur].head) + '</b><p>' + esc(LEAD[cur].text) + '</p><ul class="path">';
+    LEAD.forEach(function(m, i){
+      lh += '<li class="' + (i === cur ? 'cur' : (i > cur ? 'future' : '')) + '"><em>' + Math.floor(m.t) + '</em>' + esc(m.head) + '</li>';
+    });
+    leadBox.innerHTML = lh + '</ul>';
+
+    /* Skills */
+    var total = 0;
+    areaNames.forEach(function(a){
+      var n = 0, A = areas[a];
+      A.rows.forEach(function(r){
+        var y = t - r.since, started = y >= -0.001;
+        r.el.hidden = !started;
+        if (started){
+          n++;
+          r.fill.style.width = Math.max(4, Math.min(1, y / (TMAX - TMIN)) * 100) + '%';
+          r.yrs.textContent = y < 1 ? '<1 yr' : Math.floor(y) + ' yrs';
+          var isNew = y < 1 && t > TMIN + 1;
+          var badge = r.name.querySelector('.new');
+          if (isNew && !badge){ badge = document.createElement('span'); badge.className = 'new'; badge.textContent = 'new'; r.name.appendChild(badge); }
+          if (!isNew && badge){ badge.remove(); }
+        }
+      });
+      A.count.textContent = n + ' skill' + (n === 1 ? '' : 's');
+      A.card.hidden = !(n > 0 && (areaFilter === 'All' || areaFilter === a));
+      total += n;
+    });
+  }
+
+  function setValue(v){ range.value = Math.max(VMIN, Math.min(VMAX, v)); render(); }
+  range.addEventListener('input', function(){ stopPlay(); render(); });
+
+  nowBox.addEventListener('click', function(e){
+    var b = e.target.closest ? e.target.closest('[data-job]') : null;
+    if (!b) return;
+    var j = J[+b.getAttribute('data-job')];
+    j.el.open = true;
+    j.el.scrollIntoView({behavior: reduce ? 'auto' : 'smooth', block:'start'});
+  });
+
+  /* Play */
+  var timer = null, playBtn = $('#play');
+  function stopPlay(){ if (timer){ clearInterval(timer); timer = null; } playBtn.innerHTML = '&#9654; Play'; playBtn.setAttribute('aria-label', 'Play career animation'); }
+  playBtn.addEventListener('click', function(){
+    if (timer){ stopPlay(); return; }
+    if (+range.value >= VMAX) setValue(VMIN);
+    playBtn.innerHTML = '&#10074;&#10074; Pause'; playBtn.setAttribute('aria-label', 'Pause career animation');
+    timer = setInterval(function(){
+      var next = +range.value + 2;
+      if (next >= VMAX){ setValue(VMAX); stopPlay(); return; }
+      setValue(next);
+    }, 110);
+  });
+
+  render();
+  ot.hidden = false;
+
+  /* Detailed timeline: sort order */
+  var tog = $('#toggle-all'), allOpen = false;
+  tog.addEventListener('click', function(){
+    allOpen = !allOpen;
+    jobEls.forEach(function(d){ d.open = allOpen; });
+    tog.textContent = allOpen ? 'Collapse all' : 'Expand all';
+  });
+  var sortBtn = $('#sort-order'), newest = true;
+  sortBtn.addEventListener('click', function(){
+    newest = !newest;
+    $$('details.job', jobsBox).reverse().forEach(function(d){ jobsBox.appendChild(d); });
+    sortBtn.textContent = newest ? 'Newest first' : 'Oldest first';
+    sortBtn.setAttribute('aria-label', 'Sorted ' + (newest ? 'newest' : 'oldest') + ' first. Switch order.');
+  });
+
+  /* Toolbox filters */
+  var groups = $$('#skills-grid .skill-group');
+  var tAreas = ['All'];
+  groups.forEach(function(g){ var a = g.dataset.area; if (tAreas.indexOf(a) < 0) tAreas.push(a); });
+  var tbox = $('#filters');
+  tAreas.forEach(function(a, i){
+    var b = document.createElement('button');
+    b.type = 'button'; b.className = 'chip'; b.textContent = a; b.setAttribute('aria-pressed', i === 0 ? 'true' : 'false');
+    b.addEventListener('click', function(){
+      $$('.chip', tbox).forEach(function(c){ c.setAttribute('aria-pressed','false'); });
+      b.setAttribute('aria-pressed','true');
+      groups.forEach(function(g){ g.hidden = !(a === 'All' || g.dataset.area === a); });
+    });
+    tbox.appendChild(b);
+  });
+
+  /* Print: open everything */
+  window.addEventListener('beforeprint', function(){ jobEls.forEach(function(d){ d.open = true; }); });
+
+  /* Share */
+  $('#share').addEventListener('click', function(){
+    var btn = this, url = location.href.split('#')[0];
+    var done = function(msg){ var old = btn.textContent; btn.textContent = msg; setTimeout(function(){ btn.textContent = old; }, 1800); };
+    if (navigator.share){ navigator.share({title: document.title, url: url}).catch(function(){}); return; }
+    if (navigator.clipboard && navigator.clipboard.writeText){ navigator.clipboard.writeText(url).then(function(){ done('Link copied'); }, function(){ done('Copy failed'); }); }
+    else { done('Copy the address bar'); }
+  });
+})();
+</script>
+</body>
+</html>
