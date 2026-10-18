@@ -7,6 +7,7 @@ import IndianCommunities from '../pages/IndianCommunities';
 import BookkeepingTracker from '../pages/BookkeepingTracker';
 import WealthTools from '../pages/WealthTools';
 import InvestmentUniverse from '../pages/InvestmentUniverse';
+import InvestmentDetail from '../pages/InvestmentDetail';
 import Blog from '../pages/Blog';
 import BlogPost from '../pages/BlogPost';
 import WealthToolFrame from '../components/WealthToolFrame';
@@ -97,6 +98,7 @@ export default function App() {
           element={<Navigate to="/resources" replace />}
         />
         <Route path="/wealth-tools/investment-universe" element={<InvestmentUniverse />} />
+        <Route path="/wealth-tools/investment-universe/:slug" element={<InvestmentDetail />} />
         <Route
           path="/wealth-tools/investment-universe.html"
           element={<Navigate to="/wealth-tools/investment-universe" replace />}

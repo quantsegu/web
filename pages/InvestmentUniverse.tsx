@@ -25,6 +25,8 @@ import CategoryCard from '../components/investment-universe/CategoryCard';
 import CategoryFilters, { type CategoryFilter } from '../components/investment-universe/CategoryFilters';
 import ComparisonTable from '../components/investment-universe/ComparisonTable';
 import SpectrumMap from '../components/investment-universe/SpectrumMap';
+import PricingIndex from '../components/investment-universe/PricingIndex';
+import SspaSection from '../components/investment-universe/SspaSection';
 import { universeUi } from '../components/investment-universe/universeUi';
 import {
   INVESTMENT_CATEGORIES,
@@ -56,10 +58,12 @@ const COLLECTIBLE_IDS = new Set(['whisky', 'wine', 'vsop-spirits', 'collectibles
 
 const SECTION_NAV = [
   { id: 'overview', label: 'Overview' },
+  { id: 'pricing-index', label: 'Pricing & valuation pages' },
   { id: 'asset-class', label: 'Asset classes' },
   { id: 'categories', label: 'Categories' },
   { id: 'comparison', label: 'Compare' },
   { id: 'deep-dives', label: 'Deep dives' },
+  { id: 'sspa', label: 'SSPA structured products' },
   { id: 'portfolio', label: 'Portfolio roles' },
   { id: 'suitability', label: 'Suitability' },
   { id: 'maps', label: 'Maps' },
@@ -118,6 +122,17 @@ export default function InvestmentUniverse() {
             <p className="text-gray-400 text-sm max-w-2xl">
               Calm, analytical reference material. No return promises. Not personal advice.
             </p>
+            <div className="flex flex-wrap gap-3 mt-6">
+              <a href="#pricing-index" className="btn-primary text-sm">
+                Pricing &amp; valuation pages
+              </a>
+              <Link
+                to="/wealth-tools/investment-universe/leverage"
+                className="text-saffron-300 hover:text-white text-sm font-medium py-3 px-4 transition-colors"
+              >
+                Leverage products →
+              </Link>
+            </div>
             <div className="section-divider !w-32 !mt-6 !mx-0" />
           </motion.div>
         </div>
@@ -146,13 +161,13 @@ export default function InvestmentUniverse() {
         <div className={universeUi.container}>
           <SectionHeader
             title="What this page covers"
-            subtitle="Sixteen asset types—from global equities to weather-linked instruments—compared on role, liquidity, and complexity."
+            subtitle="Sixteen asset types and the five SSPA structured-product families, each with a pricing and valuation page."
           />
           <div className="grid sm:grid-cols-3 gap-4 max-w-4xl mx-auto text-center">
             {[
               { n: '16', label: 'Categories mapped' },
-              { n: '4', label: 'Spectrum views' },
-              { n: '7', label: 'Suitability lenses' },
+              { n: '5', label: 'SSPA product families' },
+              { n: '21', label: 'Pricing & valuation pages' },
             ].map((stat) => (
               <div key={stat.label} className={universeUi.panel + ' py-6 px-4'}>
                 <p className="text-2xl font-bold text-white tabular-nums">{stat.n}</p>
@@ -163,7 +178,9 @@ export default function InvestmentUniverse() {
         </div>
       </section>
 
-      <section id="asset-class" className={universeUi.sectionAlt}>
+      <PricingIndex />
+
+      <section id="asset-class" className={universeUi.section}>
         <div className={universeUi.container}>
           <SectionHeader
             title="What is an asset class?"
@@ -260,12 +277,20 @@ export default function InvestmentUniverse() {
                       {para}
                     </p>
                   ))}
+                  <Link
+                    to={`/wealth-tools/investment-universe/${cat.id}`}
+                    className="inline-block mt-3 text-saffron-300 hover:text-white text-sm font-medium transition-colors"
+                  >
+                    Pricing &amp; valuation →
+                  </Link>
                 </motion.article>
               );
             })}
           </div>
         </div>
       </section>
+
+      <SspaSection />
 
       <section id="portfolio" className={universeUi.sectionAlt}>
         <div className={universeUi.container}>
@@ -395,6 +420,14 @@ export default function InvestmentUniverse() {
               <div key={w.title} className={universeUi.panel + ' p-5 border-l-2 border-red-400/50'}>
                 <h3 className="text-white font-semibold text-sm mb-2">{w.title}</h3>
                 <p className={universeUi.proseMuted}>{w.body}</p>
+                {w.title === 'Leverage risk' && (
+                  <Link
+                    to="/wealth-tools/investment-universe/leverage"
+                    className="inline-block mt-2 text-saffron-300 hover:text-white text-sm transition-colors"
+                  >
+                    How leverage products are priced →
+                  </Link>
+                )}
               </div>
             ))}
           </div>
