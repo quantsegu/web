@@ -5,6 +5,8 @@
     { "src": "/wealth-tools/swiss-tax-locator/", "dest": "/wealth-tools/swiss-tax-locator.html" },
     { "src": "/lakshmi/?", "dest": "/lakshmi.html" },
     { "src": "/selfcare/?", "dest": "/selfcare.html" },
+    { "src": "/border-kitchen-dossier/?", "dest": "/border-kitchen-dossier.html" },
+    { "src": "/food-truck-field-guide/?", "dest": "/food-truck-field-guide.html" },
     { "src": "/(.*)", "dest": "/index.html" }
   ]
 }

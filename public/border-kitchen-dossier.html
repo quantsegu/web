@@ -1,0 +1,1463 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><style>img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Border Kitchen Dossier</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+<style>
+  :root {
+    --ground: #F3F1F4;
+    --surface: #FFFFFF;
+    --surface-2: #FBF9FC;
+    --ink: #211B23;
+    --ink-2: #5E5563;
+    --ink-3: #8A8190;
+    --line: #E2DCE5;
+    --line-strong: #CFC6D3;
+    --accent: #5B2A4A;
+    --accent-2: #8C5378;
+    --accent-soft: #F1E5EE;
+    --ok: #2F6B45;
+    --ok-soft: #E4F0E8;
+    --wait: #8A5A00;
+    --wait-soft: #F7EDD9;
+    --stop: #9E2B25;
+    --stop-soft: #F8E5E3;
+    --idle: #9A92A0;
+    --shadow: 0 1px 2px rgba(33, 27, 35, .06), 0 8px 24px -16px rgba(33, 27, 35, .22);
+    --radius: 6px;
+    --maxw: 940px;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --ground: #15111A;
+      --surface: #1D1822;
+      --surface-2: #241E29;
+      --ink: #EEE8F0;
+      --ink-2: #B4AABA;
+      --ink-3: #887E90;
+      --line: #322A38;
+      --line-strong: #453A4C;
+      --accent: #D8A2C5;
+      --accent-2: #B9799F;
+      --accent-soft: #33232E;
+      --ok: #7FC79A;
+      --ok-soft: #1E3328;
+      --wait: #DCA94E;
+      --wait-soft: #35291445;
+      --stop: #E88A82;
+      --stop-soft: #3A2220;
+      --idle: #7C7384;
+      --shadow: 0 1px 2px rgba(0, 0, 0, .4), 0 8px 24px -16px rgba(0, 0, 0, .8);
+    }
+  }
+  :root[data-theme="dark"] {
+    --ground: #15111A;
+    --surface: #1D1822;
+    --surface-2: #241E29;
+    --ink: #EEE8F0;
+    --ink-2: #B4AABA;
+    --ink-3: #887E90;
+    --line: #322A38;
+    --line-strong: #453A4C;
+    --accent: #D8A2C5;
+    --accent-2: #B9799F;
+    --accent-soft: #33232E;
+    --ok: #7FC79A;
+    --ok-soft: #1E3328;
+    --wait: #DCA94E;
+    --wait-soft: #352914;
+    --stop: #E88A82;
+    --stop-soft: #3A2220;
+    --idle: #7C7384;
+    --shadow: 0 1px 2px rgba(0, 0, 0, .4), 0 8px 24px -16px rgba(0, 0, 0, .8);
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    background: var(--ground);
+    color: var(--ink);
+    font-family: "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+    font-size: 15px;
+    line-height: 1.55;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .wrap {
+    max-width: var(--maxw);
+    margin: 0 auto;
+    padding-inline: 18px;
+    padding-block: 0 72px;
+  }
+
+  h1, h2, h3, .eyebrow, .num, .gate-stamp {
+    font-family: Archivo, "Helvetica Neue", Arial, sans-serif;
+  }
+
+  .eyebrow {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: .14em;
+    text-transform: uppercase;
+    color: var(--ink-3);
+  }
+
+  .mono { font-family: "IBM Plex Mono", ui-monospace, "SF Mono", Menlo, monospace; }
+
+  a { color: var(--accent); text-underline-offset: 2px; }
+  a:hover { color: var(--accent-2); }
+
+  :focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+    border-radius: 3px;
+  }
+
+  /* ---------- masthead ---------- */
+  .masthead {
+    padding-block: 34px 22px;
+    border-bottom: 2px solid var(--ink);
+  }
+  .masthead .eyebrow { display: block; margin-bottom: 10px; }
+  h1 {
+    font-size: clamp(27px, 5.4vw, 40px);
+    font-weight: 700;
+    letter-spacing: -.02em;
+    line-height: 1.08;
+    margin: 0 0 12px;
+    text-wrap: balance;
+  }
+  .standfirst {
+    margin: 0;
+    max-width: 60ch;
+    color: var(--ink-2);
+    font-size: 15px;
+  }
+  .route {
+    margin-top: 16px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px 10px;
+    align-items: center;
+    font-size: 11.5px;
+    letter-spacing: .06em;
+    text-transform: uppercase;
+    color: var(--ink-3);
+  }
+  .route b { color: var(--ink-2); font-weight: 600; }
+  .route i { font-style: normal; color: var(--line-strong); }
+
+  /* ---------- progress rail ---------- */
+  .rail {
+    position: sticky;
+    top: env(safe-area-inset-top, 0px);
+    z-index: 30;
+    background: var(--ground);
+    border-bottom: 1px solid var(--line);
+    padding-block: 11px;
+    margin-bottom: 26px;
+  }
+  .rail-inner {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px 18px;
+    align-items: center;
+  }
+  .rail-count {
+    font-family: Archivo, sans-serif;
+    font-weight: 700;
+    font-size: 15px;
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+  }
+  .rail-count span { color: var(--ink-3); font-weight: 500; }
+  .bar {
+    flex: 1 1 200px;
+    min-width: 140px;
+    height: 7px;
+    border-radius: 99px;
+    overflow: hidden;
+    display: flex;
+    background: var(--line);
+  }
+  .bar i { display: block; height: 100%; transition: width .3s ease; }
+  .bar .b-done { background: var(--ok); }
+  .bar .b-prog { background: var(--accent); }
+  .bar .b-wait { background: var(--wait); }
+  .bar .b-stop { background: var(--stop); }
+  .legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px 12px;
+    font-size: 11.5px;
+    color: var(--ink-2);
+    font-variant-numeric: tabular-nums;
+  }
+  .legend b { font-weight: 600; }
+  .dot {
+    display: inline-block;
+    width: 7px; height: 7px;
+    border-radius: 2px;
+    margin-right: 5px;
+    vertical-align: 1px;
+  }
+  .save-state {
+    font-size: 11px;
+    color: var(--ink-3);
+    letter-spacing: .04em;
+    white-space: nowrap;
+  }
+  .save-state[data-kind="warn"] { color: var(--wait); }
+
+  /* ---------- next action ---------- */
+  .next {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-left: 3px solid var(--accent);
+    border-radius: var(--radius);
+    padding: 14px 16px;
+    margin-bottom: 30px;
+    box-shadow: var(--shadow);
+  }
+  .next .eyebrow { display: block; margin-bottom: 5px; }
+  .next p { margin: 0; font-size: 15px; }
+  .next p b { font-weight: 600; }
+
+  /* ---------- gates ---------- */
+  .gates {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+    margin-bottom: 36px;
+  }
+  @media (max-width: 720px) { .gates { grid-template-columns: 1fr; } }
+
+  .gate {
+    position: relative;
+    background: var(--surface-2);
+    border: 1px dashed var(--line-strong);
+    border-radius: var(--radius);
+    padding: 15px 15px 14px;
+  }
+  .gate.is-clear {
+    border-style: solid;
+    border-color: var(--ok);
+    background: var(--ok-soft);
+  }
+  .gate h3 {
+    margin: 6px 0 4px;
+    font-size: 15px;
+    font-weight: 600;
+    letter-spacing: -.01em;
+  }
+  .gate p { margin: 0; font-size: 12.5px; color: var(--ink-2); }
+  .gate-stamp {
+    display: inline-block;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: .16em;
+    text-transform: uppercase;
+    padding: 2px 7px;
+    border: 1.5px solid currentColor;
+    border-radius: 3px;
+    color: var(--ink-3);
+    transform: rotate(-1.5deg);
+  }
+  .gate.is-clear .gate-stamp { color: var(--ok); }
+  .gate-need {
+    margin-top: 9px;
+    font-size: 11.5px;
+    color: var(--ink-3);
+  }
+
+  /* ---------- phases ---------- */
+  .phase { margin-bottom: 34px; }
+  .phase-head {
+    display: flex;
+    align-items: baseline;
+    gap: 12px;
+    padding-bottom: 8px;
+    margin-bottom: 4px;
+    border-bottom: 1px solid var(--ink);
+  }
+  .phase-head h2 {
+    margin: 0;
+    font-size: 17px;
+    font-weight: 700;
+    letter-spacing: -.01em;
+    flex: 1 1 auto;
+  }
+  .phase-when {
+    font-size: 11.5px;
+    color: var(--ink-3);
+    letter-spacing: .05em;
+    text-transform: uppercase;
+    white-space: nowrap;
+  }
+  .phase-note {
+    margin: 10px 0 14px;
+    font-size: 13px;
+    color: var(--ink-2);
+    max-width: 66ch;
+  }
+
+  /* ---------- steps ---------- */
+  .steps { border-top: 1px solid var(--line); }
+  .step {
+    border-bottom: 1px solid var(--line);
+    border-left: 3px solid var(--idle);
+    background: var(--surface);
+    transition: border-left-color .2s ease;
+  }
+  .step[data-status="done"] { border-left-color: var(--ok); }
+  .step[data-status="prog"] { border-left-color: var(--accent); }
+  .step[data-status="wait"] { border-left-color: var(--wait); }
+  .step[data-status="stop"] { border-left-color: var(--stop); }
+  .step[data-status="na"] { border-left-color: var(--line-strong); opacity: .62; }
+
+  .step-head {
+    display: grid;
+    grid-template-columns: 34px minmax(0, 1fr) auto;
+    gap: 4px 10px;
+    align-items: center;
+    padding: 11px 14px 11px 11px;
+  }
+  .num {
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--ink-3);
+    font-variant-numeric: tabular-nums;
+    letter-spacing: .02em;
+  }
+  .step[data-status="done"] .num { color: var(--ok); }
+  .title-btn {
+    grid-column: 2;
+    text-align: left;
+    background: none;
+    border: 0;
+    padding: 0;
+    margin: 0;
+    font: inherit;
+    font-weight: 600;
+    color: var(--ink);
+    cursor: pointer;
+    display: flex;
+    align-items: baseline;
+    gap: 7px;
+    min-width: 0;
+  }
+  .title-btn:hover { color: var(--accent); }
+  .title-btn .chev {
+    flex: none;
+    font-size: 10px;
+    color: var(--ink-3);
+    transition: transform .18s ease;
+  }
+  .title-btn[aria-expanded="true"] .chev { transform: rotate(90deg); }
+  .title-btn .t { min-width: 0; }
+  .step[data-status="done"] .title-btn .t { text-decoration: line-through; text-decoration-color: var(--line-strong); }
+
+  .step-sub {
+    grid-column: 2;
+    font-size: 11.5px;
+    color: var(--ink-3);
+    display: flex;
+    flex-wrap: wrap;
+    gap: 3px 10px;
+  }
+  .step-sub .who { color: var(--ink-2); font-weight: 500; }
+
+  select.status {
+    grid-column: 3;
+    grid-row: 1 / span 2;
+    font: inherit;
+    font-size: 12px;
+    font-weight: 600;
+    padding: 5px 8px;
+    border-radius: 99px;
+    border: 1px solid var(--line-strong);
+    background: var(--surface-2);
+    color: var(--ink-2);
+    cursor: pointer;
+    max-width: 140px;
+  }
+  .step[data-status="done"] select.status { background: var(--ok-soft); border-color: var(--ok); color: var(--ok); }
+  .step[data-status="prog"] select.status { background: var(--accent-soft); border-color: var(--accent); color: var(--accent); }
+  .step[data-status="wait"] select.status { background: var(--wait-soft); border-color: var(--wait); color: var(--wait); }
+  .step[data-status="stop"] select.status { background: var(--stop-soft); border-color: var(--stop); color: var(--stop); }
+
+  @media (max-width: 560px) {
+    .step-head { grid-template-columns: 30px minmax(0, 1fr); }
+    select.status { grid-column: 1 / -1; grid-row: auto; justify-self: start; margin-top: 6px; }
+  }
+
+  .step-body {
+    padding: 2px 16px 18px 48px;
+    border-top: 1px dashed var(--line);
+    margin-top: -1px;
+  }
+  @media (max-width: 560px) { .step-body { padding-left: 16px; } }
+  .step-body p { margin: 12px 0 0; font-size: 13.5px; color: var(--ink-2); max-width: 68ch; }
+  .step-body p.flag {
+    background: var(--wait-soft);
+    border-left: 2px solid var(--wait);
+    padding: 8px 11px;
+    border-radius: 0 4px 4px 0;
+    color: var(--ink);
+  }
+  .step-body .out {
+    margin-top: 12px;
+    font-size: 12.5px;
+    color: var(--ink-2);
+  }
+  .step-body .out b {
+    font-family: Archivo, sans-serif;
+    font-size: 10.5px;
+    letter-spacing: .13em;
+    text-transform: uppercase;
+    color: var(--ink-3);
+    display: block;
+    margin-bottom: 2px;
+  }
+
+  .fields {
+    margin-top: 16px;
+    display: grid;
+    grid-template-columns: 160px minmax(0, 1fr);
+    gap: 10px;
+    align-items: start;
+  }
+  @media (max-width: 560px) { .fields { grid-template-columns: 1fr; } }
+  .fields label {
+    font-family: Archivo, sans-serif;
+    font-size: 10.5px;
+    letter-spacing: .13em;
+    text-transform: uppercase;
+    color: var(--ink-3);
+    display: block;
+    margin-bottom: 4px;
+  }
+  input[type="date"], textarea, input[type="text"] {
+    width: 100%;
+    font: inherit;
+    font-size: 13px;
+    color: var(--ink);
+    background: var(--surface-2);
+    border: 1px solid var(--line-strong);
+    border-radius: 4px;
+    padding: 6px 9px;
+  }
+  input[type="date"] { font-variant-numeric: tabular-nums; }
+  textarea { resize: vertical; min-height: 58px; line-height: 1.5; }
+
+  /* ---------- contacts ---------- */
+  .scroller { overflow-x: auto; border: 1px solid var(--line); border-radius: var(--radius); background: var(--surface); }
+  table { border-collapse: collapse; width: 100%; min-width: 660px; font-size: 13px; }
+  th, td { text-align: left; padding: 10px 12px; border-bottom: 1px solid var(--line); vertical-align: top; }
+  thead th {
+    font-family: Archivo, sans-serif;
+    font-size: 10.5px;
+    letter-spacing: .13em;
+    text-transform: uppercase;
+    color: var(--ink-3);
+    font-weight: 600;
+    background: var(--surface-2);
+    position: sticky; top: 0;
+  }
+  tbody tr:last-child td { border-bottom: 0; }
+  td.ord { font-variant-numeric: tabular-nums; color: var(--ink-3); font-weight: 600; font-family: Archivo, sans-serif; width: 34px; }
+  td .org { font-weight: 600; display: block; }
+  td .addr { font-size: 12px; word-break: break-word; }
+  td .ask { color: var(--ink-2); font-size: 12.5px; }
+  .sentbox { display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--ink-2); white-space: nowrap; }
+  input[type="checkbox"] { accent-color: var(--accent); width: 15px; height: 15px; cursor: pointer; }
+
+  /* ---------- checklist ---------- */
+  .dossier {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(255px, 1fr));
+    gap: 14px;
+  }
+  .pack {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    padding: 15px 16px;
+  }
+  .pack h3 { margin: 0 0 3px; font-size: 14px; font-weight: 600; }
+  .pack .cnt { font-size: 11px; color: var(--ink-3); font-variant-numeric: tabular-nums; letter-spacing: .05em; }
+  .pack ul { list-style: none; margin: 11px 0 0; padding: 0; display: flex; flex-direction: column; gap: 7px; }
+  .pack li { display: flex; gap: 8px; align-items: flex-start; font-size: 13px; line-height: 1.45; }
+  .pack li label { cursor: pointer; }
+  .pack li input { margin-top: 2px; flex: none; }
+  .pack li.on label { color: var(--ink-3); text-decoration: line-through; text-decoration-color: var(--line-strong); }
+
+  section.block { margin-bottom: 36px; }
+  section.block > .eyebrow { display: block; margin-bottom: 8px; }
+  section.block > h2 {
+    margin: 0 0 6px;
+    font-size: 19px;
+    font-weight: 700;
+    letter-spacing: -.015em;
+  }
+  section.block > .lede { margin: 0 0 16px; font-size: 13.5px; color: var(--ink-2); max-width: 66ch; }
+
+  footer {
+    border-top: 1px solid var(--line);
+    padding-top: 16px;
+    font-size: 12px;
+    color: var(--ink-3);
+    max-width: 72ch;
+  }
+  footer p { margin: 0 0 8px; }
+
+  @media (prefers-reduced-motion: reduce) {
+    * { transition: none !important; animation: none !important; }
+  }
+</style>
+
+<div class="wrap">
+
+  <header class="masthead">
+    <span class="eyebrow">Launch dossier · Compliance &amp; sequencing</span>
+    <h1>Border Kitchen Dossier</h1>
+    <p class="standfirst">Daily cross-border supply of prepared meals from a German production kitchen to a food truck trading in the Zurich area. Every step below is ordered by what it unblocks, not by what is easiest to start.</p>
+    <div class="route">
+      <b>German kitchen</b> <i>→</i> <b>Export declaration</b> <i>→</i> <b>Swiss import</b> <i>→</i> <b>Truck</b> <i>→</i> <b>Private sites, Zurich</b>
+    </div>
+  </header>
+
+  <div class="rail">
+    <div class="rail-inner">
+      <div class="rail-count"><span id="doneCount">0</span> <span>of</span> <span id="liveCount">28</span> <span>steps closed</span></div>
+      <div class="bar" id="bar" role="img" aria-label="Progress by status">
+        <i class="b-done" id="segDone" style="width:0%"></i>
+        <i class="b-prog" id="segProg" style="width:0%"></i>
+        <i class="b-wait" id="segWait" style="width:0%"></i>
+        <i class="b-stop" id="segStop" style="width:0%"></i>
+      </div>
+      <div class="legend" id="legend">
+        <span><i class="dot" style="background:var(--accent)"></i><b id="nProg">0</b> in progress</span>
+        <span><i class="dot" style="background:var(--wait)"></i><b id="nWait">0</b> awaiting reply</span>
+        <span><i class="dot" style="background:var(--stop)"></i><b id="nStop">0</b> blocked</span>
+      </div>
+      <div class="save-state" id="saveState">Connecting…</div>
+    </div>
+  </div>
+
+  <div class="next">
+    <span class="eyebrow">Do this next</span>
+    <p id="nextAction">Loading…</p>
+  </div>
+
+  <section class="block">
+    <span class="eyebrow">Hard gates</span>
+    <h2>Three points where you stop and check</h2>
+    <p class="lede">Each gate opens only when its steps are closed. Passing a gate early is how this business loses money — the whole cross-border model rests on a duty rate nobody has quoted yet.</p>
+    <div class="gates" id="gates"></div>
+  </section>
+
+  <div id="phases"></div>
+
+  <section class="block">
+    <span class="eyebrow">Register of authorities</span>
+    <h2>Who to write to, in this order</h2>
+    <p class="lede">Verified against each authority's own published contact pages in September 2026. Tick each line as you send and as you get a reply — an unanswered authority is a blocked step, not a finished one.</p>
+    <div class="scroller">
+      <table>
+        <thead>
+          <tr><th>#</th><th>Authority</th><th>Reach it at</th><th>What you need from them</th><th>Sent</th><th>Replied</th></tr>
+        </thead>
+        <tbody id="contactRows"></tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="block">
+    <span class="eyebrow">Dossier contents</span>
+    <h2>What has to exist on paper</h2>
+    <p class="lede">One digital folder, plus a printed set carried in the truck. An inspector asking for the self-control file is not a hypothetical — mobile food businesses are inspected on the same risk basis as fixed premises.</p>
+    <div class="dossier" id="dossier"></div>
+  </section>
+
+  <footer>
+    <p><b>Scope note.</b> This tracker reflects the corrected sequence: the Reisendenbewilligung is included, the city food markets are treated as a separate stall business rather than a truck channel, and the agricultural import licensing question (GEB and tariff quotas) is placed ahead of the veterinary question, which the Switzerland–EU common veterinary area largely settles.</p>
+    <p><b>Sources.</b> Kantonales Labor Zürich; Amt für Wirtschaft Kanton Zürich (mobile food stands); BAZG customs regions, tariff rulings and Passar; BLW agricultural import licensing; BLV common veterinary area; Stadt Zürich commercial permits and food markets; German Customs central information service. Verified 18 September 2026. Not legal or tax advice — the authorities' own written answers govern.</p>
+  </footer>
+
+</div>
+
+<script>
+(function () {
+  "use strict";
+
+  var STATUSES = [
+    { k: "todo", label: "Not started" },
+    { k: "prog", label: "In progress" },
+    { k: "wait", label: "Awaiting reply" },
+    { k: "done", label: "Closed" },
+    { k: "stop", label: "Blocked" },
+    { k: "na",   label: "Not applicable" }
+  ];
+
+  var PHASES = [
+    {
+      id: "p0", name: "Frame the pilot", when: "Week 0",
+      note: "Two decisions that change who you write to later. Settle them before sending a single email.",
+      steps: [
+        { id: "s01", t: "Fix the pilot parameters",
+          who: "You", lead: "1 day",
+          d: "Take-away only, no alcohol, no seating, four to six dishes, vegetarian and vegan first. Every one of those choices removes a permit or a licence from the critical path. Adding seating or alcohol later is a decision to reopen this dossier, not a menu tweak.",
+          out: "A one-page concept and a preliminary menu." },
+        { id: "s02", t: "Choose the importing entity and its canton",
+          who: "You", lead: "1 week",
+          d: "A sole proprietorship in your canton of residence, or trading through an existing company. This is not only a tax question: the Reisendenbewilligung is issued by the canton where you live, or by the canton of the company seat whose contract you work under — so a Schwyz residence and a Zug company seat point at two different authorities, and neither of them is Zurich.",
+          flag: "Decide this before step 12. Applying to the wrong canton means starting that application again.",
+          out: "A named legal entity, its canton, and a UID." }
+      ]
+    },
+    {
+      id: "p1", name: "Prove the numbers", when: "Weeks 1–8",
+      note: "Mostly waiting on other people. Start all of it in the same week, because the binding tariff ruling alone takes about forty days and everything downstream depends on the number it returns.",
+      steps: [
+        { id: "s03", t: "Write the dish specification",
+          who: "You", lead: "1 week",
+          d: "For every dish: ingredients with their percentage by weight, allergens, how it is cooked and packed, how it is presented for sale, what it is for, and good photographs. Customs classifies a composite food by what it is made of and how it is put up, so a vague description gets the tariff request bounced rather than answered.",
+          out: "A menu specification and allergen matrix — the input for the next step." },
+        { id: "s04", t: "Request the binding tariff ruling",
+          who: "BAZG tariff service", lead: "~40 days",
+          d: "Submit questionnaire 40.10 by email to tarifauskunft@bazg.admin.ch, one request per product, with the specification from step 3. Do not send samples — they will be asked for if needed. The answer is normally given within forty days and is what tells you whether this business works at all.",
+          flag: "Time-limited route. From January 2027 tariff requests move to the ePortal and need a “Tarifanfrage” business-partner role that only becomes available around end-November 2026. Submitting before year-end avoids that registration step entirely.",
+          out: "A tariff number and duty rate for each dish." },
+        { id: "s05", t: "Screen for agricultural import licensing",
+          who: "BLW", lead: "2–3 weeks",
+          d: "This is the step the original plan missed. A prepared dish whose meat content exceeds roughly a fifth of its weight is treated as a meat product. Commercial meat imports need a Generaleinfuhrbewilligung from 20 kg gross, and most meat sits inside auctioned tariff quotas — outside the quota the out-of-quota rate applies and is deliberately punitive. Dairy-heavy dishes deserve the same check.",
+          out: "A yes or no on the import licence, and your exposure to quota versus out-of-quota rates." },
+        { id: "s06", t: "Confirm the Swiss import procedure",
+          who: "Zoll Nordost", lead: "1–2 weeks",
+          d: "Write to zoll.nordost@bazg.admin.ch describing exactly what you plan: small chilled consignments, every weekday, for resale. Ask which crossing suits commercial food traffic, its opening hours, the declaration route, how import VAT is handled, and the customs status of the truck itself if it carries foreign plates.",
+          out: "A named crossing, a declaration route, and a written procedure you can repeat daily." },
+        { id: "s07", t: "Confirm the German export procedure",
+          who: "German Customs", lead: "1–2 weeks",
+          d: "Write to info.gewerblich@zoll.de, or the English desk. Establish who is exporter of record — your entity or the kitchen — whether an EORI number is needed, which electronic export declaration applies, and whether daily low-value consignments qualify for any simplification.",
+          out: "A named exporter of record and a declaration method." },
+        { id: "s08", t: "Build the landed-cost model",
+          who: "You", lead: "1 week",
+          d: "Per dish: cost ex-kitchen, plus duty from step 4, plus transport, plus the per-consignment clearance fee, plus import VAT and the cash-flow gap before you reclaim it. Then price the same dish cooked in Switzerland. If the Swiss kitchen wins, the honest answer is to cook here and keep the concept.",
+          flag: "This is the decision the whole dossier exists to inform. Treat a thin margin as a no.",
+          out: "A per-dish landed cost and a go or no-go on the cross-border model." }
+      ]
+    },
+    {
+      id: "p2", name: "Register", when: "Weeks 4–10",
+      note: "Can run alongside phase 1. None of it costs much, and two of these take weeks of elapsed time you do not want to discover late.",
+      steps: [
+        { id: "s09", t: "Establish the Swiss entity",
+          who: "Commercial register", lead: "1–3 weeks",
+          d: "Register the entity chosen in step 2, with a commercial-register entry where the legal form or turnover requires one. Everything downstream — the food-business notification, the VAT number, the customs account — hangs off the UID.",
+          out: "A UID number." },
+        { id: "s10", t: "Register for VAT",
+          who: "Federal Tax Administration", lead: "2–4 weeks",
+          d: "Registration is compulsory from CHF 100,000 of annual turnover. Below that, register voluntarily anyway: an unregistered importer pays import VAT on every single consignment and cannot reclaim any of it. Take-away food is taxed at 2.6 per cent; the same dish eaten on the spot is 8.1 per cent, which is one more reason the pilot has no seating.",
+          out: "A VAT number, and a decision on effective versus flat-rate accounting." },
+        { id: "s11", t: "File the food-business notification",
+          who: "Kantonales Labor Zürich", lead: "2–4 weeks",
+          d: "Notification is a form, not a conversation: submit it online before you begin trading, under articles 20 and 62 of the food and utility articles ordinance. The categories that fit this model are C106 importer, C601 itinerant trader, D201 catering and party service, and D501 producer of traiteur goods. Ask your detailed questions after the notification is filed, quoting the business number.",
+          flag: "Use info@kl.zh.ch — not the older klzh.ch spelling that still circulates in municipal directories.",
+          out: "A Meldebestätigung by post carrying your Betriebsnummer. Changes must be reported within fourteen days." },
+        { id: "s12", t: "Apply for the Reisendenbewilligung",
+          who: "Your canton of residence or seat", lead: "3–6 weeks",
+          d: "Required whenever goods are offered outside fixed business premises. The exemption covers officially organised markets, fairs, exhibitions and neighbourhood festivals — which is exactly what selling on private corporate sites is not. Apply in the canton from step 2. It is valid across Switzerland and runs five years for Swiss nationals.",
+          out: "A permit valid Switzerland-wide." },
+        { id: "s13", t: "Verify the German kitchen's status",
+          who: "German kitchen and its local food authority", lead: "2 weeks",
+          d: "For products of animal origin, EU law requires approval with an identification mark, not merely registration — so “the kitchen is registered” is not the answer you need if dairy, egg or meat is ever in scope. Obtain the approval number, the hygiene plan, batch traceability, allergen documentation and a written recall-cooperation clause.",
+          out: "Approval evidence, and named contacts on both the kitchen and authority side." }
+      ]
+    },
+    {
+      id: "p3", name: "Build the chain", when: "Weeks 8–14",
+      note: "Only start spending here once gate A is clear.",
+      steps: [
+        { id: "s14", t: "Appoint a Swiss customs broker",
+          who: "Broker", lead: "2–3 weeks",
+          d: "Transit and export have already moved to the Passar system; import has only been in pilot since the second quarter of 2026, so import declarations still run on e-dec for now. Put a migration clause in the engagement so the switch is the broker's problem rather than a renegotiation.",
+          out: "A signed engagement, a per-consignment fee, and a named daily contact." },
+        { id: "s15", t: "Set up the export side",
+          who: "German kitchen or your German entity", lead: "2–4 weeks",
+          d: "Either obtain EORI registration and electronic export declaration capability, or get it in writing that the kitchen acts as exporter of record and will declare each consignment. Ambiguity here surfaces at the border at seven in the morning.",
+          out: "A working export declaration process." },
+        { id: "s16", t: "Contract the German kitchen",
+          who: "German kitchen", lead: "2–4 weeks",
+          d: "The contract carries the compliance: batch coding, production and cooling and dispatch temperature records, per-dish allergen sheets, a daily commercial invoice and packing list in the exact format your broker needs, recall cooperation, and a notice period you could survive.",
+          out: "A signed supply agreement with the document formats annexed." },
+        { id: "s17", t: "Fix the route and the clock",
+          who: "You", lead: "1 week",
+          d: "Dispatch time, crossing, its commercial opening hours, drive time, and arrival at the site in time for a lunch service. Run it once on a normal weekday morning before committing. If the food cannot arrive cold and on time, no amount of paperwork rescues the model.",
+          flag: "Test this before signing anything long-term. It is the cheapest way to kill a bad plan.",
+          out: "A timed route plan with a margin for delay." }
+      ]
+    },
+    {
+      id: "p4", name: "Secure where you sell", when: "Weeks 6–16",
+      note: "Start early — this is the slowest human process in the whole plan and the one with the least certainty.",
+      steps: [
+        { id: "s18", t: "Sign private-site agreements",
+          who: "Site owners", lead: "6–12 weeks",
+          d: "Your primary channel: office parks, corporate campuses, gyms, co-working buildings, cultural venues, hospitals. Each agreement needs written permission, permitted hours, power, water and waste arrangements, access rules, and whatever indemnity and insurance the site requires.",
+          out: "Two or more sites booked in writing before you buy a truck." },
+        { id: "s19", t: "Ask about public ground",
+          who: "Stadtpolizei Zürich", lead: "4–8 weeks",
+          d: "Write to stp-gewerbe@zuerich.ch and ask properly — but build no plan on the answer. Commercial use of public ground in the city requires specific permission, availability is tightly managed, and a legal parking space is not a legal selling pitch.",
+          out: "A written answer, most likely a no. Treat a yes as upside." },
+        { id: "s20", t: "Confirm the hospitality position per site",
+          who: "Each Standortgemeinde", lead: "2–4 weeks",
+          d: "The Gastwirtschaftspatent is granted by the municipality where the truck actually stands, not by the City of Zurich unless you are in the city. Opfikon, Dübendorf and Wallisellen each decide for themselves. Take-away with no alcohol and no seating should sit outside the requirement — small alcohol-free operations with at most ten standing or seated places are exempt — but get that confirmed in writing for every municipality you trade in.",
+          out: "A written position from each municipality." },
+        { id: "s21", t: "Park the city food markets",
+          who: "Stadtpolizei Zürich", lead: "Deferred",
+          d: "Worth understanding before you build a plan around it: the city markets trade from six to eleven in the morning, pitches measure three metres by two point two, annual places sit on a waiting list that is currently full, and day pitches are drawn by weekly lottery closing Monday at eight the week before — and are billed whether or not you turn up. That is a morning stall business, not a lunchtime truck business.",
+          flag: "Mark this not applicable unless you decide to run a stall as a separate venture.",
+          out: "A conscious decision to defer, recorded." }
+      ]
+    },
+    {
+      id: "p5", name: "Truck and compliance file", when: "Weeks 10–20",
+      note: "The capital spend. Everything here assumes gate A is behind you.",
+      steps: [
+        { id: "s22", t: "Specify and acquire the truck",
+          who: "Converter", lead: "8–16 weeks",
+          d: "Commercial refrigeration, hot holding and regeneration, a dedicated handwash unit, potable water and a waste-water tank, cleanable surfaces, waste handling, and certified gas and electrical installations. If the vehicle carries foreign plates, its customs status and road-traffic approval are a separate question to settle before it crosses for work.",
+          out: "A truck, its technical file, and the gas and electrical certificates." },
+        { id: "s23", t: "Build the self-control file",
+          who: "You", lead: "2–3 weeks",
+          d: "Incoming goods, temperatures, cleaning, allergens, traceability, staff training, water and waste, recall and disposal — each with a daily record sheet someone actually fills in. Mobile operations are inspected on the same risk basis as fixed premises, so the file lives in the truck.",
+          out: "An inspection-ready folder, digital and printed." },
+        { id: "s24", t: "Build the customer-facing allergen information",
+          who: "You", lead: "1 week",
+          d: "Per dish, in German, legible at the point of sale, and consistent with the specification from step 3 and whatever the kitchen actually cooks. Drift between the three is the most common way a good operation fails an inspection.",
+          out: "Point-of-sale allergen information and a matching internal matrix." },
+        { id: "s25", t: "Arrange insurance",
+          who: "Broker", lead: "2–3 weeks",
+          d: "Public and product liability, food contamination and recall cover, stock and equipment, commercial vehicle, and employer accident cover if you hire. Get three quotes; the recall cover is the one that varies most.",
+          out: "Certificates on file." }
+      ]
+    },
+    {
+      id: "p6", name: "Prove it, then pilot", when: "Weeks 18+",
+      note: "",
+      steps: [
+        { id: "s26", t: "Run the whole chain once, for real",
+          who: "Everyone", lead: "1 day",
+          d: "Kitchen dispatch, temperature log, export declaration, crossing, import clearance, arrival temperature, site setup, service, then stock and waste reconciliation. One trial day, end to end, producing one complete audit trail. Anything that only works on paper fails here, cheaply.",
+          out: "A single complete audit trail for one day." },
+        { id: "s27", t: "Run the pilot",
+          who: "You", lead: "8–12 weeks",
+          d: "Two or three recurring weekday lunches plus selected events. Pre-orders and card payments, which cut waste, shorten queues and tell you the next day's import quantity before you order it.",
+          out: "Twelve weeks of trading data." },
+        { id: "s28", t: "Review before expanding",
+          who: "You", lead: "Weekly",
+          d: "Food cost, waste, demand by site, margin after duty and clearance, and every compliance gap the pilot exposed. Only after this review: a longer menu, meat or dairy, more locations, or a reconsideration of seating and alcohol — each of which reopens steps in this dossier.",
+          out: "A decision to scale, adjust, or stop." }
+      ]
+    }
+  ];
+
+  var GATES = [
+    { id: "gA", name: "Economics cleared", need: ["s04", "s08"],
+      desc: "The duty rate is known and the landed cost beats cooking in Switzerland.",
+      blocks: "No kitchen lease, no truck, no advertised locations until this is stamped." },
+    { id: "gB", name: "Licensed to sell", need: ["s11", "s12"],
+      desc: "Food business notified and the itinerant-trade permit issued.",
+      blocks: "No trading, not even a free tasting at a client site, until this is stamped." },
+    { id: "gC", name: "Chain proven", need: ["s26"],
+      desc: "One full day has moved from the German kitchen to a Zurich customer with an intact audit trail.",
+      blocks: "No recurring schedule published until this is stamped." }
+  ];
+
+  var CONTACTS = [
+    { id: "c1", org: "BAZG tariff service", addr: "tarifauskunft@bazg.admin.ch",
+      ask: "Binding tariff ruling per dish, using questionnaire 40.10. Everything downstream depends on this number." },
+    { id: "c2", org: "Kantonales Labor Zürich", addr: "info@kl.zh.ch · +41 43 244 71 00 · Fehrenstrasse 15, 8032 Zürich",
+      ask: "File the food-business notification online first, then ask about truck inspection and self-control expectations." },
+    { id: "c3", org: "Amt für Wirtschaft, Standortförderung ZH", addr: "standort@vd.zh.ch · +41 43 259 49 92",
+      ask: "Permit scoping for a mobile food business, including which authority issues what." },
+    { id: "c4", org: "Zoll Nordost (BAZG)", addr: "zoll.nordost@bazg.admin.ch · +41 58 480 11 11 · Schaffhausen",
+      ask: "Daily commercial import procedure, crossing, opening hours, and the truck's own customs status." },
+    { id: "c5", org: "BAZG general information", addr: "+41 58 467 15 15 · official web form",
+      ask: "General procedural questions where you do not yet know which office owns the answer." },
+    { id: "c6", org: "German Customs, business desk", addr: "info.gewerblich@zoll.de · +49 228 303-26030",
+      ask: "Exporter of record, EORI, electronic export declaration, and simplifications for daily consignments." },
+    { id: "c7", org: "German Customs, English desk", addr: "enquiries.english@zoll.de · +49 228 303-26040",
+      ask: "The same questions in English if the German thread stalls." },
+    { id: "c8", org: "BLW (agriculture)", addr: "Official contact route, blw.admin.ch",
+      ask: "Whether a Generaleinfuhrbewilligung applies, and quota exposure — only if meat or dairy is in scope." },
+    { id: "c9", org: "German kitchen's local food authority", addr: "Varies by municipality",
+      ask: "Confirmation that the kitchen is approved, not merely registered, for products of animal origin." },
+    { id: "c10", org: "Stadtpolizei Zürich, trade permits", addr: "stp-gewerbe@zuerich.ch · +41 44 411 72 73",
+      ask: "Whether any public-ground pitch exists for a take-away truck. Ask, but expect no." },
+    { id: "c11", org: "Stadtpolizei Zürich, market lottery", addr: "stp-tagesverlosung@zuerich.ch",
+      ask: "Only if you pursue a market stall. Subject line must carry market, day and date." }
+  ];
+
+  var PACKS = [
+    { id: "k1", name: "Business and location", items: [
+      ["k1a", "Entity registration and UID"],
+      ["k1b", "VAT number and accounting method"],
+      ["k1c", "Reisendenbewilligung"],
+      ["k1d", "Insurance certificates"],
+      ["k1e", "Truck registration and technical file"],
+      ["k1f", "Gas and electrical certificates"],
+      ["k1g", "Signed private-site agreements"],
+      ["k1h", "Written municipal position on hospitality permit"]
+    ]},
+    { id: "k2", name: "Food safety", items: [
+      ["k2a", "KLZ Meldebestätigung and Betriebsnummer"],
+      ["k2b", "Truck floor plan and equipment list"],
+      ["k2c", "HACCP and self-control plan"],
+      ["k2d", "Cleaning and disinfection plan"],
+      ["k2e", "Staff hygiene and training records"],
+      ["k2f", "Water filling, cleaning and waste-water process"],
+      ["k2g", "Pest control and maintenance log"],
+      ["k2h", "Allergen matrix and point-of-sale information"],
+      ["k2i", "Recall plan with named contacts"],
+      ["k2j", "German kitchen approval evidence"]
+    ]},
+    { id: "k3", name: "Daily consignment", items: [
+      ["k3a", "Supply agreement with the German kitchen"],
+      ["k3b", "Ingredient specifications from suppliers"],
+      ["k3c", "Per-dish recipe and allergen sheets"],
+      ["k3d", "Batch and lot list"],
+      ["k3e", "Production, cooling and dispatch temperature record"],
+      ["k3f", "Daily commercial invoice"],
+      ["k3g", "Packing list by dish, quantity, net weight, batch"],
+      ["k3h", "Export and import declaration references"],
+      ["k3i", "Binding tariff ruling reference"],
+      ["k3j", "Arrival and service temperature records"],
+      ["k3k", "Stock, sales and waste reconciliation"]
+    ]}
+  ];
+
+  // ---------- state ----------
+  var ALL = [];
+  PHASES.forEach(function (p) { p.steps.forEach(function (s) { s.phase = p; ALL.push(s); }); });
+  ALL.forEach(function (s, i) { s.n = i + 1; });
+
+  var state = {};   // stepId -> {status, note, due}
+  var contacts = {}; // contactId -> {sent, replied}
+  var packs = {};    // itemId -> bool
+
+  ALL.forEach(function (s) { state[s.id] = { status: "todo", note: "", due: "" }; });
+  CONTACTS.forEach(function (c) { contacts[c.id] = { sent: false, replied: false }; });
+  PACKS.forEach(function (k) { k.items.forEach(function (it) { packs[it[0]] = false; }); });
+
+  var db = null, canWrite = true;
+  var saveEl = document.getElementById("saveState");
+
+  function setSave(txt, kind) {
+    saveEl.textContent = txt;
+    if (kind) { saveEl.setAttribute("data-kind", kind); } else { saveEl.removeAttribute("data-kind"); }
+  }
+
+  // ---------- build DOM ----------
+  var phasesEl = document.getElementById("phases");
+
+  PHASES.forEach(function (p) {
+    var sec = document.createElement("section");
+    sec.className = "phase";
+
+    var head = document.createElement("div");
+    head.className = "phase-head";
+    var h2 = document.createElement("h2");
+    h2.textContent = p.name;
+    var when = document.createElement("span");
+    when.className = "phase-when";
+    when.textContent = p.when;
+    head.appendChild(h2);
+    head.appendChild(when);
+    sec.appendChild(head);
+
+    if (p.note) {
+      var note = document.createElement("p");
+      note.className = "phase-note";
+      note.textContent = p.note;
+      sec.appendChild(note);
+    }
+
+    var list = document.createElement("div");
+    list.className = "steps";
+
+    p.steps.forEach(function (s) {
+      list.appendChild(buildStep(s));
+    });
+
+    sec.appendChild(list);
+    phasesEl.appendChild(sec);
+  });
+
+  function buildStep(s) {
+    var art = document.createElement("article");
+    art.className = "step";
+    art.id = "step-" + s.id;
+    art.setAttribute("data-status", "todo");
+
+    var head = document.createElement("div");
+    head.className = "step-head";
+
+    var num = document.createElement("span");
+    num.className = "num mono";
+    num.textContent = s.n < 10 ? "0" + s.n : String(s.n);
+    head.appendChild(num);
+
+    var btn = document.createElement("button");
+    btn.className = "title-btn";
+    btn.id = "tog-" + s.id;
+    btn.type = "button";
+    btn.setAttribute("aria-expanded", "false");
+    btn.setAttribute("aria-controls", "body-" + s.id);
+    var chev = document.createElement("span");
+    chev.className = "chev";
+    chev.textContent = "▶";
+    chev.setAttribute("aria-hidden", "true");
+    var tspan = document.createElement("span");
+    tspan.className = "t";
+    tspan.textContent = s.t;
+    btn.appendChild(chev);
+    btn.appendChild(tspan);
+    head.appendChild(btn);
+
+    var sub = document.createElement("div");
+    sub.className = "step-sub";
+    var who = document.createElement("span");
+    who.className = "who";
+    who.textContent = s.who;
+    var lead = document.createElement("span");
+    lead.textContent = s.lead;
+    sub.appendChild(who);
+    sub.appendChild(lead);
+    head.appendChild(sub);
+
+    var sel = document.createElement("select");
+    sel.className = "status";
+    sel.id = "status-" + s.id;
+    sel.setAttribute("aria-label", "Status for step " + s.n + ": " + s.t);
+    STATUSES.forEach(function (st) {
+      var o = document.createElement("option");
+      o.value = st.k;
+      o.textContent = st.label;
+      sel.appendChild(o);
+    });
+    sel.addEventListener("change", function () {
+      state[s.id].status = sel.value;
+      paintStep(s);
+      recompute();
+      saveStep(s.id);
+    });
+    head.appendChild(sel);
+
+    art.appendChild(head);
+
+    var body = document.createElement("div");
+    body.className = "step-body";
+    body.id = "body-" + s.id;
+    body.hidden = true;
+
+    var p1 = document.createElement("p");
+    p1.textContent = s.d;
+    body.appendChild(p1);
+
+    if (s.flag) {
+      var pf = document.createElement("p");
+      pf.className = "flag";
+      pf.textContent = s.flag;
+      body.appendChild(pf);
+    }
+
+    if (s.out) {
+      var outd = document.createElement("div");
+      outd.className = "out";
+      var ob = document.createElement("b");
+      ob.textContent = "Output before moving on";
+      outd.appendChild(ob);
+      outd.appendChild(document.createTextNode(s.out));
+      body.appendChild(outd);
+    }
+
+    var fields = document.createElement("div");
+    fields.className = "fields";
+
+    var dwrap = document.createElement("div");
+    var dlab = document.createElement("label");
+    dlab.setAttribute("for", "due-" + s.id);
+    dlab.textContent = "Target date";
+    var dinp = document.createElement("input");
+    dinp.type = "date";
+    dinp.id = "due-" + s.id;
+    dinp.addEventListener("change", function () {
+      state[s.id].due = dinp.value;
+      saveStep(s.id);
+    });
+    dwrap.appendChild(dlab);
+    dwrap.appendChild(dinp);
+    fields.appendChild(dwrap);
+
+    var nwrap = document.createElement("div");
+    var nlab = document.createElement("label");
+    nlab.setAttribute("for", "note-" + s.id);
+    nlab.textContent = "Notes, references, who replied";
+    var nta = document.createElement("textarea");
+    nta.id = "note-" + s.id;
+    nta.rows = 2;
+    var tmr = null;
+    nta.addEventListener("input", function () {
+      state[s.id].note = nta.value;
+      if (tmr) { clearTimeout(tmr); }
+      tmr = setTimeout(function () { saveStep(s.id); }, 900);
+    });
+    nta.addEventListener("blur", function () {
+      if (tmr) { clearTimeout(tmr); tmr = null; }
+      state[s.id].note = nta.value;
+      saveStep(s.id);
+    });
+    nwrap.appendChild(nlab);
+    nwrap.appendChild(nta);
+    fields.appendChild(nwrap);
+
+    body.appendChild(fields);
+    art.appendChild(body);
+
+    btn.addEventListener("click", function () {
+      var open = btn.getAttribute("aria-expanded") === "true";
+      btn.setAttribute("aria-expanded", open ? "false" : "true");
+      body.hidden = open;
+    });
+
+    s._el = { art: art, sel: sel, due: dinp, note: nta };
+    return art;
+  }
+
+  function paintStep(s) {
+    var st = state[s.id];
+    s._el.art.setAttribute("data-status", st.status);
+    if (s._el.sel.value !== st.status) { s._el.sel.value = st.status; }
+    if (document.activeElement !== s._el.note && s._el.note.value !== st.note) { s._el.note.value = st.note; }
+    if (document.activeElement !== s._el.due && s._el.due.value !== (st.due || "")) { s._el.due.value = st.due || ""; }
+  }
+
+  // ---------- gates ----------
+  var gatesEl = document.getElementById("gates");
+  GATES.forEach(function (g) {
+    var d = document.createElement("div");
+    d.className = "gate";
+    d.id = "gate-" + g.id;
+
+    var stamp = document.createElement("span");
+    stamp.className = "gate-stamp";
+    stamp.textContent = "Not cleared";
+
+    var h3 = document.createElement("h3");
+    h3.textContent = g.name;
+
+    var p = document.createElement("p");
+    p.textContent = g.desc;
+
+    var need = document.createElement("div");
+    need.className = "gate-need";
+
+    d.appendChild(stamp);
+    d.appendChild(h3);
+    d.appendChild(p);
+    d.appendChild(need);
+    gatesEl.appendChild(d);
+
+    g._el = { box: d, stamp: stamp, need: need };
+  });
+
+  // ---------- contacts ----------
+  var rows = document.getElementById("contactRows");
+  CONTACTS.forEach(function (c, i) {
+    var tr = document.createElement("tr");
+
+    var td0 = document.createElement("td");
+    td0.className = "ord mono";
+    td0.textContent = String(i + 1);
+    tr.appendChild(td0);
+
+    var td1 = document.createElement("td");
+    var org = document.createElement("span");
+    org.className = "org";
+    org.textContent = c.org;
+    td1.appendChild(org);
+    tr.appendChild(td1);
+
+    var td2 = document.createElement("td");
+    var addr = document.createElement("span");
+    addr.className = "addr mono";
+    addr.textContent = c.addr;
+    td2.appendChild(addr);
+    tr.appendChild(td2);
+
+    var td3 = document.createElement("td");
+    var ask = document.createElement("span");
+    ask.className = "ask";
+    ask.textContent = c.ask;
+    td3.appendChild(ask);
+    tr.appendChild(td3);
+
+    var td4 = document.createElement("td");
+    var l4 = document.createElement("label");
+    l4.className = "sentbox";
+    l4.setAttribute("for", "sent-" + c.id);
+    var cb4 = document.createElement("input");
+    cb4.type = "checkbox";
+    cb4.id = "sent-" + c.id;
+    cb4.addEventListener("change", function () {
+      contacts[c.id].sent = cb4.checked;
+      saveContact(c.id);
+    });
+    l4.appendChild(cb4);
+    td4.appendChild(l4);
+    tr.appendChild(td4);
+
+    var td5 = document.createElement("td");
+    var l5 = document.createElement("label");
+    l5.className = "sentbox";
+    l5.setAttribute("for", "rep-" + c.id);
+    var cb5 = document.createElement("input");
+    cb5.type = "checkbox";
+    cb5.id = "rep-" + c.id;
+    cb5.addEventListener("change", function () {
+      contacts[c.id].replied = cb5.checked;
+      saveContact(c.id);
+    });
+    l5.appendChild(cb5);
+    td5.appendChild(l5);
+    tr.appendChild(td5);
+
+    rows.appendChild(tr);
+    c._el = { sent: cb4, replied: cb5 };
+  });
+
+  // ---------- dossier ----------
+  var dossEl = document.getElementById("dossier");
+  PACKS.forEach(function (k) {
+    var box = document.createElement("div");
+    box.className = "pack";
+    var h3 = document.createElement("h3");
+    h3.textContent = k.name;
+    var cnt = document.createElement("div");
+    cnt.className = "cnt mono";
+    var ul = document.createElement("ul");
+
+    k.items.forEach(function (it) {
+      var li = document.createElement("li");
+      var cb = document.createElement("input");
+      cb.type = "checkbox";
+      cb.id = "pack-" + it[0];
+      var lab = document.createElement("label");
+      lab.setAttribute("for", "pack-" + it[0]);
+      lab.textContent = it[1];
+      cb.addEventListener("change", function () {
+        packs[it[0]] = cb.checked;
+        li.className = cb.checked ? "on" : "";
+        paintPackCount(k);
+        savePacks();
+      });
+      li.appendChild(cb);
+      li.appendChild(lab);
+      ul.appendChild(li);
+      it._el = { cb: cb, li: li };
+    });
+
+    box.appendChild(h3);
+    box.appendChild(cnt);
+    box.appendChild(ul);
+    dossEl.appendChild(box);
+    k._cnt = cnt;
+    paintPackCount(k);
+  });
+
+  function paintPackCount(k) {
+    var n = 0;
+    k.items.forEach(function (it) { if (packs[it[0]]) { n++; } });
+    k._cnt.textContent = n + " / " + k.items.length + " on file";
+  }
+
+  // ---------- recompute ----------
+  function recompute() {
+    var c = { todo: 0, prog: 0, wait: 0, done: 0, stop: 0, na: 0 };
+    ALL.forEach(function (s) { c[state[s.id].status]++; });
+    var live = ALL.length - c.na;
+    if (live < 1) { live = 1; }
+
+    document.getElementById("doneCount").textContent = c.done;
+    document.getElementById("liveCount").textContent = ALL.length - c.na;
+    document.getElementById("nProg").textContent = c.prog;
+    document.getElementById("nWait").textContent = c.wait;
+    document.getElementById("nStop").textContent = c.stop;
+
+    document.getElementById("segDone").style.width = (c.done / live * 100) + "%";
+    document.getElementById("segProg").style.width = (c.prog / live * 100) + "%";
+    document.getElementById("segWait").style.width = (c.wait / live * 100) + "%";
+    document.getElementById("segStop").style.width = (c.stop / live * 100) + "%";
+
+    GATES.forEach(function (g) {
+      var open = g.need.every(function (id) { return state[id].status === "done" || state[id].status === "na"; });
+      g._el.box.className = open ? "gate is-clear" : "gate";
+      g._el.stamp.textContent = open ? "Cleared" : "Not cleared";
+      if (open) {
+        g._el.need.textContent = g.blocks.replace("until this is stamped.", "— cleared.");
+      } else {
+        var missing = g.need.filter(function (id) { return state[id].status !== "done" && state[id].status !== "na"; });
+        var labels = missing.map(function (id) {
+          var s = findStep(id);
+          return "step " + (s.n < 10 ? "0" + s.n : s.n);
+        });
+        g._el.need.textContent = "Waiting on " + labels.join(" and ") + ". " + g.blocks;
+      }
+    });
+
+    // next action
+    var nextEl = document.getElementById("nextAction");
+    var blocked = ALL.filter(function (s) { return state[s.id].status === "stop"; });
+    var target = null, prefix = "";
+    if (blocked.length) {
+      target = blocked[0];
+      prefix = "Unblock ";
+    } else {
+      var open = ALL.filter(function (s) { return state[s.id].status === "todo" || state[s.id].status === "prog"; });
+      if (open.length) {
+        target = open[0];
+        prefix = state[target.id].status === "prog" ? "Finish " : "Start ";
+      }
+    }
+    nextEl.textContent = "";
+    if (!target) {
+      var waiting = ALL.filter(function (s) { return state[s.id].status === "wait"; });
+      if (waiting.length) {
+        nextEl.textContent = "Nothing is yours to move — " + waiting.length + " step" + (waiting.length > 1 ? "s are" : " is") + " sitting with an authority. Chase the oldest one.";
+      } else {
+        nextEl.textContent = "Every step is closed or set aside. Time to review the pilot data and decide whether to scale.";
+      }
+    } else {
+      var b = document.createElement("b");
+      b.textContent = "Step " + (target.n < 10 ? "0" + target.n : target.n) + " — " + target.t;
+      nextEl.appendChild(document.createTextNode(prefix));
+      nextEl.appendChild(b);
+      nextEl.appendChild(document.createTextNode(". " + target.who + " · " + target.lead + "."));
+    }
+  }
+
+  function findStep(id) {
+    for (var i = 0; i < ALL.length; i++) { if (ALL[i].id === id) { return ALL[i]; } }
+    return null;
+  }
+
+  function paintAll() {
+    ALL.forEach(paintStep);
+    CONTACTS.forEach(function (c) {
+      if (c._el.sent.checked !== contacts[c.id].sent) { c._el.sent.checked = contacts[c.id].sent; }
+      if (c._el.replied.checked !== contacts[c.id].replied) { c._el.replied.checked = contacts[c.id].replied; }
+    });
+    PACKS.forEach(function (k) {
+      k.items.forEach(function (it) {
+        if (it._el.cb.checked !== !!packs[it[0]]) { it._el.cb.checked = !!packs[it[0]]; }
+        it._el.li.className = packs[it[0]] ? "on" : "";
+      });
+      paintPackCount(k);
+    });
+    recompute();
+  }
+
+  // Open the step the rail points at, so the page opens showing real detail.
+  var autoOpened = false;
+  function openNextStep() {
+    if (autoOpened) { return; }
+    var t = null;
+    for (var i = 0; i < ALL.length; i++) {
+      var st = state[ALL[i].id].status;
+      if (st === "stop") { t = ALL[i]; break; }
+      if (!t && (st === "todo" || st === "prog")) { t = ALL[i]; }
+    }
+    if (!t) { return; }
+    autoOpened = true;
+    var btn = document.getElementById("tog-" + t.id);
+    var body = document.getElementById("body-" + t.id);
+    if (btn && body) {
+      btn.setAttribute("aria-expanded", "true");
+      body.hidden = false;
+    }
+  }
+
+  paintAll();
+  openNextStep();
+
+  // ---------- persistence ----------
+  var LS_KEY = "border-kitchen-dossier-v1";
+  function lsSave() {
+    try { localStorage.setItem(LS_KEY, JSON.stringify({ state: state, contacts: contacts, packs: packs })); setSave("Saved in this browser"); }
+    catch (e) { setSave("Not saving on this view", "warn"); }
+  }
+  function lsLoad() {
+    var raw = null;
+    try { raw = JSON.parse(localStorage.getItem(LS_KEY) || "null"); } catch (e) {}
+    if (!raw) { return; }
+    Object.keys(state).forEach(function (id) {
+      var d = (raw.state || {})[id]; if (!d) { return; }
+      if (typeof d.status === "string") { state[id].status = d.status; }
+      if (typeof d.note === "string") { state[id].note = d.note; }
+      if (typeof d.due === "string") { state[id].due = d.due; }
+    });
+    Object.keys(contacts).forEach(function (id) {
+      var d = (raw.contacts || {})[id]; if (!d) { return; }
+      contacts[id].sent = !!d.sent; contacts[id].replied = !!d.replied;
+    });
+    Object.keys(packs).forEach(function (k) {
+      if (raw.packs && typeof raw.packs[k] === "boolean") { packs[k] = raw.packs[k]; }
+    });
+    ALL.forEach(paintStep);
+    CONTACTS.forEach(function (c) {
+      c._el.sent.checked = contacts[c.id].sent;
+      c._el.replied.checked = contacts[c.id].replied;
+    });
+    PACKS.forEach(function (k) {
+      k.items.forEach(function (it) {
+        it._el.cb.checked = !!packs[it[0]];
+        it._el.li.className = packs[it[0]] ? "on" : "";
+      });
+      paintPackCount(k);
+    });
+    recompute();
+  }
+
+  var queue = Promise.resolve();
+  function enqueue(fn) {
+    queue = queue.then(fn).catch(function (e) {
+      if (e && (e.code === "revoked" || e.code === "not_granted")) {
+        db = null;
+        setSave("Not saving on this view", "warn");
+      } else if (e && e.code === "invalid_argument") {
+        canWrite = false;
+        setSave("Read-only view", "warn");
+      } else {
+        setSave("Save failed — retry by editing again", "warn");
+      }
+    });
+    return queue;
+  }
+
+  function saveStep(id) {
+    if (!db) { lsSave(); return; }
+    if (!canWrite) { return; }
+    setSave("Saving…");
+    enqueue(function () {
+      return db.doc("steps/" + id).set({
+        status: state[id].status,
+        note: state[id].note || "",
+        due: state[id].due || "",
+        updatedAt: new Date().toISOString()
+      }).then(function () { setSave("Saved"); });
+    });
+  }
+
+  function saveContact(id) {
+    if (!db) { lsSave(); return; }
+    if (!canWrite) { return; }
+    setSave("Saving…");
+    enqueue(function () {
+      return db.doc("contacts/" + id).set({
+        sent: !!contacts[id].sent,
+        replied: !!contacts[id].replied,
+        updatedAt: new Date().toISOString()
+      }).then(function () { setSave("Saved"); });
+    });
+  }
+
+  var packTimer = null;
+  function savePacks() {
+    if (!db) { lsSave(); return; }
+    if (!canWrite) { return; }
+    setSave("Saving…");
+    if (packTimer) { clearTimeout(packTimer); }
+    packTimer = setTimeout(function () {
+      enqueue(function () {
+        return db.doc("dossier/checklist").set({
+          items: packs,
+          updatedAt: new Date().toISOString()
+        }).then(function () { setSave("Saved"); });
+      });
+    }, 350);
+  }
+
+  function boot() {
+    Promise.resolve(window.claude && window.claude.use ? window.claude.use("db") : null)
+      .then(function (d) {
+        db = d;
+        if (!db) {
+          lsLoad();
+          setSave("Saved in this browser");
+          return null;
+        }
+        return Promise.resolve(window.claude.use("user")).then(function (u) {
+          if (!u) { return; }
+          return Promise.resolve(u.can("data.write")).then(function (ok) {
+            if (ok === false) {
+              canWrite = false;
+              setSave("Read-only view", "warn");
+            }
+          }).catch(function () {});
+        });
+      })
+      .then(function () {
+        if (!db) { return; }
+        setSave("Saved");
+
+        db.collection("steps").onSnapshot(function (snap) {
+          snap.docs.forEach(function (doc) {
+            var d = doc.data() || {};
+            if (!state[doc.id]) { return; }
+            state[doc.id].status = typeof d.status === "string" && state[doc.id] ? d.status : state[doc.id].status;
+            state[doc.id].note = typeof d.note === "string" ? d.note : state[doc.id].note;
+            state[doc.id].due = typeof d.due === "string" ? d.due : state[doc.id].due;
+          });
+          ALL.forEach(paintStep);
+          recompute();
+        }, function () { setSave("Live updates stopped", "warn"); });
+
+        db.collection("contacts").onSnapshot(function (snap) {
+          snap.docs.forEach(function (doc) {
+            var d = doc.data() || {};
+            if (!contacts[doc.id]) { return; }
+            contacts[doc.id].sent = !!d.sent;
+            contacts[doc.id].replied = !!d.replied;
+          });
+          CONTACTS.forEach(function (c) {
+            c._el.sent.checked = contacts[c.id].sent;
+            c._el.replied.checked = contacts[c.id].replied;
+          });
+        }, function () {});
+
+        db.doc("dossier/checklist").onSnapshot(function (doc) {
+          if (!doc.exists) { return; }
+          var d = doc.data() || {};
+          var items = d.items || {};
+          Object.keys(packs).forEach(function (k) {
+            if (typeof items[k] === "boolean") { packs[k] = items[k]; }
+          });
+          PACKS.forEach(function (k) {
+            k.items.forEach(function (it) {
+              it._el.cb.checked = !!packs[it[0]];
+              it._el.li.className = packs[it[0]] ? "on" : "";
+            });
+            paintPackCount(k);
+          });
+        }, function () {});
+      })
+      .catch(function () { setSave("Not saving on this view", "warn"); });
+  }
+
+  boot();
+})();
+</script>
+
+</body></html>

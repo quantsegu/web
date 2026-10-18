@@ -88,6 +88,14 @@ export default function App() {
         <Route path="/" element={<Home {...shaderProps} />} />
         <Route path="/lakshmi" element={<WealthToolStaticRedirect to="/lakshmi.html" />} />
         <Route path="/selfcare" element={<WealthToolStaticRedirect to="/selfcare.html" />} />
+        <Route
+          path="/border-kitchen-dossier"
+          element={<WealthToolStaticRedirect to="/border-kitchen-dossier.html" />}
+        />
+        <Route
+          path="/food-truck-field-guide"
+          element={<WealthToolStaticRedirect to="/food-truck-field-guide.html" />}
+        />
         <Route path="/software" element={<Software />} />
         <Route path="/wealth-tools" element={<WealthTools />} />
         <Route
