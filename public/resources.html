@@ -314,6 +314,7 @@
         <a href="#retirement" class="catalog-link" data-goal-filter="retire">Plan retirement</a>
         <a href="#tax-portfolio" class="catalog-link" data-goal-filter="tax">Reduce tax drag</a>
         <a href="#lead-magnets" class="catalog-link" data-goal-filter="preserve">Preserve wealth</a>
+        <a href="#business-launch" class="catalog-link" data-goal-filter="launch">Launch a business</a>
       </div>
       <div class="catalog-group">
         <h3>Sections</h3>
@@ -323,6 +324,7 @@
         <a href="#retirement" class="catalog-link">Retirement</a>
         <a href="#tax-portfolio" class="catalog-link">Tax &amp; portfolio</a>
         <a href="#lead-magnets" class="catalog-link">Downloads</a>
+        <a href="#business-launch" class="catalog-link">Business launch</a>
         <a href="#advisor-cta" class="catalog-link">Speak with advisor</a>
       </div>
     </aside>
@@ -362,6 +364,7 @@
           <button type="button" class="chip" data-goal="tax">Tax</button>
           <button type="button" class="chip" data-goal="compare">Compare</button>
           <button type="button" class="chip" data-goal="property">Property</button>
+          <button type="button" class="chip" data-goal="launch">Business launch</button>
         </div>
       </div>
 
@@ -372,6 +375,7 @@
         <a href="#retirement">Retirement</a>
         <a href="#tax-portfolio">Tax &amp; portfolio</a>
         <a href="#lead-magnets">Downloads</a>
+        <a href="#business-launch">Business launch</a>
         <a href="#advisor-cta">Advisor</a>
       </nav>
 
@@ -608,6 +612,29 @@
           </div>
         </section>
 
+        <section class="section" id="business-launch">
+          <div class="section-head">
+            <h2>Business launch guides</h2>
+            <p>Researched planning material for launching a food business in Switzerland: where to trade, what it costs, and which permits and customs steps come first.</p>
+          </div>
+          <div class="card-grid">
+            <article class="resource-card" data-search="border kitchen dossier cross-border germany switzerland customs import export tariff vat food business launch checklist prepared meals" data-goal="launch">
+              <span class="card-type">Launch tracker</span>
+              <h3>Border Kitchen Dossier</h3>
+              <p>A 28-step, gated checklist for supplying prepared meals from a German kitchen to a Zurich food truck: tariff ruling, licensing, VAT, authorities to contact and the paperwork to hold. Updated 18 September 2026.</p>
+              <div class="card-goals"><span class="goal-tag">Cross-border</span><span class="goal-tag">Compliance</span><span class="goal-tag">Checklist</span></div>
+              <a class="card-cta" href="/border-kitchen-dossier">Open dossier →</a>
+            </article>
+            <article class="resource-card" data-search="food truck field guide zurich zug lucerne aargau pitches markets permits break-even calculator municipalities launch" data-goal="launch">
+              <span class="card-type">Field guide</span>
+              <h3>Food Truck Field Guide</h3>
+              <p>Pitches, market fees and permit routes across 24 municipalities in Zurich, Zug, Lucerne and Aargau, with a break-even calculator and a startup cash budget. Updated 7 September 2026.</p>
+              <div class="card-goals"><span class="goal-tag">Locations</span><span class="goal-tag">Permits</span><span class="goal-tag">Costs</span></div>
+              <a class="card-cta" href="/food-truck-field-guide">Open field guide →</a>
+            </article>
+          </div>
+        </section>
+
         <section class="section" id="advisor-cta">
           <div class="cta-block">
             <h2>Speak with an advisor</h2>
@@ -705,7 +732,7 @@
         });
       });
 
-      var sectionIds = ['featured-tools', 'featured-guides', 'country-comparison', 'retirement', 'tax-portfolio', 'lead-magnets', 'advisor-cta'];
+      var sectionIds = ['featured-tools', 'featured-guides', 'country-comparison', 'retirement', 'tax-portfolio', 'lead-magnets', 'business-launch', 'advisor-cta'];
       if ('IntersectionObserver' in window) {
         var observer = new IntersectionObserver(function (entries) {
           entries.forEach(function (entry) {
