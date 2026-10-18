@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom';
 import type { InvestmentCategory } from '../../lib/investmentUniverse';
+import { PRICING_DETAILS, type CategoryId } from '../../lib/investmentPricing';
 import { roleBadgeClass, universeUi } from './universeUi';
 
 interface CategoryCardProps {
@@ -9,6 +10,7 @@ interface CategoryCardProps {
 
 export default function CategoryCard({ category, icon }: CategoryCardProps) {
   const badge = roleBadgeClass[category.portfolioRole];
+  const detail = PRICING_DETAILS[category.id as CategoryId];
 
   return (
     <article
@@ -59,6 +61,37 @@ export default function CategoryCard({ category, icon }: CategoryCardProps) {
           <dd className={universeUi.proseMuted}>{category.useCase}</dd>
         </div>
       </dl>
+
+      <div className="mb-4 rounded-md bg-black/30 border border-saffron-500/15 p-3">
+        <p className={universeUi.label}>Pricing &amp; valuation</p>
+        <p className="text-sm text-gray-300 mt-1">{detail.headline}</p>
+        <ul className="flex flex-wrap gap-1.5 mt-2" aria-label="Valuation methods">
+          {detail.strategies.slice(0, 3).map((s) => (
+            <li key={s.name} className="text-[0.7rem] text-saffron-200 border border-saffron-500/25 rounded px-1.5 py-0.5">
+              {s.name}
+            </li>
+          ))}
+        </ul>
+        {category.id === 'derivatives' && (
+          <p className="text-xs text-gray-400 mt-2">
+            Structured products:{' '}
+            {[
+              ['capital-protection', 'Capital protection'],
+              ['yield-enhancement', 'Yield enhancement'],
+              ['participation', 'Participation'],
+              ['leverage', 'Leverage'],
+              ['credit-risk', 'Credit risk'],
+            ].map(([id, label], i) => (
+              <span key={id}>
+                {i > 0 && ' · '}
+                <Link to={`/wealth-tools/investment-universe/${id}`} className="text-saffron-300 hover:text-white">
+                  {label}
+                </Link>
+              </span>
+            ))}
+          </p>
+        )}
+      </div>
 
       <div className="mt-auto pt-3 border-t border-saffron-500/15">
         <div className="flex items-center justify-between gap-3">

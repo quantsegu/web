@@ -25,6 +25,7 @@ import CategoryCard from '../components/investment-universe/CategoryCard';
 import CategoryFilters, { type CategoryFilter } from '../components/investment-universe/CategoryFilters';
 import ComparisonTable from '../components/investment-universe/ComparisonTable';
 import SpectrumMap from '../components/investment-universe/SpectrumMap';
+import PricingIndex from '../components/investment-universe/PricingIndex';
 import SspaSection from '../components/investment-universe/SspaSection';
 import { universeUi } from '../components/investment-universe/universeUi';
 import {
@@ -57,6 +58,7 @@ const COLLECTIBLE_IDS = new Set(['whisky', 'wine', 'vsop-spirits', 'collectibles
 
 const SECTION_NAV = [
   { id: 'overview', label: 'Overview' },
+  { id: 'pricing-index', label: 'Pricing & valuation pages' },
   { id: 'asset-class', label: 'Asset classes' },
   { id: 'categories', label: 'Categories' },
   { id: 'comparison', label: 'Compare' },
@@ -120,6 +122,17 @@ export default function InvestmentUniverse() {
             <p className="text-gray-400 text-sm max-w-2xl">
               Calm, analytical reference material. No return promises. Not personal advice.
             </p>
+            <div className="flex flex-wrap gap-3 mt-6">
+              <a href="#pricing-index" className="btn-primary text-sm">
+                Pricing &amp; valuation pages
+              </a>
+              <Link
+                to="/wealth-tools/investment-universe/leverage"
+                className="text-saffron-300 hover:text-white text-sm font-medium py-3 px-4 transition-colors"
+              >
+                Leverage products →
+              </Link>
+            </div>
             <div className="section-divider !w-32 !mt-6 !mx-0" />
           </motion.div>
         </div>
@@ -165,7 +178,9 @@ export default function InvestmentUniverse() {
         </div>
       </section>
 
-      <section id="asset-class" className={universeUi.sectionAlt}>
+      <PricingIndex />
+
+      <section id="asset-class" className={universeUi.section}>
         <div className={universeUi.container}>
           <SectionHeader
             title="What is an asset class?"
@@ -405,6 +420,14 @@ export default function InvestmentUniverse() {
               <div key={w.title} className={universeUi.panel + ' p-5 border-l-2 border-red-400/50'}>
                 <h3 className="text-white font-semibold text-sm mb-2">{w.title}</h3>
                 <p className={universeUi.proseMuted}>{w.body}</p>
+                {w.title === 'Leverage risk' && (
+                  <Link
+                    to="/wealth-tools/investment-universe/leverage"
+                    className="inline-block mt-2 text-saffron-300 hover:text-white text-sm transition-colors"
+                  >
+                    How leverage products are priced →
+                  </Link>
+                )}
               </div>
             ))}
           </div>
