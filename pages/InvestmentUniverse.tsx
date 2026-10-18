@@ -25,6 +25,7 @@ import CategoryCard from '../components/investment-universe/CategoryCard';
 import CategoryFilters, { type CategoryFilter } from '../components/investment-universe/CategoryFilters';
 import ComparisonTable from '../components/investment-universe/ComparisonTable';
 import SpectrumMap from '../components/investment-universe/SpectrumMap';
+import SspaSection from '../components/investment-universe/SspaSection';
 import { universeUi } from '../components/investment-universe/universeUi';
 import {
   INVESTMENT_CATEGORIES,
@@ -60,6 +61,7 @@ const SECTION_NAV = [
   { id: 'categories', label: 'Categories' },
   { id: 'comparison', label: 'Compare' },
   { id: 'deep-dives', label: 'Deep dives' },
+  { id: 'sspa', label: 'SSPA structured products' },
   { id: 'portfolio', label: 'Portfolio roles' },
   { id: 'suitability', label: 'Suitability' },
   { id: 'maps', label: 'Maps' },
@@ -146,13 +148,13 @@ export default function InvestmentUniverse() {
         <div className={universeUi.container}>
           <SectionHeader
             title="What this page covers"
-            subtitle="Sixteen asset types—from global equities to weather-linked instruments—compared on role, liquidity, and complexity."
+            subtitle="Sixteen asset types and the five SSPA structured-product families, each with a pricing and valuation page."
           />
           <div className="grid sm:grid-cols-3 gap-4 max-w-4xl mx-auto text-center">
             {[
               { n: '16', label: 'Categories mapped' },
-              { n: '4', label: 'Spectrum views' },
-              { n: '7', label: 'Suitability lenses' },
+              { n: '5', label: 'SSPA product families' },
+              { n: '21', label: 'Pricing & valuation pages' },
             ].map((stat) => (
               <div key={stat.label} className={universeUi.panel + ' py-6 px-4'}>
                 <p className="text-2xl font-bold text-white tabular-nums">{stat.n}</p>
@@ -260,12 +262,20 @@ export default function InvestmentUniverse() {
                       {para}
                     </p>
                   ))}
+                  <Link
+                    to={`/wealth-tools/investment-universe/${cat.id}`}
+                    className="inline-block mt-3 text-saffron-300 hover:text-white text-sm font-medium transition-colors"
+                  >
+                    Pricing &amp; valuation →
+                  </Link>
                 </motion.article>
               );
             })}
           </div>
         </div>
       </section>
+
+      <SspaSection />
 
       <section id="portfolio" className={universeUi.sectionAlt}>
         <div className={universeUi.container}>

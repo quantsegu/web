@@ -1,3 +1,4 @@
+import { Link } from 'react-router-dom';
 import type { InvestmentCategory } from '../../lib/investmentUniverse';
 import { roleBadgeClass, universeUi } from './universeUi';
 
@@ -60,7 +61,15 @@ export default function CategoryCard({ category, icon }: CategoryCardProps) {
       </dl>
 
       <div className="mt-auto pt-3 border-t border-saffron-500/15">
-        <span className={`${universeUi.badge} ${badge}`}>{category.portfolioRole}</span>
+        <div className="flex items-center justify-between gap-3">
+          <span className={`${universeUi.badge} ${badge}`}>{category.portfolioRole}</span>
+          <Link
+            to={`/wealth-tools/investment-universe/${category.id}`}
+            className="text-saffron-300 hover:text-white text-xs font-medium transition-colors"
+          >
+            Pricing &amp; valuation →
+          </Link>
+        </div>
       </div>
     </article>
   );
