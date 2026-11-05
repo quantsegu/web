@@ -69,6 +69,20 @@ export default function Collaborations() {
         'Creative and content partner supporting storytelling, publishing, and digital experiences across our ecosystem.',
       url: 'https://www.lekhly.com/',
     },
+    {
+      name: 'KYCpro',
+      logo: 'KP',
+      description:
+        'AI-native operating system for institutional KYC—unifying onboarding and periodic refresh in one intelligent workspace, built by KYC practitioners.',
+      url: 'https://kycpro.net/',
+    },
+    {
+      name: 'KYCpro AI',
+      logo: 'KA',
+      description:
+        'AI-powered KYC platform from the KYCpro family, bringing intelligent automation to client onboarding and compliance reviews.',
+      url: 'https://kycproai.com',
+    },
   ];
 
   return (
