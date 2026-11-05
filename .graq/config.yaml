@@ -1,0 +1,5 @@
+project: auto-detected
+token_budget:
+  session_start: 800
+  max_gcc_overhead_pct: 5
+auto_commit_interval_min: 30

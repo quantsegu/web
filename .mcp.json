@@ -1,0 +1,17 @@
+{
+  "mcpServers": {
+    "graqle": {
+      "type": "stdio",
+      "command": "/Users/lakshmisegu/opt/miniconda3/bin/graq",
+      "args": [
+        "mcp",
+        "serve",
+        "--config",
+        "graqle.yaml"
+      ],
+      "env": {
+        "NEO4J_PASSWORD": "${NEO4J_PASSWORD}"
+      }
+    }
+  }
+}

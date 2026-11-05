@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="description" content="Compare personal vs Swiss GmbH/AG car ownership — 5-year TCO with VAT, Privatanteil 10.8%, and cantonal tax." />
-  <title>Personal vs Company Car — Swiss Ownership Comparison</title>
+  <meta name="description" content="Compare personal vs company car ownership in Switzerland or the Netherlands — new vs used, 5-year TCO with VAT/BTW, Privatanteil or bijtelling, and corporate tax." />
+  <title>Personal vs Company Car — Switzerland &amp; Netherlands, New vs Used</title>
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js" defer></script>
   <style>
     :root {
@@ -147,6 +147,7 @@
     }
     .prefix-wrap input { padding-left: 40px; }
 
+    .tco-table td.best, .tco-table th.best { color: var(--gain); font-weight: 700; }
     .preset-row { display: grid; grid-template-columns: 1fr 1fr; gap: 4px; margin-bottom: 12px; }
     .preset-row button {
       padding: 6px; font-size: 0.68rem; border: 1px solid var(--border);
@@ -284,10 +285,10 @@
       </svg>
       <div>
         <div class="logo-title">Personal vs Company Car</div>
-        <div class="logo-sub">Swiss 5-year TCO</div>
+        <div class="logo-sub" id="logoSub">Swiss 5-year TCO</div>
       </div>
     </a>
-    <span class="header-tag">2024/25 tax rules</span>
+    <span class="header-tag" id="headerTag">2026 tax rules</span>
     <div class="header-actions">
       <a href="/wealth-tools" class="btn btn-sm">Wealth Tools</a>
       <button type="button" class="btn btn-sm" id="btnTheme" aria-label="Toggle theme">Dark</button>
@@ -296,14 +297,21 @@
 
   <div class="page-hero">
     <p class="hero-eyebrow">Decision tool</p>
-    <h1>Personal or <em>company car</em> ownership in Switzerland?</h1>
-    <p>Enter any vehicle and profile — get a full 5-year comparison with VAT reclaim, Privatanteil (10.8%), depreciation, cantonal motor tax, and net cost to you. Runs in your browser; no account required.</p>
+    <h1 id="heroTitle">Personal or <em>company car</em> ownership in Switzerland?</h1>
+    <p id="heroText"></p>
   </div>
 
   <div class="workspace">
     <aside class="form-panel" aria-label="Your profile">
       <div class="panel-title">Your profile</div>
 
+      <div class="section-divider">Country</div>
+      <div class="preset-row" role="group" aria-label="Country" id="countryRow">
+        <button type="button" data-country="ch" class="active">Switzerland</button>
+        <button type="button" data-country="nl">Netherlands</button>
+      </div>
+
+      <div class="section-divider">Vehicle</div>
       <div class="preset-row" role="group" aria-label="Vehicle presets">
         <button type="button" data-preset="tesla" class="active">Tesla MY</button>
         <button type="button" data-preset="vw">VW Golf</button>
@@ -311,15 +319,14 @@
         <button type="button" data-preset="van">Kombi EV</button>
       </div>
 
-      <div class="section-divider">Vehicle</div>
       <div class="field">
         <label for="carName">Car make &amp; model</label>
         <input type="text" id="carName" value="Tesla Model Y Long Range" />
       </div>
       <div class="field-row">
         <div class="field">
-          <label for="purchasePrice">Purchase price</label>
-          <div class="prefix-wrap"><span>CHF</span><input type="number" id="purchasePrice" value="58000" min="5000" step="500" /></div>
+          <label for="purchasePrice" id="lblPrice">New price incl. VAT</label>
+          <div class="prefix-wrap"><span class="cur">CHF</span><input type="number" id="purchasePrice" value="58000" min="5000" step="500" /></div>
         </div>
         <div class="field">
           <label for="businessUse">Business use %</label>
@@ -345,8 +352,50 @@
         </div>
       </div>
 
-      <div class="section-divider">Personal &amp; company</div>
       <div class="field">
+        <label for="condition">New or used?</label>
+        <select id="condition">
+          <option value="new" selected>New car</option>
+          <option value="used">Used car</option>
+          <option value="compare">Compare new vs used</option>
+        </select>
+      </div>
+
+      <div id="usedFields" class="hidden">
+        <div class="section-divider">Used alternative</div>
+        <div class="field-row">
+          <div class="field">
+            <label for="usedAge">Age (years)</label>
+            <input type="number" id="usedAge" value="3" min="1" max="20" step="1" />
+          </div>
+          <div class="field">
+            <label for="usedPrice">Used price</label>
+            <div class="prefix-wrap"><span class="cur">CHF</span><input type="number" id="usedPrice" value="32000" min="1000" step="500" data-auto="1" /></div>
+          </div>
+        </div>
+        <div class="field">
+          <label for="usedSeller">Seller</label>
+          <select id="usedSeller">
+            <option value="vat" selected>Dealer — VAT shown on invoice</option>
+            <option value="novat">Private seller / margin scheme (no VAT)</option>
+          </select>
+          <span class="field-hint" id="usedSellerHint"></span>
+        </div>
+        <div class="field-row">
+          <div class="field">
+            <label for="usedResalePct">Resale % of used price</label>
+            <input type="number" id="usedResalePct" value="45" min="0" max="90" step="5" />
+          </div>
+          <div class="field">
+            <label for="usedMaintUplift">Extra maintenance %</label>
+            <input type="number" id="usedMaintUplift" value="25" min="0" max="200" step="5" />
+          </div>
+        </div>
+        <span class="field-hint">Used car is assumed bought with cash. Same running costs as the new car, plus the maintenance uplift.</span>
+      </div>
+
+      <div class="section-divider">Personal &amp; company</div>
+      <div class="field" id="cantonField">
         <label for="canton">Canton</label>
         <select id="canton">
           <option value="zg" selected>Zug</option>
@@ -365,16 +414,16 @@
       <div class="field-row">
         <div class="field">
           <label for="companyProfit">Company profit / yr</label>
-          <div class="prefix-wrap"><span>CHF</span><input type="number" id="companyProfit" value="120000" min="0" step="5000" /></div>
+          <div class="prefix-wrap"><span class="cur">CHF</span><input type="number" id="companyProfit" value="120000" min="0" step="5000" /></div>
         </div>
         <div class="field">
-          <label for="marginalRate">Personal tax rate %</label>
+          <label for="marginalRate" id="lblMarginal">Personal tax rate %</label>
           <input type="number" id="marginalRate" value="28" min="10" max="55" step="0.5" />
         </div>
       </div>
       <div class="field-row">
         <div class="field">
-          <label for="vatRegistered">VAT registered</label>
+          <label for="vatRegistered" id="lblVatReg">VAT registered</label>
           <select id="vatRegistered">
             <option value="yes" selected>Yes</option>
             <option value="no">No</option>
@@ -382,21 +431,38 @@
         </div>
         <div class="field">
           <label for="companyType">Company type</label>
-          <select id="companyType">
-            <option value="gmbh" selected>GmbH</option>
-            <option value="ag">AG</option>
-            <option value="sole">Sole trader</option>
-          </select>
+          <select id="companyType"></select>
         </div>
       </div>
       <div class="field">
         <label for="corpTaxRate">Company profit tax %</label>
-        <input type="number" id="corpTaxRate" value="11.8" min="11" max="22" step="0.1" />
-        <span class="field-hint">Pre-filled from canton</span>
+        <input type="number" id="corpTaxRate" value="11.8" min="5" max="30" step="0.1" />
+        <span class="field-hint" id="corpHint">Pre-filled from canton</span>
       </div>
       <div class="field">
-        <label for="socialRate">Social on Privatanteil %</label>
+        <label for="socialRate" id="lblSocial">Social on Privatanteil %</label>
         <input type="number" id="socialRate" value="12" min="0" max="25" step="0.5" />
+      </div>
+
+      <div id="nlFields" class="hidden">
+        <div class="section-divider">Dutch specifics</div>
+        <div class="field-row">
+          <div class="field">
+            <label for="annualKm">Total km / year</label>
+            <input type="number" id="annualKm" value="15000" min="0" step="1000" />
+          </div>
+          <div class="field">
+            <label for="bpm">BPM in new price</label>
+            <div class="prefix-wrap"><span class="cur">€</span><input type="number" id="bpm" value="400" min="0" step="100" /></div>
+          </div>
+        </div>
+        <div class="field">
+          <label for="privateKm">Private use of company car</label>
+          <select id="privateKm">
+            <option value="yes" selected>&gt;500 km/yr (bijtelling applies)</option>
+            <option value="no">≤500 km/yr (needs rittenregistratie)</option>
+          </select>
+        </div>
       </div>
 
       <div class="section-divider">Running costs / yr</div>
@@ -406,7 +472,7 @@
           <input type="number" id="insurance" value="1500" min="0" step="50" />
         </div>
         <div class="field">
-          <label for="mvTax">MV tax (ICE base)</label>
+          <label for="mvTax" id="lblMv">MV tax (ICE base)</label>
           <input type="number" id="mvTax" value="560" min="0" step="20" data-auto="1" />
         </div>
       </div>
@@ -433,18 +499,18 @@
         </div>
       </div>
       <div class="field">
-        <label for="registration">Registration (one-off)</label>
+        <label for="registration">Registration / fees (one-off)</label>
         <input type="number" id="registration" value="400" min="0" step="50" />
       </div>
 
       <div id="leaseFields" class="hidden">
         <div class="section-divider">Leasing</div>
         <div class="field">
-          <label for="leaseMonthly">Lease / month (CHF)</label>
+          <label for="leaseMonthly" id="lblLeaseMonthly">Lease / month (CHF)</label>
           <input type="number" id="leaseMonthly" value="650" min="0" step="50" />
         </div>
-        <div class="field">
-          <label for="leaseBuyout">List price ex VAT (Privatanteil base)</label>
+        <div class="field" id="leaseBuyoutField">
+          <label for="leaseBuyout" id="lblLeaseBuyout">List price ex VAT (Privatanteil base)</label>
           <input type="number" id="leaseBuyout" value="53654" min="0" step="500" />
         </div>
       </div>
@@ -469,6 +535,15 @@
         <div class="compare-grid tabular" id="compareGrid"></div>
         <div class="verdict-box tabular" id="verdictBox"></div>
         <p class="notice tabular" id="complianceNotice"></p>
+
+        <section class="card hidden" id="nuCard">
+          <div class="card-header">New vs used — all four options</div>
+          <div class="card-body tabular">
+            <div id="nuTable" style="overflow-x:auto"></div>
+            <div class="chart-wrap" style="margin-top:12px"><canvas id="chartNu" aria-label="New vs used net cost"></canvas></div>
+            <div id="nuNote" style="margin-top:10px"></div>
+          </div>
+        </section>
 
         <section class="card">
           <div class="card-header">Acquisition</div>
@@ -514,27 +589,25 @@
 
         <section class="cta-block">
           <h2>Request a vehicle &amp; allocation review</h2>
-          <p>Validate Privatanteil, MWST, logbook, and salary certificate treatment with your Treuhänder.</p>
+          <p id="ctaText">Validate Privatanteil, MWST, logbook, and salary certificate treatment with your Treuhänder.</p>
           <a href="/#contact" class="btn btn-primary">Contact Shreshti</a>
         </section>
       </div>
     </main>
   </div>
 
-  <p class="disclaimer">
-    Illustrative model based on Swiss tax law 2024/25 (Privatanteil 10.8%, VAT 8.1%). Not financial, legal, or tax advice — confirm with a licensed advisor before deciding.
-  </p>
+  <p class="disclaimer" id="disclaimer"></p>
 
   <script>
 (function () {
   'use strict';
 
-  const VAT = 0.081;
+  const DEP_YEARS = 5;
   const PRIVAT_MONTHLY = 0.009;
   const PRIVAT_MIN_MONTH = 150;
-  const DEP_YEARS = 5;
 
-  const CANTONS = {
+  /* ── Country configuration ─────────────────────────────────────────── */
+  const CH_CANTONS = {
     zg: { name: 'Zug', corp: 11.8, mvIce: 500, wealthPm: 0.12 },
     zh: { name: 'Zürich', corp: 19.6, mvIce: 680, wealthPm: 0.18 },
     ge: { name: 'Genève', corp: 14.7, mvIce: 720, wealthPm: 0.35 },
@@ -548,43 +621,89 @@
     sz: { name: 'Schwyz', corp: 14.1, mvIce: 520, wealthPm: 0.14 },
   };
 
-  const FUEL_DEFAULTS = {
-    electric: { maintenance: 800, charging: 1000 },
-    petrol: { maintenance: 1200, charging: 2400 },
-    diesel: { maintenance: 1300, charging: 2200 },
-    hybrid: { maintenance: 1100, charging: 1600 },
+  const COUNTRIES = {
+    ch: {
+      id: 'ch', cur: 'CHF', locale: 'de-CH', vat: 0.081, vatName: 'VAT', rules: '2026 Swiss rules',
+      logoSub: 'Swiss 5-year TCO',
+      heroTitle: 'Personal or <em>company car</em> ownership in Switzerland?',
+      heroText: 'Enter any vehicle and profile — get a full 5-year comparison for a new or used car with VAT reclaim, Privatanteil (10.8%), depreciation, cantonal motor tax, and net cost to you. Runs in your browser; no account required.',
+      disclaimer: 'Illustrative model based on Swiss tax law (Privatanteil 10.8%, VAT 8.1%; 2024/25 parameters, check current rates). Not financial, legal, or tax advice — confirm with a licensed advisor before deciding.',
+      cta: 'Validate Privatanteil, MWST, logbook, and salary certificate treatment with your Treuhänder.',
+      benefit: 'Privatanteil',
+      companyTypes: [['gmbh', 'GmbH'], ['ag', 'AG'], ['sole', 'Sole trader']],
+      labels: { price: 'New price incl. VAT', marginal: 'Personal tax rate %', vatReg: 'VAT registered', social: 'Social on Privatanteil %', mv: 'MV tax (ICE base)', leaseBuyout: 'List price ex VAT (Privatanteil base)', leaseMonthly: 'Lease / month (CHF)', corpHint: 'Pre-filled from canton' },
+      usedSellerHint: 'Private sales carry no VAT, so no VAT can be reclaimed.',
+      defaults: { companyProfit: 120000, marginalRate: 28, socialRate: 12, registration: 400, leaseMonthly: 650, usedSeller: 'vat', companyType: 'gmbh' },
+      fuel: {
+        electric: { maintenance: 800, charging: 1000 },
+        petrol: { maintenance: 1200, charging: 2400 },
+        diesel: { maintenance: 1300, charging: 2200 },
+        hybrid: { maintenance: 1100, charging: 1600 },
+      },
+      presets: {
+        tesla: { carName: 'Tesla Model Y Long Range', purchasePrice: 58000, fuelType: 'electric', insurance: 1500, mvTax: 560, maintenance: 800, charging: 1000, resalePct: 50, businessUse: 70 },
+        vw: { carName: 'VW Golf 2.0 TDI', purchasePrice: 42000, fuelType: 'diesel', insurance: 1200, mvTax: 480, maintenance: 1300, charging: 2200, resalePct: 42 },
+        bmw: { carName: 'BMW 320d Touring', purchasePrice: 65000, fuelType: 'diesel', insurance: 1800, mvTax: 620, maintenance: 1500, charging: 2800, resalePct: 45 },
+        van: { carName: 'VW ID. Buzz', purchasePrice: 72000, fuelType: 'electric', insurance: 1400, mvTax: 700, maintenance: 900, charging: 1100, resalePct: 48, businessUse: 85 },
+      },
+    },
+    nl: {
+      id: 'nl', cur: '€', locale: 'nl-NL', vat: 0.21, vatName: 'BTW', rules: '2026 Dutch rules',
+      logoSub: 'Dutch 5-year TCO',
+      heroTitle: 'Personal or <em>company car</em> ownership in the Netherlands?',
+      heroText: 'Enter any vehicle and profile — get a full 5-year comparison for a new or used car with BTW reclaim, bijtelling, the BTW private-use correction, BPM, MRB, and the €0.25/km allowance for a privately owned car. Runs in your browser; no account required.',
+      disclaimer: 'Illustrative model using 2026 Dutch rules (BTW 21%, bijtelling 22% / 18% EV up to €30,000, Vpb 19% / 25.8%, BTW private-use correction 2.7% of catalogue value, €0.25/km). BPM, MRB, insurance and resale are estimates you can overwrite. Box 3, running-cost BTW and EV-rate changes after 2026 are not modelled. Not financial, legal, or tax advice — confirm with a belastingadviseur before deciding.',
+      cta: 'Validate bijtelling, BTW correction, rittenregistratie, and DGA car allocation with your belastingadviseur.',
+      benefit: 'Bijtelling',
+      companyTypes: [['bv', 'BV (DGA)'], ['sole', 'Eenmanszaak / ZZP']],
+      labels: { price: 'New catalogue price incl. BTW + BPM', marginal: 'Personal box 1 rate %', vatReg: 'BTW registered', social: 'Social levies on bijtelling %', mv: 'Road tax (MRB) / yr', leaseBuyout: 'Catalogue value', leaseMonthly: 'Lease / month (€)', corpHint: 'Vpb: 19% to €200k profit, 25.8% above' },
+      usedSellerHint: 'Dealer margin-scheme and private cars carry no BTW, so no BTW can be reclaimed.',
+      kmRate: 0.25,
+      defaults: { companyProfit: 120000, marginalRate: 49.5, socialRate: 0, registration: 150, leaseMonthly: 600, usedSeller: 'novat', companyType: 'bv' },
+      fuel: {
+        electric: { maintenance: 600, charging: 900, mvTax: 280 },
+        petrol: { maintenance: 800, charging: 2000, mvTax: 1000 },
+        diesel: { maintenance: 900, charging: 1900, mvTax: 1600 },
+        hybrid: { maintenance: 750, charging: 1300, mvTax: 900 },
+      },
+      presets: {
+        tesla: { carName: 'Tesla Model Y Long Range', purchasePrice: 47000, fuelType: 'electric', insurance: 1100, mvTax: 280, maintenance: 600, charging: 900, resalePct: 50, businessUse: 70, bpm: 360 },
+        vw: { carName: 'VW Golf 1.5 eTSI', purchasePrice: 36000, fuelType: 'petrol', insurance: 1000, mvTax: 1000, maintenance: 800, charging: 2000, resalePct: 45, bpm: 3300 },
+        bmw: { carName: 'BMW 320d Touring', purchasePrice: 62000, fuelType: 'diesel', insurance: 1400, mvTax: 1600, maintenance: 1100, charging: 1900, resalePct: 45, bpm: 7500 },
+        van: { carName: 'VW ID. Buzz', purchasePrice: 62000, fuelType: 'electric', insurance: 1300, mvTax: 330, maintenance: 700, charging: 1000, resalePct: 48, businessUse: 85, bpm: 360 },
+      },
+    },
   };
 
-  const PRESETS = {
-    tesla: { carName: 'Tesla Model Y Long Range', purchasePrice: 58000, fuelType: 'electric', insurance: 1500, mvTax: 560, maintenance: 800, charging: 1000, resalePct: 50, businessUse: 70 },
-    vw: { carName: 'VW Golf 2.0 TDI', purchasePrice: 42000, fuelType: 'diesel', insurance: 1200, mvTax: 480, maintenance: 1300, charging: 2200, resalePct: 42 },
-    bmw: { carName: 'BMW 320d Touring', purchasePrice: 65000, fuelType: 'diesel', insurance: 1800, mvTax: 620, maintenance: 1500, charging: 2800, resalePct: 45 },
-    van: { carName: 'VW ID. Buzz', purchasePrice: 72000, fuelType: 'electric', insurance: 1400, mvTax: 700, maintenance: 900, charging: 1100, resalePct: 48, businessUse: 85 },
-  };
-
+  let C = COUNTRIES.ch;
   const $ = (id) => document.getElementById(id);
-  let chartTco;
+  let chartTco, chartNu;
   let hasRun = false;
 
   function pct(v) { return Number(v) / 100; }
-  function exVat(incl) { return incl / (1 + VAT); }
   function fmt(n) {
     if (!Number.isFinite(n)) return '—';
-    return 'CHF ' + Math.round(n).toLocaleString('de-CH');
+    const s = Math.round(n).toLocaleString(C.locale);
+    return C.cur === '€' ? '€ ' + s : C.cur + ' ' + s;
   }
   function fmtPct(n) { return Number(n).toFixed(1) + '%'; }
   function isEv(fuel) { return fuel === 'electric' || fuel === 'hybrid'; }
+  function exVatOf(incl) { return incl / (1 + C.vat); }
 
+  /* ── Inputs ────────────────────────────────────────────────────────── */
   function readInputs() {
+    const country = C.id;
     const canton = $('canton').value;
-    const c = CANTONS[canton] || CANTONS.zg;
+    const c = CH_CANTONS[canton] || CH_CANTONS.zg;
     const fuel = $('fuelType').value;
     return {
+      country,
       carName: $('carName').value.trim() || 'Vehicle',
       purchasePrice: Number($('purchasePrice').value),
       fuelType: fuel,
       isEv: isEv(fuel),
-      canton, cantonName: c.name,
+      condition: $('condition').value,
+      canton, cantonName: country === 'ch' ? c.name : 'the Netherlands',
       businessUse: Number($('businessUse').value),
       companyProfit: Number($('companyProfit').value),
       marginalRate: Number($('marginalRate').value),
@@ -605,210 +724,426 @@
       additionalNotes: ($('additionalNotes').value || '').trim(),
       cantonMvIce: c.mvIce,
       wealthPm: c.wealthPm / 1000,
+      usedAge: Math.max(1, Number($('usedAge').value) || 1),
+      usedPrice: Number($('usedPrice').value),
+      usedSeller: $('usedSeller').value,
+      usedResalePct: Number($('usedResalePct').value),
+      usedMaintUplift: Number($('usedMaintUplift').value) || 0,
+      annualKm: Number($('annualKm').value) || 0,
+      bpm: Number($('bpm').value) || 0,
+      privateKm: $('privateKm').value,
+    };
+  }
+
+  /* A vehicle describes one purchase option (new or used) fed into simulate(). */
+  function vehicle(inp, cond) {
+    if (cond === 'used') {
+      return {
+        cond, priceIncl: inp.usedPrice, hasVat: inp.usedSeller === 'vat',
+        resalePct: inp.usedResalePct, maintenance: inp.maintenance * (1 + inp.usedMaintUplift / 100),
+        depYears: Math.max(3, DEP_YEARS - Math.floor(inp.usedAge / 2)), age: inp.usedAge,
+        catalog: inp.purchasePrice, financing: 'cash',
+      };
+    }
+    return {
+      cond: 'new', priceIncl: inp.purchasePrice, hasVat: true, resalePct: inp.resalePct,
+      maintenance: inp.maintenance, depYears: DEP_YEARS, age: 0, catalog: inp.purchasePrice,
+      financing: inp.financing,
     };
   }
 
   function annualMvTax(inp) {
+    if (inp.country === 'nl') return inp.mvTaxIce;
     const base = inp.mvTaxIce > 0 ? inp.mvTaxIce : inp.cantonMvIce;
     return inp.isEv ? base * 0.5 : base;
   }
-  function annualRunning(inp) {
-    return inp.insurance + annualMvTax(inp) + inp.maintenance + inp.charging;
-  }
-  function privatanteilBase(inp) {
-    const ex = inp.financing === 'lease' ? inp.leaseBuyout : exVat(inp.purchasePrice);
-    return Math.max(ex * PRIVAT_MONTHLY * 12, PRIVAT_MIN_MONTH * 12);
+  function annualRunning(inp, v) {
+    return inp.insurance + annualMvTax(inp) + v.maintenance + inp.charging;
   }
 
-  function simulate(inp) {
+  /* NL bijtelling: % of the original catalogue value, fixed 60 months from first registration. */
+  function nlBijtelling(inp, v) {
+    if (v.cond === 'used' && v.age >= 15) {
+      return { base: v.priceIncl, annual: v.priceIncl * 0.35, label: '35% of current value (15+ yr old car)' };
+    }
+    const cat = v.catalog;
+    if (inp.fuelType === 'electric') {
+      const year = 2026 - v.age;
+      const low = year >= 2026 ? 0.18 : year === 2025 ? 0.17 : year >= 2022 ? 0.16 : null;
+      if (low !== null) {
+        return {
+          base: cat, annual: low * Math.min(cat, 30000) + 0.22 * Math.max(0, cat - 30000),
+          label: `${Math.round(low * 100)}% of first €30,000 + 22% above`,
+        };
+      }
+    }
+    return { base: cat, annual: cat * 0.22, label: '22% of catalogue value' };
+  }
+
+  /* ── Simulation ────────────────────────────────────────────────────── */
+  function simulate(inp, v) {
+    const nl = inp.country === 'nl';
     const years = inp.horizon;
     const biz = Math.min(1, Math.max(0, inp.businessUse / 100));
-    const flatOk = inp.businessUse > 50 && inp.companyType !== 'sole';
-    const priceIncl = inp.purchasePrice;
-    const priceEx = exVat(priceIncl);
+    const sole = inp.companyType === 'sole';
+    const flatOk = nl ? inp.privateKm === 'yes' : (inp.businessUse > 50 && !sole);
+    const lease = v.financing === 'lease';
+    const priceIncl = v.priceIncl;
+    const priceEx = v.hasVat ? exVatOf(priceIncl) : priceIncl;
     const vatAmt = priceIncl - priceEx;
-    const vatReclaim = inp.vatRegistered && flatOk ? vatAmt * biz : 0;
-    const running = annualRunning(inp);
-    const resale = priceIncl * pct(inp.resalePct);
-    const privat = flatOk ? privatanteilBase(inp) : 0;
-    const depAnnual = priceEx / DEP_YEARS;
-    const leaseAnnual = inp.financing === 'lease' ? inp.leaseMonthly * 12 : 0;
-    const personalAcq = priceIncl;
-    const companyAcqNet = inp.financing === 'cash' ? priceIncl - vatReclaim : 0;
+    const running = annualRunning(inp, v);
+    const resale = priceIncl * pct(v.resalePct);
+    const depN = Math.min(years, v.depYears);
+    const vatReclaim = nl
+      ? (inp.vatRegistered ? vatAmt : 0)
+      : (inp.vatRegistered && flatOk ? vatAmt * biz : 0);
+    const depBase = vatReclaim > 0 ? priceEx : priceIncl;
+    const depAnnual = depBase / v.depYears;
+    const leaseAnnual = lease ? inp.leaseMonthly * 12 : 0;
+    const deductRate = (nl && sole) ? pct(inp.marginalRate) : inp.corpTaxRate;
 
+    // Private-use benefit: Privatanteil (CH) or bijtelling (NL)
+    let benefitBase = 0, benefitAnnual = 0, benefitLabel = '';
+    if (nl) {
+      const b = nlBijtelling(inp, v);
+      benefitBase = b.base; benefitLabel = b.label;
+      benefitAnnual = flatOk ? b.annual : 0;
+    } else {
+      benefitBase = lease ? inp.leaseBuyout : priceEx;
+      benefitAnnual = flatOk ? Math.max(benefitBase * PRIVAT_MONTHLY * 12, PRIVAT_MIN_MONTH * 12) : 0;
+    }
+    const privat = benefitAnnual;
+
+    // BTW private-use correction (NL) / VAT on the Privatanteil (CH), per year
+    const corrAnnual = nl
+      ? ((inp.vatRegistered && (lease || v.hasVat) && flatOk) ? benefitBase * 0.027 : 0)
+      : privat * C.vat;
+
+    // Personal ownership
+    const kmAllowance = nl ? inp.annualKm * biz * C.kmRate : 0;
+    const personalAcq = priceIncl;
     const personalGross = personalAcq + inp.registration + running * years;
-    const personalTaxSave = ((priceEx / DEP_YEARS) * biz * years + running * biz * years) * pct(inp.marginalRate);
-    const wealthTax = priceIncl * inp.wealthPm * years * 0.85;
+    const persDepAnnual = priceEx / v.depYears;
+    const personalTaxSave = nl
+      ? kmAllowance * years * deductRate
+      : (persDepAnnual * biz * depN + running * biz * years) * pct(inp.marginalRate);
+    const wealthTax = nl ? 0 : priceIncl * inp.wealthPm * years * 0.85;
     const personalNet = personalGross - personalTaxSave - resale + wealthTax;
 
+    // Company ownership
     let companyGross = inp.registration + running * years;
-    let companyTaxSave = 0;
-    if (inp.financing === 'cash') {
+    let companyTaxSave, disposalTax = 0;
+    const companyAcqNet = lease ? 0 : priceIncl - vatReclaim;
+    if (!lease) {
       companyGross += companyAcqNet;
-      companyTaxSave = (depAnnual * years + running * years) * inp.corpTaxRate;
+      companyTaxSave = (depAnnual * depN + running * years) * deductRate;
+      const book = depBase * Math.max(0, 1 - depN / v.depYears);
+      const resaleBasis = vatReclaim > 0 ? resale / (1 + C.vat) : resale;
+      disposalTax = (resaleBasis - book) * deductRate;
     } else {
       companyGross += leaseAnnual * years;
-      companyTaxSave = (leaseAnnual * years + running * years) * inp.corpTaxRate;
+      companyTaxSave = (leaseAnnual * years + running * years) * deductRate;
     }
     const ownerPrivTax = privat * pct(inp.marginalRate) * years;
     const ownerSocial = privat * inp.socialRate * years;
-    const vatPriv = privat * VAT * years;
-    const companyNet = companyGross - companyTaxSave + ownerPrivTax + ownerSocial + vatPriv - resale;
+    const vatPriv = corrAnnual * years;
+    const companyNet = companyGross - companyTaxSave + ownerPrivTax + ownerSocial + vatPriv + disposalTax - resale;
 
     const diff = companyNet - personalNet;
     const winner = personalNet <= companyNet ? 'personal' : 'company';
 
-    const yearlyPersonal = [];
-    const yearlyCompany = [];
+    const yearlyPersonal = [], yearlyCompany = [];
     let cumP = personalAcq + inp.registration;
-    let cumC = (inp.financing === 'cash' ? companyAcqNet : 0) + inp.registration;
-    const annualPersSave = (depAnnual * biz + running * biz) * pct(inp.marginalRate);
-    const annualCorpSave = ((inp.financing === 'lease' ? leaseAnnual : depAnnual) + running) * inp.corpTaxRate;
-    const annualOwnerCost = flatOk ? privat * (pct(inp.marginalRate) + inp.socialRate + VAT) : 0;
-
+    let cumC = companyAcqNet + inp.registration;
+    const annualOwnerCost = privat * (pct(inp.marginalRate) + inp.socialRate) + corrAnnual;
+    const wealthAnnual = wealthTax / years;
     for (let y = 1; y <= years; y++) {
-      cumP += running - annualPersSave - (y === years ? resale : 0);
-      cumC += running - annualCorpSave + annualOwnerCost - (y === years ? resale : 0);
-      if (inp.financing === 'lease') cumC += leaseAnnual;
+      const persSave = nl ? kmAllowance * deductRate
+        : ((y <= v.depYears ? persDepAnnual * biz : 0) + running * biz) * pct(inp.marginalRate);
+      const corpSave = ((lease ? leaseAnnual : (y <= v.depYears ? depAnnual : 0)) + running) * deductRate;
+      cumP += running - persSave + wealthAnnual - (y === years ? resale : 0);
+      cumC += running - corpSave + annualOwnerCost - (y === years ? resale - disposalTax : 0);
+      if (lease) cumC += leaseAnnual;
       yearlyPersonal.push({ year: y, net: cumP });
       yearlyCompany.push({ year: y, net: cumC });
     }
 
     return {
-      priceIncl, priceEx, vatAmt, vatReclaim, running, resale, privat, flatOk, biz,
-      depAnnual, leaseAnnual, personalAcq, companyAcqNet,
-      personalGross, personalTaxSave, wealthTax, personalNet,
-      companyGross, companyTaxSave, ownerPrivTax, ownerSocial, vatPriv, companyNet,
+      v, nl, priceIncl, priceEx, vatAmt, vatReclaim, running, resale, privat, flatOk, biz, lease, sole,
+      depAnnual, leaseAnnual, personalAcq, companyAcqNet, deductRate,
+      personalGross, personalTaxSave, wealthTax, personalNet, kmAllowance,
+      companyGross, companyTaxSave, ownerPrivTax, ownerSocial, vatPriv, disposalTax, companyNet,
+      benefitBase, benefitLabel, corrAnnual,
       diff, winner, yearlyPersonal, yearlyCompany, mvTax: annualMvTax(inp),
+      best: Math.min(personalNet, companyNet),
     };
   }
 
-  function buildCompareCards(inp, r) {
+  /* ── Rendering ─────────────────────────────────────────────────────── */
+  function companyTitle(inp) {
+    const t = inp.companyType;
+    if (inp.country === 'nl') return t === 'sole' ? 'Eenmanszaak*' : 'BV (DGA)';
+    return t === 'ag' ? 'AG' : t === 'sole' ? 'Sole trader*' : 'GmbH';
+  }
+
+  function buildCompareCards(inp, r, tag) {
     const personalWins = r.winner === 'personal';
+    const nl = inp.country === 'nl';
+    const personalMeta = nl
+      ? `No bijtelling · No BTW reclaim<br>${fmt(inp.annualKm * r.biz * C.kmRate)}/yr km allowance · cars are outside box 3`
+      : 'No Privatanteil · No VAT reclaim<br>Wealth tax · Simpler admin';
+    const companyMeta = nl
+      ? `Bijtelling ${fmt(r.privat)}/yr · Depreciation deductible<br>${r.vatReclaim > 0 ? 'BTW reclaimed · ' : ''}More compliance`
+      : `Privatanteil ${fmt(r.privat)}/yr · Depreciation deductible<br>${r.vatReclaim > 0 ? 'VAT on books · ' : ''}More compliance`;
     $('compareGrid').innerHTML = `
       <div class="compare-card personal ${personalWins ? 'winner' : ''}">
         <div class="compare-card-header">
-          <h3>Personal ownership</h3>
+          <h3>Personal ownership${tag}</h3>
           ${personalWins ? '<span class="winner-tag">Better</span>' : ''}
         </div>
         <div class="compare-card-body">
           <div class="cost-label">${inp.horizon}-yr net cost to you</div>
           <div class="cost-value">${fmt(r.personalNet)}</div>
-          <div class="cost-meta">No Privatanteil · No VAT reclaim<br>Wealth tax · Simpler admin</div>
+          <div class="cost-meta">${personalMeta}</div>
         </div>
       </div>
       <div class="compare-card company ${!personalWins ? 'winner' : ''}">
         <div class="compare-card-header">
-          <h3>Company (${inp.companyType === 'ag' ? 'AG' : inp.companyType === 'sole' ? 'Sole trader*' : 'GmbH'})</h3>
+          <h3>Company (${companyTitle(inp)})${tag}</h3>
           ${!personalWins ? '<span class="winner-tag">Better</span>' : ''}
         </div>
         <div class="compare-card-body">
           <div class="cost-label">${inp.horizon}-yr net cost to you</div>
           <div class="cost-value">${fmt(r.companyNet)}</div>
-          ${r.vatReclaim > 0 ? `<div class="cost-saving">VAT reclaim: ${fmt(r.vatReclaim)}</div>` : ''}
-          <div class="cost-meta">Privatanteil ${fmt(r.privat)}/yr · Depreciation deductible<br>${r.vatReclaim > 0 ? 'VAT on books · ' : ''}More compliance</div>
+          ${r.vatReclaim > 0 ? `<div class="cost-saving">${C.vatName} reclaim: ${fmt(r.vatReclaim)}</div>` : ''}
+          <div class="cost-meta">${companyMeta}</div>
         </div>
       </div>`;
   }
 
-  function render(inp, r) {
-    buildCompareCards(inp, r);
+  function colHtml(title, rows, cls) {
+    return `<div class="detail-col ${cls}"><h4>${title}</h4><dl>` +
+      rows.map(([k, v]) => `<div class="metric-row"><dt>${k}</dt><dd>${v}</dd></div>`).join('') + '</dl></div>';
+  }
+
+  function render(inp, rNew, rUsed) {
+    const compare = inp.condition === 'compare';
+    const usedBasis = inp.condition === 'used';
+    const r = usedBasis ? rUsed : rNew;
+    const nl = inp.country === 'nl';
+    const BEN = C.benefit;
+    const tag = compare ? ' · new' : usedBasis ? ' · used' : '';
+    const condWord = usedBasis ? 'used' : 'new';
+
+    buildCompareCards(inp, r, tag);
     const winLabel = r.winner === 'personal' ? 'Private ownership' : 'Company ownership';
     $('verdictBox').innerHTML = `
-      <div class="verdict-label">Verdict · ${inp.carName}</div>
+      <div class="verdict-label">Verdict · ${inp.carName} (${condWord})</div>
       <strong>${winLabel}</strong> is lower by ${fmt(Math.abs(r.diff))} over ${inp.horizon} years
       (private ${fmt(r.personalNet)} vs company ${fmt(r.companyNet)} net to owner).
       ${inp.additionalNotes ? '<br><br><span style="opacity:0.85">Note: ' + inp.additionalNotes.replace(/</g, '&lt;') + '</span>' : ''}`;
 
-    let notice = r.flatOk
-      ? `Flat Privatanteil 10.8% p.a. (0.9%/month, min CHF 150/mo) incl. commuting · Canton ${inp.cantonName} · VAT 8.1%.`
-      : 'Business use ≤50% or sole trader: flat Privatanteil may not apply — use a logbook; company path may be understated.';
-    if (inp.companyType === 'sole') notice += ' *Sole trader: model uses Einzelunternehmen rules; Privatanteil on car differs from GmbH.';
+    let notice;
+    if (nl) {
+      notice = r.flatOk
+        ? `Bijtelling ${r.benefitLabel} on catalogue value ${fmt(r.benefitBase)} · BTW correction 2.7% of catalogue value · BTW 21% · Vpb/box 1 rates 2026.`
+        : 'Private use ≤500 km/yr: no bijtelling or BTW correction, but a full rittenregistratie is mandatory — any unlogged private km triggers back-assessment.';
+      if (r.sole) notice += ' *Eenmanszaak: deductions are taken at your box 1 rate; MKB profit exemption and entrepreneur allowances are not modelled.';
+    } else {
+      notice = r.flatOk
+        ? `Flat Privatanteil 10.8% p.a. (0.9%/month, min CHF 150/mo) incl. commuting · Canton ${inp.cantonName} · VAT 8.1%.`
+        : 'Business use ≤50% or sole trader: flat Privatanteil may not apply — use a logbook; company path may be understated.';
+      if (r.sole) notice += ' *Sole trader: model uses Einzelunternehmen rules; Privatanteil on car differs from GmbH.';
+    }
     $('complianceNotice').textContent = notice;
 
+    const bpmRow = nl && !usedBasis ? [['of which BPM (not recoverable)', fmt(inp.bpm)]] : [];
     $('acquisitionCols').innerHTML = colHtml('Personal', [
-      ['Purchase incl. VAT', fmt(r.priceIncl)],
-      ['VAT recovery', '—'],
-      ['Registration', fmt(inp.registration)],
+      [`Purchase incl. ${C.vatName}${usedBasis && !r.v.hasVat ? ' (none charged)' : ''}`, fmt(r.priceIncl)],
+      [`${C.vatName} recovery`, '—'],
+      ...bpmRow,
+      ['Registration / fees', fmt(inp.registration)],
       ['Net acquisition', fmt(r.personalAcq)],
     ], 'personal') + colHtml('Company', [
-      ['Purchase incl. VAT', fmt(r.priceIncl)],
-      ['VAT reclaimed', fmt(r.vatReclaim)],
-      ['Registration', fmt(inp.registration)],
-      ['Net acquisition', inp.financing === 'cash' ? fmt(r.companyAcqNet) : 'Leased'],
+      [`Purchase incl. ${C.vatName}${usedBasis && !r.v.hasVat ? ' (none charged)' : ''}`, fmt(r.priceIncl)],
+      [`${C.vatName} reclaimed`, fmt(r.vatReclaim)],
+      ...bpmRow,
+      ['Registration / fees', fmt(inp.registration)],
+      ['Net acquisition', r.lease ? 'Leased' : fmt(r.companyAcqNet)],
     ], 'company');
 
     const bizPct = fmtPct(inp.businessUse);
-    $('runningTable').innerHTML = `<table class="tco-table"><thead><tr>
+    $('runningTable').innerHTML = nl
+      ? `<table class="tco-table"><thead><tr>
+      <th>Cost / year</th><th>Amount</th><th>Personal</th><th>Company</th></tr></thead><tbody>
+      <tr><td>Insurance</td><td>${fmt(inp.insurance)}</td><td>—</td><td>100%</td></tr>
+      <tr><td>Road tax (MRB)</td><td>${fmt(r.mvTax)}</td><td>—</td><td>100%</td></tr>
+      <tr><td>Maintenance</td><td>${fmt(r.v.maintenance)}</td><td>—</td><td>100%</td></tr>
+      <tr><td>Fuel / charging</td><td>${fmt(inp.charging)}</td><td>—</td><td>100%</td></tr>
+      <tr><td>Km allowance (${C.cur}0.25 × ${Math.round(inp.annualKm * r.biz).toLocaleString(C.locale)} business km)</td><td>—</td><td>${fmt(r.kmAllowance)}</td><td>—</td></tr>
+      <tr class="total"><td>Total running</td><td>${fmt(r.running)}</td><td>${fmt(r.running)}</td><td>${fmt(r.running)}</td></tr>
+    </tbody></table>`
+      : `<table class="tco-table"><thead><tr>
       <th>Cost / year</th><th>Amount</th><th>Personal</th><th>Company</th></tr></thead><tbody>
       <tr><td>Insurance</td><td>${fmt(inp.insurance)}</td><td>${bizPct} deduct.</td><td>100%</td></tr>
       <tr><td>Motor vehicle tax</td><td>${fmt(r.mvTax)}</td><td>—</td><td>100%</td></tr>
-      <tr><td>Maintenance</td><td>${fmt(inp.maintenance)}</td><td>${bizPct}</td><td>100%</td></tr>
+      <tr><td>Maintenance</td><td>${fmt(r.v.maintenance)}</td><td>${bizPct}</td><td>100%</td></tr>
       <tr><td>Fuel / charging</td><td>${fmt(inp.charging)}</td><td>${bizPct}</td><td>100%</td></tr>
       <tr class="total"><td>Total</td><td>${fmt(r.running)}</td><td>${fmt(r.running * r.biz)}</td><td>${fmt(r.running)}</td></tr>
     </tbody></table>`;
 
-    $('taxCols').innerHTML = colHtml('Personal tax', [
-      ['Wealth tax (est.)', fmt(r.wealthTax)],
-      ['Business deduction', bizPct + ' of dep. + running'],
-      ['Income tax saved', fmt(r.personalTaxSave)],
-      ['Commute', 'Limited with private car'],
-    ], 'personal') + colHtml('Company tax', [
-      ['Depreciation', fmt(r.depAnnual) + '/yr'],
-      ['Corp. tax saved', fmt(r.companyTaxSave)],
-      ['Privatanteil / yr', fmt(r.privat) + ' → Lohnausweis 2.2'],
-      ['Your income tax', fmt(r.ownerPrivTax / inp.horizon) + '/yr'],
-      ['Social + MWST', fmt((r.ownerSocial + r.vatPriv) / inp.horizon) + '/yr'],
-    ], 'company');
+    const persTaxRows = nl
+      ? [
+        ['Box 3 (wealth) on the car', 'Exempt'],
+        ['Km allowance deduction', fmt(r.kmAllowance) + '/yr'],
+        [r.sole ? 'Income tax saved' : 'Vpb saved on allowance', fmt(r.personalTaxSave)],
+        ['Commute', 'Included in business km'],
+      ]
+      : [
+        ['Wealth tax (est.)', fmt(r.wealthTax)],
+        ['Business deduction', bizPct + ' of dep. + running'],
+        ['Income tax saved', fmt(r.personalTaxSave)],
+        ['Commute', 'Limited with private car'],
+      ];
+    const compTaxRows = nl
+      ? [
+        ['Depreciation', r.lease ? 'Lease expensed' : fmt(r.depAnnual) + '/yr'],
+        [r.sole ? 'Income tax saved' : 'Vpb saved', fmt(r.companyTaxSave)],
+        ['Bijtelling / yr', fmt(r.privat) + ' → loonstrook'],
+        ['Your box 1 tax on it', fmt(r.ownerPrivTax / inp.horizon) + '/yr'],
+        ['BTW correction + social', fmt((r.ownerSocial + r.vatPriv) / inp.horizon) + '/yr'],
+        ['Tax on disposal gain', fmt(r.disposalTax)],
+      ]
+      : [
+        ['Depreciation', fmt(r.depAnnual) + '/yr'],
+        ['Corp. tax saved', fmt(r.companyTaxSave)],
+        ['Privatanteil / yr', fmt(r.privat) + ' → Lohnausweis 2.2'],
+        ['Your income tax', fmt(r.ownerPrivTax / inp.horizon) + '/yr'],
+        ['Social + MWST', fmt((r.ownerSocial + r.vatPriv) / inp.horizon) + '/yr'],
+        ['Tax on disposal gain', fmt(r.disposalTax)],
+      ];
+    $('taxCols').innerHTML = colHtml('Personal tax', persTaxRows, 'personal') + colHtml('Company tax', compTaxRows, 'company');
 
     const run5 = r.running * inp.horizon;
     $('tcoTable').innerHTML = `<thead><tr><th>Element (${inp.horizon} yr)</th><th>Personal</th><th>Company</th></tr></thead><tbody>
-      <tr><td>Net purchase / lease capital</td><td>${fmt(r.personalAcq)}</td><td>${inp.financing === 'cash' ? fmt(r.companyAcqNet) : fmt(r.leaseAnnual * inp.horizon)}</td></tr>
+      <tr><td>Net purchase / lease capital</td><td>${fmt(r.personalAcq)}</td><td>${r.lease ? fmt(r.leaseAnnual * inp.horizon) : fmt(r.companyAcqNet)}</td></tr>
       <tr><td>Running costs</td><td>${fmt(run5)}</td><td>${fmt(run5)}</td></tr>
       <tr><td>Tax savings</td><td>−${fmt(r.personalTaxSave)}</td><td>−${fmt(r.companyTaxSave)}</td></tr>
-      <tr><td>Privatanteil tax cost</td><td>—</td><td>+${fmt(r.ownerPrivTax + r.ownerSocial + r.vatPriv)}</td></tr>
-      <tr><td>Wealth tax</td><td>+${fmt(r.wealthTax)}</td><td>—</td></tr>
+      <tr><td>${BEN} tax cost${nl ? ' (incl. BTW correction)' : ''}</td><td>—</td><td>+${fmt(r.ownerPrivTax + r.ownerSocial + r.vatPriv)}</td></tr>
+      ${nl ? '' : `<tr><td>Wealth tax</td><td>+${fmt(r.wealthTax)}</td><td>—</td></tr>`}
+      <tr><td>Tax on disposal gain</td><td>—</td><td>${r.disposalTax >= 0 ? '+' : '−'}${fmt(Math.abs(r.disposalTax))}</td></tr>
       <tr><td>Resale</td><td>−${fmt(r.resale)}</td><td>−${fmt(r.resale)}</td></tr>
       <tr class="total"><td>Total net cost</td><td>${fmt(r.personalNet)}</td><td>${fmt(r.companyNet)}</td></tr>
-      <tr class="total"><td>Saving vs alternative</td><td>${personalWinsLabel(r)}</td><td>${companyWinsLabel(r)}</td></tr>
+      <tr class="total"><td>Saving vs alternative</td><td>${r.winner === 'personal' ? fmt(Math.abs(r.diff)) : '—'}</td><td>${r.winner === 'company' ? fmt(Math.abs(r.diff)) : '—'}</td></tr>
     </tbody>`;
 
-    $('leaseNote').innerHTML = inp.financing === 'lease'
-      ? '<p><strong>Leasing selected.</strong> Privatanteil uses list price ex VAT, not monthly payment. Payments are expensed; VAT on instalments subject to private-use correction. Leasing rarely changes the verdict unless subsidised vs buying.</p>'
-      : '<p><strong>Cash purchase.</strong> Straight-line depreciation over 5 years on ex-VAT cost. Switch to Leasing in the form to compare fleet-style structures.</p>';
+    $('leaseNote').innerHTML = usedBasis
+      ? '<p><strong>Used car.</strong> Modelled as a cash purchase; used-car leasing is rare and priced very differently. Switch to <em>New car</em> or <em>Compare</em> to test a lease on the new option.</p>'
+      : inp.financing === 'lease'
+        ? `<p><strong>Leasing selected.</strong> ${BEN} uses ${nl ? 'catalogue value' : 'list price ex VAT'}, not the monthly payment. Payments are expensed; ${nl ? 'BTW correction still applies to private use' : 'VAT on instalments subject to private-use correction'}. Leasing rarely changes the verdict unless subsidised vs buying.</p>`
+        : '<p><strong>Cash purchase.</strong> Straight-line depreciation over 5 years on the ' + (r.vatReclaim > 0 ? 'ex-' + C.vatName : 'gross') + ' cost. Switch to Leasing in the form to compare fleet-style structures.</p>';
 
     const fuelLabel = { electric: 'Electric', petrol: 'Petrol', diesel: 'Diesel', hybrid: 'Hybrid' }[inp.fuelType];
-    $('evNote').innerHTML = inp.isEv
-      ? `<p><strong>${fuelLabel}:</strong> ~50% motor vehicle tax vs ICE in ${inp.cantonName}. No federal Swiss purchase subsidy. Home charging via company: clarify MWST. Zug may revise EV tax rules.</p>`
-      : `<p><strong>${fuelLabel}:</strong> Full cantonal motor vehicle tax. Higher fuel/charging line in the model. No EV-specific discounts.</p>`;
+    $('evNote').innerHTML = nl
+      ? (inp.fuelType === 'electric'
+        ? `<p><strong>Electric:</strong> bijtelling is 18% on the first €30,000 of catalogue value (22% above) for cars first registered in 2026, fixed for 60 months; older cars keep the rate of their registration year. EV road-tax discounts and BPM are small but change by year — enter your actual MRB and BPM. Check the rate for your registration date with the Belastingdienst.</p>`
+        : `<p><strong>${fuelLabel}:</strong> bijtelling is a flat 22% of catalogue value, and BPM (included in the new price) and MRB are higher than for an EV. BPM is not recoverable and not charged again on a used Dutch car.</p>`)
+      : (inp.isEv
+        ? `<p><strong>${fuelLabel}:</strong> ~50% motor vehicle tax vs ICE in ${inp.cantonName}. No federal Swiss purchase subsidy. Home charging via company: clarify MWST. Zug may revise EV tax rules.</p>`
+        : `<p><strong>${fuelLabel}:</strong> Full cantonal motor vehicle tax. Higher fuel/charging line in the model. No EV-specific discounts.</p>`);
 
     const guides = [];
+    const rate = fmtPct(r.deductRate * 100);
     if (r.winner === 'personal') {
-      guides.push({ t: 'Private ownership wins', b: `At ${fmtPct(inp.marginalRate)} marginal tax vs ${fmtPct(inp.corpTaxRate * 100)} company rate in ${inp.cantonName}, Privatanteil cost outweighs corporate shields for this ${inp.carName}.` });
+      guides.push({ t: 'Private ownership wins', b: nl
+        ? `Bijtelling at your ${fmtPct(inp.marginalRate)} box 1 rate costs more than the BTW reclaim and ${rate} tax shield save for this ${inp.carName}.`
+        : `At ${fmtPct(inp.marginalRate)} marginal tax vs ${rate} company rate in ${inp.cantonName}, Privatanteil cost outweighs corporate shields for this ${inp.carName}.` });
     } else {
-      guides.push({ t: 'Company ownership wins', b: `VAT (${fmt(r.vatReclaim)}) and deductible costs beat Privatanteil drag — often when profit stays in the company at ${fmtPct(inp.corpTaxRate * 100)}.` });
+      guides.push({ t: 'Company ownership wins', b: `${C.vatName} (${fmt(r.vatReclaim)}) and deductible costs beat ${BEN.toLowerCase()} drag — often when profit stays in the company at ${rate}.` });
     }
-    guides.push({ t: 'Compliance', b: 'Company: Lohnausweis 2.2, box F, MWST on benefit, Fahrtenbuch if ≤50% business. Missing Privatanteil → hidden dividend risk.' });
+    guides.push({ t: 'Compliance', b: nl
+      ? 'BV: bijtelling runs through payroll, BTW private-use correction in the BTW return, rittenregistratie if ≤500 private km. Missing bijtelling → loonheffing correction and fines.'
+      : 'Company: Lohnausweis 2.2, box F, MWST on benefit, Fahrtenbuch if ≤50% business. Missing Privatanteil → hidden dividend risk.' });
     guides.push({ t: 'When the other structure wins', b: r.winner === 'personal'
-      ? 'Company: ~100% business use, high VAT reclaim, low personal marginal rate, long profit retention.'
-      : 'Private: high marginal tax, moderate LTV, shareholder needs simple admin.' });
+      ? (nl ? 'Company: low bijtelling (EV, low catalogue value), high BTW reclaim, profit taxed at 19%, and a low personal rate.' : 'Company: ~100% business use, high VAT reclaim, low personal marginal rate, long profit retention.')
+      : (nl ? 'Private: 49.5% box 1 rate, high-catalogue ICE, mostly private km, or shareholder wants simple admin.' : 'Private: high marginal tax, moderate LTV, shareholder needs simple admin.') });
+    if (nl && usedBasis) {
+      guides.push({ t: 'Used car and bijtelling', b: `Bijtelling stays on the original catalogue value (${fmt(r.benefitBase)}), not the ${fmt(r.priceIncl)} you paid, unless the car is 15+ years old. A used car cuts depreciation but not the bijtelling charge.` });
+    }
+    if (!nl && usedBasis) {
+      guides.push({ t: 'Used car and Privatanteil', b: `Privatanteil follows the purchase price, so the cheaper used car also lowers it (${fmt(r.privat)}/yr). Private sellers charge no VAT, so there is nothing to reclaim.` });
+    }
     if (inp.companyProfit > 200000) {
-      guides.push({ t: 'Profit context', b: `Company profit CHF ${inp.companyProfit.toLocaleString('de-CH')}/yr — effective rate still ~${fmtPct(inp.corpTaxRate * 100)} in ${inp.cantonName}; Pillar Two not modelled.` });
+      guides.push({ t: 'Profit context', b: nl
+        ? `Company profit ${fmt(inp.companyProfit)}/yr — the part above €200,000 is taxed at 25.8%, which raises the value of deductions on the marginal euro.`
+        : `Company profit CHF ${inp.companyProfit.toLocaleString('de-CH')}/yr — effective rate still ~${rate} in ${inp.cantonName}; Pillar Two not modelled.` });
     }
     $('guideList').innerHTML = guides.map(g => `<li><strong>${g.t}</strong>${g.b}</li>`).join('');
 
+    renderNewVsUsed(inp, rNew, rUsed, compare);
     renderChart(inp, r);
   }
 
-  function personalWinsLabel(r) {
-    return r.winner === 'personal' ? fmt(Math.abs(r.diff)) : '—';
-  }
-  function companyWinsLabel(r) {
-    return r.winner === 'company' ? fmt(Math.abs(r.diff)) : '—';
-  }
-  function colHtml(title, rows, cls) {
-    return `<div class="detail-col ${cls}"><h4>${title}</h4><dl>` +
-      rows.map(([k, v]) => `<div class="metric-row"><dt>${k}</dt><dd>${v}</dd></div>`).join('') + '</dl></div>';
+  function renderNewVsUsed(inp, n, u, show) {
+    $('nuCard').classList.toggle('hidden', !show);
+    if (!show) return;
+    const nl = inp.country === 'nl';
+    const options = [
+      { k: 'np', label: 'New · Personal', val: n.personalNet },
+      { k: 'nc', label: 'New · Company', val: n.companyNet },
+      { k: 'up', label: 'Used · Personal', val: u.personalNet },
+      { k: 'uc', label: 'Used · Company', val: u.companyNet },
+    ];
+    const best = options.reduce((a, b) => (b.val < a.val ? b : a));
+    const bestNew = options[0].val <= options[1].val ? options[0] : options[1];
+    const bestUsed = options[2].val <= options[3].val ? options[2] : options[3];
+    const cls = (k) => (best.k === k ? ' class="best"' : '');
+    const delta = (a, b) => {
+      const d = b - a;
+      return (d <= 0 ? '−' : '+') + fmt(Math.abs(d));
+    };
+    $('nuTable').innerHTML = `<table class="tco-table"><thead><tr>
+      <th>${inp.horizon}-yr net cost</th><th>New</th><th>Used (${inp.usedAge} yr)</th><th>Used vs new</th></tr></thead><tbody>
+      <tr><td>Purchase price</td><td>${fmt(n.priceIncl)}</td><td>${fmt(u.priceIncl)}${u.v.hasVat ? '' : ' (no ' + C.vatName + ')'}</td><td>${delta(n.priceIncl, u.priceIncl)}</td></tr>
+      <tr><td>Personal ownership</td><td${cls('np')}>${fmt(n.personalNet)}</td><td${cls('up')}>${fmt(u.personalNet)}</td><td>${delta(n.personalNet, u.personalNet)}</td></tr>
+      <tr><td>Company (${companyTitle(inp)})</td><td${cls('nc')}>${fmt(n.companyNet)}</td><td${cls('uc')}>${fmt(u.companyNet)}</td><td>${delta(n.companyNet, u.companyNet)}</td></tr>
+      <tr><td>${C.benefit} / yr (company)</td><td>${fmt(n.privat)}</td><td>${fmt(u.privat)}</td><td>${delta(n.privat, u.privat)}</td></tr>
+      <tr><td>${C.vatName} reclaimed (company)</td><td>${fmt(n.vatReclaim)}</td><td>${fmt(u.vatReclaim)}</td><td>${delta(n.vatReclaim, u.vatReclaim)}</td></tr>
+      <tr class="total"><td>Cheapest structure</td><td>${n.winner === 'personal' ? 'Personal' : 'Company'}</td><td>${u.winner === 'personal' ? 'Personal' : 'Company'}</td><td>${delta(bestNew.val, bestUsed.val)}</td></tr>
+    </tbody></table>`;
+
+    const saving = bestNew.val - bestUsed.val;
+    const pctSave = bestNew.val ? Math.abs(saving) / bestNew.val * 100 : 0;
+    const headline = saving > 0
+      ? `<strong>Cheapest overall: ${best.label}</strong> — the used car saves ${fmt(saving)} (${pctSave.toFixed(0)}%) over ${inp.horizon} years versus the best new option.`
+      : `<strong>Cheapest overall: ${best.label}</strong> — the new car is ${fmt(Math.abs(saving))} cheaper over ${inp.horizon} years than the best used option.`;
+    const why = nl
+      ? `Bijtelling is charged on the original catalogue value (${fmt(u.benefitBase)}) in both cases, so ${u.privat >= n.privat * 0.99 ? 'buying used does nothing to reduce it' : 'it is similar'}. The used-car advantage comes from lower depreciation, partly offset by ${u.v.hasVat ? '' : 'no BTW to reclaim (the company path loses its BTW advantage) and '}higher maintenance.`
+      : `Privatanteil follows the purchase price, so used cuts it from ${fmt(n.privat)} to ${fmt(u.privat)} per year. ${u.v.hasVat ? '' : 'A private/no-VAT purchase gives up the VAT reclaim, which weakens the company path.'}`;
+    $('nuNote').innerHTML = `<p>${headline}</p><p style="margin-top:6px;color:var(--text-muted)">${why}</p>`;
+
+    if (typeof Chart === 'undefined') return;
+    const dark = document.documentElement.getAttribute('data-theme') === 'dark';
+    const colors = { text: dark ? '#b0a89a' : '#5e5850', grid: dark ? '#3d3830' : '#e0dcd4', p: dark ? '#6a9fd4' : '#2a5f8f', c: dark ? '#4db87a' : '#138808' };
+    if (chartNu) chartNu.destroy();
+    chartNu = new Chart($('chartNu'), {
+      type: 'bar',
+      data: {
+        labels: ['New', `Used (${inp.usedAge} yr)`],
+        datasets: [
+          { label: 'Personal', data: [n.personalNet, u.personalNet], backgroundColor: colors.p },
+          { label: 'Company', data: [n.companyNet, u.companyNet], backgroundColor: colors.c },
+        ],
+      },
+      options: {
+        responsive: true, maintainAspectRatio: false,
+        plugins: { legend: { labels: { color: colors.text } } },
+        scales: {
+          x: { ticks: { color: colors.text }, grid: { color: colors.grid } },
+          y: { beginAtZero: true, ticks: { color: colors.text, callback: val => C.cur + ' ' + Math.round(val / 1000) + 'k' }, grid: { color: colors.grid } },
+        },
+      },
+    });
   }
 
   function renderChart(inp, r) {
@@ -830,12 +1165,13 @@
         plugins: { legend: { labels: { color: colors.text } } },
         scales: {
           x: { ticks: { color: colors.text }, grid: { color: colors.grid } },
-          y: { ticks: { color: colors.text, callback: v => 'CHF ' + Math.round(v / 1000) + 'k' }, grid: { color: colors.grid } },
+          y: { ticks: { color: colors.text, callback: val => C.cur + ' ' + Math.round(val / 1000) + 'k' }, grid: { color: colors.grid } },
         },
       },
     });
   }
 
+  /* ── Control flow ──────────────────────────────────────────────────── */
   function showResults() {
     $('emptyState').classList.add('hidden');
     $('results').classList.remove('hidden');
@@ -845,59 +1181,127 @@
   function runAnalysis() {
     const inp = readInputs();
     if (inp.purchasePrice < 1000) return;
-    if (inp.financing === 'lease' && !inp.leaseBuyout) {
-      inp.leaseBuyout = Math.round(exVat(inp.purchasePrice));
+    if (inp.condition !== 'new' && !(inp.usedPrice >= 1000)) return;
+    if (inp.country === 'ch' && inp.financing === 'lease' && !inp.leaseBuyout) {
+      inp.leaseBuyout = Math.round(exVatOf(inp.purchasePrice));
       $('leaseBuyout').value = inp.leaseBuyout;
     }
     showResults();
-    render(inp, simulate(inp));
+    render(inp, simulate(inp, vehicle(inp, 'new')), simulate(inp, vehicle(inp, 'used')));
+  }
+
+  function autoUsedPrice() {
+    const el = $('usedPrice');
+    if (el.dataset.auto !== '1') return;
+    const price = Number($('purchasePrice').value) || 0;
+    const age = Math.max(1, Number($('usedAge').value) || 1);
+    el.value = Math.max(1000, Math.round(price * Math.pow(0.82, age) / 500) * 500);
+  }
+
+  function autoNlCorp() {
+    if (C.id !== 'nl') return;
+    if ($('companyType').value === 'sole') {
+      $('corpTaxRate').value = $('marginalRate').value;
+    } else {
+      $('corpTaxRate').value = Number($('companyProfit').value) > 200000 ? 25.8 : 19;
+    }
   }
 
   function onCantonChange() {
-    const c = CANTONS[$('canton').value];
-    if (c) {
+    const c = CH_CANTONS[$('canton').value];
+    if (C.id === 'ch' && c) {
       $('corpTaxRate').value = c.corp;
       if ($('mvTax').dataset.auto === '1') $('mvTax').value = c.mvIce;
     }
   }
 
   function onFuelChange() {
-    const d = FUEL_DEFAULTS[$('fuelType').value];
+    const d = C.fuel[$('fuelType').value];
     if (d) {
       $('maintenance').value = d.maintenance;
       $('charging').value = d.charging;
+      if (C.id === 'nl' && d.mvTax && $('mvTax').dataset.auto === '1') $('mvTax').value = d.mvTax;
     }
     if (hasRun) runAnalysis();
   }
 
   function applyPreset(name) {
-    const p = PRESETS[name];
+    const p = C.presets[name];
     if (!p) return;
     document.querySelectorAll('[data-preset]').forEach(b => b.classList.toggle('active', b.dataset.preset === name));
     Object.entries(p).forEach(([k, v]) => { const el = $(k); if (el) el.value = v; });
+    $('mvTax').dataset.auto = '1';
+    $('usedPrice').dataset.auto = '1';
+    autoUsedPrice();
     onCantonChange();
+    autoNlCorp();
     runAnalysis();
   }
 
+  function applyConditionUi() {
+    $('usedFields').classList.toggle('hidden', $('condition').value === 'new');
+  }
+
+  function setCountry(id, opts) {
+    C = COUNTRIES[id] || COUNTRIES.ch;
+    const nl = C.id === 'nl';
+    document.querySelectorAll('[data-country]').forEach(b => b.classList.toggle('active', b.dataset.country === C.id));
+    $('logoSub').textContent = C.logoSub;
+    $('headerTag').textContent = C.rules;
+    $('heroTitle').innerHTML = C.heroTitle;
+    $('heroText').textContent = C.heroText;
+    $('disclaimer').textContent = C.disclaimer;
+    $('ctaText').textContent = C.cta;
+    $('lblPrice').textContent = C.labels.price;
+    $('lblMarginal').textContent = C.labels.marginal;
+    $('lblVatReg').textContent = C.labels.vatReg;
+    $('lblSocial').textContent = C.labels.social;
+    $('lblMv').textContent = C.labels.mv;
+    $('lblLeaseBuyout').textContent = C.labels.leaseBuyout;
+    $('lblLeaseMonthly').textContent = C.labels.leaseMonthly;
+    $('corpHint').textContent = C.labels.corpHint;
+    $('usedSellerHint').textContent = C.usedSellerHint;
+    document.querySelectorAll('.cur').forEach(el => { el.textContent = C.cur; });
+    $('cantonField').classList.toggle('hidden', nl);
+    $('nlFields').classList.toggle('hidden', !nl);
+    $('leaseBuyoutField').classList.toggle('hidden', nl);
+    $('companyType').innerHTML = C.companyTypes.map(([v, l]) => `<option value="${v}">${l}</option>`).join('');
+    $('companyType').value = C.defaults.companyType;
+    Object.entries(C.defaults).forEach(([k, v]) => { const el = $(k); if (el && k !== 'companyType') el.value = v; });
+    $('corpTaxRate').dataset.nlAuto = nl ? '1' : '0';
+    if (document.documentElement.setAttribute && !(opts && opts.silent)) {
+      try { history.replaceState(null, '', nl ? '?country=nl' : location.pathname); } catch (e) { /* ignore */ }
+    }
+    applyPreset('tesla');
+  }
+
   $('analyseBtn').addEventListener('click', runAnalysis);
+  document.querySelectorAll('[data-country]').forEach(b => b.addEventListener('click', () => setCountry(b.dataset.country)));
+  $('condition').addEventListener('change', () => { applyConditionUi(); autoUsedPrice(); if (hasRun) runAnalysis(); });
   $('financing').addEventListener('change', () => {
     $('leaseFields').classList.toggle('hidden', $('financing').value !== 'lease');
-    if ($('financing').value === 'lease') $('leaseBuyout').value = Math.round(exVat(Number($('purchasePrice').value)));
+    if ($('financing').value === 'lease') $('leaseBuyout').value = Math.round(exVatOf(Number($('purchasePrice').value)));
     if (hasRun) runAnalysis();
   });
   $('canton').addEventListener('change', () => { onCantonChange(); if (hasRun) runAnalysis(); });
   $('fuelType').addEventListener('change', onFuelChange);
   $('mvTax').addEventListener('input', () => { $('mvTax').dataset.auto = '0'; if (hasRun) runAnalysis(); });
+  $('usedPrice').addEventListener('input', () => { $('usedPrice').dataset.auto = '0'; if (hasRun) runAnalysis(); });
+  $('usedAge').addEventListener('input', () => { autoUsedPrice(); if (hasRun) runAnalysis(); });
   $('purchasePrice').addEventListener('input', () => {
-    if ($('financing').value === 'lease') $('leaseBuyout').value = Math.round(exVat(Number($('purchasePrice').value) || 0));
+    if ($('financing').value === 'lease') $('leaseBuyout').value = Math.round(exVatOf(Number($('purchasePrice').value) || 0));
+    autoUsedPrice();
     if (hasRun) runAnalysis();
   });
+  $('companyProfit').addEventListener('input', () => { autoNlCorp(); if (hasRun) runAnalysis(); });
+  $('marginalRate').addEventListener('input', () => { if ($('companyType').value === 'sole') autoNlCorp(); if (hasRun) runAnalysis(); });
+  $('companyType').addEventListener('change', () => { autoNlCorp(); if (hasRun) runAnalysis(); });
 
   document.querySelectorAll('[data-preset]').forEach(b => b.addEventListener('click', () => applyPreset(b.dataset.preset)));
-  ['carName','businessUse','marginalRate','corpTaxRate','vatRegistered','companyType','socialRate',
-    'leaseMonthly','leaseBuyout','insurance','maintenance','charging','horizon','resalePct','registration','companyProfit'
+  ['carName','businessUse','corpTaxRate','vatRegistered','socialRate','usedSeller','usedResalePct','usedMaintUplift',
+    'annualKm','bpm','privateKm','leaseMonthly','leaseBuyout','insurance','maintenance','charging','horizon','resalePct','registration'
   ].forEach(id => { const el = $(id); if (el) el.addEventListener('input', () => { if (hasRun) runAnalysis(); }); });
-  $('vatRegistered').addEventListener('change', () => { if (hasRun) runAnalysis(); });
+  ['vatRegistered','usedSeller','privateKm'].forEach(id => $(id).addEventListener('change', () => { if (hasRun) runAnalysis(); }));
 
   $('btnTheme').addEventListener('click', () => {
     const d = document.documentElement.getAttribute('data-theme') === 'dark';
@@ -911,8 +1315,10 @@
     document.documentElement.setAttribute('data-theme', dark ? 'dark' : 'light');
     $('btnTheme').textContent = dark ? 'Light' : 'Dark';
     $('mvTax').dataset.auto = '1';
+    $('usedPrice').dataset.auto = '1';
+    const startNl = /[?&]country=nl\b/.test(location.search);
     function wait() {
-      if (typeof Chart !== 'undefined') applyPreset('tesla');
+      if (typeof Chart !== 'undefined') { applyConditionUi(); setCountry(startNl ? 'nl' : 'ch'); }
       else setTimeout(wait, 50);
     }
     wait();

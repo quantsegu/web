@@ -1,0 +1,698 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Compare permanent salary vs contracting (ZZP, BV, AG, free-zone company, payrolling) across the Netherlands, Zug and Dubai — with pension, benefits, a comfort uplift and cost-of-living adjustment." />
+  <title>Salary &amp; Contracting Scenario Comparison — NL · Zug · Dubai</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js" defer></script>
+  <style>
+    :root {
+      --accent: #8b4518;
+      --accent-hover: #6d3612;
+      --accent-muted: rgba(139, 69, 24, 0.12);
+      --personal: #2a5f8f;
+      --personal-muted: rgba(42, 95, 143, 0.1);
+      --company: #138808;
+      --company-muted: rgba(19, 136, 8, 0.1);
+      --bg: #f6f4f0;
+      --surface: #ffffff;
+      --surface-2: #edeae4;
+      --border: #d6d0c6;
+      --text: #1c1916;
+      --text-muted: #5e5850;
+      --text-faint: #8a8378;
+      --gain: #1a6b3c;
+      --loss: #9b2c2c;
+      --shadow: 0 1px 3px rgba(0,0,0,0.06);
+      --radius: 4px;
+      --font: "Helvetica Neue", Helvetica, Arial, system-ui, sans-serif;
+      --header-h: 48px;
+      --form-w: 320px;
+    }
+    [data-theme="dark"] {
+      --accent: #d4a574;
+      --accent-hover: #e8bc8a;
+      --accent-muted: rgba(212, 165, 116, 0.15);
+      --personal: #6a9fd4;
+      --personal-muted: rgba(106, 159, 212, 0.12);
+      --company: #4db87a;
+      --company-muted: rgba(77, 184, 122, 0.12);
+      --bg: #141210;
+      --surface: #1f1c18;
+      --surface-2: #2a2620;
+      --border: #3d3830;
+      --text: #f0ebe3;
+      --text-muted: #b0a89a;
+      --text-faint: #7a7368;
+      --gain: #4db87a;
+      --loss: #e07070;
+      --shadow: 0 1px 3px rgba(0,0,0,0.35);
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { font-size: 14px; scroll-behavior: smooth; }
+    body {
+      font-family: var(--font); background: var(--bg); color: var(--text);
+      line-height: 1.45; font-feature-settings: "tnum" 1, "lnum" 1;
+      min-height: 100vh;
+    }
+    .tabular { font-variant-numeric: tabular-nums lining-nums; }
+    button, input, select, textarea { font-family: inherit; font-size: inherit; }
+    a { color: var(--accent); }
+    :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+    .app-header {
+      position: sticky; top: 0; z-index: 100; height: var(--header-h);
+      display: flex; align-items: center; gap: 12px; padding: 0 16px;
+      background: var(--surface); border-bottom: 1px solid var(--border); box-shadow: var(--shadow);
+    }
+    .logo { display: flex; align-items: center; gap: 8px; text-decoration: none; color: var(--text); }
+    .logo svg { width: 28px; height: 28px; }
+    .logo-title { font-size: 0.95rem; font-weight: 600; }
+    .logo-sub { font-size: 0.68rem; color: var(--text-muted); }
+    .header-tag {
+      font-size: 0.65rem; letter-spacing: 0.08em; text-transform: uppercase;
+      color: var(--text-faint); border: 1px solid var(--border); padding: 4px 8px; border-radius: var(--radius);
+    }
+    .header-actions { margin-left: auto; display: flex; align-items: center; gap: 8px; }
+    .btn {
+      padding: 6px 12px; border: 1px solid var(--border); border-radius: var(--radius);
+      background: var(--surface); color: var(--text); cursor: pointer; font-size: 0.8rem; text-decoration: none;
+    }
+    .btn:hover { background: var(--surface-2); }
+    .btn-primary { background: var(--accent); border-color: var(--accent); color: #fff; font-weight: 600; }
+    [data-theme="dark"] .btn-primary { color: #1a1410; }
+    .btn-sm { padding: 4px 8px; font-size: 0.72rem; }
+
+    .page-hero {
+      padding: 28px 24px 20px;
+      border-bottom: 1px solid var(--border);
+      background: linear-gradient(180deg, var(--accent-muted) 0%, transparent 100%);
+      max-width: 52rem;
+    }
+    .hero-eyebrow {
+      font-size: 0.65rem; font-weight: 600; letter-spacing: 0.12em;
+      text-transform: uppercase; color: var(--accent); margin-bottom: 8px;
+    }
+    .page-hero h1 {
+      font-size: clamp(1.5rem, 4vw, 2rem); font-weight: 700;
+      letter-spacing: -0.03em; line-height: 1.15; margin-bottom: 8px;
+    }
+    .page-hero h1 em { font-style: normal; color: var(--accent); }
+    .page-hero p { color: var(--text-muted); font-size: 0.9rem; max-width: 36rem; }
+
+    .workspace {
+      display: grid; grid-template-columns: var(--form-w) 1fr;
+      min-height: calc(100vh - var(--header-h) - 120px);
+      border-top: 1px solid var(--border);
+    }
+
+    .form-panel {
+      border-right: 1px solid var(--border);
+      background: var(--surface);
+      padding: 16px;
+      overflow-y: auto;
+      max-height: calc(100vh - var(--header-h));
+      position: sticky; top: var(--header-h);
+    }
+    .panel-title {
+      font-size: 0.65rem; font-weight: 600; text-transform: uppercase;
+      letter-spacing: 0.08em; color: var(--text-faint);
+      margin-bottom: 12px; padding-bottom: 8px; border-bottom: 1px solid var(--border);
+    }
+    .section-divider {
+      font-size: 0.62rem; font-weight: 600; letter-spacing: 0.08em;
+      text-transform: uppercase; color: var(--text-faint);
+      margin: 14px 0 10px; display: flex; align-items: center; gap: 8px;
+    }
+    .section-divider::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+
+    .field { margin-bottom: 10px; }
+    .field label {
+      display: block; font-size: 0.7rem; font-weight: 500; color: var(--text-muted);
+      margin-bottom: 4px; text-transform: uppercase; letter-spacing: 0.04em;
+    }
+    .field input, .field select, .field textarea {
+      width: 100%; padding: 7px 9px; border: 1px solid var(--border);
+      border-radius: var(--radius); background: var(--bg); color: var(--text);
+    }
+    .field textarea { min-height: 64px; resize: vertical; line-height: 1.45; text-transform: none; }
+    .field-hint { font-size: 0.65rem; color: var(--text-faint); margin-top: 3px; }
+    .field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+    .field.hidden { display: none; }
+    .prefix-wrap { position: relative; }
+    .prefix-wrap span {
+      position: absolute; left: 9px; top: 50%; transform: translateY(-50%);
+      font-size: 0.72rem; color: var(--text-faint);
+    }
+    .prefix-wrap input { padding-left: 40px; }
+
+    .tco-table td.best, .tco-table th.best { color: var(--gain); font-weight: 700; }
+    .preset-row { display: grid; grid-template-columns: 1fr 1fr; gap: 4px; margin-bottom: 12px; }
+    .preset-row button {
+      padding: 6px; font-size: 0.68rem; border: 1px solid var(--border);
+      border-radius: var(--radius); background: var(--bg); color: var(--text-muted); cursor: pointer;
+    }
+    .preset-row button.active { border-color: var(--accent); background: var(--accent-muted); color: var(--accent); font-weight: 600; }
+
+    .analyse-btn {
+      width: 100%; margin-top: 12px; padding: 11px;
+      background: var(--accent); color: #fff; border: none; border-radius: var(--radius);
+      font-size: 0.85rem; font-weight: 600; cursor: pointer;
+      transition: background 0.15s;
+    }
+    .analyse-btn:hover { background: var(--accent-hover); }
+    [data-theme="dark"] .analyse-btn { color: #1a1410; }
+
+    .output-panel { padding: 20px 24px 32px; min-width: 0; }
+
+    .empty-state {
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      text-align: center; padding: 4rem 2rem; color: var(--text-muted);
+    }
+    .empty-state .icon { font-size: 2rem; opacity: 0.35; margin-bottom: 12px; }
+    .empty-state h3 { font-size: 1.1rem; font-weight: 600; color: var(--text); opacity: 0.6; margin-bottom: 6px; }
+    .empty-state p { font-size: 0.82rem; max-width: 280px; line-height: 1.55; }
+
+    .compare-grid {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 16px;
+    }
+    .compare-card {
+      border: 1px solid var(--border); border-radius: var(--radius);
+      overflow: hidden; background: var(--surface); box-shadow: var(--shadow);
+    }
+    .compare-card.winner { border-width: 2px; }
+    .compare-card.personal.winner { border-color: var(--personal); }
+    .compare-card.company.winner { border-color: var(--company); }
+    .compare-card-header {
+      padding: 10px 14px; display: flex; align-items: center; justify-content: space-between;
+    }
+    .compare-card.personal .compare-card-header { background: var(--personal-muted); }
+    .compare-card.company .compare-card-header { background: var(--company-muted); }
+    .compare-card-header h3 { font-size: 0.8rem; font-weight: 600; }
+    .compare-card.personal .compare-card-header h3 { color: var(--personal); }
+    .compare-card.company .compare-card-header h3 { color: var(--company); }
+    .winner-tag {
+      font-size: 0.62rem; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase;
+      background: var(--gain); color: #fff; padding: 2px 7px; border-radius: var(--radius);
+    }
+    .compare-card-body { padding: 12px 14px; }
+    .cost-label { font-size: 0.62rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-faint); }
+    .cost-value { font-size: 1.45rem; font-weight: 700; margin: 4px 0 8px; }
+    .cost-meta { font-size: 0.72rem; color: var(--text-muted); line-height: 1.5; }
+    .cost-saving { font-size: 0.72rem; color: var(--gain); font-weight: 600; margin-top: 4px; }
+
+    .verdict-box {
+      background: var(--text); color: var(--bg);
+      border-radius: var(--radius); padding: 14px 16px; margin-bottom: 16px;
+      font-size: 0.88rem; line-height: 1.6;
+    }
+    [data-theme="dark"] .verdict-box { background: #0a1628; color: #f0ebe3; }
+    .verdict-box .verdict-label {
+      font-size: 0.65rem; text-transform: uppercase; letter-spacing: 0.1em;
+      opacity: 0.65; margin-bottom: 6px;
+    }
+    .verdict-box strong { color: var(--accent); }
+    [data-theme="dark"] .verdict-box strong { color: #ff9933; }
+
+    .notice {
+      padding: 10px 12px; margin-bottom: 14px; font-size: 0.78rem; color: var(--text-muted);
+      background: var(--surface); border-left: 3px solid var(--accent);
+      border-radius: var(--radius); border: 1px solid var(--border); border-left-width: 3px;
+    }
+
+    .card {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: var(--radius); margin-bottom: 14px; box-shadow: var(--shadow);
+    }
+    .card-header {
+      padding: 8px 12px; border-bottom: 1px solid var(--border);
+      font-size: 0.78rem; font-weight: 600;
+    }
+    .card-body { padding: 12px; }
+    .chart-wrap { position: relative; height: 240px; }
+
+    .detail-cols { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    @media (max-width: 640px) { .detail-cols { grid-template-columns: 1fr; } }
+    .detail-col { padding: 10px; border: 1px solid var(--border); border-radius: var(--radius); font-size: 0.76rem; }
+    .detail-col.personal { background: var(--personal-muted); }
+    .detail-col.company { background: var(--company-muted); }
+    .detail-col h4 { font-size: 0.68rem; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 8px; }
+    .metric-row { display: flex; justify-content: space-between; padding: 4px 0; border-bottom: 1px solid var(--border); }
+    .metric-row:last-child { border-bottom: none; }
+    .metric-row dt { color: var(--text-muted); margin: 0; }
+    .metric-row dd { margin: 0; font-weight: 600; }
+
+    .tco-table { width: 100%; border-collapse: collapse; font-size: 0.75rem; }
+    .tco-table th, .tco-table td { padding: 7px 8px; border-bottom: 1px solid var(--border); text-align: right; }
+    .tco-table th { text-align: left; color: var(--text-faint); font-weight: 600; font-size: 0.68rem; text-transform: uppercase; }
+    .tco-table tr.total { font-weight: 700; background: var(--surface-2); }
+
+    .guide-list { list-style: none; }
+    .guide-list li {
+      padding: 9px 11px; margin-bottom: 6px; border: 1px solid var(--border);
+      border-radius: var(--radius); font-size: 0.78rem; color: var(--text-muted);
+    }
+    .guide-list li strong { display: block; color: var(--text); margin-bottom: 3px; font-size: 0.82rem; }
+
+    .cta-block {
+      text-align: center; padding: 22px 16px;
+      background: var(--accent-muted); border: 1px solid var(--border); border-radius: var(--radius);
+    }
+    .cta-block h2 { margin: 0 0 8px; font-size: 1.05rem; }
+    .cta-block p { margin: 0 0 14px; color: var(--text-muted); font-size: 0.84rem; }
+
+    .disclaimer {
+      font-size: 0.68rem; color: var(--text-faint); padding: 12px 24px;
+      border-top: 1px solid var(--border); letter-spacing: 0.02em;
+    }
+
+    @media (max-width: 900px) {
+      .workspace { grid-template-columns: 1fr; }
+      .form-panel { position: static; max-height: none; border-right: none; border-bottom: 1px solid var(--border); }
+      .compare-grid { grid-template-columns: 1fr; }
+    }
+      .verdict-box .verdict-label{}
+    .tco-table td.best{color:var(--gain);font-weight:700}
+    .tco-table td.l, .tco-table th.l{text-align:left}
+    details.ctry{border:1px solid var(--border);border-radius:var(--radius);margin-bottom:8px;background:var(--surface)}
+    details.ctry summary{cursor:pointer;padding:8px 10px;font-weight:600;font-size:0.78rem}
+    details.ctry .inner{padding:4px 10px 10px}
+    .sub-h{font-size:0.62rem;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;color:var(--text-faint);margin:10px 0 6px}
+    .chart-wrap.tall{height:360px}
+    .ss-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+    @media (max-width:900px){.ss-grid{grid-template-columns:1fr}}
+    .ss-grid h4{font-size:0.78rem;margin-bottom:6px}
+    .ss-grid p{font-size:0.72rem;color:var(--text-muted);margin-bottom:5px}
+    .ss-grid p b{color:var(--text)}
+    .pill{display:inline-block;font-size:0.62rem;padding:1px 6px;border-radius:9px;background:var(--accent-muted);color:var(--accent);margin-left:4px}
+  </style>
+</head>
+<body>
+  <header class="app-header">
+    <a class="logo" href="/wealth-tools" aria-label="Wealth Tools">
+      <svg viewBox="0 0 32 32" aria-hidden="true" fill="none">
+        <rect width="32" height="32" rx="4" fill="currentColor" opacity="0.08"/>
+        <path d="M8 22V12M14 22V8M20 22v-6M26 22V10" stroke="var(--company)" stroke-width="2.2" stroke-linecap="round"/>
+        <circle cx="8" cy="12" r="1.8" fill="var(--personal)"/><circle cx="14" cy="8" r="1.8" fill="var(--personal)"/>
+      </svg>
+      <div>
+        <div class="logo-title">Salary Scenario Comparison</div>
+        <div class="logo-sub">NL · Zug · Dubai</div>
+      </div>
+    </a>
+    <span class="header-tag">Illustrative · 2026 rates</span>
+    <div class="header-actions">
+      <a href="/wealth-tools" class="btn btn-sm">Wealth Tools</a>
+      <button type="button" class="btn btn-sm" id="btnTheme" aria-label="Toggle theme">Dark</button>
+    </div>
+  </header>
+
+  <div class="page-hero">
+    <p class="hero-eyebrow">Decision tool</p>
+    <h1>Permanent job or <em>contracting</em>: where do you keep more?</h1>
+    <p>Compare a permanent salary (with pension, benefits and a comfort uplift) against ZZP, BV, AG, free-zone company and payrolling routes in the Netherlands, Zug and Dubai — with currency conversion and a cost-of-living adjustment. Runs in your browser.</p>
+  </div>
+
+  <div class="workspace">
+    <aside class="form-panel" aria-label="Inputs">
+      <div class="panel-title">Your inputs</div>
+
+      <div class="section-divider">Contracting income</div>
+      <div class="field-row">
+        <div class="field"><label for="dailyRate">Daily rate (€)</label><input type="number" id="dailyRate" value="800" min="100" step="50" /></div>
+        <div class="field"><label for="workDays">Working days / yr</label><input type="number" id="workDays" value="220" min="50" max="260" step="5" /></div>
+      </div>
+      <div class="field"><label for="expenses">Business expenses / yr (€)</label><input type="number" id="expenses" value="0" min="0" step="1000" /><span class="field-hint" id="revHint"></span></div>
+      <div class="field"><label for="ownProv">Own pension &amp; disability cover % of revenue</label><input type="number" id="ownProv" value="8" min="0" max="30" step="0.5" /><span class="field-hint">Contractors fund this themselves; counted as savings, not spendable cash.</span></div>
+
+      <div class="section-divider">Permanent role</div>
+      <div class="field"><label for="permGross">Gross base salary (€ / yr)</label><input type="number" id="permGross" value="120000" min="20000" step="5000" /><span class="field-hint"><a href="#" id="matchRev">Match contractor revenue</a></span></div>
+      <div class="field"><label for="comfort">Comfort uplift % (added to permanent gross)</label><input type="number" id="comfort" value="10" min="0" max="50" step="1" /><span class="field-hint">Premium you put on job security, paid leave, sick pay and no admin. 0 = off.</span></div>
+
+      <div class="section-divider">Exchange &amp; cost of living</div>
+      <div class="field-row">
+        <div class="field"><label for="fxChf">CHF per €</label><input type="number" id="fxChf" value="0.95" min="0.5" max="2" step="0.01" /></div>
+        <div class="field"><label for="fxAed">AED per €</label><input type="number" id="fxAed" value="3.98" min="1" max="10" step="0.01" /></div>
+      </div>
+      <div class="field-row">
+        <div class="field"><label for="colNl">CoL index NL</label><input type="number" id="colNl" value="100" min="50" step="5" /></div>
+        <div class="field"><label for="colZg">Zug</label><input type="number" id="colZg" value="145" min="50" step="5" /></div>
+      </div>
+      <div class="field"><label for="colAe">CoL index Dubai</label><input type="number" id="colAe" value="85" min="50" step="5" /></div>
+
+      <div class="section-divider">Country assumptions</div>
+      <div id="ctryForms"></div>
+    </aside>
+
+    <main class="output-panel">
+      <div id="results">
+        <p class="notice tabular" id="notice"></p>
+
+        <section class="card">
+          <div class="card-header">Scenario results</div>
+          <div class="card-body" style="overflow-x:auto"><table class="tco-table tabular" id="resTable"></table></div>
+        </section>
+
+        <section class="card">
+          <div class="card-header">Where the gross goes (EUR)</div>
+          <div class="card-body"><div class="chart-wrap tall"><canvas id="chartStack" aria-label="Income breakdown"></canvas></div></div>
+        </section>
+
+        <section class="card">
+          <div class="card-header">Spendable vs total value (EUR)</div>
+          <div class="card-body"><div class="chart-wrap tall"><canvas id="chartNet" aria-label="Net comparison"></canvas></div></div>
+        </section>
+
+        <section class="card">
+          <div class="card-header">Permanent package in detail</div>
+          <div class="card-body detail-cols tabular" id="permCols"></div>
+        </section>
+
+        <section class="card">
+          <div class="card-header">How to read this</div>
+          <div class="card-body"><ul class="guide-list" id="guideList"></ul></div>
+        </section>
+
+        <section class="card">
+          <div class="card-header">Social security &amp; benefits reference</div>
+          <div class="card-body"><div class="ss-grid" id="ssGrid"></div>
+            <p class="field-hint" style="margin-top:10px">Reference notes carried over from the CountryCompare script — check current figures before relying on them. For lifestyle scoring see the <a href="/wealth-tools/country-comparison-master-dashboard">CountryScope Master Dashboard</a>.</p>
+          </div>
+        </section>
+
+        <section class="cta-block">
+          <h2>Request a structuring review</h2>
+          <p>Validate salary/dividend split, pension and residency position with a licensed advisor before you decide.</p>
+          <a href="/#contact" class="btn btn-primary">Contact Shreshti</a>
+        </section>
+      </div>
+    </main>
+  </div>
+
+  <p class="disclaimer">Illustrative model using effective flat rates for personal tax (not full progressive brackets) and 2026 Dutch corporate, box 2, ZZP and MKB parameters. Retained company profit is not cash in hand until paid out and taxed. Not financial, legal, or tax advice — confirm with a licensed advisor.</p>
+
+  <script>
+(function () {
+  'use strict';
+  const $ = (id) => document.getElementById(id);
+  const num = (id) => { const v = Number($(id).value); return Number.isFinite(v) ? v : 0; };
+
+  const CTRY = {
+    nl: { name: 'Netherlands', short: 'NL', cur: 'EUR', sym: '€', colId: 'colNl' },
+    zg: { name: 'Zug (CH)', short: 'Zug', cur: 'CHF', sym: 'CHF ', colId: 'colZg' },
+    ae: { name: 'Dubai (UAE)', short: 'Dubai', cur: 'AED', sym: 'AED ', colId: 'colAe' },
+  };
+  const fxOf = (c) => c === 'nl' ? 1 : c === 'zg' ? num('fxChf') : num('fxAed');
+
+  // [key, label, default] — percentages are entered as numbers (e.g. 39.61)
+  const TAX_FIELDS = {
+    nl: [
+      ['income', 'Income tax rate %', 39.61], ['social', 'Employee social security %', 6.69],
+      ['payroll', 'Payrolling tax rate %', 46.65],
+      ['zzpDed', 'ZZP self-employed deduction (€)', 1200], ['mkb', 'MKB profit exemption %', 12.7],
+      ['zvw', 'ZZP Zvw contribution %', 5.26], ['zvwCap', 'Zvw income cap (€)', 79000],
+      ['minSalary', 'BV director salary (€)', 60000], ['salPension', 'Pension on director salary %', 0],
+      ['corpLow', 'Vpb up to €200k %', 19], ['corpHigh', 'Vpb above €200k %', 25.8],
+      ['divLow', 'Box 2 up to €68,843 %', 24.5], ['divHigh', 'Box 2 above %', 31],
+    ],
+    zg: [
+      ['income', 'Income tax rate %', 5], ['social', 'Employee social security %', 5.15],
+      ['minSalary', 'AG director salary (CHF)', 57000], ['salPension', 'Pension on director salary %', 8.65],
+      ['corp', 'Corporate tax %', 11.8], ['div', 'Dividend tax %', 0],
+    ],
+    ae: [
+      ['income', 'Income tax rate %', 0], ['social', 'Employee social security %', 0],
+      ['minSalary', 'FZ director salary (AED)', 238800], ['salPension', 'Pension on director salary %', 0],
+      ['corp', 'Corporate tax %', 9], ['div', 'Dividend tax %', 0],
+    ],
+  };
+  // Permanent package defaults
+  const PERM_FIELDS = {
+    nl: [['ee', 'Employee pension %', 6], ['er', 'Employer pension %', 12], ['bonus', 'Holiday allowance / 13th month / bonus %', 8], ['taxable', 'Taxable cash benefits (€ / yr)', 0], ['car', 'Company car cost, employer-paid (€ / yr)', 0], ['carTaxPct', 'Taxable share of car %', 22], ['taxfree', 'Other tax-free benefits (€ / yr)', 0]],
+    zg: [['ee', 'Employee pension (BVG) %', 8.65], ['er', 'Employer pension (BVG) %', 8.65], ['bonus', '13th month / bonus %', 0], ['taxable', 'Taxable cash benefits (CHF / yr)', 0], ['car', 'Company car cost, employer-paid (CHF / yr)', 0], ['carTaxPct', 'Taxable share of car %', 9.6], ['taxfree', 'Other tax-free benefits (CHF / yr)', 0]],
+    ae: [['ee', 'Employee pension %', 0], ['er', 'Employer end-of-service gratuity %', 5.75], ['bonus', 'Bonus %', 0], ['taxable', 'Taxable cash benefits (AED / yr)', 0], ['car', 'Company car cost, employer-paid (AED / yr)', 0], ['carTaxPct', 'Taxable share of car %', 0], ['taxfree', 'Other tax-free benefits (AED / yr)', 0]],
+  };
+
+  const SCEN = [
+    { c: 'nl', id: 'perm', label: 'NL · Permanent', kind: 'perm' },
+    { c: 'nl', id: 'zzp', label: 'NL · ZZP (self-employed)', kind: 'zzp' },
+    { c: 'nl', id: 'bvfull', label: 'NL · BV, full salary', kind: 'bvfull' },
+    { c: 'nl', id: 'bvmin', label: 'NL · BV, min salary + retain', kind: 'bvmin' },
+    { c: 'nl', id: 'bvdiv', label: 'NL · BV, min salary + dividend', kind: 'bvdiv' },
+    { c: 'nl', id: 'payroll', label: 'NL · Payrolling (no BV)', kind: 'payroll' },
+    { c: 'zg', id: 'perm', label: 'Zug · Permanent', kind: 'perm' },
+    { c: 'zg', id: 'ag', label: 'Zug · AG, min salary + retain', kind: 'bvmin' },
+    { c: 'ae', id: 'perm', label: 'Dubai · Permanent', kind: 'perm' },
+    { c: 'ae', id: 'fz', label: 'Dubai · FZ company, min salary + retain', kind: 'bvmin' },
+  ];
+
+  const SS_REF = {
+    nl: { t: '🇳🇱 Netherlands', rows: [['Rate', 'Up to 27.65% total (employer + employee)'], ['Unemployment', 'WW: 75% for 2 months, then 70%, up to 24 months'], ['Disability', 'WIA: up to 75% of last salary (≥35% incapacity)'], ['Healthcare', 'Mandatory basic insurance, ~€120–150/month'], ['Pension', 'AOW ~€1,300/month (single) + employer pension']] },
+    zg: { t: '🇨🇭 Zug', rows: [['Rate', 'Up to 13.8% total (employer + employee)'], ['Unemployment', 'ALV: 70–80% for up to 18 months'], ['Disability', 'IV: up to 100% pension by degree (≥40%)'], ['Healthcare', 'Mandatory basic insurance, CHF 300–400/month'], ['Pension', 'AHV up to CHF 2,390/month + BVG + 3rd pillar']] },
+    ae: { t: '🇦🇪 Dubai', rows: [['Rate', 'No mandatory social security for expats'], ['Unemployment', 'None for expats'], ['Disability', 'Via private / employer health insurance'], ['Healthcare', 'Employer must provide basic cover'], ['Pension', 'End-of-service gratuity: 21 days/yr (first 5 yrs), then 30']] },
+  };
+
+  let hasCharts = false, chartStack, chartNet;
+
+  function buildForms() {
+    $('ctryForms').innerHTML = Object.keys(CTRY).map((c, i) => {
+      const f = (arr, kind) => arr.map(([k, label, def]) =>
+        `<div class="field"><label for="${c}_${kind}_${k}">${label}</label><input type="number" id="${c}_${kind}_${k}" value="${def}" step="any" min="0" /></div>`).join('');
+      return `<details class="ctry"${i === 0 ? ' open' : ''}><summary>${CTRY[c].name}</summary><div class="inner">
+        <div class="sub-h">Permanent package</div>${f(PERM_FIELDS[c], 'perm')}
+        <div class="sub-h">Tax &amp; company</div>${f(TAX_FIELDS[c], 'tax')}</div></details>`;
+    }).join('');
+  }
+  const P = (c, k) => num(`${c}_perm_${k}`);
+  const T = (c, k) => num(`${c}_tax_${k}`);
+
+  const corpTax = (c, ciLocal) => c === 'nl'
+    ? Math.min(ciLocal, 200000) * T('nl', 'corpLow') / 100 + Math.max(0, ciLocal - 200000) * T('nl', 'corpHigh') / 100
+    : ciLocal * T(c, 'corp') / 100;
+  const divTax = (c, d) => c === 'nl'
+    ? Math.min(d, 68843) * T('nl', 'divLow') / 100 + Math.max(0, d - 68843) * T('nl', 'divHigh') / 100
+    : d * T(c, 'div') / 100;
+
+  /* All amounts below are in the country's local currency. */
+  function calc(sc, S) {
+    const c = sc.c, fx = fxOf(c);
+    const r = { gross: 0, spendable: 0, retained: 0, pensionSaved: 0, erPension: 0, benefits: 0,
+      personalTax: 0, social: 0, corpTax: 0, divTax: 0, expenses: 0, comfortGross: 0, bonus: 0, cashGross: 0, car: 0 };
+    if (sc.kind === 'perm') {
+      const base = S.permGross * fx;
+      const g = base * (1 + S.comfort / 100);
+      const bonus = g * P(c, 'bonus') / 100;
+      const cash = g + bonus + P(c, 'taxable');
+      const ee = g * P(c, 'ee') / 100;
+      const car = P(c, 'car');
+      const taxable = cash + car * P(c, 'carTaxPct') / 100 - ee;
+      r.personalTax = taxable * T(c, 'income') / 100;
+      r.social = taxable * T(c, 'social') / 100;
+      r.spendable = cash - ee - r.personalTax - r.social;
+      r.cashGross = cash; r.bonus = bonus; r.pensionSaved = ee; r.erPension = g * P(c, 'er') / 100;
+      r.car = car; r.benefits = P(c, 'taxfree') + car; r.comfortGross = g - base;
+      // gross = salary increased by the employer's contributions and benefits (total package)
+      r.gross = cash + r.erPension + r.benefits;
+      return r;
+    }
+    const G = S.rev * fx, E = S.exp * fx;
+    const own = G * S.ownProv / 100;
+    r.gross = G; r.expenses = E;
+    const profit = G - E;
+    if (sc.kind === 'zzp') {
+      const ded = T('nl', 'zzpDed');
+      const taxable = Math.max(0, profit - ded) * (1 - T('nl', 'mkb') / 100);
+      r.personalTax = taxable * T('nl', 'income') / 100;
+      r.social = Math.min(Math.max(profit, 0), T('nl', 'zvwCap')) * T('nl', 'zvw') / 100;
+      r.pensionSaved = own;
+      r.spendable = profit - r.personalTax - r.social - own;
+    } else if (sc.kind === 'payroll') {
+      r.personalTax = profit * T(c, 'payroll') / 100;
+      r.social = profit * T(c, 'social') / 100;
+      r.pensionSaved = own;
+      r.spendable = profit - r.personalTax - r.social - own;
+    } else {
+      const full = sc.kind === 'bvfull';
+      const salary = full ? Math.max(profit, 0) : Math.min(T(c, 'minSalary'), Math.max(profit, 0));
+      const ee = salary * T(c, 'salPension') / 100;
+      const taxable = salary - ee;
+      r.personalTax = taxable * T(c, 'income') / 100;
+      r.social = salary * T(c, 'social') / 100;
+      const ownEff = Math.max(0, own - ee);
+      r.pensionSaved = ee + ownEff;
+      const salNet = taxable - r.personalTax - r.social;
+      const ci = Math.max(0, profit - salary);
+      r.corpTax = corpTax(c, ci);
+      const after = ci - r.corpTax;
+      if (sc.kind === 'bvdiv') {
+        r.divTax = divTax(c, after);
+        r.spendable = salNet + after - r.divTax - ownEff;
+      } else {
+        r.retained = after;
+        r.spendable = salNet - ownEff;
+      }
+    }
+    return r;
+  }
+
+  function enrich(sc, r, S) {
+    const fx = fxOf(sc.c), col = num(CTRY[sc.c].colId) || 100;
+    const toE = (v) => v / fx;
+    const retValue = r.retained - divTax(sc.c, r.retained); // retained profit valued after the tax due on payout
+    const total = r.spendable + retValue + r.pensionSaved + r.erPension + r.benefits;
+    return {
+      sc, r, fx,
+      grossE: toE(r.gross), spendE: toE(r.spendable), retE: toE(r.retained), retValE: toE(retValue), totalE: toE(total),
+      netE: toE(r.spendable + r.retained),
+      colSpendE: toE(r.spendable) * 100 / col, colTotalE: toE(total) * 100 / col,
+      retention: r.gross > 0 ? (r.spendable + r.retained) / r.gross * 100 : 0,
+      total, col,
+    };
+  }
+
+  function fmtLocal(c, n) {
+    return CTRY[c].sym + Math.round(n).toLocaleString(c === 'zg' ? 'de-CH' : 'nl-NL');
+  }
+  const fE = (n) => '€' + Math.round(n).toLocaleString('nl-NL');
+
+  function breakEvenRate(sc, S, targetTotalLocal) {
+    let lo = 0, hi = 3000000;
+    const f = (rev) => { const r = calc(sc, Object.assign({}, S, { rev })); return r.spendable + (r.retained - divTax(sc.c, r.retained)) + r.pensionSaved + r.erPension + r.benefits; };
+    if (f(hi) < targetTotalLocal) return null;
+    for (let i = 0; i < 50; i++) { const mid = (lo + hi) / 2; if (f(mid) < targetTotalLocal) lo = mid; else hi = mid; }
+    return hi / Math.max(1, S.days);
+  }
+
+  function readState() {
+    const days = num('workDays');
+    return {
+      rev: num('dailyRate') * days, days, exp: num('expenses'), ownProv: num('ownProv'),
+      permGross: num('permGross'), comfort: num('comfort'),
+    };
+  }
+
+  function run() {
+    const S = readState();
+    $('revHint').textContent = 'Contractor revenue: ' + fE(S.rev) + ' / yr (' + num('dailyRate') + ' × ' + S.days + ' days)';
+    const rows = SCEN.map(sc => enrich(sc, calc(sc, S), S));
+    const permByC = {};
+    rows.forEach(x => { if (x.sc.kind === 'perm') permByC[x.sc.c] = x; });
+    rows.forEach(x => {
+      if (x.sc.kind !== 'perm') {
+        const be = breakEvenRate(x.sc, S, permByC[x.sc.c].total);
+        x.be = be === null ? null : be / x.fx;
+      }
+    });
+    render(rows, S);
+  }
+
+  function render(rows, S) {
+    $('notice').textContent = `Permanent gross is the salary (incl. a ${S.comfort}% comfort uplift) increased by employer pension, company car and other employer-paid benefits. "Total value" = spendable cash + retained company profit (valued after the dividend tax due on payout) + pension saved (yours and employer's) + tax-free benefits. "Net income" shows retained profit at face value, as in the source scripts.`;
+
+    const head = `<thead><tr><th class="l">Scenario</th><th>Gross</th><th>Net income</th><th>Spendable</th><th>Total value (EUR)</th><th>CoL-adjusted (EUR)</th><th>Retention</th><th>Break-even day rate*</th></tr></thead>`;
+    const body = rows.map(x => `<tr>
+      <td class="l">${x.sc.label}</td>
+      <td>${fmtLocal(x.sc.c, x.r.gross)}</td>
+      <td>${fmtLocal(x.sc.c, x.r.spendable + x.r.retained)}${x.r.retained > 0 ? `<span class="pill">${fmtLocal(x.sc.c, x.r.retained)} retained</span>` : ''}</td>
+      <td>${fE(x.spendE)}</td>
+      <td>${fE(x.totalE)}</td>
+      <td>${fE(x.colTotalE)}</td>
+      <td>${x.retention.toFixed(1)}%</td>
+      <td>${x.sc.kind === 'perm' ? '—' : x.be == null ? 'n/a' : fE(x.be)}</td></tr>`).join('');
+    $('resTable').innerHTML = head + '<tbody>' + body + '</tbody>';
+
+    // Permanent detail
+    $('permCols').innerHTML = ['nl', 'zg', 'ae'].map(c => {
+      const x = rows.find(y => y.sc.c === c && y.sc.kind === 'perm'), r = x.r;
+      const L = (v) => fmtLocal(c, v);
+      return `<div class="detail-col personal"><h4>${CTRY[c].name}</h4><dl>` + [
+        ['Base salary', L(S.permGross * x.fx)],
+        ['Comfort uplift', '+' + L(r.comfortGross)],
+        ['Bonus / holiday', '+' + L(r.bonus)],
+        ['Taxable cash benefits', '+' + L(P(c, 'taxable'))],
+        ['Employer pension / gratuity', '+' + L(r.erPension)],
+        ['Company car (employer cost)', '+' + L(r.car)],
+        ['Other tax-free benefits', '+' + L(P(c, 'taxfree'))],
+        ['Total package (gross)', L(r.gross)],
+        ['Employee pension', '−' + L(r.pensionSaved)],
+        ['Income tax', '−' + L(r.personalTax)],
+        ['Social security', '−' + L(r.social)],
+        ['Employer pension, car & benefits', '−' + L(r.erPension + r.benefits)],
+        ['Net cash', L(r.spendable)],
+        ['Total value (net + pension + benefits)', L(x.total)],
+      ].map(([k, v]) => `<div class="metric-row"><dt>${k}</dt><dd>${v}</dd></div>`).join('') + '</dl></div>';
+    }).join('');
+
+    const permNl = rows[0];
+    $('guideList').innerHTML = [
+      { t: 'Gross for permanent', b: 'The permanent gross is the salary plus everything the employer adds on top: pension, company car and other benefits. Contractor gross is the revenue billed. The break-even day rate shows the daily rate needed to match the permanent package in the same country.' },
+      { t: 'Comfort uplift', b: `A ${S.comfort}% uplift adds ${fE(permNl.r.comfortGross)} to the Dutch permanent gross (before tax). Set it to 0 to see the pure cash comparison; raise it to value job security, paid leave and sick pay more.` },
+      { t: 'Retained profit', b: 'BV/AG/FZ "retain" routes look strong because corporate tax is low, but the retained money is only usable after it is paid out as dividend or salary. The dividend route shows the after-tax payout.' },
+      { t: 'What is not modelled', b: 'Progressive brackets (flat effective rates are used), employer social charges on director salary, the Dutch 30% ruling, Swiss wealth tax, dividend relief in Zug, residency and substance rules, and VAT.' },
+    ].map(g => `<li><strong>${g.t}</strong>${g.b}</li>`).join('');
+
+    renderCharts(rows);
+  }
+
+  function renderCharts(rows) {
+    if (typeof Chart === 'undefined') return;
+    const dark = document.documentElement.getAttribute('data-theme') === 'dark';
+    const tc = dark ? '#b0a89a' : '#5e5850', gc = dark ? '#3d3830' : '#e0dcd4';
+    const labels = rows.map(x => x.sc.label);
+    const comp = [
+      ['Spendable net', x => x.spendE, '#35a789'], ['Retained in company', x => x.retE, '#8ccfb9'],
+      ['Pension saved (employee / own)', x => x.r.pensionSaved / x.fx, '#008080'], ['Employer pension', x => x.r.erPension / x.fx, '#4aa3a3'], ['Employer benefits (car etc.)', x => x.r.benefits / x.fx, '#b08fd0'], ['Income tax', x => x.r.personalTax / x.fx, '#fb8500'],
+      ['Social security', x => x.r.social / x.fx, '#37536d'], ['Corporate tax', x => x.r.corpTax / x.fx, '#ff4136'],
+      ['Dividend tax', x => x.r.divTax / x.fx, '#800080'], ['Expenses', x => x.r.expenses / x.fx, '#a9a9a9'],
+    ];
+    if (chartStack) chartStack.destroy();
+    chartStack = new Chart($('chartStack'), {
+      type: 'bar',
+      data: { labels, datasets: comp.map(([label, fn, color]) => ({ label, data: rows.map(fn), backgroundColor: color })) },
+      options: {
+        responsive: true, maintainAspectRatio: false,
+        plugins: { legend: { labels: { color: tc, boxWidth: 12 } } },
+        scales: { x: { stacked: true, ticks: { color: tc, maxRotation: 60 }, grid: { color: gc } },
+          y: { stacked: true, ticks: { color: tc, callback: v => '€' + Math.round(v / 1000) + 'k' }, grid: { color: gc } } },
+      },
+    });
+    if (chartNet) chartNet.destroy();
+    chartNet = new Chart($('chartNet'), {
+      type: 'bar',
+      data: { labels, datasets: [
+        { label: 'Spendable', data: rows.map(x => x.spendE), backgroundColor: '#35a789' },
+        { label: 'Total value', data: rows.map(x => x.totalE), backgroundColor: dark ? '#6a9fd4' : '#2a5f8f' },
+        { label: 'Total value, CoL-adjusted', data: rows.map(x => x.colTotalE), backgroundColor: '#fb8500' },
+      ] },
+      options: {
+        responsive: true, maintainAspectRatio: false,
+        plugins: { legend: { labels: { color: tc, boxWidth: 12 } } },
+        scales: { x: { ticks: { color: tc, maxRotation: 60 }, grid: { color: gc } },
+          y: { beginAtZero: true, ticks: { color: tc, callback: v => '€' + Math.round(v / 1000) + 'k' }, grid: { color: gc } } },
+      },
+    });
+  }
+
+  function init() {
+    const dark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+    document.documentElement.setAttribute('data-theme', dark ? 'dark' : 'light');
+    $('btnTheme').textContent = dark ? 'Light' : 'Dark';
+    buildForms();
+    $('ssGrid').innerHTML = Object.values(SS_REF).map(s =>
+      `<div class="detail-col"><h4>${s.t}</h4>${s.rows.map(([k, v]) => `<p><b>${k}:</b> ${v}</p>`).join('')}</div>`).join('');
+    document.querySelector('.form-panel').addEventListener('input', run);
+    $('matchRev').addEventListener('click', (e) => { e.preventDefault(); $('permGross').value = Math.round(num('dailyRate') * num('workDays')); run(); });
+    $('btnTheme').addEventListener('click', () => {
+      const d = document.documentElement.getAttribute('data-theme') === 'dark';
+      document.documentElement.setAttribute('data-theme', d ? 'light' : 'dark');
+      $('btnTheme').textContent = d ? 'Dark' : 'Light';
+      run();
+    });
+    (function wait() { if (typeof Chart !== 'undefined') run(); else setTimeout(wait, 50); })();
+  }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init); else init();
+})();
+  </script>
+</body>
+</html>

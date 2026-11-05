@@ -77,6 +77,22 @@ export const wealthTools: WealthTool[] = [
     ctaLabel: 'Compare take-home',
   },
   {
+    id: 'salary-scenario-comparison',
+    title: 'Salary & Contracting Scenario Comparison',
+    description:
+      'Compare a permanent salary against ZZP, BV, AG, free-zone company and payrolling routes in the Netherlands, Zug, and Dubai — with pension, benefits, a comfort uplift, currency conversion, and cost-of-living adjustment.',
+    features: [
+      'Ten scenarios: permanent, ZZP, BV (full salary, retain, dividend), payrolling, Zug AG, Dubai free-zone',
+      'Permanent package: employee and employer pension, bonus, taxable and tax-free benefits',
+      'Comfort % uplift added to permanent gross salary',
+      'Cost-of-living adjusted ranking and break-even day rate vs permanent',
+      'EUR / CHF / AED conversion with editable tax assumptions',
+    ],
+    href: '/wealth-tools/salary-scenario-comparison',
+    icon: 'tax',
+    ctaLabel: 'Compare scenarios',
+  },
+  {
     id: 'investment-universe',
     title: 'The Investment Universe',
     description:
@@ -225,13 +241,13 @@ export const wealthTools: WealthTool[] = [
     id: 'personal-vs-company-car-planner',
     title: 'Personal vs Company Car Planner',
     description:
-      'Compare 5-year total cost of any vehicle privately vs through a Swiss GmbH or AG — side-by-side cards, VAT, Privatanteil 10.8%, cantonal tax, leasing, and decision guide.',
+      'Compare 5-year total cost of any vehicle privately vs through a company in Switzerland (GmbH/AG) or the Netherlands (BV) — new vs used, VAT/BTW, Privatanteil or bijtelling, leasing, and decision guide.',
     features: [
+      'Switzerland and Netherlands rule sets with CHF / EUR',
+      'New vs used comparison across personal and company ownership',
+      'Privatanteil 10.8% (CH) and bijtelling, BTW correction, BPM, MRB (NL)',
       'Any make/model — presets or custom purchase price',
-      'Acquisition, running costs, and tax treatment side by side',
-      'Zug and other canton corporate tax defaults',
-      'Cash vs leasing with Privatanteil on list price',
-      '5-year TCO table, chart, and decision guide',
+      'Cash vs leasing, 5-year TCO table, chart, and decision guide',
     ],
     href: '/wealth-tools/personal-vs-company-car-planner',
     icon: 'car',
