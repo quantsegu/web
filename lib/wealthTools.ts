@@ -93,6 +93,21 @@ export const wealthTools: WealthTool[] = [
     ctaLabel: 'Compare scenarios',
   },
   {
+    id: 'all-inclusive-rate-calculator',
+    title: 'All-Inclusive Rate Calculator',
+    description:
+      'Turn a Swiss all-inclusive contractor day rate into gross salary, statutory deductions, and an estimated net monthly payout — modelled on a rate slip simulation.',
+    features: [
+      'Day rate and worked days with live recalculation',
+      'Editable employer charges, bank holiday compensation, and holiday accrual',
+      'AHV, ALV, NBU, KTG, BVG, and withholding tax deductions with insured-salary cap',
+      'Line-by-line rate breakdown from gross rate to net payout',
+    ],
+    href: '/wealth-tools/all-inclusive-rate-calculator',
+    icon: 'tax',
+    ctaLabel: 'Open calculator',
+  },
+  {
     id: 'investment-universe',
     title: 'The Investment Universe',
     description:

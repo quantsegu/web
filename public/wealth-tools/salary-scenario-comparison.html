@@ -324,6 +324,16 @@
         <div class="field"><label for="workDays">Working days / yr</label><input type="number" id="workDays" value="220" min="50" max="260" step="5" /></div>
       </div>
       <div class="field"><label for="expenses">Business expenses / yr (€)</label><input type="number" id="expenses" value="0" min="0" step="1000" /><span class="field-hint" id="revHint"></span></div>
+      <div class="sub-h" style="margin-top:12px">Company car &amp; assets (deductible)</div>
+      <div class="field-row">
+        <div class="field"><label for="carPrice">Company car price (€)</label><input type="number" id="carPrice" value="0" min="0" step="5000" /></div>
+        <div class="field"><label for="carYears">Depreciation (yrs)</label><input type="number" id="carYears" value="5" min="1" max="20" step="1" /></div>
+      </div>
+      <div class="field"><label for="carRun">Car running costs / yr (€)</label><input type="number" id="carRun" value="0" min="0" step="500" /><span class="field-hint">Fuel, insurance, tax, maintenance, lease. The private-use addition is taxed on you personally.</span></div>
+      <div class="field-row">
+        <div class="field"><label for="assetPrice">Equipment &amp; other assets (€)</label><input type="number" id="assetPrice" value="0" min="0" step="1000" /></div>
+        <div class="field"><label for="assetYears">Depreciation (yrs)</label><input type="number" id="assetYears" value="4" min="1" max="20" step="1" /></div>
+      </div>
       <div class="field"><label for="ownProv">Own pension &amp; disability cover % of revenue</label><input type="number" id="ownProv" value="8" min="0" max="30" step="0.5" /><span class="field-hint">Contractors fund this themselves; counted as savings, not spendable cash.</span></div>
 
       <div class="section-divider">Permanent role</div>
@@ -352,6 +362,12 @@
         <section class="card">
           <div class="card-header">Scenario results</div>
           <div class="card-body" style="overflow-x:auto"><table class="tco-table tabular" id="resTable"></table></div>
+        </section>
+
+        <section class="card">
+          <div class="card-header">Company costs &amp; depreciation: tax effect</div>
+          <div class="card-body" style="overflow-x:auto"><table class="tco-table tabular" id="dedTable"></table>
+            <p class="field-hint" style="margin-top:10px" id="dedNote"></p></div>
         </section>
 
         <section class="card">
@@ -496,32 +512,37 @@
       r.gross = cash + r.erPension + r.benefits;
       return r;
     }
-    const G = S.rev * fx, E = S.exp * fx;
+    const G = S.rev * fx;
+    // Deductible costs: running expenses + straight-line depreciation on car and assets + car running costs
+    const carDepr = S.carPrice * fx / Math.max(1, S.carYears), assetDepr = S.assetPrice * fx / Math.max(1, S.assetYears);
+    const carCost = carDepr + S.carRun * fx;
+    const E = S.exp * fx + carCost + assetDepr;
     const own = G * S.ownProv / 100;
-    r.gross = G; r.expenses = E;
+    const carAdd = carCost * P(c, 'carTaxPct') / 100; // private-use addition, taxed on the owner personally
+    r.gross = G; r.expenses = E; r.depr = carDepr + assetDepr; r.carAdd = carAdd; r.car = carCost; r.benefits = carCost;
     const profit = G - E;
     if (sc.kind === 'zzp') {
       const ded = T('nl', 'zzpDed');
-      const taxable = Math.max(0, profit - ded) * (1 - T('nl', 'mkb') / 100);
+      const taxable = Math.max(0, profit + carAdd - ded) * (1 - T('nl', 'mkb') / 100);
       r.personalTax = taxable * T('nl', 'income') / 100;
-      r.social = Math.min(Math.max(profit, 0), T('nl', 'zvwCap')) * T('nl', 'zvw') / 100;
+      r.social = Math.min(Math.max(profit + carAdd, 0), T('nl', 'zvwCap')) * T('nl', 'zvw') / 100;
       r.pensionSaved = own;
       r.spendable = profit - r.personalTax - r.social - own;
     } else if (sc.kind === 'payroll') {
-      r.personalTax = profit * T(c, 'payroll') / 100;
-      r.social = profit * T(c, 'social') / 100;
+      r.personalTax = (profit + carAdd) * T(c, 'payroll') / 100;
+      r.social = (profit + carAdd) * T(c, 'social') / 100;
       r.pensionSaved = own;
       r.spendable = profit - r.personalTax - r.social - own;
     } else {
       const full = sc.kind === 'bvfull';
       const salary = full ? Math.max(profit, 0) : Math.min(T(c, 'minSalary'), Math.max(profit, 0));
       const ee = salary * T(c, 'salPension') / 100;
-      const taxable = salary - ee;
+      const taxable = salary - ee + carAdd;
       r.personalTax = taxable * T(c, 'income') / 100;
-      r.social = salary * T(c, 'social') / 100;
+      r.social = (salary + carAdd) * T(c, 'social') / 100;
       const ownEff = Math.max(0, own - ee);
       r.pensionSaved = ee + ownEff;
-      const salNet = taxable - r.personalTax - r.social;
+      const salNet = salary - ee - r.personalTax - r.social;
       const ci = Math.max(0, profit - salary);
       r.corpTax = corpTax(c, ci);
       const after = ci - r.corpTax;
@@ -569,6 +590,7 @@
     return {
       rev: num('dailyRate') * days, days, exp: num('expenses'), ownProv: num('ownProv'),
       permGross: num('permGross'), comfort: num('comfort'),
+      carPrice: num('carPrice'), carYears: num('carYears'), carRun: num('carRun'), assetPrice: num('assetPrice'), assetYears: num('assetYears'),
     };
   }
 
@@ -583,6 +605,14 @@
         const be = breakEvenRate(x.sc, S, permByC[x.sc.c].total);
         x.be = be === null ? null : be / x.fx;
       }
+    });
+    // Tax effect of deductible costs: same scenario with all costs set to zero
+    const S0 = Object.assign({}, S, { exp: 0, carPrice: 0, carRun: 0, assetPrice: 0 });
+    const taxOf = (r) => r.personalTax + r.social + r.corpTax + r.divTax;
+    rows.forEach(x => {
+      if (x.sc.kind === 'perm') return;
+      const r0 = calc(x.sc, S0);
+      x.ded = { without: taxOf(r0), withC: taxOf(x.r), spendDelta: x.r.spendable + (x.r.retained - divTax(x.sc.c, x.r.retained)) - (r0.spendable + (r0.retained - divTax(x.sc.c, r0.retained))) };
     });
     render(rows, S);
   }
@@ -601,6 +631,14 @@
       <td>${x.retention.toFixed(1)}%</td>
       <td>${x.sc.kind === 'perm' ? '—' : x.be == null ? 'n/a' : fE(x.be)}</td></tr>`).join('');
     $('resTable').innerHTML = head + '<tbody>' + body + '</tbody>';
+
+    // Deductions table
+    const dRows = rows.filter(x => x.ded);
+    const anyCost = dRows.some(x => x.r.expenses > 0);
+    $('dedTable').innerHTML = `<thead><tr><th class="l">Scenario</th><th>Deductible costs</th><th>of which depreciation</th><th>Private-use addition (taxed)</th><th>Taxes without costs</th><th>Taxes with costs</th><th>Tax saved</th></tr></thead><tbody>` +
+      dRows.map(x => `<tr><td class="l">${x.sc.label}</td><td>${fmtLocal(x.sc.c, x.r.expenses)}</td><td>${fmtLocal(x.sc.c, x.r.depr)}</td><td>${fmtLocal(x.sc.c, x.r.carAdd)}</td><td>${fmtLocal(x.sc.c, x.ded.without)}</td><td>${fmtLocal(x.sc.c, x.ded.withC)}</td><td>${fmtLocal(x.sc.c, x.ded.without - x.ded.withC)}</td></tr>`).join('') + '</tbody>';
+    $('dedNote').textContent = (anyCost ? '' : 'No costs entered yet: add business expenses, a company car or assets in the inputs to see the effect. ') +
+      'Business expenses, car costs and straight-line depreciation reduce taxable profit (ZZP/payrolling: personal income; BV/AG/FZ: corporate profit and, in the full-salary route, the salary). The car and its running costs also count as a benefit in total value, and the private-use addition (taxable share of car cost) is taxed on you. Residual value of assets at the end is ignored.';
 
     // Permanent detail
     $('permCols').innerHTML = ['nl', 'zg', 'ae'].map(c => {

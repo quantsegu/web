@@ -1,0 +1,326 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="description" content="Turn a Swiss all-inclusive day rate into gross salary, statutory deductions, and estimated net payout.">
+<title>All-Inclusive Rate Calculator — Shreshti Wealth</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,500&family=Work+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600&display=swap">
+<style>
+  :root{
+    --bg:#f4f6f4; --surface:#ffffff; --surface-2:#eef2ef; --border:#d7ded9;
+    --text:#1a2420; --text-muted:#5c6b63; --accent:#2f6a5b; --accent-soft:#e3ede9;
+    --accent-strong:#1f4a3f; --warn:#a6631b; --warn-soft:#f6ead9; --net:#245b3f; --net-soft:#e2f0e7;
+    --shadow: 0 1px 2px rgba(20,30,25,0.06), 0 8px 24px -12px rgba(20,30,25,0.12);
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --bg:#121613; --surface:#191f1b; --surface-2:#1f2621; --border:#2c352e;
+      --text:#e9efe9; --text-muted:#94a29a; --accent:#6fbfa4; --accent-soft:#1d2e28;
+      --accent-strong:#8fd6bc; --warn:#e0a558; --warn-soft:#2e2519; --net:#7fd2a8; --net-soft:#1a2b21;
+      --shadow: 0 1px 2px rgba(0,0,0,0.3), 0 8px 24px -12px rgba(0,0,0,0.5);
+    }
+  }
+  :root[data-theme="dark"]{
+    --bg:#121613; --surface:#191f1b; --surface-2:#1f2621; --border:#2c352e;
+    --text:#e9efe9; --text-muted:#94a29a; --accent:#6fbfa4; --accent-soft:#1d2e28;
+    --accent-strong:#8fd6bc; --warn:#e0a558; --warn-soft:#2e2519; --net:#7fd2a8; --net-soft:#1a2b21;
+    --shadow: 0 1px 2px rgba(0,0,0,0.3), 0 8px 24px -12px rgba(0,0,0,0.5);
+  }
+  *{box-sizing:border-box;}
+  body{margin:0;background:var(--bg);color:var(--text);font-family:'Work Sans', ui-sans-serif, system-ui, sans-serif;line-height:1.5;}
+  .wrap{max-width:1180px;margin:0 auto;padding:2.5rem 1.5rem 4rem;}
+  header.page{margin-bottom:2rem;}
+  .eyebrow{font-size:0.72rem;font-weight:600;letter-spacing:0.14em;text-transform:uppercase;color:var(--accent);}
+  h1{font-family:'Newsreader', Georgia, serif;font-weight:500;font-size:clamp(1.7rem, 2.4vw, 2.35rem);margin:0.25rem 0 0.4rem;text-wrap:balance;letter-spacing:-0.01em;}
+  .sub{color:var(--text-muted);font-size:0.98rem;max-width:60ch;}
+  .layout{display:grid;grid-template-columns: 340px 1fr;gap:1.5rem;align-items:start;}
+  @media (max-width: 860px){ .layout{ grid-template-columns: 1fr; } }
+  .panel{background:var(--surface);border:1px solid var(--border);border-radius:14px;box-shadow:var(--shadow);}
+  .inputs{position:sticky;top:1.5rem;padding:1.4rem 1.4rem 1.6rem;}
+  @media (max-width: 860px){ .inputs{ position:static; } }
+  .inputs h2, .results h2{font-family:'Newsreader', Georgia, serif;font-weight:500;font-size:1.05rem;margin:0 0 0.15rem;}
+  .section-note{color:var(--text-muted);font-size:0.8rem;margin:0 0 1rem;}
+  .field{margin-bottom:0.95rem;}
+  .field label{display:flex;justify-content:space-between;align-items:baseline;font-size:0.78rem;font-weight:500;color:var(--text-muted);margin-bottom:0.3rem;}
+  .field label .unit{font-size:0.72rem;color:var(--text-muted);font-weight:400;}
+  .field input{width:100%;padding:0.5rem 0.65rem;border:1px solid var(--border);border-radius:8px;background:var(--surface-2);color:var(--text);font-family:'JetBrains Mono', ui-monospace, monospace;font-size:0.92rem;font-variant-numeric: tabular-nums;transition: border-color 0.15s ease, background 0.15s ease;}
+  .field input:focus{outline:none;border-color:var(--accent);background:var(--surface);}
+  .field input:focus-visible{outline:2px solid var(--accent);outline-offset:1px;}
+  .divider{border:none;border-top:1px solid var(--border);margin:1.1rem 0;}
+  .toggle-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:0.9rem;}
+  .toggle-row span{font-size:0.78rem;font-weight:500;color:var(--text-muted);}
+  button.reset{width:100%;margin-top:0.3rem;padding:0.55rem;border-radius:8px;border:1px solid var(--border);background:var(--surface-2);color:var(--text);font-family:'Work Sans', sans-serif;font-size:0.82rem;font-weight:500;cursor:pointer;}
+  button.reset:hover{ border-color:var(--accent); color:var(--accent); }
+  button.reset:focus-visible{ outline:2px solid var(--accent); outline-offset:2px; }
+  .results{display:flex;flex-direction:column;gap:1.2rem;}
+  .tiles{display:grid;grid-template-columns:repeat(3, 1fr);gap:1rem;}
+  @media (max-width:700px){ .tiles{ grid-template-columns:1fr; } }
+  .tile{background:var(--surface);border:1px solid var(--border);border-radius:14px;box-shadow:var(--shadow);padding:1.1rem 1.2rem;}
+  .tile .label{font-size:0.72rem;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;color:var(--text-muted);}
+  .tile .value{font-family:'JetBrains Mono', ui-monospace, monospace;font-size:1.55rem;font-weight:500;margin-top:0.35rem;font-variant-numeric: tabular-nums;}
+  .tile.accent{ border-color:var(--accent); background:var(--accent-soft); }
+  .tile.accent .value{ color:var(--accent-strong); }
+  .tile.net{ border-color:var(--net); background:var(--net-soft); }
+  .tile.net .value{ color:var(--net); }
+  .tile .sub-value{font-size:0.76rem;color:var(--text-muted);margin-top:0.3rem;}
+  .table-card{padding:1.3rem 1.4rem 1.5rem;}
+  table{width:100%;border-collapse:collapse;font-size:0.88rem;}
+  .table-scroll{ overflow-x:auto; }
+  thead th{text-align:left;font-size:0.7rem;font-weight:600;letter-spacing:0.06em;text-transform:uppercase;color:var(--text-muted);padding:0.4rem 0.6rem;border-bottom:1px solid var(--border);}
+  thead th.num, td.num{ text-align:right; font-variant-numeric: tabular-nums; }
+  tbody td{padding:0.5rem 0.6rem;border-bottom:1px solid var(--border);font-family:'JetBrains Mono', ui-monospace, monospace;}
+  tbody td.label-cell{font-family:'Work Sans', sans-serif;color:var(--text);}
+  tr.subtotal td{background:var(--surface-2);font-weight:600;border-top:1px solid var(--border);border-bottom:1px solid var(--border);}
+  tr.deduction td.num{ color:var(--warn); }
+  tr.final td{background:var(--net-soft);color:var(--net);font-weight:600;font-size:0.95rem;}
+  tr.spacer td{ padding:0.15rem; border:none; background:transparent; }
+  .flow-note{font-size:0.78rem;color:var(--text-muted);margin-top:0.9rem;padding-top:0.9rem;border-top:1px solid var(--border);}
+  .flow-note code{font-family:'JetBrains Mono', monospace;background:var(--surface-2);padding:0.05rem 0.35rem;border-radius:4px;}
+  footer.page{margin-top:2rem;font-size:0.76rem;color:var(--text-muted);max-width:70ch;}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="page">
+    <div class="eyebrow">Payroll simulation</div>
+    <h1>All-Inclusive Rate Calculator</h1>
+    <p class="sub">Enter a day rate and worked days to see how it splits into gross salary, statutory deductions, and net payout — modelled on a Swiss all-inclusive contractor rate slip.</p>
+  </header>
+
+  <div class="layout">
+    <div class="panel inputs">
+      <h2>Inputs</h2>
+      <p class="section-note">Edit any figure — every result updates live.</p>
+
+      <div class="field">
+        <label for="rate">All-inclusive rate <span class="unit">CHF / day</span></label>
+        <input type="number" id="rate" value="946" step="0.01" inputmode="decimal">
+      </div>
+      <div class="field">
+        <label for="days">Worked days <span class="unit">this month</span></label>
+        <input type="number" id="days" value="20" step="0.5" inputmode="decimal">
+      </div>
+
+      <hr class="divider">
+      <div class="toggle-row"><span>Rate build-up</span></div>
+
+      <div class="field">
+        <label for="employerLoad">Employer charges &amp; margin <span class="unit">%</span></label>
+        <input type="number" id="employerLoad" value="9.7792" step="0.0001" inputmode="decimal">
+      </div>
+      <div class="field">
+        <label for="bankHoliday">Bank holiday compensation <span class="unit">%</span></label>
+        <input type="number" id="bankHoliday" value="3.20" step="0.01" inputmode="decimal">
+      </div>
+      <div class="field">
+        <label for="holidayPct">Holiday accrual <span class="unit">%</span></label>
+        <input type="number" id="holidayPct" value="8.33" step="0.01" inputmode="decimal">
+      </div>
+
+      <hr class="divider">
+      <div class="toggle-row"><span>Employee deductions</span></div>
+
+      <div class="field">
+        <label for="ahv">AHV / old age &amp; survivors <span class="unit">%</span></label>
+        <input type="number" id="ahv" value="5.3" step="0.01" inputmode="decimal">
+      </div>
+      <div class="field">
+        <label for="alv">ALV / unemployment <span class="unit">%</span></label>
+        <input type="number" id="alv" value="1.1" step="0.01" inputmode="decimal">
+      </div>
+      <div class="field">
+        <label for="nbu">NBU contribution <span class="unit">%</span></label>
+        <input type="number" id="nbu" value="0.63" step="0.01" inputmode="decimal">
+      </div>
+      <div class="field">
+        <label for="cap">ALV / NBU insured cap <span class="unit">CHF / mo</span></label>
+        <input type="number" id="cap" value="12350" step="1" inputmode="decimal">
+      </div>
+      <div class="field">
+        <label for="wht">Withholding tax <span class="unit">%</span></label>
+        <input type="number" id="wht" value="10.38" step="0.01" inputmode="decimal">
+      </div>
+      <div class="field">
+        <label for="ktg">KTG / daily sickness <span class="unit">%</span></label>
+        <input type="number" id="ktg" value="0.542" step="0.001" inputmode="decimal">
+      </div>
+      <div class="field">
+        <label for="bvgBase">BVG insured base <span class="unit">CHF / mo</span></label>
+        <input type="number" id="bvgBase" value="700" step="1" inputmode="decimal">
+      </div>
+      <div class="field">
+        <label for="bvgPct">BVG employee share <span class="unit">%</span></label>
+        <input type="number" id="bvgPct" value="50" step="0.5" inputmode="decimal">
+      </div>
+
+      <button class="reset" id="resetBtn" type="button">Reset to sample rate slip</button>
+    </div>
+
+    <div class="results">
+      <div class="tiles">
+        <div class="tile accent">
+          <div class="label">Gross monthly salary</div>
+          <div class="value" id="tileGross">CHF 0</div>
+          <div class="sub-value" id="tileGrossRate">Gross rate CHF 0 / day</div>
+        </div>
+        <div class="tile">
+          <div class="label">Net before holiday accrual</div>
+          <div class="value" id="tileNetBefore">CHF 0</div>
+          <div class="sub-value">After AHV, ALV, NBU, tax, KTG, BVG</div>
+        </div>
+        <div class="tile net">
+          <div class="label">Estimated net payout</div>
+          <div class="value" id="tileNetPayout">CHF 0</div>
+          <div class="sub-value">After holiday accrual is set aside</div>
+        </div>
+      </div>
+
+      <div class="panel table-card">
+        <h2>Rate breakdown</h2>
+        <p class="section-note">Mirrors the line items on a Swisslinx-style salary simulation.</p>
+        <div class="table-scroll">
+        <table>
+          <thead>
+            <tr>
+              <th>Designation</th>
+              <th class="num">Days</th>
+              <th class="num">Rate / day</th>
+              <th class="num">Amount</th>
+            </tr>
+          </thead>
+          <tbody id="tbody"></tbody>
+        </table>
+        </div>
+        <p class="flow-note">Flow: <code>all-inclusive rate → ÷ (1 + employer charges) → gross rate</code>, split into regular time, bank holiday compensation and holiday accrual; gross salary then carries the employee deductions above, and holiday accrual is set aside from the net to give the estimated payout.</p>
+      </div>
+    </div>
+  </div>
+
+  <footer class="page">
+    Estimates only, for personal planning — not a payslip. Percentages and caps default to a sample rate simulation and should be checked against your own employer's current rates and the statutory insured salary limit in force.
+  </footer>
+</div>
+
+<script>
+(function(){
+  var ids = ['rate','days','employerLoad','bankHoliday','holidayPct','ahv','alv','nbu','cap','wht','ktg','bvgBase','bvgPct'];
+  var defaults = {
+    rate:946, days:20, employerLoad:9.7792, bankHoliday:3.20, holidayPct:8.33,
+    ahv:5.3, alv:1.1, nbu:0.63, cap:12350, wht:10.38, ktg:0.542, bvgBase:700, bvgPct:50
+  };
+
+  function fmt(n){
+    var neg = n < -0.004;
+    var v = Math.abs(n);
+    var s = v.toLocaleString('en-CH', {minimumFractionDigits:2, maximumFractionDigits:2}).replace(/,/g,"'");
+    return (neg ? '(' : '') + 'CHF ' + s + (neg ? ')' : '');
+  }
+  function fmtPlain(n){
+    return n.toLocaleString('en-CH', {minimumFractionDigits:2, maximumFractionDigits:2}).replace(/,/g,"'");
+  }
+  function val(id){
+    var n = parseFloat(document.getElementById(id).value);
+    return isNaN(n) ? 0 : n;
+  }
+  function row(label, days, rate, amount, cls){
+    var tr = document.createElement('tr');
+    if (cls) tr.className = cls;
+    var td1 = document.createElement('td');
+    td1.className = 'label-cell';
+    td1.textContent = label;
+    var td2 = document.createElement('td');
+    td2.className = 'num';
+    td2.textContent = (days === null) ? '' : days;
+    var td3 = document.createElement('td');
+    td3.className = 'num';
+    td3.textContent = (rate === null) ? '' : fmtPlain(rate);
+    var td4 = document.createElement('td');
+    td4.className = 'num';
+    td4.textContent = fmt(amount);
+    tr.appendChild(td1); tr.appendChild(td2); tr.appendChild(td3); tr.appendChild(td4);
+    return tr;
+  }
+  function spacerRow(){
+    var tr = document.createElement('tr');
+    tr.className = 'spacer';
+    var td = document.createElement('td');
+    td.colSpan = 4;
+    tr.appendChild(td);
+    return tr;
+  }
+
+  function compute(){
+    var allInclusive = val('rate');
+    var days = val('days');
+    var employerLoadPct = val('employerLoad') / 100;
+    var bankHolidayPct = val('bankHoliday') / 100;
+    var holidayPct = val('holidayPct') / 100;
+    var ahvPct = val('ahv') / 100;
+    var alvPct = val('alv') / 100;
+    var nbuPct = val('nbu') / 100;
+    var cap = val('cap');
+    var whtPct = val('wht') / 100;
+    var ktgPct = val('ktg') / 100;
+    var bvgBase = val('bvgBase');
+    var bvgPct = val('bvgPct') / 100;
+
+    var grossRate = allInclusive / (1 + employerLoadPct);
+    var holidayFactor = (1 + bankHolidayPct) * (1 + holidayPct);
+    var regularRate = holidayFactor > 0 ? grossRate / holidayFactor : 0;
+    var bankHolidayRate = regularRate * bankHolidayPct;
+    var holidayRate = (regularRate + bankHolidayRate) * holidayPct;
+
+    var regularAmount = regularRate * days;
+    var bankHolidayAmount = bankHolidayRate * days;
+    var holidayAmount = holidayRate * days;
+    var grossMonthly = regularAmount + bankHolidayAmount + holidayAmount;
+
+    var insuredBase = Math.min(grossMonthly, cap);
+    var ahvAmt = grossMonthly * ahvPct;
+    var alvAmt = insuredBase * alvPct;
+    var nbuAmt = insuredBase * nbuPct;
+    var whtAmt = grossMonthly * whtPct;
+    var ktgAmt = grossMonthly * ktgPct;
+    var bvgAmt = bvgBase * bvgPct;
+
+    var totalDeductions = ahvAmt + alvAmt + nbuAmt + whtAmt + ktgAmt + bvgAmt;
+    var netBefore = grossMonthly - totalDeductions;
+    var netPayout = netBefore - holidayAmount;
+
+    document.getElementById('tileGross').textContent = fmt(grossMonthly);
+    document.getElementById('tileGrossRate').textContent = 'Gross rate ' + fmtPlain(grossRate) + ' / day';
+    document.getElementById('tileNetBefore').textContent = fmt(netBefore);
+    document.getElementById('tileNetPayout').textContent = fmt(netPayout);
+
+    var tbody = document.getElementById('tbody');
+    tbody.innerHTML = '';
+    tbody.appendChild(row('Regular time', days.toFixed(2), regularRate, regularAmount));
+    tbody.appendChild(row(val('bankHoliday').toFixed(2) + '% Bank holiday compensation', days.toFixed(2), bankHolidayRate, bankHolidayAmount));
+    tbody.appendChild(row(val('holidayPct').toFixed(2) + '% Holiday accrual', days.toFixed(2), holidayRate, holidayAmount));
+    tbody.appendChild(row('Gross rate', null, null, grossRate, 'subtotal'));
+    tbody.appendChild(row('Gross monthly salary', null, null, grossMonthly, 'subtotal'));
+    tbody.appendChild(spacerRow());
+    tbody.appendChild(row('AHV (old age & survivors)  ' + val('ahv').toFixed(2) + '%', null, null, -ahvAmt, 'deduction'));
+    tbody.appendChild(row('ALV (unemployment)  ' + val('alv').toFixed(2) + '%', null, null, -alvAmt, 'deduction'));
+    tbody.appendChild(row('NBU contribution  ' + val('nbu').toFixed(2) + '%', null, null, -nbuAmt, 'deduction'));
+    tbody.appendChild(row('Withholding tax  ' + val('wht').toFixed(2) + '%', null, null, -whtAmt, 'deduction'));
+    tbody.appendChild(row('KTG (daily sickness)  ' + val('ktg').toFixed(3) + '%', null, null, -ktgAmt, 'deduction'));
+    tbody.appendChild(row('BVG (occupational pension)  ' + val('bvgPct').toFixed(1) + '%', null, null, -bvgAmt, 'deduction'));
+    tbody.appendChild(row('Net monthly salary (before holiday accrual)', null, null, netBefore, 'subtotal'));
+    tbody.appendChild(row('Holiday accrual set aside', null, null, -holidayAmount, 'deduction'));
+    tbody.appendChild(row('Estimated net monthly payout', null, null, netPayout, 'final'));
+  }
+
+  ids.forEach(function(id){
+    document.getElementById(id).addEventListener('input', compute);
+  });
+  document.getElementById('resetBtn').addEventListener('click', function(){
+    ids.forEach(function(id){ document.getElementById(id).value = defaults[id]; });
+    compute();
+  });
+  compute();
+})();
+</script>
+</body>
+</html>

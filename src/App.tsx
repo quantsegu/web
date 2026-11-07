@@ -179,6 +179,19 @@ export default function App() {
           element={<Navigate to="/wealth-tools/take-home-pay-comparison" replace />}
         />
         <Route
+          path="/wealth-tools/salary-scenario-comparison"
+          element={
+            <WealthToolFrame
+              src="/wealth-tools/salary-scenario-comparison.html"
+              title="Salary & Contracting Scenario Comparison"
+            />
+          }
+        />
+        <Route
+          path="/wealth-tools/salary-scenario-comparison.html"
+          element={<Navigate to="/wealth-tools/salary-scenario-comparison" replace />}
+        />
+        <Route
           path="/wealth-tools/nl-ch-vehicle-cost-comparison"
           element={
             <WealthToolFrame
@@ -250,6 +263,19 @@ export default function App() {
         <Route
           path="/wealth-tools/investment-policy-dashboard.html"
           element={<Navigate to="/wealth-tools/investment-policy-dashboard" replace />}
+        />
+        <Route
+          path="/wealth-tools/all-inclusive-rate-calculator"
+          element={
+            <WealthToolFrame
+              src="/wealth-tools/all-inclusive-rate-calculator.html"
+              title="All-Inclusive Rate Calculator"
+            />
+          }
+        />
+        <Route
+          path="/wealth-tools/all-inclusive-rate-calculator.html"
+          element={<Navigate to="/wealth-tools/all-inclusive-rate-calculator" replace />}
         />
         <Route
           path="/wealth-tools/pension-scope"
